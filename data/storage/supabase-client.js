@@ -601,6 +601,310 @@ class SupabaseClient {
     }
   }
   
+  // Chat Operations
+  
+  /**
+   * Create a new conversation
+   */
+  async createConversation(userId, title = null) {
+    try {
+      const { data, error } = await this.supabase
+        .from('chat_conversations')
+        .insert({
+          user_id: userId,
+          title: title
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      this.logger.info('Conversation created', { conversation_id: data.id, user_id: userId });
+      return data;
+      
+    } catch (error) {
+      this.logger.error('Failed to create conversation', { error: error.message, user_id: userId });
+      throw error;
+    }
+  }
+  
+  /**
+   * Get user conversations
+   */
+  async getUserConversations(userId, options = {}) {
+    try {
+      let query = this.supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .order('last_message_at', { ascending: false });
+      
+      if (options.limit) {
+        query = query.limit(options.limit);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      
+      return data || [];
+      
+    } catch (error) {
+      this.logger.error('Failed to get user conversations', { error: error.message, user_id: userId });
+      throw error;
+    }
+  }
+  
+  /**
+   * Get conversation with messages
+   */
+  async getConversationWithMessages(conversationId, userId) {
+    try {
+      // Get conversation
+      const { data: conversation, error: convError } = await this.supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('id', conversationId)
+        .eq('user_id', userId)
+        .single();
+      
+      if (convError) throw convError;
+      
+      // Get messages
+      const { data: messages, error: msgError } = await this.supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: true });
+      
+      if (msgError) throw msgError;
+      
+      return {
+        ...conversation,
+        messages: messages || []
+      };
+      
+    } catch (error) {
+      this.logger.error('Failed to get conversation with messages', { 
+        conversation_id: conversationId, 
+        user_id: userId,
+        error: error.message 
+      });
+      throw error;
+    }
+  }
+  
+  /**
+   * Add message to conversation
+   */
+  async addMessage(conversationId, userId, role, content, metadata = {}) {
+    try {
+      const { data, error } = await this.supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: conversationId,
+          user_id: userId,
+          role: role,
+          content: content,
+          model_name: metadata.model_name,
+          tokens_used: metadata.tokens_used,
+          processing_time_ms: metadata.processing_time_ms,
+          context: metadata.context || {},
+          attachments: metadata.attachments || []
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      this.logger.info('Message added', { 
+        message_id: data.id, 
+        conversation_id: conversationId,
+        role: role 
+      });
+      
+      return data;
+      
+    } catch (error) {
+      this.logger.error('Failed to add message', { 
+        conversation_id: conversationId,
+        user_id: userId,
+        error: error.message 
+      });
+      throw error;
+    }
+  }
+  
+  /**
+   * Update conversation title
+   */
+  async updateConversationTitle(conversationId, userId, title) {
+    try {
+      const { data, error } = await this.supabase
+        .from('chat_conversations')
+        .update({ title: title })
+        .eq('id', conversationId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      this.logger.info('Conversation title updated', { conversation_id: conversationId });
+      return data;
+      
+    } catch (error) {
+      this.logger.error('Failed to update conversation title', { 
+        conversation_id: conversationId,
+        error: error.message 
+      });
+      throw error;
+    }
+  }
+  
+  /**
+   * Archive conversation
+   */
+  async archiveConversation(conversationId, userId) {
+    try {
+      const { data, error } = await this.supabase
+        .from('chat_conversations')
+        .update({ is_archived: true, is_active: false })
+        .eq('id', conversationId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      this.logger.info('Conversation archived', { conversation_id: conversationId });
+      return data;
+      
+    } catch (error) {
+      this.logger.error('Failed to archive conversation', { 
+        conversation_id: conversationId,
+        error: error.message 
+      });
+      throw error;
+    }
+  }
+  
+  // Session Management
+  
+  /**
+   * Create user session
+   */
+  async createSession(userId, sessionToken, metadata = {}) {
+    try {
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
+      
+      const { data, error } = await this.supabase
+        .from('user_sessions')
+        .insert({
+          user_id: userId,
+          session_token: sessionToken,
+          expires_at: expiresAt,
+          ip_address: metadata.ip_address,
+          user_agent: metadata.user_agent,
+          device_info: metadata.device_info || {}
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      this.logger.info('Session created', { session_id: data.id, user_id: userId });
+      return data;
+      
+    } catch (error) {
+      this.logger.error('Failed to create session', { error: error.message, user_id: userId });
+      throw error;
+    }
+  }
+  
+  /**
+   * Validate session token
+   */
+  async validateSession(sessionToken) {
+    try {
+      const { data, error } = await this.supabase
+        .from('user_sessions')
+        .select(`
+          *,
+          users (
+            id,
+            email,
+            name,
+            avatar_url,
+            is_active
+          )
+        `)
+        .eq('session_token', sessionToken)
+        .eq('is_active', true)
+        .gte('expires_at', new Date().toISOString())
+        .single();
+      
+      if (error) throw error;
+      
+      // Update last used timestamp
+      await this.supabase
+        .from('user_sessions')
+        .update({ last_used_at: new Date() })
+        .eq('id', data.id);
+      
+      return {
+        session: data,
+        user: data.users
+      };
+      
+    } catch (error) {
+      this.logger.error('Failed to validate session', { error: error.message });
+      return null;
+    }
+  }
+  
+  /**
+   * Invalidate session
+   */
+  async invalidateSession(sessionToken) {
+    try {
+      const { error } = await this.supabase
+        .from('user_sessions')
+        .update({ is_active: false })
+        .eq('session_token', sessionToken);
+      
+      if (error) throw error;
+      
+      this.logger.info('Session invalidated');
+      
+    } catch (error) {
+      this.logger.error('Failed to invalidate session', { error: error.message });
+      throw error;
+    }
+  }
+  
+  /**
+   * Clean up expired sessions
+   */
+  async cleanupExpiredSessions() {
+    try {
+      const { data, error } = await this.supabase
+        .rpc('cleanup_expired_sessions');
+      
+      if (error) throw error;
+      
+      this.logger.info('Expired sessions cleaned up', { count: data });
+      return data;
+      
+    } catch (error) {
+      this.logger.error('Failed to cleanup expired sessions', { error: error.message });
+      throw error;
+    }
+  }
+
   // Utility Operations
   
   /**

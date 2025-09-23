@@ -474,7 +474,148 @@ GRANT USAGE ON SCHEMA public TO authenticated;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 
+-- Chat system tables for conversation storage
+CREATE TABLE chat_conversations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  title VARCHAR(200),
+  
+  -- Conversation metadata
+  message_count INTEGER DEFAULT 0,
+  total_tokens INTEGER DEFAULT 0,
+  last_message_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  -- Context and settings
+  context JSONB DEFAULT '{}',
+  model_settings JSONB DEFAULT '{}',
+  
+  -- Status
+  is_active BOOLEAN DEFAULT true,
+  is_archived BOOLEAN DEFAULT false,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE chat_messages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  conversation_id UUID REFERENCES chat_conversations(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  
+  -- Message content
+  role VARCHAR(20) NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
+  content TEXT NOT NULL,
+  
+  -- AI model metadata
+  model_name VARCHAR(50),
+  tokens_used INTEGER,
+  processing_time_ms INTEGER,
+  
+  -- Context and attachments
+  context JSONB DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
+  
+  -- Message metadata
+  edited_at TIMESTAMPTZ,
+  is_deleted BOOLEAN DEFAULT false,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- User sessions for authentication
+CREATE TABLE user_sessions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  session_token VARCHAR(500) UNIQUE NOT NULL,
+  
+  -- Session metadata
+  ip_address INET,
+  user_agent TEXT,
+  device_info JSONB,
+  
+  -- Session status
+  is_active BOOLEAN DEFAULT true,
+  expires_at TIMESTAMPTZ NOT NULL,
+  last_used_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for chat performance
+CREATE INDEX idx_conversations_user ON chat_conversations(user_id);
+CREATE INDEX idx_conversations_active ON chat_conversations(user_id, is_active, last_message_at DESC);
+CREATE INDEX idx_conversations_updated ON chat_conversations(updated_at DESC);
+
+CREATE INDEX idx_messages_conversation ON chat_messages(conversation_id);
+CREATE INDEX idx_messages_created ON chat_messages(conversation_id, created_at);
+CREATE INDEX idx_messages_user ON chat_messages(user_id);
+
+CREATE INDEX idx_sessions_user ON user_sessions(user_id);
+CREATE INDEX idx_sessions_token ON user_sessions(session_token);
+CREATE INDEX idx_sessions_active ON user_sessions(is_active, expires_at);
+
+-- RLS policies for chat tables
+ALTER TABLE chat_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_sessions ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see their own conversations
+CREATE POLICY conversations_own_data ON chat_conversations
+  FOR ALL USING (user_id::text = auth.uid()::text);
+
+-- Users can only see their own messages
+CREATE POLICY messages_own_data ON chat_messages
+  FOR ALL USING (user_id::text = auth.uid()::text);
+
+-- Users can only see their own sessions
+CREATE POLICY sessions_own_data ON user_sessions
+  FOR ALL USING (user_id::text = auth.uid()::text);
+
+-- Triggers for chat tables
+CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON chat_conversations
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Function to update conversation stats
+CREATE OR REPLACE FUNCTION update_conversation_stats()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Update conversation message count and last message time
+  UPDATE chat_conversations 
+  SET 
+    message_count = (
+      SELECT COUNT(*) FROM chat_messages 
+      WHERE conversation_id = NEW.conversation_id AND is_deleted = false
+    ),
+    last_message_at = NEW.created_at,
+    updated_at = NOW()
+  WHERE id = NEW.conversation_id;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_conversation_stats_trigger
+  AFTER INSERT ON chat_messages
+  FOR EACH ROW EXECUTE FUNCTION update_conversation_stats();
+
+-- Function to clean up expired sessions
+CREATE OR REPLACE FUNCTION cleanup_expired_sessions()
+RETURNS INTEGER AS $$
+DECLARE
+  deleted_count INTEGER;
+BEGIN
+  UPDATE user_sessions 
+  SET is_active = false 
+  WHERE expires_at < NOW() AND is_active = true;
+  
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
+  RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Enable real-time for key tables
 ALTER PUBLICATION supabase_realtime ADD TABLE signals;
 ALTER PUBLICATION supabase_realtime ADD TABLE feedback;
 ALTER PUBLICATION supabase_realtime ADD TABLE signal_deliveries;
+ALTER PUBLICATION supabase_realtime ADD TABLE chat_conversations;
+ALTER PUBLICATION supabase_realtime ADD TABLE chat_messages;
