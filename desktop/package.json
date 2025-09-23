@@ -2,7 +2,7 @@
   "name": "@heyjarvis/desktop",
   "version": "1.0.0",
   "description": "HeyJarvis Desktop Dashboard - Electron app for competitive intelligence monitoring",
-  "main": "main/app-lifecycle.js",
+  "main": "main.js",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev:main\" \"npm run dev:renderer\"",

@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   target: 'electron-renderer',
@@ -35,6 +36,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './renderer/copilot.html',
       filename: 'index.html'
+    }),
+    new webpack.DefinePlugin({
+      'global': 'globalThis'
     })
   ],
   resolve: {

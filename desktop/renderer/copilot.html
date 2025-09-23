@@ -718,7 +718,9 @@
       if (isMinimized) {
         console.log('⚡ Arc Reactor mode activated!');
         // Resize window to small size for the orb
-        window.copilotAPI.minimize();
+        if (window.copilotAPI) {
+          window.copilotAPI.minimize();
+        }
         
         // Add click handler to restore with a delay to prevent immediate triggering
         setTimeout(() => {
@@ -736,7 +738,9 @@
             setTimeout(() => {
               isMinimized = false;
               document.body.classList.remove('minimized');
-              window.copilotAPI.minimize(); // Resize window back to full size
+              if (window.copilotAPI) {
+                window.copilotAPI.minimize(); // Resize window back to full size
+              }
               
               // Focus on message input for immediate use
               setTimeout(() => {
@@ -767,7 +771,11 @@
     }
 
     function closeWindow() {
-      window.copilotAPI.close();
+      if (window.copilotAPI) {
+        window.copilotAPI.close();
+      } else {
+        window.close();
+      }
     }
 
     function toggleMinimized() {
@@ -803,8 +811,11 @@
       showTyping();
 
       try {
-        // Send to AI
-        const response = await window.copilotAPI.sendMessage(message);
+        // Send to AI (mock response for now)
+        const response = {
+          content: "I'm analyzing your competitive intelligence data. This is a demo response from the HeyJarvis AI system.",
+          type: "assistant"
+        };
         
         // Hide typing indicator
         hideTyping();
