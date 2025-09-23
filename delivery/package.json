@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "nodemon slack/app.js",
     "start": "node slack/app.js",
+    "build": "echo 'No build step required for delivery service'",
     "test": "jest",
     "lint": "eslint ."
   },

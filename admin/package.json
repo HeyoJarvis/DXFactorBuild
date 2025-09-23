@@ -1,0 +1,23 @@
+{
+  "name": "@heyjarvis/admin",
+  "version": "1.0.0",
+  "description": "Administrative dashboard and API for HeyJarvis platform",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Admin development server not yet implemented'",
+    "start": "echo 'Admin service not yet implemented'",
+    "build": "echo 'No build step required for admin service'",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "keywords": [
+    "admin",
+    "dashboard",
+    "api"
+  ]
+}
