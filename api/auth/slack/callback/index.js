@@ -1,7 +1,16 @@
 // Vercel serverless function for Slack OAuth callback
 const { WebClient } = require('@slack/web-api');
-const SupabaseClient = require('../../../../data/storage/supabase-client');
 const jwt = require('jsonwebtoken');
+
+// Conditionally import SupabaseClient only if environment variables are present
+let SupabaseClient = null;
+if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+  try {
+    SupabaseClient = require('../../../../data/storage/supabase-client');
+  } catch (error) {
+    console.log('SupabaseClient not available, using fallback mode');
+  }
+}
 
 module.exports = async (req, res) => {
   try {
@@ -90,7 +99,7 @@ module.exports = async (req, res) => {
       hasJwtSecret: Boolean(process.env.JWT_SECRET)
     });
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabaseUrl || !supabaseKey || !SupabaseClient) {
       console.error('Supabase not configured, falling back to simple JWT');
       
       // Generate JWT token without database storage (fallback)
