@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+  <title>HeyJarvis Copilot</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, 
+        rgba(10, 10, 15, 0.98) 0%, 
+        rgba(20, 25, 35, 0.95) 50%, 
+        rgba(15, 20, 30, 0.98) 100%);
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(40px) saturate(150%);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 212, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    /* Arc Reactor glow effect */
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, 
+        rgba(0, 212, 255, 0.03) 0%, 
+        rgba(0, 150, 200, 0.01) 30%, 
+        transparent 70%);
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    .copilot-header {
+      background: linear-gradient(135deg, 
+        rgba(40, 45, 55, 0.95) 0%, 
+        rgba(25, 30, 40, 0.98) 100%);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: move;
+      border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+      -webkit-app-region: drag;
+      backdrop-filter: blur(20px);
+      position: relative;
+    }
+
+    .copilot-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 212, 255, 0.5) 50%, 
+        transparent 100%);
+    }
+
+    .copilot-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #00d4ff;
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+    }
+
+    .copilot-icon {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 
+        0 4px 12px rgba(0, 212, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+    }
+
+    .copilot-icon::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 150, 200, 0.1));
+      z-index: -1;
+      animation: iconGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes iconGlow {
+      0% { opacity: 0.5; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .copilot-controls {
+      display: flex;
+      gap: 8px;
+      -webkit-app-region: no-drag;
+    }
+
+    .control-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .control-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .control-btn:hover::before {
+      opacity: 1;
+    }
+
+    .control-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .control-btn.minimize {
+      background: rgba(255, 193, 7, 0.15);
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+
+    .control-btn.minimize:hover {
+      background: rgba(255, 193, 7, 0.25);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+
+    .control-btn.close {
+      background: rgba(220, 53, 69, 0.15);
+      border-color: rgba(220, 53, 69, 0.3);
+    }
+
+    .control-btn.close:hover {
+      background: rgba(220, 53, 69, 0.25);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .copilot-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-container {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-container::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .chat-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .chat-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+    }
+
+    .message {
+      padding: 16px 20px;
+      border-radius: 18px;
+      max-width: 85%;
+      word-wrap: break-word;
+      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      backdrop-filter: blur(20px);
+      font-weight: 400;
+      line-height: 1.5;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .message.user {
+      background: linear-gradient(135deg, 
+        rgba(0, 212, 255, 0.9) 0%, 
+        rgba(0, 150, 200, 0.95) 100%);
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 
+        0 8px 25px rgba(0, 212, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .message.user::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -8px;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid rgba(0, 212, 255, 0.9);
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+
+    .message.assistant {
+      background: linear-gradient(135deg, 
+        rgba(40, 45, 55, 0.95) 0%, 
+        rgba(30, 35, 45, 0.98) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      align-self: flex-start;
+      box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .message.assistant::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: -8px;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-right: 8px solid rgba(40, 45, 55, 0.95);
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+
+    .message.system {
+      background: linear-gradient(135deg, 
+        rgba(255, 193, 7, 0.15) 0%, 
+        rgba(255, 165, 0, 0.1) 100%);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      color: #ffc107;
+      align-self: center;
+      font-size: 13px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .message.error {
+      background: linear-gradient(135deg, 
+        rgba(220, 53, 69, 0.15) 0%, 
+        rgba(200, 40, 60, 0.1) 100%);
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      color: #ff6b7d;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
+    }
+
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+    }
+
+    .typing-indicator.active {
+      display: flex;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: #00d4ff;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    .input-container {
+      padding: 20px;
+      border-top: 1px solid rgba(0, 212, 255, 0.15);
+      background: linear-gradient(135deg, 
+        rgba(25, 30, 40, 0.98) 0%, 
+        rgba(20, 25, 35, 0.95) 100%);
+      backdrop-filter: blur(20px);
+      position: relative;
+    }
+
+    .input-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 212, 255, 0.5) 50%, 
+        transparent 100%);
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .message-input {
+      flex: 1;
+      background: linear-gradient(135deg, 
+        rgba(40, 45, 55, 0.8) 0%, 
+        rgba(35, 40, 50, 0.9) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #ffffff;
+      font-size: 14px;
+      resize: none;
+      min-height: 48px;
+      max-height: 120px;
+      font-family: inherit;
+      font-weight: 400;
+      line-height: 1.4;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .message-input:focus {
+      outline: none;
+      border-color: #00d4ff;
+      box-shadow: 
+        0 0 0 3px rgba(0, 212, 255, 0.15),
+        0 4px 20px rgba(0, 212, 255, 0.1);
+      background: linear-gradient(135deg, 
+        rgba(45, 50, 60, 0.9) 0%, 
+        rgba(40, 45, 55, 0.95) 100%);
+    }
+
+    .message-input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 300;
+    }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, 
+        rgba(0, 212, 255, 0.9) 0%, 
+        rgba(0, 150, 200, 0.95) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      box-shadow: 
+        0 4px 15px rgba(0, 212, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .send-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .send-btn:hover:not(:disabled)::before {
+      opacity: 1;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 
+        0 8px 25px rgba(0, 212, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .send-btn:active {
+      transform: scale(0.95);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .welcome-message {
+      text-align: center;
+      padding: 60px 30px;
+      color: rgba(255, 255, 255, 0.8);
+      background: linear-gradient(135deg, 
+        rgba(0, 212, 255, 0.02) 0%, 
+        rgba(0, 150, 200, 0.01) 100%);
+      margin: 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 212, 255, 0.1);
+    }
+
+    .welcome-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.4));
+      animation: welcomeFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes welcomeFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .welcome-text {
+      font-size: 18px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ffffff, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 300;
+      line-height: 1.4;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: center;
+    }
+
+    .quick-action {
+      background: linear-gradient(135deg, 
+        rgba(40, 45, 55, 0.8) 0%, 
+        rgba(35, 40, 50, 0.9) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #00d4ff;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quick-action::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .quick-action:hover::before {
+      opacity: 1;
+    }
+
+    .quick-action:hover {
+      background: linear-gradient(135deg, 
+        rgba(0, 212, 255, 0.15) 0%, 
+        rgba(0, 150, 200, 0.1) 100%);
+      border-color: #00d4ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes typing {
+      0%, 80%, 100% {
+        transform: scale(0);
+      }
+      40% {
+        transform: scale(1);
+      }
+    }
+
+    /* Arc Reactor Minimized State */
+    body.minimized {
+      width: 80px !important;
+      height: 80px !important;
+      min-width: 80px !important;
+      min-height: 80px !important;
+      max-width: 80px !important;
+      max-height: 80px !important;
+      background: transparent !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+      border: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      overflow: visible !important;
+      backdrop-filter: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+    }
+
+    /* Hide all content when minimized */
+    body.minimized > * {
+      display: none !important;
+    }
+
+    body.minimized * {
+      display: none;
+    }
+
+    body.minimized::before {
+      content: '';
+      width: 80px;
+      height: 80px;
+      background-image: url('./ARCR.webp');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center center;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      filter: none;
+      animation: none;
+      z-index: 10;
+      opacity: 0.85;
+    }
+
+    /* Remove the ::after element completely for clean Arc Reactor */
+
+    body.minimized:hover::before {
+      opacity: 1;
+    }
+
+    /* Animation keyframes removed for clean Arc Reactor */
+  </style>
+</head>
+<body>
+  <div class="copilot-header">
+    <div class="copilot-title">
+      <div class="copilot-icon">🤖</div>
+      HeyJarvis Copilot
+    </div>
+    <div class="copilot-controls">
+      <button class="control-btn minimize" onclick="minimizeWindow(event)" title="Minimize">−</button>
+      <button class="control-btn close" onclick="closeWindow()" title="Close">×</button>
+    </div>
+  </div>
+
+  <div class="copilot-content">
+    <div class="chat-container" id="chatContainer">
+      <div class="welcome-message">
+        <div class="welcome-icon">🤖</div>
+        <div class="welcome-text">Hello! I'm your AI copilot.</div>
+        <div class="welcome-subtitle">Ask me about competitors, market trends, or strategic insights.</div>
+        
+        <div class="quick-actions">
+          <div class="quick-action" onclick="sendQuickMessage('What are the latest competitor moves?')">
+            Latest competitor moves
+          </div>
+          <div class="quick-action" onclick="sendQuickMessage('Analyze market trends')">
+            Market trends
+          </div>
+          <div class="quick-action" onclick="sendQuickMessage('Show me recent signals')">
+            Recent signals
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator">
+      <span>HeyJarvis is thinking</span>
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <div class="input-wrapper">
+        <textarea 
+          class="message-input" 
+          id="messageInput" 
+          placeholder="Ask me anything about your competitive landscape..."
+          rows="1"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let isMinimized = false;
+    let chatHistory = [];
+
+    // DOM elements
+    const chatContainer = document.getElementById('chatContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // Send message on Enter (but not Shift+Enter)
+    messageInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Window controls
+    function minimizeWindow(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      
+      console.log('🔄 Minimizing window...');
+      
+      // Toggle the minimized state directly
+      isMinimized = !isMinimized;
+      console.log('🔄 Toggling minimized state:', isMinimized);
+      document.body.classList.toggle('minimized', isMinimized);
+      
+      if (isMinimized) {
+        console.log('⚡ Arc Reactor mode activated!');
+        // Resize window to small size for the orb
+        window.copilotAPI.minimize();
+        
+        // Add click handler to restore with a delay to prevent immediate triggering
+        setTimeout(() => {
+          document.body.onclick = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('🔄 Arc Reactor clicked - restoring...');
+            // Remove the click handler first
+            document.body.onclick = null;
+            
+            // Smooth restoration with animation
+            document.body.style.transition = 'all 0.3s ease-out';
+            
+            // Restore the interface
+            setTimeout(() => {
+              isMinimized = false;
+              document.body.classList.remove('minimized');
+              window.copilotAPI.minimize(); // Resize window back to full size
+              
+              // Focus on message input for immediate use
+              setTimeout(() => {
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput) {
+                  messageInput.focus();
+                }
+                document.body.style.transition = '';
+              }, 300);
+            }, 100);
+          };
+        }, 500); // Wait 500ms before adding the click handler
+      } else {
+        console.log('📱 Full interface restored');
+        // Remove click handler first
+        document.body.onclick = null;
+        // Resize window back to full size
+        window.copilotAPI.minimize();
+        
+        // Focus on message input
+        setTimeout(() => {
+          const messageInput = document.getElementById('messageInput');
+          if (messageInput) {
+            messageInput.focus();
+          }
+        }, 100);
+      }
+    }
+
+    function closeWindow() {
+      window.copilotAPI.close();
+    }
+
+    function toggleMinimized() {
+      isMinimized = !isMinimized;
+      console.log('🔄 Toggling minimized state:', isMinimized);
+      document.body.classList.toggle('minimized', isMinimized);
+      
+      if (isMinimized) {
+        console.log('⚡ Arc Reactor mode activated!');
+        document.body.onclick = () => {
+          console.log('🔄 Arc Reactor clicked - restoring...');
+          toggleMinimized();
+        };
+      } else {
+        console.log('📱 Full interface restored');
+        document.body.onclick = null;
+      }
+    }
+
+    // Message handling
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+
+      // Clear input
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+
+      // Add user message
+      addMessage(message, 'user');
+
+      // Show typing indicator
+      showTyping();
+
+      try {
+        // Send to AI
+        const response = await window.copilotAPI.sendMessage(message);
+        
+        // Hide typing indicator
+        hideTyping();
+        
+        // Add AI response
+        addMessage(response.content, response.type === 'error' ? 'error' : 'assistant');
+        
+      } catch (error) {
+        hideTyping();
+        addMessage('Sorry, I encountered an error. Please try again.', 'error');
+        console.error('Message send error:', error);
+      }
+    }
+
+    function sendQuickMessage(message) {
+      messageInput.value = message;
+      sendMessage();
+    }
+
+    function addMessage(content, type) {
+      // Remove welcome message if it exists
+      const welcomeMessage = chatContainer.querySelector('.welcome-message');
+      if (welcomeMessage) {
+        welcomeMessage.remove();
+      }
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${type}`;
+      messageDiv.textContent = content;
+      
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      // Store in history
+      chatHistory.push({ content, type, timestamp: new Date() });
+    }
+
+    function showTyping() {
+      typingIndicator.classList.add('active');
+      sendBtn.disabled = true;
+    }
+
+    function hideTyping() {
+      typingIndicator.classList.remove('active');
+      sendBtn.disabled = false;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      messageInput.focus();
+      
+      // Note: Minimize state is now handled directly in minimizeWindow() function
+      
+      // Add system message
+      setTimeout(() => {
+        addMessage('Copilot ready! I can help you with competitive intelligence, market analysis, and strategic insights.', 'system');
+      }, 1000);
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+  </script>
+</body>
+</html>

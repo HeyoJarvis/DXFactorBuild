@@ -1,0 +1,39 @@
+{
+  "name": "@heyjarvis/delivery",
+  "version": "1.0.0",
+  "description": "Signal delivery system for Slack, Teams, and other workflow integrations",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon slack/app.js",
+    "start": "node slack/app.js",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@heyjarvis/core": "file:../core",
+    "@heyjarvis/data": "file:../data",
+    "@slack/bolt": "^3.17.1",
+    "@slack/web-api": "^7.0.2",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "winston": "^3.11.0",
+    "bull": "^4.12.2",
+    "redis": "^4.6.12",
+    "uuid": "^9.0.1",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.3",
+    "@types/node": "^20.11.5"
+  },
+  "keywords": [
+    "slack",
+    "teams",
+    "delivery",
+    "notifications"
+  ]
+}

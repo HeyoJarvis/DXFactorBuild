@@ -1,0 +1,38 @@
+{
+  "name": "@heyjarvis/core",
+  "version": "1.0.0",
+  "description": "Core business logic for signal processing, relevance scoring, and actions",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint .",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "@heyjarvis/data": "file:../data",
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0-rc.12",
+    "rss-parser": "^3.13.0",
+    "natural": "^6.10.0",
+    "compromise": "^14.10.0",
+    "sentiment": "^5.0.2",
+    "@anthropic-ai/sdk": "^0.24.3",
+    "bull": "^4.12.2",
+    "cron": "^3.1.6",
+    "winston": "^3.11.0",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.3",
+    "@types/node": "^20.11.5"
+  },
+  "keywords": [
+    "signals",
+    "processing",
+    "relevance",
+    "ai"
+  ]
+}
