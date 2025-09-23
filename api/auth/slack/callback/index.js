@@ -50,16 +50,28 @@ module.exports = async (req, res) => {
 
     // Debug logging
     console.log('OAuth result:', JSON.stringify(result, null, 2));
+    console.log('authed_user:', result.authed_user);
+    console.log('team:', result.team);
 
     // Extract user information with better error handling
-    const userToken = result.authed_user?.access_token;
-    const slackUserId = result.authed_user?.id;
+    // Handle both user token and bot token scenarios
+    const userToken = result.authed_user?.access_token || result.access_token;
+    const slackUserId = result.authed_user?.id || result.user_id;
     const teamName = result.team?.name;
-    const scopeString = result.authed_user?.scope || '';
+    const scopeString = result.authed_user?.scope || result.scope || '';
     const scopes = scopeString ? scopeString.split(',') : [];
 
+    console.log('Extracted values:', {
+      userToken: userToken ? 'present' : 'missing',
+      slackUserId: slackUserId || 'missing',
+      teamName: teamName || 'missing',
+      scopes: scopes
+    });
+
     if (!userToken || !slackUserId) {
-      return res.status(400).send(getErrorPage('Invalid OAuth response: missing user token or ID'));
+      const errorDetails = `Missing: ${!userToken ? 'userToken ' : ''}${!slackUserId ? 'slackUserId' : ''}`;
+      console.error('OAuth validation failed:', errorDetails);
+      return res.status(400).send(getErrorPage(`Invalid OAuth response: ${errorDetails}. Please check Slack app configuration.`));
     }
 
     // Get user info
