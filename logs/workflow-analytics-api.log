@@ -1,0 +1,19 @@
+{"level":"info","message":"🚀 Workflow Analytics API server started on port 3002","service":"workflow-analytics-api","timestamp":"2025-09-23T04:09:09.421Z"}
+{"level":"info","message":"📊 Health check: http://localhost:3002/api/health","service":"workflow-analytics-api","timestamp":"2025-09-23T04:09:09.422Z"}
+{"level":"info","message":"Stopping Workflow Analytics API server...","service":"workflow-analytics-api","timestamp":"2025-09-23T04:09:10.456Z"}
+{"level":"info","message":"🚀 Workflow Analytics API server started on port 3002","service":"workflow-analytics-api","timestamp":"2025-09-23T04:11:40.820Z"}
+{"level":"info","message":"📊 Health check: http://localhost:3002/api/health","service":"workflow-analytics-api","timestamp":"2025-09-23T04:11:40.820Z"}
+{"level":"info","message":"Stopping Workflow Analytics API server...","service":"workflow-analytics-api","timestamp":"2025-09-23T04:11:41.849Z"}
+{"level":"info","message":"🚀 Workflow Analytics API server started on port 3001","service":"workflow-analytics-api","timestamp":"2025-09-23T04:28:21.322Z"}
+{"level":"info","message":"📊 Health check: http://localhost:3001/api/health","service":"workflow-analytics-api","timestamp":"2025-09-23T04:28:21.323Z"}
+{"error":"Session not found","level":"error","message":"User analytics error","requestingUserId":"ceo_test","service":"workflow-analytics-api","timestamp":"2025-09-23T04:29:51.418Z","userId":"user_alice"}
+{"error":"Session not found","level":"error","message":"User analytics error","requestingUserId":"user_alice","service":"workflow-analytics-api","timestamp":"2025-09-23T04:29:51.428Z","userId":"user_alice"}
+{"error":"Session not found","level":"error","message":"User analytics error","requestingUserId":"user_alice","service":"workflow-analytics-api","timestamp":"2025-09-23T04:29:51.436Z","userId":"user_bob"}
+{"error":"Session not found","level":"error","message":"Team analytics error","requestingUserId":"ceo_test","service":"workflow-analytics-api","timestamp":"2025-09-23T04:29:51.453Z"}
+{"error":"Session not found","level":"error","message":"Team analytics error","requestingUserId":"user_alice","service":"workflow-analytics-api","timestamp":"2025-09-23T04:29:51.461Z"}
+{"error":"Session not found","level":"error","message":"User analytics error","requestingUserId":"ceo_api_test","service":"workflow-analytics-api","timestamp":"2025-09-23T04:33:19.785Z","userId":"user_api_test"}
+{"error":"Session not found","level":"error","message":"User analytics error","requestingUserId":"user_api_test","service":"workflow-analytics-api","timestamp":"2025-09-23T04:33:19.787Z","userId":"user_api_test"}
+{"error":"Session not found","level":"error","message":"User analytics error","requestingUserId":"user_api_test","service":"workflow-analytics-api","timestamp":"2025-09-23T04:33:19.789Z","userId":"ceo_api_test"}
+{"error":"Session not found","level":"error","message":"Team analytics error","requestingUserId":"ceo_api_test","service":"workflow-analytics-api","timestamp":"2025-09-23T04:33:19.790Z"}
+{"error":"Session not found","level":"error","message":"Team analytics error","requestingUserId":"user_api_test","service":"workflow-analytics-api","timestamp":"2025-09-23T04:33:19.791Z"}
+{"level":"info","message":"Stopping Workflow Analytics API server...","service":"workflow-analytics-api","timestamp":"2025-09-23T18:57:42.758Z"}

@@ -1,0 +1,23 @@
+{
+  "name": "heyjarvis-oauth",
+  "version": "1.0.0",
+  "description": "HeyJarvis OAuth System for Slack Integration",
+  "main": "production-oauth-system.js",
+  "scripts": {
+    "start": "node production-oauth-system.js",
+    "dev": "node production-oauth-system.js"
+  },
+  "dependencies": {
+    "@slack/web-api": "^6.8.1",
+    "@slack/bolt": "^3.13.1",
+    "express": "^4.18.2",
+    "winston": "^3.8.2",
+    "dotenv": "^16.0.3"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "keywords": ["slack", "oauth", "workflow", "intelligence"],
+  "author": "HeyJarvis",
+  "license": "MIT"
+}
