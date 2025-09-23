@@ -27,24 +27,50 @@ module.exports = async (req, res) => {
     // Generate state for security
     const state = req.query.user_id || 'user_' + Math.random().toString(36).substr(2, 9);
     
-    // OAuth URL with required scopes
-    const scopes = [
-      'channels:history',
-      'groups:history', 
-      'im:history',
-      'mpim:history',
-      'users:read',
-      'channels:read',
-      'groups:read',
-      'im:read',
-      'mpim:read'
-    ].join(',');
+    // Check if this is an admin installation or user authentication
+    const isInstallation = req.query.install === 'true';
+    let oauthUrl;
+    
+    if (isInstallation) {
+      // Admin installation: needs bot scopes + user scopes
+      const botScopes = [
+        'channels:history',
+        'groups:history', 
+        'im:history',
+        'mpim:history',
+        'users:read',
+        'channels:read',
+        'groups:read',
+        'im:read',
+        'mpim:read'
+      ].join(',');
+      
+      const userScopes = [
+        'identity.basic',
+        'identity.email',
+        'identity.team'
+      ].join(',');
 
-    const oauthUrl = `https://slack.com/oauth/v2/authorize?` +
-      `client_id=${clientId}&` +
-      `scope=${encodeURIComponent(scopes)}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `state=${state}`;
+      oauthUrl = `https://slack.com/oauth/v2/authorize?` +
+        `client_id=${clientId}&` +
+        `scope=${encodeURIComponent(botScopes)}&` +
+        `user_scope=${encodeURIComponent(userScopes)}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+        `state=${state}`;
+    } else {
+      // Regular user authentication: only user identity scopes
+      const userScopes = [
+        'identity.basic',
+        'identity.email',
+        'identity.team'
+      ].join(',');
+
+      oauthUrl = `https://slack.com/oauth/v2/authorize?` +
+        `client_id=${clientId}&` +
+        `user_scope=${encodeURIComponent(userScopes)}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+        `state=${state}`;
+    }
 
     // Redirect to Slack OAuth
     res.redirect(302, oauthUrl);
