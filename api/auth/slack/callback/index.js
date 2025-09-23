@@ -80,63 +80,128 @@ module.exports = async (req, res) => {
     const userClient = new WebClient(userToken);
     const userInfo = await userClient.users.info({ user: slackUserId });
 
-    // Initialize Supabase client
-    const supabase = new SupabaseClient();
+    // Check if Supabase is configured
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
     
-    // Create or update user in database
-    const userData = {
-      email: userInfo.user.profile.email,
-      name: userInfo.user.real_name || userInfo.user.display_name || 'Unknown User',
-      avatar_url: userInfo.user.profile.image_512,
-      auth_provider: 'slack',
-      auth_id: slackUserId,
-      email_verified: true,
-      context: {
-        role: 'analyst', // Default role, user can update later
-        seniority: 'mid'
-      },
-      integrations: {
-        slack: {
-          workspace_id: result.team?.id,
-          user_id: slackUserId,
-          access_token: userToken,
-          connected: true
-        }
-      },
-      last_login: new Date()
-    };
-
-    console.log('Creating/updating user in Supabase:', userData.email);
-    const user = await supabase.upsertUser(userData);
-    
-    // Generate JWT token for session management
-    const jwtSecret = process.env.JWT_SECRET || 'your-jwt-secret-key';
-    const sessionToken = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email,
-        slackUserId: slackUserId 
-      },
-      jwtSecret,
-      { expiresIn: '7d' }
-    );
-
-    // Store session in database
-    await supabase.createSession(user.id, sessionToken, {
-      ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-      user_agent: req.headers['user-agent']
+    console.log('Environment check:', {
+      hasSupabaseUrl: Boolean(supabaseUrl),
+      hasSupabaseKey: Boolean(supabaseKey),
+      hasJwtSecret: Boolean(process.env.JWT_SECRET)
     });
 
-    // Success response with redirect to chat interface
-    res.send(getSuccessPage({
-      user_id: user.id,
-      slack_user_id: slackUserId,
-      real_name: userInfo.user.real_name,
-      email: userInfo.user.profile.email,
-      team_name: teamName,
-      scopes: scopes,
-      session_token: sessionToken
-    }));
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Supabase not configured, falling back to simple JWT');
+      
+      // Generate JWT token without database storage (fallback)
+      const jwtSecret = process.env.JWT_SECRET || 'your-jwt-secret-key';
+      const sessionToken = jwt.sign(
+        { 
+          slackUserId: slackUserId,
+          email: userInfo.user.profile.email,
+          name: userInfo.user.real_name,
+          fallback: true
+        },
+        jwtSecret,
+        { expiresIn: '7d' }
+      );
+
+      return res.send(getSuccessPage({
+        user_id: slackUserId, // Use Slack ID as fallback
+        slack_user_id: slackUserId,
+        real_name: userInfo.user.real_name,
+        email: userInfo.user.profile.email,
+        team_name: teamName,
+        scopes: scopes,
+        session_token: sessionToken
+      }));
+    }
+
+    try {
+      // Initialize Supabase client
+      const supabase = new SupabaseClient();
+      
+      // Create or update user in database
+      const userData = {
+        email: userInfo.user.profile.email,
+        name: userInfo.user.real_name || userInfo.user.display_name || 'Unknown User',
+        avatar_url: userInfo.user.profile.image_512,
+        auth_provider: 'slack',
+        auth_id: slackUserId,
+        email_verified: true,
+        context: {
+          role: 'analyst', // Default role, user can update later
+          seniority: 'mid'
+        },
+        integrations: {
+          slack: {
+            workspace_id: result.team?.id,
+            user_id: slackUserId,
+            access_token: userToken,
+            connected: true
+          }
+        },
+        last_login: new Date()
+      };
+
+      console.log('Creating/updating user in Supabase:', userData.email);
+      const user = await supabase.upsertUser(userData);
+      
+      // Generate JWT token for session management
+      const jwtSecret = process.env.JWT_SECRET || 'your-jwt-secret-key';
+      const sessionToken = jwt.sign(
+        { 
+          userId: user.id, 
+          email: user.email,
+          slackUserId: slackUserId 
+        },
+        jwtSecret,
+        { expiresIn: '7d' }
+      );
+
+      // Store session in database
+      await supabase.createSession(user.id, sessionToken, {
+        ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        user_agent: req.headers['user-agent']
+      });
+
+      // Success response with redirect to chat interface
+      res.send(getSuccessPage({
+        user_id: user.id,
+        slack_user_id: slackUserId,
+        real_name: userInfo.user.real_name,
+        email: userInfo.user.profile.email,
+        team_name: teamName,
+        scopes: scopes,
+        session_token: sessionToken
+      }));
+
+    } catch (dbError) {
+      console.error('Database error, falling back to JWT-only:', dbError);
+      
+      // Fallback: Generate JWT token without database storage
+      const jwtSecret = process.env.JWT_SECRET || 'your-jwt-secret-key';
+      const sessionToken = jwt.sign(
+        { 
+          slackUserId: slackUserId,
+          email: userInfo.user.profile.email,
+          name: userInfo.user.real_name,
+          fallback: true
+        },
+        jwtSecret,
+        { expiresIn: '7d' }
+      );
+
+      res.send(getSuccessPage({
+        user_id: slackUserId, // Use Slack ID as fallback
+        slack_user_id: slackUserId,
+        real_name: userInfo.user.real_name,
+        email: userInfo.user.profile.email,
+        team_name: teamName,
+        scopes: scopes,
+        session_token: sessionToken
+      }));
+    }
 
   } catch (error) {
     console.error('OAuth callback error:', error);

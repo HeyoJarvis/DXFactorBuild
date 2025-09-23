@@ -44,6 +44,20 @@ module.exports = async (req, res) => {
     const { method, query } = req;
     const userId = req.userId;
 
+    // Check if we're in fallback mode (no database)
+    if (req.user?.fallback) {
+      return res.json({
+        error: 'Chat functionality requires database setup',
+        message: 'Please configure Supabase environment variables for full chat functionality',
+        fallback: true,
+        user: {
+          id: req.user.id,
+          name: req.user.name,
+          email: req.user.email
+        }
+      });
+    }
+
     switch (method) {
       case 'GET':
         return await handleGet(req, res, supabase, userId, query);

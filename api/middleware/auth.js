@@ -43,28 +43,44 @@ class AuthMiddleware {
         });
       }
 
-      // Validate session in database
-      const sessionData = await this.supabase.validateSession(token);
-      
-      if (!sessionData || !sessionData.user) {
-        return res.status(401).json({ 
-          error: 'Session expired or invalid',
-          code: 'INVALID_SESSION' 
-        });
-      }
+      // Check if this is a fallback token (no database)
+      if (decoded.fallback) {
+        console.log('Using fallback authentication (no database)');
+        
+        // Create minimal user object from JWT
+        req.user = {
+          id: decoded.slackUserId,
+          email: decoded.email,
+          name: decoded.name,
+          is_active: true,
+          fallback: true
+        };
+        req.userId = decoded.slackUserId;
+        req.session = { fallback: true };
+      } else {
+        // Validate session in database
+        const sessionData = await this.supabase.validateSession(token);
+        
+        if (!sessionData || !sessionData.user) {
+          return res.status(401).json({ 
+            error: 'Session expired or invalid',
+            code: 'INVALID_SESSION' 
+          });
+        }
 
-      // Check if user is active
-      if (!sessionData.user.is_active) {
-        return res.status(403).json({ 
-          error: 'Account deactivated',
-          code: 'ACCOUNT_INACTIVE' 
-        });
-      }
+        // Check if user is active
+        if (!sessionData.user.is_active) {
+          return res.status(403).json({ 
+            error: 'Account deactivated',
+            code: 'ACCOUNT_INACTIVE' 
+          });
+        }
 
-      // Attach user and session to request
-      req.user = sessionData.user;
-      req.session = sessionData.session;
-      req.userId = sessionData.user.id;
+        // Attach user and session to request
+        req.user = sessionData.user;
+        req.session = sessionData.session;
+        req.userId = sessionData.user.id;
+      }
 
       next();
 
@@ -253,6 +269,44 @@ class AuthMiddleware {
         });
       }
 
+      // Verify JWT token
+      let decoded;
+      try {
+        decoded = jwt.verify(token, this.jwtSecret);
+      } catch (jwtError) {
+        return res.status(401).json({ 
+          error: 'Invalid token',
+          code: 'INVALID_TOKEN' 
+        });
+      }
+
+      // Handle fallback tokens
+      if (decoded.fallback) {
+        // Generate new fallback token
+        const newToken = jwt.sign(
+          { 
+            slackUserId: decoded.slackUserId,
+            email: decoded.email,
+            name: decoded.name,
+            fallback: true
+          },
+          this.jwtSecret,
+          { expiresIn: '7d' }
+        );
+
+        return res.json({
+          success: true,
+          token: newToken,
+          fallback: true,
+          user: {
+            id: decoded.slackUserId,
+            email: decoded.email,
+            name: decoded.name
+          }
+        });
+      }
+
+      // Handle database tokens
       const sessionData = await this.supabase.validateSession(token);
       
       if (!sessionData) {
