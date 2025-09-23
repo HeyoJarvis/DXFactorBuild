@@ -92,6 +92,31 @@
             color: #00d4ff;
             margin-bottom: 10px;
         }
+        
+        .btn {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            transition: transform 0.2s;
+            font-weight: 600;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+        }
+        
+        .auth-btn {
+            font-size: 1.1rem;
+            padding: 15px 30px;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -116,7 +141,13 @@
         </div>
         
         <div class="status">
-            <h3>🚀 Deployment Status</h3>
+            <h3>🚀 Get Started</h3>
+            <p>Connect your Slack account to begin competitive intelligence monitoring</p>
+            <a href="/api/auth/slack" class="btn auth-btn">🔐 Connect with Slack</a>
+        </div>
+        
+        <div class="status">
+            <h3>📊 Deployment Status</h3>
             <p>Platform successfully deployed and ready for competitive intelligence monitoring</p>
         </div>
     </div>

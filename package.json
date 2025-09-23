@@ -22,7 +22,7 @@
     "build:desktop": "cd desktop && npm run build",
     "build:delivery": "cd delivery && npm run build",
     "build:admin": "cd admin && npm run build",
-    "build:web": "mkdir -p dist && cp index.html dist/ && echo 'Web deployment build completed'",
+    "build:web": "mkdir -p dist && cp index.html dist/ && cp -r api dist/ && echo 'Web deployment build completed'",
     "test": "npm run test:e2e && npm run test:load && npm run test:compliance",
     "test:e2e": "cd tests && npm run test:e2e",
     "test:load": "cd tests && npm run test:load",
