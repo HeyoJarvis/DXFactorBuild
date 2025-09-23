@@ -44,6 +44,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     toggle: (enabled) => ipcRenderer.invoke('notifications:toggle', enabled)
   },
   
+  // API integration with Vercel backend
+  api: {
+    getInsights: (userId) => ipcRenderer.invoke('api:getInsights', userId),
+    getSignals: (userId, limit) => ipcRenderer.invoke('api:getSignals', userId, limit),
+    healthCheck: () => ipcRenderer.invoke('api:healthCheck')
+  },
+
   // Event listeners
   on: (channel, callback) => {
     const validChannels = [

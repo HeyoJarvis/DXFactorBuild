@@ -10,12 +10,14 @@
  */
 
 const { ipcMain } = require('electron');
+const APIClient = require('../main/api-client');
 
 class IPCHandlers {
   constructor(appLifecycle) {
     this.appLifecycle = appLifecycle;
     this.logger = appLifecycle.getLogger();
     this.store = appLifecycle.getStore();
+    this.apiClient = new APIClient();
   }
   
   /**
@@ -28,6 +30,7 @@ class IPCHandlers {
       this.setupWindowHandlers();
       this.setupPerformanceHandlers();
       this.setupNotificationHandlers();
+      this.setupAPIHandlers();
       
       this.logger.info('IPC handlers setup complete');
       
@@ -345,6 +348,45 @@ class IPCHandlers {
         'Consider partnership opportunities'
       ]
     };
+  }
+
+  /**
+   * Setup API handlers for connecting to Vercel backend
+   */
+  setupAPIHandlers() {
+    // Get latest insights from Vercel API
+    ipcMain.handle('api:getInsights', async (event, userId) => {
+      try {
+        const insights = await this.apiClient.getLatestInsights(userId);
+        return { success: true, insights };
+      } catch (error) {
+        this.logger.error('Failed to get insights from API', { error: error.message });
+        return { success: false, error: error.message };
+      }
+    });
+
+    // Get recent signals from Vercel API  
+    ipcMain.handle('api:getSignals', async (event, userId, limit = 10) => {
+      try {
+        const signals = await this.apiClient.getRecentSignals(userId, limit);
+        return { success: true, signals };
+      } catch (error) {
+        this.logger.error('Failed to get signals from API', { error: error.message });
+        return { success: false, error: error.message };
+      }
+    });
+
+    // Check API connectivity
+    ipcMain.handle('api:healthCheck', async () => {
+      try {
+        const isHealthy = await this.apiClient.healthCheck();
+        return { success: true, healthy: isHealthy };
+      } catch (error) {
+        return { success: false, healthy: false, error: error.message };
+      }
+    });
+
+    this.logger.info('API handlers setup complete');
   }
 }
 
