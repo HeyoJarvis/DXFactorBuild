@@ -48,11 +48,19 @@ module.exports = async (req, res) => {
       return res.status(400).send(getErrorPage(`OAuth exchange failed: ${result.error}`));
     }
 
-    // Extract user information
-    const userToken = result.authed_user.access_token;
-    const slackUserId = result.authed_user.id;
-    const teamName = result.team.name;
-    const scopes = result.authed_user.scope.split(',');
+    // Debug logging
+    console.log('OAuth result:', JSON.stringify(result, null, 2));
+
+    // Extract user information with better error handling
+    const userToken = result.authed_user?.access_token;
+    const slackUserId = result.authed_user?.id;
+    const teamName = result.team?.name;
+    const scopeString = result.authed_user?.scope || '';
+    const scopes = scopeString ? scopeString.split(',') : [];
+
+    if (!userToken || !slackUserId) {
+      return res.status(400).send(getErrorPage('Invalid OAuth response: missing user token or ID'));
+    }
 
     // Get user info
     const userClient = new WebClient(userToken);
