@@ -622,13 +622,20 @@
 
       if (!currentConversation || !currentConversation.messages || currentConversation.messages.length === 0) {
         emptyState.style.display = 'flex';
-        container.innerHTML = ''; // Clear any existing messages
+        // Clear only message elements, preserve empty state
+        const messageElements = container.querySelectorAll('.message');
+        messageElements.forEach(el => el.remove());
         return;
       }
 
       emptyState.style.display = 'none';
       
-      container.innerHTML = currentConversation.messages.map(message => `
+      // Clear existing messages but preserve empty state
+      const messageElements = container.querySelectorAll('.message');
+      messageElements.forEach(el => el.remove());
+      
+      // Add new messages
+      const messagesHTML = currentConversation.messages.map(message => `
         <div class="message ${message.role}">
           <div>${message.content.replace(/\n/g, '<br>')}</div>
           <div class="message-time">
@@ -636,6 +643,9 @@
           </div>
         </div>
       `).join('');
+      
+      // Insert messages after empty state
+      emptyState.insertAdjacentHTML('afterend', messagesHTML);
 
       // Scroll to bottom
       container.scrollTop = container.scrollHeight;
@@ -693,7 +703,10 @@
         });
 
         if (!response.ok) {
-          throw new Error('Failed to send message');
+          console.error('Send message failed:', response.status, response.statusText);
+          const errorText = await response.text().catch(() => 'Unknown error');
+          console.error('Error response:', errorText);
+          throw new Error(`Failed to send message: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
