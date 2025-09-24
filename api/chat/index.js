@@ -392,9 +392,9 @@ async function handleFallbackMode(req, res, method, query) {
 
   switch (method) {
     case 'GET':
-      const { action, conversation_id } = query;
+      const { action: getAction, conversation_id: getConversationId } = query;
       
-      switch (action) {
+      switch (getAction) {
         case 'conversations':
           return res.json({
             conversations: userConversations,
@@ -403,7 +403,7 @@ async function handleFallbackMode(req, res, method, query) {
 
         case 'conversation':
         case 'messages':
-          const conversation = userConversations.find(c => c.id === conversation_id);
+          const conversation = userConversations.find(c => c.id === getConversationId);
           if (!conversation) {
             return res.status(404).json({ error: 'Conversation not found' });
           }
@@ -425,9 +425,9 @@ async function handleFallbackMode(req, res, method, query) {
       }
 
     case 'POST':
-      const { action, conversation_id, message, title } = req.body;
+      const { action: postAction, conversation_id: postConversationId, message, title } = req.body;
       
-      switch (action) {
+      switch (postAction) {
         case 'create_conversation':
           const newConversation = {
             id: `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -441,11 +441,11 @@ async function handleFallbackMode(req, res, method, query) {
           return res.json({ conversation: newConversation, fallback: true });
 
         case 'send_message':
-          if (!conversation_id || !message) {
+          if (!postConversationId || !message) {
             return res.status(400).json({ error: 'conversation_id and message are required' });
           }
 
-          const targetConversation = userConversations.find(c => c.id === conversation_id);
+          const targetConversation = userConversations.find(c => c.id === postConversationId);
           if (!targetConversation) {
             return res.status(404).json({ error: 'Conversation not found' });
           }
@@ -453,7 +453,7 @@ async function handleFallbackMode(req, res, method, query) {
           // Add user message
           const userMessage = {
             id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            conversation_id,
+            conversation_id: postConversationId,
             role: 'user',
             content: message,
             created_at: new Date().toISOString(),
@@ -468,7 +468,7 @@ async function handleFallbackMode(req, res, method, query) {
           // Add AI message
           const aiMessage = {
             id: `msg_${Date.now() + 1}_${Math.random().toString(36).substr(2, 9)}`,
-            conversation_id,
+            conversation_id: postConversationId,
             role: 'assistant',
             content: aiResponse.content,
             created_at: new Date().toISOString(),
