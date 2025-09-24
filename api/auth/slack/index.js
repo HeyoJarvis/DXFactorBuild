@@ -64,11 +64,12 @@ module.exports = async (req, res) => {
       console.log('Bot scopes:', botScopes);
       console.log('User scopes:', userScopes);
     } else {
-      // Regular user authentication: only user identity scopes
+      // Regular user authentication: identity scopes + users:read for real names
       const userScopes = [
         'identity.basic',
         'identity.email',
-        'identity.team'
+        'identity.team',
+        'users:read'
       ].join(',');
 
       oauthUrl = `https://slack.com/oauth/v2/authorize?` +
@@ -76,6 +77,10 @@ module.exports = async (req, res) => {
         `user_scope=${encodeURIComponent(userScopes)}&` +
         `redirect_uri=${encodeURIComponent(redirectUri)}&` +
         `state=${state}`;
+        
+      // Debug logging
+      console.log('Regular user OAuth URL:', oauthUrl);
+      console.log('User scopes:', userScopes);
     }
 
     // Redirect to Slack OAuth
