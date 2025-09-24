@@ -68,11 +68,9 @@ module.exports = async (req, res) => {
 
       oauthUrl = `https://slack.com/oauth/v2/authorize?` +
         `client_id=${clientId}&` +
-        `scope=&` +
         `user_scope=${encodeURIComponent(userScopes)}&` +
         `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `state=${state}&` +
-        `granular_bot_scope=1`;
+        `state=${state}`;
         
       // Debug logging
       console.log('Regular user OAuth URL:', oauthUrl);
