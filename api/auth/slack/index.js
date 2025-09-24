@@ -71,7 +71,8 @@ module.exports = async (req, res) => {
         `scope=&` +
         `user_scope=${encodeURIComponent(userScopes)}&` +
         `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `state=${state}`;
+        `state=${state}&` +
+        `granular_bot_scope=1`;
         
       // Debug logging
       console.log('Regular user OAuth URL:', oauthUrl);
