@@ -32,17 +32,17 @@ module.exports = async (req, res) => {
     let oauthUrl;
     
     if (isInstallation) {
-      // Admin installation: needs bot scopes + user scopes
+      // Admin installation: needs bot scopes + user scopes (match Slack app config exactly)
       const botScopes = [
         'channels:history',
-        'groups:history', 
-        'im:history',
-        'mpim:history',
-        'users:read',
         'channels:read',
+        'chat:write',
         'groups:read',
+        'im:history',
         'im:read',
-        'mpim:read'
+        'mpim:history',
+        'mpim:read',
+        'users:read'
       ].join(',');
       
       const userScopes = [
