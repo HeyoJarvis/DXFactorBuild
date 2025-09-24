@@ -344,7 +344,15 @@ ALTER TABLE signal_deliveries ENABLE ROW LEVEL SECURITY;
 
 -- Users can only see their own data
 CREATE POLICY users_own_data ON users
-  FOR ALL USING (auth.uid()::text = id::text);
+  FOR SELECT USING (auth.uid()::text = id::text);
+
+-- Allow user creation during OAuth (no auth context yet)
+CREATE POLICY users_insert_during_oauth ON users
+  FOR INSERT WITH CHECK (true);
+
+-- Users can update their own data
+CREATE POLICY users_update_own ON users
+  FOR UPDATE USING (auth.uid()::text = id::text);
 
 -- Team members can see team data
 CREATE POLICY team_members_access ON teams
