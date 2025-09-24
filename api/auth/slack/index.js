@@ -36,12 +36,9 @@ module.exports = async (req, res) => {
       const botScopes = [
         'channels:history',
         'channels:read',
-        'chat:write',
+        'groups:history',
         'groups:read',
         'im:history',
-        'im:read',
-        'mpim:history',
-        'mpim:read',
         'users:read'
       ].join(',');
       
