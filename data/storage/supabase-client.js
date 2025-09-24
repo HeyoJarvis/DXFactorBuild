@@ -963,6 +963,123 @@ class SupabaseClient {
       return {};
     }
   }
+
+  // ===== SLACK CONVERSATION METHODS =====
+
+  /**
+   * Store a Slack conversation
+   */
+  async storeSlackConversation(conversationData) {
+    try {
+      const { data, error } = await this.supabase
+        .from('slack_conversations')
+        .insert([{
+          id: conversationData.id,
+          channel_id: conversationData.channel_id,
+          channel_name: conversationData.channel_name,
+          channel_type: conversationData.channel_type,
+          messages: conversationData.messages,
+          participants: conversationData.participants,
+          relevance_score: conversationData.relevance_score,
+          key_topics: conversationData.key_topics,
+          action_items: conversationData.action_items,
+          conversation_type: conversationData.conversation_type,
+          summary: conversationData.summary,
+          captured_at: conversationData.captured_at,
+          created_at: conversationData.created_at
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      this.logger.info('Slack conversation stored', { 
+        conversation_id: data.id,
+        relevance_score: data.relevance_score 
+      });
+
+      return data;
+    } catch (error) {
+      this.logger.error('Failed to store Slack conversation', { 
+        error: error.message,
+        conversation_id: conversationData.id 
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get Slack conversations by relevance score
+   */
+  async getSlackConversations(options = {}) {
+    try {
+      const {
+        minRelevance = 0.5,
+        limit = 20,
+        offset = 0,
+        conversationType = null,
+        channelId = null
+      } = options;
+
+      let query = this.supabase
+        .from('slack_conversations')
+        .select('*')
+        .gte('relevance_score', minRelevance)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (conversationType) {
+        query = query.eq('conversation_type', conversationType);
+      }
+
+      if (channelId) {
+        query = query.eq('channel_id', channelId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      return data;
+    } catch (error) {
+      this.logger.error('Failed to get Slack conversations', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Store conversation context for chat interface
+   */
+  async storeConversationContext(contextData) {
+    try {
+      const { data, error } = await this.supabase
+        .from('conversation_contexts')
+        .insert([{
+          id: contextData.id,
+          conversation_id: contextData.conversation_id,
+          title: contextData.title,
+          context_type: contextData.context_type,
+          source_data: contextData.source_data,
+          context_prompt: contextData.context_prompt,
+          created_at: contextData.created_at,
+          expires_at: contextData.expires_at
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      this.logger.info('Conversation context stored', { context_id: data.id });
+
+      return data;
+    } catch (error) {
+      this.logger.error('Failed to store conversation context', { 
+        error: error.message,
+        context_id: contextData.id 
+      });
+      throw error;
+    }
+  }
 }
 
 module.exports = SupabaseClient;

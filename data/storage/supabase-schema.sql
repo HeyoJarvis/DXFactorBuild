@@ -621,9 +621,73 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ===== SLACK CONVERSATION TABLES =====
+
+-- Slack Conversations table
+CREATE TABLE IF NOT EXISTS slack_conversations (
+    id TEXT PRIMARY KEY,
+    channel_id TEXT NOT NULL,
+    channel_name TEXT NOT NULL,
+    channel_type TEXT NOT NULL CHECK (channel_type IN ('public', 'private', 'dm', 'group')),
+    messages JSONB NOT NULL DEFAULT '[]',
+    participants JSONB NOT NULL DEFAULT '[]',
+    relevance_score DECIMAL(3,2) NOT NULL CHECK (relevance_score >= 0 AND relevance_score <= 1),
+    key_topics TEXT[] DEFAULT '{}',
+    action_items TEXT[] DEFAULT '{}',
+    conversation_type TEXT DEFAULT 'general',
+    summary TEXT,
+    captured_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Conversation Contexts table (for chat interface)
+CREATE TABLE IF NOT EXISTS conversation_contexts (
+    id TEXT PRIMARY KEY,
+    conversation_id TEXT REFERENCES slack_conversations(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    context_type TEXT NOT NULL DEFAULT 'slack_conversation',
+    source_data JSONB NOT NULL DEFAULT '{}',
+    context_prompt TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL,
+    used_count INTEGER DEFAULT 0,
+    last_used_at TIMESTAMPTZ
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_slack_conversations_relevance ON slack_conversations(relevance_score DESC);
+CREATE INDEX IF NOT EXISTS idx_slack_conversations_channel ON slack_conversations(channel_id);
+CREATE INDEX IF NOT EXISTS idx_slack_conversations_type ON slack_conversations(conversation_type);
+CREATE INDEX IF NOT EXISTS idx_slack_conversations_created ON slack_conversations(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_conversation_contexts_expires ON conversation_contexts(expires_at);
+CREATE INDEX IF NOT EXISTS idx_conversation_contexts_type ON conversation_contexts(context_type);
+
+-- RLS policies for Slack conversation tables
+ALTER TABLE slack_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE conversation_contexts ENABLE ROW LEVEL SECURITY;
+
+-- Allow all authenticated users to read Slack conversations (team-wide visibility)
+CREATE POLICY slack_conversations_read ON slack_conversations
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+-- Allow service role to insert/update Slack conversations
+CREATE POLICY slack_conversations_write ON slack_conversations
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- Allow authenticated users to read conversation contexts
+CREATE POLICY conversation_contexts_read ON conversation_contexts
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+-- Allow service role to manage conversation contexts
+CREATE POLICY conversation_contexts_write ON conversation_contexts
+  FOR ALL USING (auth.role() = 'service_role');
+
 -- Enable real-time for key tables
 ALTER PUBLICATION supabase_realtime ADD TABLE signals;
 ALTER PUBLICATION supabase_realtime ADD TABLE feedback;
 ALTER PUBLICATION supabase_realtime ADD TABLE signal_deliveries;
 ALTER PUBLICATION supabase_realtime ADD TABLE chat_conversations;
 ALTER PUBLICATION supabase_realtime ADD TABLE chat_messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE slack_conversations;
+ALTER PUBLICATION supabase_realtime ADD TABLE conversation_contexts;
