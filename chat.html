@@ -476,15 +476,29 @@
         });
 
         if (!response.ok) {
-          throw new Error('Failed to load conversations');
+          throw new Error(`HTTP ${response.status}: Failed to load conversations`);
         }
 
         const data = await response.json();
+        console.log('Load conversations response:', data);
+        
+        // Handle fallback mode
+        if (data.fallback) {
+          console.log('Running in fallback mode - limited functionality');
+          document.getElementById('chatTitle').textContent = 'Chat (Limited Mode)';
+          conversations = [];
+          renderConversations();
+          return;
+        }
+        
         conversations = data.conversations || [];
         renderConversations();
 
       } catch (error) {
         console.error('Error loading conversations:', error);
+        // Initialize empty conversations array on error
+        conversations = [];
+        renderConversations();
       }
     }
 
@@ -492,19 +506,27 @@
     function renderConversations() {
       const container = document.getElementById('conversationsList');
       
-      if (conversations.length === 0) {
+      if (!conversations || conversations.length === 0) {
         container.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 20px; font-size: 14px;">No conversations yet</p>';
         return;
       }
 
-      container.innerHTML = conversations.map(conv => `
+      // Filter out any invalid conversations
+      const validConversations = conversations.filter(conv => conv && conv.id);
+
+      if (validConversations.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 20px; font-size: 14px;">No valid conversations</p>';
+        return;
+      }
+
+      container.innerHTML = validConversations.map(conv => `
         <div class="conversation-item ${currentConversation?.id === conv.id ? 'active' : ''}" 
              onclick="selectConversation('${conv.id}')">
           <div class="conversation-title">
             ${conv.title || 'New Conversation'}
           </div>
           <div class="conversation-preview">
-            ${new Date(conv.last_message_at).toLocaleDateString()}
+            ${conv.last_message_at ? new Date(conv.last_message_at).toLocaleDateString() : 'No messages'}
           </div>
         </div>
       `).join('');
@@ -520,16 +542,29 @@
             'Authorization': `Bearer ${sessionToken}`
           },
           body: JSON.stringify({
-            action: 'create_conversation'
+            action: 'create_conversation',
+            title: 'New Conversation'
           })
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create conversation');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP ${response.status}: Failed to create conversation`);
         }
 
         const data = await response.json();
+        console.log('Create conversation response:', data);
+        
         const newConversation = data.conversation;
+        
+        if (!newConversation || !newConversation.id) {
+          throw new Error('Invalid conversation data received from server');
+        }
+        
+        // Initialize conversations array if needed
+        if (!conversations) {
+          conversations = [];
+        }
         
         conversations.unshift(newConversation);
         renderConversations();
@@ -537,7 +572,7 @@
 
       } catch (error) {
         console.error('Error creating conversation:', error);
-        alert('Failed to create new conversation');
+        alert('Failed to create new conversation: ' + error.message);
       }
     }
 
