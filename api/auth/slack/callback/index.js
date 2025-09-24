@@ -325,10 +325,12 @@ function getSuccessPage(result) {
           // Store session token in localStorage for persistent login
           localStorage.setItem('heyjarvis_session', '${result.session_token}');
           
-          // Auto-redirect to chat interface after 3 seconds
-          setTimeout(() => {
-            window.location.href = '/chat?token=${result.session_token}';
-          }, 3000);
+          // Auto-redirect disabled for debugging
+          // setTimeout(() => {
+          //   window.location.href = '/chat?token=${result.session_token}';
+          // }, 3000);
+          
+          console.log('Session token:', '${result.session_token}');
         </script>
       </div>
     </body>
