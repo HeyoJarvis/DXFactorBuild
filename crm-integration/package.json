@@ -1,0 +1,42 @@
+{
+  "name": "@heyjarvis/crm-integration",
+  "version": "1.0.0",
+  "description": "AI-powered CRM workflow analyzer and optimization engine",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "test": "node test-crm-integration.js",
+    "test:quick": "node test-crm-integration.js",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@heyjarvis/core": "file:../core",
+    "@heyjarvis/data": "file:../data",
+    "@hubspot/api-client": "^10.2.0",
+    "axios": "^1.6.7",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0",
+    "bull": "^4.12.2",
+    "cron": "^3.1.6",
+    "compromise": "^14.10.0",
+    "natural": "^6.10.0",
+    "@anthropic-ai/sdk": "^0.24.3",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.3",
+    "eslint": "^8.57.0"
+  },
+  "keywords": [
+    "crm",
+    "workflow-analysis",
+    "ai",
+    "sales-optimization",
+    "hubspot",
+    "roi-analysis"
+  ]
+}

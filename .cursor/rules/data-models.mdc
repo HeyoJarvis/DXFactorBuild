@@ -1,0 +1,394 @@
+---
+globs: *.schema.js,**/models/**,**/repositories/**
+---
+
+# Data Models & Database Patterns
+
+## 🗄️ Database Architecture
+
+### Supabase Integration
+The platform uses Supabase (PostgreSQL) as the primary database, configured in [data/storage/supabase-client.js](mdc:data/storage/supabase-client.js).
+
+### Schema Organization
+Database schemas are defined in [data/storage/supabase-schema.sql](mdc:data/storage/supabase-schema.sql) and mirrored as JavaScript models in [data/models/](mdc:data/models/).
+
+## 📋 Model Definition Pattern
+
+### Schema Structure
+All models follow this consistent pattern:
+
+```javascript
+/**
+ * Model Name Schema - Brief description
+ * 
+ * Features:
+ * 1. Validation rules
+ * 2. Default values  
+ * 3. Helper methods
+ * 4. Relationship definitions
+ */
+
+const { v4: uuidv4 } = require('uuid');
+
+const ModelSchema = {
+  // Primary fields
+  id: {
+    type: 'uuid',
+    primary: true,
+    default: () => uuidv4()
+  },
+  
+  // Required fields
+  name: {
+    type: 'string',
+    required: true,
+    maxLength: 255
+  },
+  
+  // Optional fields with defaults
+  status: {
+    type: 'string',
+    enum: ['active', 'inactive', 'pending'],
+    default: 'active'
+  },
+  
+  // Timestamps
+  created_at: {
+    type: 'timestamp',
+    default: () => new Date()
+  },
+  updated_at: {
+    type: 'timestamp',
+    default: () => new Date()
+  }
+};
+
+// Helper class for model operations
+class ModelHelpers {
+  static generateId() {
+    return uuidv4();
+  }
+  
+  static validate(data) {
+    // Validation logic
+  }
+  
+  static sanitize(data) {
+    // Data sanitization
+  }
+}
+
+module.exports = { ModelSchema, ModelHelpers };
+```
+
+## 🏗️ Core Models
+
+### User Model ([data/models/user.schema.js](mdc:data/models/user.schema.js))
+Represents platform users with preferences and context:
+
+```javascript
+const UserSchema = {
+  id: { type: 'uuid', primary: true },
+  email: { type: 'string', required: true, unique: true },
+  role: { type: 'string', enum: ['admin', 'user', 'viewer'] },
+  preferences: { type: 'jsonb', default: {} },
+  competitive_context: { type: 'jsonb', default: {} },
+  feedback_count: { type: 'integer', default: 0 },
+  last_active_at: { type: 'timestamp' }
+};
+```
+
+### Signal Model ([data/models/signal.schema.js](mdc:data/models/signal.schema.js))
+Core competitive intelligence signals:
+
+```javascript
+const SignalSchema = {
+  id: { type: 'uuid', primary: true },
+  source_id: { type: 'uuid', required: true },
+  title: { type: 'string', required: true },
+  content: { type: 'text', required: true },
+  url: { type: 'string' },
+  published_at: { type: 'timestamp' },
+  relevance_score: { type: 'float', default: 0 },
+  quality_score: { type: 'float', default: 0 },
+  entities: { type: 'jsonb', default: {} },
+  metadata: { type: 'jsonb', default: {} },
+  status: { type: 'string', enum: ['pending', 'processed', 'delivered'] }
+};
+```
+
+### Source Model ([data/models/source.schema.js](mdc:data/models/source.schema.js))
+Signal source definitions and configuration:
+
+```javascript
+const SourceSchema = {
+  id: { type: 'uuid', primary: true },
+  name: { type: 'string', required: true },
+  type: { type: 'string', enum: ['rss', 'api', 'webhook', 'scraper'] },
+  url: { type: 'string', required: true },
+  polling_config: { type: 'jsonb', default: {} },
+  trust_score: { type: 'float', default: 0.5 },
+  quality_metrics: { type: 'jsonb', default: {} },
+  last_poll_at: { type: 'timestamp' },
+  status: { type: 'string', enum: ['active', 'paused', 'error'] }
+};
+```
+
+## 🔄 Repository Pattern
+
+### Base Repository Structure
+All repositories extend a common pattern for data access:
+
+```javascript
+class BaseRepository {
+  constructor(supabaseClient) {
+    this.client = supabaseClient;
+    this.tableName = this.getTableName();
+  }
+  
+  async findById(id) {
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select('*')
+      .eq('id', id)
+      .single();
+      
+    if (error) throw error;
+    return data;
+  }
+  
+  async create(data) {
+    const sanitized = this.sanitize(data);
+    const validated = this.validate(sanitized);
+    
+    const { data: result, error } = await this.client
+      .from(this.tableName)
+      .insert(validated)
+      .select()
+      .single();
+      
+    if (error) throw error;
+    return result;
+  }
+  
+  async update(id, data) {
+    const sanitized = this.sanitize(data);
+    sanitized.updated_at = new Date();
+    
+    const { data: result, error } = await this.client
+      .from(this.tableName)
+      .update(sanitized)
+      .eq('id', id)
+      .select()
+      .single();
+      
+    if (error) throw error;
+    return result;
+  }
+}
+```
+
+### Signal Repository Example
+```javascript
+class SignalRepository extends BaseRepository {
+  getTableName() {
+    return 'signals';
+  }
+  
+  async findByRelevanceScore(minScore, limit = 50) {
+    const { data, error } = await this.client
+      .from('signals')
+      .select('*')
+      .gte('relevance_score', minScore)
+      .order('relevance_score', { ascending: false })
+      .limit(limit);
+      
+    if (error) throw error;
+    return data;
+  }
+  
+  async findByUserRelevance(userId, limit = 20) {
+    const { data, error } = await this.client
+      .rpc('get_user_relevant_signals', {
+        user_id: userId,
+        limit_count: limit
+      });
+      
+    if (error) throw error;
+    return data;
+  }
+}
+```
+
+## 🔍 Query Patterns
+
+### Complex Queries with RPC
+Use Supabase RPC functions for complex queries:
+
+```sql
+-- In supabase-schema.sql
+CREATE OR REPLACE FUNCTION get_user_relevant_signals(
+  user_id UUID,
+  limit_count INTEGER DEFAULT 20
+)
+RETURNS TABLE (
+  signal_id UUID,
+  title TEXT,
+  relevance_score FLOAT,
+  published_at TIMESTAMP
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT s.id, s.title, s.relevance_score, s.published_at
+  FROM signals s
+  JOIN user_signal_relevance usr ON s.id = usr.signal_id
+  WHERE usr.user_id = $1
+  ORDER BY usr.personalized_score DESC
+  LIMIT limit_count;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### Filtering and Pagination
+```javascript
+async findWithFilters(filters = {}, pagination = {}) {
+  let query = this.client.from(this.tableName).select('*');
+  
+  // Apply filters
+  if (filters.status) {
+    query = query.eq('status', filters.status);
+  }
+  
+  if (filters.dateRange) {
+    query = query
+      .gte('created_at', filters.dateRange.start)
+      .lte('created_at', filters.dateRange.end);
+  }
+  
+  if (filters.search) {
+    query = query.textSearch('title', filters.search);
+  }
+  
+  // Apply pagination
+  const { page = 1, limit = 20 } = pagination;
+  const offset = (page - 1) * limit;
+  
+  query = query.range(offset, offset + limit - 1);
+  
+  const { data, error, count } = await query;
+  if (error) throw error;
+  
+  return {
+    data,
+    pagination: {
+      page,
+      limit,
+      total: count,
+      totalPages: Math.ceil(count / limit)
+    }
+  };
+}
+```
+
+## 🔐 Data Validation & Sanitization
+
+### Input Validation
+```javascript
+static validate(data) {
+  const errors = [];
+  
+  // Required field validation
+  if (!data.title || data.title.trim().length === 0) {
+    errors.push('Title is required');
+  }
+  
+  // Length validation
+  if (data.title && data.title.length > 255) {
+    errors.push('Title must be less than 255 characters');
+  }
+  
+  // Email validation
+  if (data.email && !this.isValidEmail(data.email)) {
+    errors.push('Invalid email format');
+  }
+  
+  // Enum validation
+  if (data.status && !['active', 'inactive', 'pending'].includes(data.status)) {
+    errors.push('Invalid status value');
+  }
+  
+  if (errors.length > 0) {
+    throw new ValidationError('Validation failed', errors);
+  }
+  
+  return data;
+}
+```
+
+### Data Sanitization
+```javascript
+static sanitize(data) {
+  const sanitized = { ...data };
+  
+  // Trim strings
+  Object.keys(sanitized).forEach(key => {
+    if (typeof sanitized[key] === 'string') {
+      sanitized[key] = sanitized[key].trim();
+    }
+  });
+  
+  // Remove undefined values
+  Object.keys(sanitized).forEach(key => {
+    if (sanitized[key] === undefined) {
+      delete sanitized[key];
+    }
+  });
+  
+  // Sanitize HTML content
+  if (sanitized.content) {
+    sanitized.content = this.sanitizeHtml(sanitized.content);
+  }
+  
+  return sanitized;
+}
+```
+
+## 📊 Performance Optimization
+
+### Indexing Strategy
+```sql
+-- Essential indexes for performance
+CREATE INDEX idx_signals_relevance_score ON signals(relevance_score DESC);
+CREATE INDEX idx_signals_published_at ON signals(published_at DESC);
+CREATE INDEX idx_signals_source_status ON signals(source_id, status);
+CREATE INDEX idx_user_feedback_user_signal ON user_feedback(user_id, signal_id);
+
+-- Composite indexes for common queries
+CREATE INDEX idx_signals_user_relevance ON signals(user_id, relevance_score DESC, published_at DESC);
+```
+
+### Connection Pooling
+```javascript
+class SupabaseClient {
+  constructor(options = {}) {
+    this.client = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY,
+      {
+        db: {
+          schema: 'public',
+        },
+        auth: {
+          autoRefreshToken: true,
+          persistSession: false
+        },
+        realtime: {
+          params: {
+            eventsPerSecond: 10
+          }
+        }
+      }
+    );
+  }
+}
+```

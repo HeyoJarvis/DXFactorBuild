@@ -1,0 +1,280 @@
+---
+description: AI and signal processing patterns for competitive intelligence
+---
+
+# AI & Signal Processing Architecture
+
+## 🧠 AI Integration Patterns
+
+### Core AI Services
+The platform integrates multiple AI services for signal processing:
+
+- **Anthropic Claude**: Content analysis via [@anthropic-ai/sdk](mdc:core/package.json)
+- **Natural Language Processing**: Using `natural` and `compromise` libraries
+- **Sentiment Analysis**: Built-in sentiment scoring
+
+### AI Service Configuration
+```javascript
+// Standard AI service initialization
+class AIService {
+  constructor(options = {}) {
+    this.client = new AnthropicClient({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      timeout: options.timeout || 30000
+    });
+    
+    this.options = {
+      model: 'claude-3-sonnet-20240229',
+      maxTokens: 4096,
+      temperature: 0.1,
+      ...options
+    };
+  }
+}
+```
+
+## 📡 Signal Processing Pipeline
+
+### Signal Ingestion Flow
+1. **Source Polling**: [core/signals/ingestion/scheduler.js](mdc:core/signals/ingestion/scheduler.js)
+2. **Content Extraction**: Adapter-specific processing
+3. **Entity Linking**: [core/signals/enrichment/entity-linker.js](mdc:core/signals/enrichment/entity-linker.js)
+4. **Relevance Scoring**: [core/relevance/context-engine/user-model.js](mdc:core/relevance/context-engine/user-model.js)
+5. **Impact Assessment**: [core/signals/enrichment/impact-scorer.js](mdc:core/signals/enrichment/impact-scorer.js)
+
+### Base Adapter Pattern
+All signal adapters extend [core/signals/ingestion/base-adapter.js](mdc:core/signals/ingestion/base-adapter.js):
+
+```javascript
+class CustomAdapter extends BaseAdapter {
+  async poll() {
+    const pollId = uuidv4();
+    const startTime = Date.now();
+    
+    try {
+      // 1. Fetch raw content
+      const rawContent = await this.fetchContent();
+      
+      // 2. Extract signals
+      const signals = await this.extractSignals(rawContent);
+      
+      // 3. Enrich with metadata
+      const enrichedSignals = await this.enrichSignals(signals);
+      
+      // 4. Emit for processing
+      this.emit('signals_extracted', {
+        source_id: this.source.id,
+        signals: enrichedSignals,
+        poll_id: pollId
+      });
+      
+      return enrichedSignals;
+      
+    } catch (error) {
+      this.handlePollError(error, pollId, Date.now() - startTime);
+      throw error;
+    }
+  }
+}
+```
+
+## 🎯 Relevance Scoring System
+
+### User Model Architecture
+The [user-model.js](mdc:core/relevance/context-engine/user-model.js) implements multi-dimensional relevance:
+
+```javascript
+// Feature weights for relevance calculation
+this.featureWeights = {
+  category_match: 0.25,      // Signal category alignment
+  competitor_relevance: 0.30, // Competitor mention relevance
+  keyword_overlap: 0.20,     // User keyword matching
+  source_trust: 0.15,        // Source credibility score
+  temporal_relevance: 0.10   // Recency and timing
+};
+```
+
+### Relevance Calculation Pattern
+```javascript
+async calculateRelevance(signal, user, context = {}) {
+  const features = await this.extractFeatures(signal, user);
+  
+  let relevanceScore = 0;
+  for (const [feature, weight] of Object.entries(this.featureWeights)) {
+    relevanceScore += features[feature] * weight;
+  }
+  
+  // Apply user-specific learning adjustments
+  const personalizedScore = await this.applyPersonalization(
+    relevanceScore, 
+    user, 
+    signal
+  );
+  
+  return Math.max(0, Math.min(1, personalizedScore));
+}
+```
+
+## 🔗 Entity Linking & Enrichment
+
+### Entity Extraction Pattern
+```javascript
+async extractEntities(signal, userContext = {}) {
+  const entities = {
+    companies: [],
+    people: [],
+    products: [],
+    technologies: [],
+    locations: []
+  };
+  
+  // Use compromise.js for NLP extraction
+  const doc = nlp(signal.content);
+  
+  // Extract organizations
+  entities.companies = doc.organizations().out('array');
+  
+  // Extract people
+  entities.people = doc.people().out('array');
+  
+  // Custom extraction for products/technologies
+  entities.products = await this.extractProducts(signal.content);
+  entities.technologies = await this.extractTechnologies(signal.content);
+  
+  return entities;
+}
+```
+
+### Competitive Intelligence Scoring
+```javascript
+async scoreCompetitiveRelevance(signal, userCompetitors) {
+  let competitorScore = 0;
+  
+  for (const competitor of userCompetitors) {
+    const mentions = this.countMentions(signal.content, competitor.name);
+    const contextScore = await this.analyzeCompetitorContext(
+      signal.content, 
+      competitor
+    );
+    
+    competitorScore += mentions * contextScore * competitor.priority;
+  }
+  
+  return Math.min(1, competitorScore / userCompetitors.length);
+}
+```
+
+## 📊 Signal Quality Assessment
+
+### Quality Metrics
+Assess signal quality across multiple dimensions:
+
+```javascript
+assessSignalQuality(signal) {
+  const metrics = {
+    content_length: this.scoreContentLength(signal.content),
+    source_credibility: signal.source.trust_score,
+    freshness: this.scoreFreshness(signal.published_at),
+    uniqueness: this.scoreUniqueness(signal),
+    actionability: this.scoreActionability(signal.content)
+  };
+  
+  return Object.values(metrics).reduce((sum, score) => sum + score, 0) / 5;
+}
+```
+
+## 🔄 Learning & Adaptation
+
+### Feedback Integration
+```javascript
+async processFeedback(feedback) {
+  const { signal_id, user_id, feedback_type, context } = feedback;
+  
+  // Update user model based on feedback
+  await this.updateUserPreferences(user_id, signal_id, feedback_type);
+  
+  // Adjust feature weights
+  if (feedback_type === 'relevant') {
+    await this.reinforceFeatures(signal_id, user_id);
+  } else if (feedback_type === 'irrelevant') {
+    await this.penalizeFeatures(signal_id, user_id);
+  }
+  
+  // Trigger model retraining if threshold reached
+  if (await this.shouldRetrain(user_id)) {
+    await this.retrainUserModel(user_id);
+  }
+}
+```
+
+## 🚀 Performance Optimization
+
+### Batch Processing
+Process signals in batches for efficiency:
+
+```javascript
+async processBatch(signals, batchSize = 10) {
+  const batches = this.chunkArray(signals, batchSize);
+  const results = [];
+  
+  for (const batch of batches) {
+    const batchResults = await Promise.all(
+      batch.map(signal => this.processSignal(signal))
+    );
+    results.push(...batchResults);
+    
+    // Rate limiting between batches
+    await this.delay(this.options.batchDelay);
+  }
+  
+  return results;
+}
+```
+
+### Caching Strategy
+Implement intelligent caching for expensive operations:
+
+```javascript
+async getRelevanceScore(signal, user) {
+  const cacheKey = `relevance:${signal.id}:${user.id}`;
+  
+  // Check cache first
+  let score = await this.cache.get(cacheKey);
+  if (score !== null) {
+    return score;
+  }
+  
+  // Calculate and cache
+  score = await this.calculateRelevance(signal, user);
+  await this.cache.set(cacheKey, score, this.options.cacheTTL);
+  
+  return score;
+}
+```
+
+## 🎛️ Configuration & Tuning
+
+### Model Parameters
+Key parameters for tuning AI performance:
+
+```javascript
+const AI_CONFIG = {
+  relevance: {
+    learningRate: 0.1,
+    decayFactor: 0.95,
+    minFeedbackForLearning: 5,
+    maxHistoryDays: 90
+  },
+  processing: {
+    batchSize: 10,
+    maxConcurrency: 5,
+    timeoutMs: 30000,
+    retryAttempts: 3
+  },
+  quality: {
+    minContentLength: 100,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    minTrustScore: 0.3
+  }
+};
+```
