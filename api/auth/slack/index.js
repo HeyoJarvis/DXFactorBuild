@@ -34,10 +34,9 @@ module.exports = async (req, res) => {
     if (isInstallation) {
       // Admin installation: needs bot scopes + user scopes (include ALL scopes from Slack app)
       const botScopes = [
-        'channels:history',
-        'channels:read',
         'groups:history',
         'groups:read',
+        'im:read',
         'im:history',
         'users:read'
       ].join(',');
