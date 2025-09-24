@@ -13,6 +13,8 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
 }
 
 module.exports = async (req, res) => {
+  console.log('OAuth callback started', { method: req.method, query: req.query });
+  
   try {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -47,6 +49,7 @@ module.exports = async (req, res) => {
     }
 
     // Exchange code for tokens
+    console.log('Starting OAuth token exchange...');
     const client = new WebClient();
     const result = await client.oauth.v2.access({
       client_id: clientId,
@@ -54,6 +57,8 @@ module.exports = async (req, res) => {
       code: code,
       redirect_uri: redirectUri
     });
+    
+    console.log('OAuth token exchange completed', { ok: result.ok });
 
     if (!result.ok) {
       return res.status(400).send(getErrorPage(`OAuth exchange failed: ${result.error}`));
