@@ -38,7 +38,6 @@ module.exports = async (req, res) => {
         'channels:read',
         'chat:write',
         'groups:read',
-        'groups:history',
         'im:history',
         'im:read',
         'mpim:history',
