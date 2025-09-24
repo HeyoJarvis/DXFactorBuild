@@ -90,9 +90,28 @@ module.exports = async (req, res) => {
       return res.status(400).send(getErrorPage(`Invalid OAuth response: ${errorDetails}. Please check Slack app configuration.`));
     }
 
-    // Get user info
-    const userClient = new WebClient(userToken);
-    const userInfo = await userClient.users.info({ user: slackUserId });
+    // Get user info - use identity data from OAuth response for user-only auth
+    let userInfo;
+    if (scopes.includes('users:read')) {
+      // Bot installation - we have users:read scope, can make API calls
+      const userClient = new WebClient(userToken);
+      userInfo = await userClient.users.info({ user: slackUserId });
+    } else {
+      // User-only auth - use identity data from OAuth response
+      console.log('Using identity data from OAuth response (no users:read scope)');
+      userInfo = {
+        ok: true,
+        user: {
+          id: slackUserId,
+          name: result.authed_user?.id || slackUserId,
+          real_name: 'User', // Identity scope doesn't provide real name
+          profile: {
+            email: result.authed_user?.id ? `${result.authed_user.id}@slack.local` : null,
+            image_72: null
+          }
+        }
+      };
+    }
 
     // Check if Supabase is configured
     const supabaseUrl = process.env.SUPABASE_URL;
