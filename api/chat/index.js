@@ -165,8 +165,15 @@ async function handlePost(req, res, supabase, userId) {
         { model_name }
       );
 
-      // Generate AI response (placeholder - integrate with your AI service)
-      const aiResponse = await generateAIResponse(message, existingConv.messages);
+      // Generate AI response with user context for workflow analysis
+      const userContext = {
+        userId,
+        userName: req.user?.name || req.user?.real_name,
+        userRole: req.user?.is_admin ? 'admin' : 'member',
+        slackUserId: req.user?.slack_user_id
+      };
+      
+      const aiResponse = await generateAIResponse(message, existingConv.messages, userContext);
       const processingTime = Date.now() - startTime;
 
       // Add AI message
@@ -245,69 +252,133 @@ async function handleDelete(req, res, supabase, userId) {
 }
 
 /**
- * Generate AI response (placeholder - integrate with your AI service)
+ * Generate AI workflow analysis response using Claude
  */
-async function generateAIResponse(userMessage, conversationHistory) {
+async function generateAIResponse(userMessage, conversationHistory, userContext = {}) {
   try {
-    // This is a placeholder - integrate with Claude, GPT, or your preferred AI service
-    // For now, return a simple response
+    // Import AI analyzer and workflow intelligence
+    const AIAnalyzer = require('../../core/signals/enrichment/ai-analyzer');
+    const WorkflowIntelligence = require('../../core/intelligence/workflow-analyzer');
     
-    const responses = [
-      "I understand you're asking about: " + userMessage + ". Let me help you with that.",
-      "That's an interesting question. Based on what you've shared, here's my analysis...",
-      "I can help you with that. Let me break this down for you:",
-      "Great question! Here's what I think about " + userMessage.toLowerCase() + ":",
-    ];
+    const aiAnalyzer = new AIAnalyzer();
+    const workflowIntelligence = new WorkflowIntelligence();
 
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-
-    return {
-      content: randomResponse + "\n\n(This is a placeholder response. Integrate with your AI service for real responses.)",
-      model: 'placeholder-model',
-      tokens: Math.floor(Math.random() * 100) + 50
-    };
-
-    // Example integration with Claude (uncomment and configure):
-    /*
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY
-    });
-
-    const systemPrompt = `You are HeyJarvis, an AI assistant for competitive intelligence and business analysis. 
-    You help users understand market trends, competitor analysis, and strategic insights.`;
-
-    const messages = conversationHistory.map(msg => ({
-      role: msg.role === 'assistant' ? 'assistant' : 'user',
-      content: msg.content
-    }));
-
-    messages.push({ role: 'user', content: userMessage });
-
-    const response = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: messages
-    });
-
-    return {
-      content: response.content[0].text,
-      model: 'claude-3-sonnet',
-      tokens: response.usage.input_tokens + response.usage.output_tokens
-    };
-    */
+    // Determine if this is a workflow analysis request
+    const isWorkflowRequest = await detectWorkflowAnalysisRequest(userMessage);
+    
+    if (isWorkflowRequest) {
+      return await generateWorkflowAnalysis(userMessage, conversationHistory, aiAnalyzer, workflowIntelligence, userContext);
+    } else {
+      return await generateGeneralResponse(userMessage, conversationHistory, aiAnalyzer);
+    }
 
   } catch (error) {
     console.error('AI response generation error:', error);
     return {
-      content: "I apologize, but I'm having trouble generating a response right now. Please try again.",
+      content: "I apologize, but I'm having trouble generating a response right now. Please try again later.",
       model: 'error-fallback',
       tokens: 0
     };
   }
+}
+
+/**
+ * Detect if user message is requesting workflow analysis
+ */
+async function detectWorkflowAnalysisRequest(message) {
+  const workflowKeywords = [
+    'workflow', 'process', 'efficiency', 'productivity', 'task', 'request',
+    'outbound', 'communication', 'team', 'member', 'ceo', 'admin',
+    'analyze', 'analysis', 'pattern', 'improvement', 'optimization'
+  ];
+  
+  const lowerMessage = message.toLowerCase();
+  return workflowKeywords.some(keyword => lowerMessage.includes(keyword));
+}
+
+/**
+ * Generate workflow-specific AI analysis
+ */
+async function generateWorkflowAnalysis(userMessage, conversationHistory, aiAnalyzer, workflowIntelligence, userContext) {
+  const systemPrompt = `You are HeyJarvis, an AI-powered workflow analysis assistant specializing in CEO-to-team member communication patterns and productivity optimization.
+
+Your expertise includes:
+- Analyzing outbound requests from leadership to team members
+- Identifying communication patterns and bottlenecks
+- Measuring response times and engagement
+- Suggesting workflow improvements
+- Tracking task completion and follow-ups
+
+Context: You're analyzing workflows between Sundeep (CEO/Admin) and Avi (Team Member).
+
+Respond with actionable insights, patterns you notice, and specific recommendations for improving communication efficiency.`;
+
+  // Create conversation context
+  const messages = conversationHistory.map(msg => ({
+    role: msg.role === 'assistant' ? 'assistant' : 'user',
+    content: msg.content
+  }));
+  
+  messages.push({ role: 'user', content: userMessage });
+
+  // Use AI analyzer for workflow-specific analysis
+  const mockSignal = {
+    id: 'workflow_analysis',
+    title: `Workflow Analysis: ${userMessage.substring(0, 50)}...`,
+    content: userMessage,
+    url: 'internal://workflow-chat',
+    metadata: {
+      user_context: userContext,
+      conversation_length: conversationHistory.length,
+      analysis_type: 'workflow_communication'
+    }
+  };
+
+  const analysis = await aiAnalyzer.analyzeSignal(mockSignal, {
+    systemPrompt,
+    analysisType: 'workflow_analysis',
+    maxTokens: 1000
+  });
+
+  return {
+    content: analysis.analysis || analysis.summary || "I've analyzed your workflow request and here are my insights...",
+    model: 'claude-3-5-sonnet-workflow',
+    tokens: analysis.tokens || 500,
+    analysis_type: 'workflow'
+  };
+}
+
+/**
+ * Generate general AI response
+ */
+async function generateGeneralResponse(userMessage, conversationHistory, aiAnalyzer) {
+  const systemPrompt = `You are HeyJarvis, an AI assistant for business intelligence and productivity. You help users with:
+- Competitive analysis and market insights
+- Workflow optimization
+- Team communication improvement
+- Strategic planning and decision making
+
+Be helpful, concise, and actionable in your responses.`;
+
+  const mockSignal = {
+    id: 'general_chat',
+    title: userMessage.substring(0, 50),
+    content: userMessage,
+    url: 'internal://general-chat'
+  };
+
+  const analysis = await aiAnalyzer.analyzeSignal(mockSignal, {
+    systemPrompt,
+    analysisType: 'general_assistance',
+    maxTokens: 800
+  });
+
+  return {
+    content: analysis.analysis || analysis.summary || "I understand your question. Let me help you with that...",
+    model: 'claude-3-5-sonnet-general',
+    tokens: analysis.tokens || 400,
+    analysis_type: 'general'
+  };
 }
 
 /**
