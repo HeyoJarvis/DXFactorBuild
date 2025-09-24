@@ -59,12 +59,11 @@ module.exports = async (req, res) => {
       console.log('Bot scopes:', botScopes);
       console.log('User scopes:', userScopes);
     } else {
-      // Regular user authentication: identity scopes + users:read for real names
+      // Regular user authentication: ONLY identity scopes (no users:read)
       const userScopes = [
         'identity.basic',
         'identity.email',
-        'identity.team',
-        'users:read'
+        'identity.team'
       ].join(',');
 
       oauthUrl = `https://slack.com/oauth/v2/authorize?` +
