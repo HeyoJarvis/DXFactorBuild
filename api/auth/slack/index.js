@@ -32,12 +32,13 @@ module.exports = async (req, res) => {
     let oauthUrl;
     
     if (isInstallation) {
-      // Admin installation: needs bot scopes + user scopes (match Slack app config exactly)
+      // Admin installation: needs bot scopes + user scopes (include ALL scopes from Slack app)
       const botScopes = [
         'channels:history',
         'channels:read',
         'chat:write',
         'groups:read',
+        'groups:history',
         'im:history',
         'im:read',
         'mpim:history',
@@ -57,6 +58,11 @@ module.exports = async (req, res) => {
         `user_scope=${encodeURIComponent(userScopes)}&` +
         `redirect_uri=${encodeURIComponent(redirectUri)}&` +
         `state=${state}`;
+      
+      // Debug logging
+      console.log('Admin installation OAuth URL:', oauthUrl);
+      console.log('Bot scopes:', botScopes);
+      console.log('User scopes:', userScopes);
     } else {
       // Regular user authentication: only user identity scopes
       const userScopes = [
