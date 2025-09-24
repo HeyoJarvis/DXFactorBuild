@@ -24,6 +24,10 @@
       "dest": "/chat.html"
     },
     {
+      "src": "/workflow-test",
+      "dest": "/workflow-test.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
