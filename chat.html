@@ -609,8 +609,20 @@
       const container = document.getElementById('messagesContainer');
       const emptyState = document.getElementById('emptyState');
 
+      // Check if DOM elements exist
+      if (!container) {
+        console.error('messagesContainer element not found');
+        return;
+      }
+      
+      if (!emptyState) {
+        console.error('emptyState element not found');
+        return;
+      }
+
       if (!currentConversation || !currentConversation.messages || currentConversation.messages.length === 0) {
         emptyState.style.display = 'flex';
+        container.innerHTML = ''; // Clear any existing messages
         return;
       }
 
@@ -657,7 +669,9 @@
 
       currentConversation.messages = currentConversation.messages || [];
       currentConversation.messages.push(userMessage);
-      renderMessages();
+      
+      // Use setTimeout to ensure DOM is ready
+      setTimeout(() => renderMessages(), 10);
 
       // Clear input
       input.value = '';
@@ -686,7 +700,7 @@
         
         // Add AI response to conversation
         currentConversation.messages.push(data.ai_message);
-        renderMessages();
+        setTimeout(() => renderMessages(), 10);
 
         // Update conversation title if it was auto-generated
         if (data.ai_message && currentConversation.title === null) {
@@ -703,7 +717,7 @@
         
         // Remove the user message that failed
         currentConversation.messages.pop();
-        renderMessages();
+        setTimeout(() => renderMessages(), 10);
       } finally {
         isLoading = false;
         input.disabled = false;
