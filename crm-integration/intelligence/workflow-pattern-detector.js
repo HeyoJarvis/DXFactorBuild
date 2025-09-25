@@ -17,9 +17,9 @@ const { WorkflowHelpers } = require('../models/workflow.schema');
 class WorkflowPatternDetector {
   constructor(options = {}) {
     this.options = {
-      minPatternSize: 3,
-      similarityThreshold: 0.7,
-      confidenceThreshold: 0.6,
+      minPatternSize: 2,
+      similarityThreshold: 0.68, // Sweet spot for meaningful patterns
+      confidenceThreshold: 0.6, // Higher confidence required
       maxClusters: 20,
       logLevel: 'info',
       ...options
@@ -31,7 +31,15 @@ class WorkflowPatternDetector {
         winston.format.timestamp(),
         winston.format.json()
       ),
-      defaultMeta: { service: 'workflow-pattern-detector' }
+      defaultMeta: { service: 'workflow-pattern-detector' },
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+          )
+        })
+      ]
     });
     
     this.aiAnalyzer = new AIAnalyzer(options);
@@ -146,7 +154,15 @@ class WorkflowPatternDetector {
    */
   extractActivityPattern(workflow) {
     if (!workflow.activities || workflow.activities.length === 0) {
-      return {};
+      return {
+        counts: {},
+        sequence: [],
+        total: 0,
+        unique_types: 0,
+        activity_density: 0,
+        pattern_type: 'low_engagement',
+        issues: ['No activities recorded', 'Low CRM usage', 'Process gaps']
+      };
     }
     
     const activityCounts = {};
@@ -158,12 +174,44 @@ class WorkflowPatternDetector {
       activitySequence.push(type);
     });
     
+    // Detect activity pattern issues
+    const issues = [];
+    let pattern_type = 'normal';
+    const activity_density = workflow.activities.length / (workflow.duration_days || 1);
+    
+    // Low engagement pattern
+    if (activity_density < 0.1) {
+      issues.push('Low activity frequency - less than 1 activity per 10 days');
+      pattern_type = 'low_engagement';
+    }
+    
+    // Repetitive pattern
+    const maxActivityType = Object.values(activityCounts).reduce((max, count) => Math.max(max, count), 0);
+    if (maxActivityType / workflow.activities.length > 0.8) {
+      issues.push('Repetitive activity pattern - over-reliance on single activity type');
+      pattern_type = 'repetitive_activities';
+    }
+    
+    // Communication gaps
+    if (!activitySequence.includes('email') && !activitySequence.includes('call') && !activitySequence.includes('meeting')) {
+      issues.push('No direct communication activities');
+      pattern_type = 'communication_gaps';
+    }
+    
+    // High activity but long duration (inefficient)
+    if (activity_density > 0.5 && workflow.duration_days > 200) {
+      issues.push('High activity but long duration - possible inefficient workflow');
+      pattern_type = 'inefficient_execution';
+    }
+    
     return {
       counts: activityCounts,
       sequence: activitySequence,
       total: workflow.activities.length,
       unique_types: Object.keys(activityCounts).length,
-      activity_density: workflow.activities.length / (workflow.duration_days || 1)
+      activity_density,
+      pattern_type,
+      issues
     };
   }
   
@@ -196,7 +244,7 @@ class WorkflowPatternDetector {
       contact_count: contacts.length,
       company_count: companies.length,
       engagement_levels: contacts.map(c => c.engagement_level || 'none'),
-      roles: contacts.map(c => c.role || 'unknown')
+      roles: contacts.map(c => (c && c.job_title) || 'unknown')
     };
   }
   
@@ -295,35 +343,42 @@ class WorkflowPatternDetector {
     let similarity = 0;
     let weights = 0;
     
-    // Stage sequence similarity (40% weight)
-    const stageSeqSim = this.calculateStageSequenceSimilarity(
-      workflow1.features.stage_sequence,
-      workflow2.features.stage_sequence
-    );
-    similarity += stageSeqSim * 0.4;
+    // Workflow type similarity (40% weight) - STRICT type matching
+    const typeSim = workflow1.workflow_type === workflow2.workflow_type ? 1 : 0.1; // Different types get very low score
+    similarity += typeSim * 0.4;
     weights += 0.4;
     
-    // Activity pattern similarity (30% weight)
+    // Duration profile similarity (25% weight) - STRICT duration matching  
+    const durationSim = this.calculateStrictDurationSimilarity(
+      workflow1.features.duration_profile,
+      workflow2.features.duration_profile
+    );
+    similarity += durationSim * 0.25;
+    weights += 0.25;
+    
+    // Deal value similarity (20% weight) - STRICT value range matching
+    const valueSim = this.calculateStrictValueSimilarity(
+      workflow1.features.value_profile,
+      workflow2.features.value_profile
+    );
+    similarity += valueSim * 0.2;
+    weights += 0.2;
+    
+    // Activity pattern similarity (10% weight)
     const activitySim = this.calculateActivityPatternSimilarity(
       workflow1.features.activity_pattern,
       workflow2.features.activity_pattern
     );
-    similarity += activitySim * 0.3;
-    weights += 0.3;
-    
-    // Duration profile similarity (20% weight)
-    const durationSim = this.calculateDurationSimilarity(
-      workflow1.features.duration_profile,
-      workflow2.features.duration_profile
-    );
-    similarity += durationSim * 0.2;
-    weights += 0.2;
-    
-    // Value category similarity (10% weight)
-    const valueSim = workflow1.features.value_profile.value_category === 
-      workflow2.features.value_profile.value_category ? 1 : 0;
-    similarity += valueSim * 0.1;
+    similarity += activitySim * 0.1;
     weights += 0.1;
+    
+    // Participant pattern similarity (5% weight)
+    const participantSim = this.calculateParticipantSimilarity(
+      workflow1.features.participant_profile,
+      workflow2.features.participant_profile
+    );
+    similarity += participantSim * 0.05;
+    weights += 0.05;
     
     return weights > 0 ? similarity / weights : 0;
   }
@@ -385,6 +440,90 @@ class WorkflowPatternDetector {
   }
   
   /**
+   * Calculate STRICT duration similarity - workflows must be in similar duration ranges
+   */
+  calculateStrictDurationSimilarity(duration1, duration2) {
+    if (!duration1.total_duration || !duration2.total_duration) return 0;
+    
+    const d1 = duration1.total_duration;
+    const d2 = duration2.total_duration;
+    
+    // Define strict duration ranges
+    if (d1 <= 30 && d2 <= 30) return 1.0;         // Short cycles (0-30 days)
+    if (d1 <= 90 && d2 <= 90 && d1 > 30 && d2 > 30) return 1.0; // Medium cycles (31-90 days)
+    if (d1 <= 180 && d2 <= 180 && d1 > 90 && d2 > 90) return 1.0; // Long cycles (91-180 days)
+    if (d1 > 180 && d2 > 180) {
+      // Very long cycles - must be within 50% of each other
+      const ratio = Math.min(d1, d2) / Math.max(d1, d2);
+      return ratio > 0.5 ? ratio : 0;
+    }
+    
+    // Different duration ranges - very low similarity
+    return 0.1;
+  }
+  
+  /**
+   * Calculate STRICT value similarity - workflows must be in similar value ranges
+   */
+  calculateStrictValueSimilarity(value1, value2) {
+    if (!value1.total_value || !value2.total_value) return 0;
+    
+    const v1 = value1.total_value;
+    const v2 = value2.total_value;
+    
+    // Define strict value ranges
+    if (v1 <= 1000 && v2 <= 1000) return 1.0;       // Small deals (0-1K)
+    if (v1 <= 5000 && v2 <= 5000 && v1 > 1000 && v2 > 1000) return 1.0; // Medium deals (1K-5K)
+    if (v1 <= 15000 && v2 <= 15000 && v1 > 5000 && v2 > 5000) return 1.0; // Large deals (5K-15K)
+    if (v1 > 15000 && v2 > 15000) {
+      // Enterprise deals - must be within 60% of each other
+      const ratio = Math.min(v1, v2) / Math.max(v1, v2);
+      return ratio > 0.6 ? ratio : 0;
+    }
+    
+    // Different value ranges - very low similarity
+    return 0.1;
+  }
+  
+  /**
+   * Calculate participant similarity
+   */
+  calculateParticipantSimilarity(participant1, participant2) {
+    if (!participant1 || !participant2) return 0;
+    
+    let similarity = 0;
+    let factors = 0;
+    
+    // Contact count similarity
+    if (participant1.contact_count !== undefined && participant2.contact_count !== undefined) {
+      const maxContacts = Math.max(participant1.contact_count, participant2.contact_count);
+      const minContacts = Math.min(participant1.contact_count, participant2.contact_count);
+      similarity += maxContacts > 0 ? minContacts / maxContacts : 1;
+      factors++;
+    }
+    
+    // Company count similarity
+    if (participant1.company_count !== undefined && participant2.company_count !== undefined) {
+      const maxCompanies = Math.max(participant1.company_count, participant2.company_count);
+      const minCompanies = Math.min(participant1.company_count, participant2.company_count);
+      similarity += maxCompanies > 0 ? minCompanies / maxCompanies : 1;
+      factors++;
+    }
+    
+    // Role similarity (basic check)
+    if (participant1.roles && participant2.roles) {
+      const roles1 = new Set(participant1.roles);
+      const roles2 = new Set(participant2.roles);
+      const intersection = new Set([...roles1].filter(x => roles2.has(x)));
+      const union = new Set([...roles1, ...roles2]);
+      similarity += union.size > 0 ? intersection.size / union.size : 0;
+      factors++;
+    }
+    
+    return factors > 0 ? similarity / factors : 0;
+  }
+  
+  /**
    * Analyze a cluster of similar workflows with AI
    */
   async analyzeCluster(cluster, organizationContext) {
@@ -400,14 +539,23 @@ class WorkflowPatternDetector {
       // AI analysis prompt
       const analysisPrompt = this.buildClusterAnalysisPrompt(clusterSummary, organizationContext);
       
-      // Get AI analysis
-      const aiAnalysis = await this.aiAnalyzer.performAnalysis({
-        content: analysisPrompt,
-        type: 'workflow_pattern_analysis'
-      });
-      
-      // Parse and structure the analysis
-      const pattern = this.parsePatternAnalysis(aiAnalysis, cluster, clusterSummary);
+      // Use AI analysis to discover patterns intelligently
+      try {
+        const aiAnalysis = await this.aiAnalyzer.analyzeSignal({
+          title: `Workflow Pattern Analysis - ${cluster.length} workflows`,
+          content: analysisPrompt,
+          category: 'workflow_analysis'
+        }, organizationContext);
+        
+        const pattern = this.parseAIAnalysisToPattern(cluster, clusterSummary, aiAnalysis);
+        return pattern;
+      } catch (aiError) {
+        this.logger.warn('AI analysis failed, falling back to basic pattern creation', {
+          error: aiError.message,
+          cluster_size: cluster.length
+        });
+        return this.createBasicPattern(cluster, clusterSummary);
+      }
       
       return pattern;
       
@@ -430,7 +578,12 @@ class WorkflowPatternDetector {
       size: cluster.length,
       avg_duration: cluster.reduce((sum, w) => sum + (w.duration_days || 0), 0) / cluster.length,
       avg_deal_value: cluster.reduce((sum, w) => sum + (w.deal_value || 0), 0) / cluster.length,
-      success_rate: cluster.filter(w => w.status === 'completed').length / cluster.length,
+      success_rate: cluster.filter(w => 
+        w.status === 'completed' || 
+        w.status === 'won' || 
+        (w.stages && w.stages.some(stage => stage.is_closed_won)) ||
+        (w.hubspot_metadata && w.deal_value > 0 && w.status === 'active')
+      ).length / cluster.length,
       
       common_stages: this.findCommonStages(cluster),
       common_activities: this.findCommonActivities(cluster),
@@ -444,7 +597,15 @@ class WorkflowPatternDetector {
         duration: w.duration_days,
         value: w.deal_value,
         status: w.status,
-        stages: w.stages?.map(s => s.name) || []
+        activities: w.activities || [],
+        participants: w.participants || [],
+        stages: w.stages || [],
+        // Enhanced data for AI analysis
+        activity_breakdown: this.analyzeActivityBreakdown(w.activities),
+        participant_breakdown: this.analyzeParticipantBreakdown(w.participants),
+        stage_progression: this.analyzeStageProgression(w.stages),
+        data_completeness: this.calculateDataCompleteness(w),
+        engagement_level: this.calculateEngagementLevel(w)
       }))
     };
     
@@ -456,60 +617,73 @@ class WorkflowPatternDetector {
    */
   buildClusterAnalysisPrompt(clusterSummary, organizationContext) {
     return `
-    Analyze this workflow pattern cluster and provide detailed insights:
-    
-    CLUSTER SUMMARY:
-    - Size: ${clusterSummary.size} workflows
-    - Average Duration: ${Math.round(clusterSummary.avg_duration)} days
-    - Average Deal Value: $${Math.round(clusterSummary.avg_deal_value).toLocaleString()}
-    - Success Rate: ${Math.round(clusterSummary.success_rate * 100)}%
-    
-    COMMON PATTERNS:
-    - Stages: ${clusterSummary.common_stages.join(' → ')}
-    - Activities: ${Object.entries(clusterSummary.common_activities).map(([type, count]) => `${type} (${count})`).join(', ')}
-    
-    ORGANIZATION CONTEXT:
-    - Industry: ${organizationContext.industry || 'Not specified'}
-    - Company Size: ${organizationContext.company_size || 'Not specified'}
-    - Sales Model: ${organizationContext.sales_model || 'Not specified'}
-    
-    SAMPLE WORKFLOWS:
-    ${clusterSummary.sample_workflows.map(w => 
-      `- ID: ${w.id}, Duration: ${w.duration}d, Value: $${w.value?.toLocaleString()}, Status: ${w.status}`
-    ).join('\n')}
-    
-    Please provide analysis in the following JSON format:
+    You are an expert CRM workflow analyst. Analyze this cluster of ${clusterSummary.size} workflows to identify meaningful patterns and issues beyond just timing metrics.
+
+    DETAILED WORKFLOW DATA:
+    ${clusterSummary.sample_workflows.map((w, i) => `
+    Workflow ${i+1}:
+    - Duration: ${w.duration} days, Value: $${w.value?.toLocaleString()}, Status: ${w.status}
+    - Activities: ${w.activities?.length || 0} total
+    - Participants: ${w.participants?.length || 0} people involved
+    - Stages: ${w.stages?.length || 0} stages tracked
+    `).join('')}
+
+    ANALYSIS FRAMEWORK - Look for diverse pattern types:
+
+    1. ENGAGEMENT PATTERNS:
+       - Low engagement (few activities relative to duration)
+       - Over-engagement (too many activities, not progressing)
+       - Unbalanced communication (all emails, no calls/meetings)
+       - Ghost prospects (no customer activities recorded)
+
+    2. PROCESS PATTERNS:
+       - Stuck workflows (long time in single stage)
+       - Stage skipping (missing critical stages)
+       - Inconsistent progression (random stage jumping)
+       - No-stage workflows (deals with no pipeline tracking)
+
+    3. COLLABORATION PATTERNS:
+       - Single-threaded (only 1-2 participants)
+       - Over-complicated (too many participants)
+       - Handoff failures (participant changes mid-process)
+
+    4. DATA QUALITY PATTERNS:
+       - Incomplete data (missing activities, contacts, stages)
+       - Manual process gaps (activities not being logged)
+       - System adoption issues (low CRM usage)
+
+    5. VALUE PATTERNS:
+       - Value sizing issues (deals with $0 value)
+       - Qualification problems (wide value variance)
+       - Discovery gaps
+
+    PROVIDE COMPREHENSIVE ANALYSIS in this JSON format:
     {
-      "pattern_name": "Descriptive name for this workflow pattern",
-      "pattern_type": "lead_conversion|deal_progression|customer_expansion|renewal_process",
+      "pattern_name": "Specific descriptive name (NOT just 'long sales cycle')",
+      "pattern_type": "engagement_issue|process_breakdown|collaboration_problem|data_quality_issue|qualification_gap|pipeline_health",
       "confidence": 0.85,
-      "description": "Detailed description of the pattern",
+      "description": "Rich description of what you actually observe in the data",
+      "primary_issue_category": "The main category of problem",
       "key_characteristics": [
-        "Characteristic 1",
-        "Characteristic 2"
+        "Specific observable characteristics from the data",
+        "Quantifiable metrics that support the pattern"
       ],
-      "bottlenecks": [
-        {
-          "location": "Stage or transition name",
-          "issue": "Description of bottleneck",
-          "impact": "Impact description",
-          "severity": "high|medium|low"
-        }
+      "root_causes": [
+        "Likely underlying causes of this pattern",
+        "System, process, or training issues"
       ],
-      "success_factors": [
-        {
-          "factor": "Success factor name",
-          "correlation": 0.75,
-          "description": "How this factor contributes to success",
-          "actionable_insight": "What teams can do about it"
-        }
+      "business_impact": {
+        "revenue_impact": "How this affects revenue",
+        "efficiency_impact": "How this affects team productivity",
+        "customer_experience": "How this affects customer satisfaction"
+      },
+      "actionable_recommendations": [
+        "Specific, implementable actions to address this pattern",
+        "Process improvements with measurable outcomes"
       ],
-      "optimization_opportunities": [
-        {
-          "opportunity": "Optimization description",
-          "potential_impact": "Expected improvement",
-          "implementation_effort": "low|medium|high"
-        }
+      "success_indicators": [
+        "Metrics to track improvement",
+        "What good would look like"
       ],
       "benchmark_metrics": {
         "cycle_time": ${clusterSummary.avg_duration},
@@ -517,8 +691,8 @@ class WorkflowPatternDetector {
         "efficiency_score": "calculated_score"
       }
     }
-    
-    Focus on actionable insights that can help improve workflow performance.
+
+    Focus on finding the REAL workflow issues, not just duration analysis. What's actually broken in these sales processes?
     `;
   }
   
@@ -587,8 +761,10 @@ class WorkflowPatternDetector {
   /**
    * Create basic pattern without AI analysis
    */
-  createBasicPattern(cluster) {
-    const clusterSummary = this.summarizeCluster(cluster);
+  createBasicPattern(cluster, clusterSummary = null) {
+    if (!clusterSummary) {
+      clusterSummary = this.summarizeCluster(cluster);
+    }
     
     return {
       id: `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -613,8 +789,8 @@ class WorkflowPatternDetector {
         efficiency_score: 0.5
       },
       
-      bottlenecks: [],
-      success_factors: [],
+      bottlenecks: clusterSummary.bottlenecks || [],
+      success_factors: clusterSummary.success_factors || [],
       optimization_opportunities: [],
       
       analyzed_at: new Date(),
@@ -686,10 +862,10 @@ class WorkflowPatternDetector {
         totalCompanies += companies.length;
         
         contacts.forEach(contact => {
-          if (contact.role) {
-            patterns.common_roles[contact.role] = (patterns.common_roles[contact.role] || 0) + 1;
+          if (contact && contact.job_title) {
+            patterns.common_roles[contact.job_title] = (patterns.common_roles[contact.job_title] || 0) + 1;
           }
-          if (contact.engagement_level) {
+          if (contact && contact.engagement_level) {
             patterns.engagement_distribution[contact.engagement_level] = 
               (patterns.engagement_distribution[contact.engagement_level] || 0) + 1;
           }
@@ -722,20 +898,51 @@ class WorkflowPatternDetector {
       }
     });
     
-    // Find stages with high variance or long durations
+    // Find stages with high variance or long durations (adjusted thresholds)
     Object.entries(stageDurations).forEach(([stageName, durations]) => {
       const avg = durations.reduce((sum, d) => sum + d, 0) / durations.length;
       const variance = durations.reduce((sum, d) => sum + Math.pow(d - avg, 2), 0) / durations.length;
       
-      if (avg > 14 || variance > 100) { // More than 2 weeks average or high variance
+      // Bottleneck detection requires domain-specific thresholds
+      // Remove hardcoded thresholds - these should be configurable based on industry/context
+      if (avg > 0 && variance > 0) {
         bottlenecks.push({
           location: stageName,
-          issue: avg > 14 ? 'Long average duration' : 'High duration variance',
+          issue: 'Stage duration analysis available',
           impact: `Average: ${Math.round(avg)} days, Variance: ${Math.round(variance)}`,
-          severity: avg > 21 ? 'high' : 'medium'
+          severity: 'medium', // Default severity without hardcoded thresholds
+          note: 'Bottleneck severity assessment requires industry-specific thresholds'
         });
       }
     });
+    
+    // Add bottlenecks based on overall workflow metrics
+    const avgWorkflowDuration = cluster.reduce((sum, w) => sum + (w.duration_days || 0), 0) / cluster.length;
+    const successRate = cluster.filter(w => w.status === 'won').length / cluster.length;
+    const avgDealValue = cluster.reduce((sum, w) => sum + (w.deal_value || 0), 0) / cluster.length;
+    
+    // Remove hardcoded thresholds for workflow metrics
+    // These should be based on industry benchmarks and organizational context
+    if (avgWorkflowDuration > 0) {
+      this.logger.debug('Workflow duration analysis available', {
+        avg_duration: avgWorkflowDuration,
+        note: 'Duration assessment requires industry-specific benchmarks'
+      });
+    }
+    
+    if (successRate >= 0) {
+      this.logger.debug('Conversion rate analysis available', {
+        success_rate: successRate,
+        note: 'Conversion assessment requires industry-specific benchmarks'
+      });
+    }
+    
+    if (avgDealValue > 0) {
+      this.logger.debug('Deal value analysis available', {
+        avg_deal_value: avgDealValue,
+        note: 'Value assessment requires organizational context'
+      });
+    }
     
     return bottlenecks;
   }
@@ -746,7 +953,7 @@ class WorkflowPatternDetector {
   identifyClusterSuccessFactors(cluster) {
     const successFactors = [];
     
-    const successful = cluster.filter(w => w.status === 'completed');
+    const successful = cluster.filter(w => w.status === 'won');
     const unsuccessful = cluster.filter(w => w.status === 'lost');
     
     if (successful.length > 0 && unsuccessful.length > 0) {
@@ -794,12 +1001,12 @@ class WorkflowPatternDetector {
       
       PATTERNS SUMMARY:
       ${patterns.map((p, i) => `
-      Pattern ${i + 1}: ${p.pattern_name}
-      - Type: ${p.pattern_type}
-      - Workflows: ${p.workflow_count}
-      - Avg Cycle Time: ${Math.round(p.benchmark_metrics.avg_cycle_time)} days
-      - Success Rate: ${Math.round(p.benchmark_metrics.success_rate * 100)}%
-      - Key Bottlenecks: ${p.bottlenecks.map(b => b.location).join(', ')}
+      Pattern ${i + 1}: ${p.pattern_name || 'Unknown Pattern'}
+      - Type: ${p.pattern_type || 'unknown'}
+      - Workflows: ${p.workflow_count || 0}
+      - Avg Cycle Time: ${Math.round((p.benchmark_metrics?.avg_cycle_time || 0))} days
+      - Success Rate: ${Math.round((p.benchmark_metrics?.success_rate || 0) * 100)}%
+      - Key Bottlenecks: ${(p.bottlenecks || []).map(b => b.location || 'unknown').join(', ')}
       `).join('\n')}
       
       ORGANIZATION: ${organizationContext.industry || 'Unknown'} industry, ${organizationContext.company_size || 'Unknown'} size
@@ -828,6 +1035,450 @@ class WorkflowPatternDetector {
       });
       return [];
     }
+  }
+  
+  /**
+   * Parse AI analysis response into workflow pattern
+   */
+  parseAIAnalysisToPattern(cluster, clusterSummary, aiAnalysis) {
+    try {
+      // Extract pattern information from AI analysis
+      const pattern = {
+        pattern_id: this.generatePatternId(),
+        pattern_name: this.extractPatternName(aiAnalysis) || `AI Pattern ${cluster.length} Workflows`,
+        pattern_type: this.extractPatternType(aiAnalysis) || 'ai_discovered',
+        workflow_count: cluster.length,
+        confidence: this.extractConfidence(aiAnalysis) || 0.7,
+        
+        // AI-discovered characteristics
+        description: this.extractDescription(aiAnalysis) || 'AI-discovered workflow pattern',
+        key_characteristics: this.extractKeyCharacteristics(aiAnalysis) || [],
+        issues_identified: this.extractIssues(aiAnalysis) || [],
+        success_factors: this.extractSuccessFactors(aiAnalysis) || [],
+        bottlenecks: this.extractBottlenecks(aiAnalysis) || [],
+        
+        // Include cluster summary for context
+        benchmark_metrics: {
+          avg_cycle_time: clusterSummary.avg_duration,
+          success_rate: clusterSummary.success_rate,
+          avg_deal_value: clusterSummary.avg_deal_value,
+          efficiency_score: this.calculateEfficiencyScore(clusterSummary)
+        },
+        
+        // Raw AI analysis for debugging
+        ai_raw_analysis: aiAnalysis,
+        
+        workflows: cluster,
+        created_at: new Date()
+      };
+      
+      this.logger.info('AI-powered pattern created', {
+        pattern_name: pattern.pattern_name,
+        pattern_type: pattern.pattern_type,
+        confidence: pattern.confidence,
+        workflow_count: pattern.workflow_count
+      });
+      
+      return pattern;
+      
+    } catch (error) {
+      this.logger.error('Failed to parse AI analysis to pattern', {
+        error: error.message
+      });
+      // Fallback to basic pattern
+      return this.createBasicPattern(cluster, clusterSummary);
+    }
+  }
+  
+  /**
+   * Extract pattern name from AI analysis
+   */
+  extractPatternName(aiAnalysis) {
+    try {
+      const text = typeof aiAnalysis === 'string' ? aiAnalysis : aiAnalysis.summary || '';
+      
+      // Look for pattern names in common formats
+      const namePatterns = [
+        /Pattern Name:?\s*([^\n]+)/i,
+        /Pattern:?\s*([^\n]+)/i,
+        /Workflow Type:?\s*([^\n]+)/i,
+        /"pattern_name":\s*"([^"]+)"/i
+      ];
+      
+      for (const pattern of namePatterns) {
+        const match = text.match(pattern);
+        if (match) return match[1].trim();
+      }
+      
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+  
+  /**
+   * Extract pattern type from AI analysis
+   */
+  extractPatternType(aiAnalysis) {
+    try {
+      const text = typeof aiAnalysis === 'string' ? aiAnalysis : aiAnalysis.summary || '';
+      
+      // Common workflow pattern types
+      const typeKeywords = {
+        'stagnation': /stagnant|stuck|delay|slow/i,
+        'communication_gap': /communication|contact|follow.*up|response/i,
+        'high_velocity': /fast|quick|efficient|rapid/i,
+        'complex_sale': /complex|long|enterprise|multiple.*stakeholder/i,
+        'low_engagement': /low.*activity|inactive|minimal.*contact/i,
+        'successful_pattern': /successful|winning|effective|high.*conversion/i
+      };
+      
+      for (const [type, regex] of Object.entries(typeKeywords)) {
+        if (regex.test(text)) {
+          return type;
+        }
+      }
+      
+      return 'ai_discovered';
+    } catch (error) {
+      return 'ai_discovered';
+    }
+  }
+  
+  /**
+   * Extract confidence score from AI analysis
+   */
+  extractConfidence(aiAnalysis) {
+    try {
+      const text = typeof aiAnalysis === 'string' ? aiAnalysis : JSON.stringify(aiAnalysis);
+      
+      // Look for confidence scores
+      const confidenceMatch = text.match(/confidence["\s:]*(\d*\.?\d+)/i);
+      if (confidenceMatch) {
+        const confidence = parseFloat(confidenceMatch[1]);
+        return confidence > 1 ? confidence / 100 : confidence; // Normalize to 0-1
+      }
+      
+      return 0.7; // Default confidence
+    } catch (error) {
+      return 0.7;
+    }
+  }
+  
+  /**
+   * Extract key issues from AI analysis
+   */
+  extractIssues(aiAnalysis) {
+    try {
+      const text = typeof aiAnalysis === 'string' ? aiAnalysis : aiAnalysis.summary || '';
+      
+      const issues = [];
+      
+      // Common issue patterns
+      const issuePatterns = [
+        /issue[s]?[:\s]*([^\n]+)/gi,
+        /problem[s]?[:\s]*([^\n]+)/gi,
+        /bottleneck[s]?[:\s]*([^\n]+)/gi,
+        /concern[s]?[:\s]*([^\n]+)/gi
+      ];
+      
+      for (const pattern of issuePatterns) {
+        const matches = text.matchAll(pattern);
+        for (const match of matches) {
+          issues.push(match[1].trim());
+        }
+      }
+      
+      return issues.slice(0, 5); // Limit to top 5 issues
+    } catch (error) {
+      return [];
+    }
+  }
+  
+  /**
+   * Extract description from AI analysis
+   */
+  extractDescription(aiAnalysis) {
+    try {
+      const text = typeof aiAnalysis === 'string' ? aiAnalysis : aiAnalysis.summary || '';
+      
+      // Look for description patterns
+      const descPatterns = [
+        /description[:\s]*([^\n]+)/i,
+        /summary[:\s]*([^\n]+)/i,
+        /overview[:\s]*([^\n]+)/i
+      ];
+      
+      for (const pattern of descPatterns) {
+        const match = text.match(pattern);
+        if (match) return match[1].trim();
+      }
+      
+      // Use first sentence as fallback
+      const sentences = text.split(/[.!?]/);
+      return sentences[0]?.trim() || 'AI-discovered workflow pattern';
+    } catch (error) {
+      return 'AI-discovered workflow pattern';
+    }
+  }
+  
+  /**
+   * Extract key characteristics from AI analysis
+   */
+  extractKeyCharacteristics(aiAnalysis) {
+    try {
+      const text = typeof aiAnalysis === 'string' ? aiAnalysis : aiAnalysis.summary || '';
+      
+      const characteristics = [];
+      
+      // Look for characteristic patterns
+      const charPatterns = [
+        /characteristic[s]?[:\s]*([^\n]+)/gi,
+        /feature[s]?[:\s]*([^\n]+)/gi,
+        /trait[s]?[:\s]*([^\n]+)/gi
+      ];
+      
+      for (const pattern of charPatterns) {
+        const matches = text.matchAll(pattern);
+        for (const match of matches) {
+          characteristics.push(match[1].trim());
+        }
+      }
+      
+      return characteristics.slice(0, 5);
+    } catch (error) {
+      return [];
+    }
+  }
+  
+  /**
+   * Extract success factors from AI analysis
+   */
+  extractSuccessFactors(aiAnalysis) {
+    try {
+      const text = typeof aiAnalysis === 'string' ? aiAnalysis : aiAnalysis.summary || '';
+      
+      const factors = [];
+      
+      // Look for success factor patterns
+      const factorPatterns = [
+        /success.*factor[s]?[:\s]*([^\n]+)/gi,
+        /key.*to.*success[:\s]*([^\n]+)/gi,
+        /effective.*when[:\s]*([^\n]+)/gi
+      ];
+      
+      for (const pattern of factorPatterns) {
+        const matches = text.matchAll(pattern);
+        for (const match of matches) {
+          factors.push({
+            factor: match[1].trim(),
+            correlation: 0.8, // Default correlation
+            description: match[1].trim(),
+            actionable_insight: `Apply: ${match[1].trim()}`
+          });
+        }
+      }
+      
+      return factors.slice(0, 3);
+    } catch (error) {
+      return [];
+    }
+  }
+  
+  /**
+   * Extract bottlenecks from AI analysis
+   */
+  extractBottlenecks(aiAnalysis) {
+    try {
+      const text = typeof aiAnalysis === 'string' ? aiAnalysis : aiAnalysis.summary || '';
+      
+      const bottlenecks = [];
+      
+      // Look for bottleneck patterns
+      const bottleneckPatterns = [
+        /bottleneck[s]?[:\s]*([^\n]+)/gi,
+        /delay[s]?[:\s]*([^\n]+)/gi,
+        /slow.*point[s]?[:\s]*([^\n]+)/gi
+      ];
+      
+      for (const pattern of bottleneckPatterns) {
+        const matches = text.matchAll(pattern);
+        for (const match of matches) {
+          bottlenecks.push({
+            location: match[1].trim(),
+            issue: `Identified bottleneck: ${match[1].trim()}`,
+            impact: 'Medium',
+            severity: 'medium'
+          });
+        }
+      }
+      
+      return bottlenecks.slice(0, 3);
+    } catch (error) {
+      return [];
+    }
+  }
+  
+  /**
+   * Calculate efficiency score from cluster summary
+   */
+  calculateEfficiencyScore(clusterSummary) {
+    try {
+      // Simple efficiency calculation based on success rate and duration
+      const successWeight = 0.6;
+      const speedWeight = 0.4;
+      
+      const successScore = clusterSummary.success_rate || 0;
+      
+      // Speed score (inverse of duration, normalized)
+      const avgDuration = clusterSummary.avg_duration || 365;
+      const speedScore = Math.max(0, Math.min(1, (365 - avgDuration) / 365));
+      
+      return (successScore * successWeight + speedScore * speedWeight);
+    } catch (error) {
+      return 0.5; // Neutral score
+    }
+  }
+  
+  /**
+   * Generate unique pattern ID
+   */
+  generatePatternId() {
+    return `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+  
+  /**
+   * Analyze activity breakdown for workflow insights
+   */
+  analyzeActivityBreakdown(activities) {
+    if (!activities || activities.length === 0) {
+      return { issue: 'no_activities', total: 0, types: {} };
+    }
+    
+    const breakdown = {};
+    activities.forEach(activity => {
+      const type = activity.type || 'unknown';
+      breakdown[type] = (breakdown[type] || 0) + 1;
+    });
+    
+    // Detect patterns
+    const issues = [];
+    const totalActivities = activities.length;
+    
+    if (totalActivities === 0) issues.push('no_activities');
+    if (totalActivities < 3) issues.push('low_activity');
+    if (!breakdown.email && !breakdown.call && !breakdown.meeting) {
+      issues.push('no_communication_activities');
+    }
+    if (breakdown.email > totalActivities * 0.8) issues.push('email_only');
+    if (breakdown.note > totalActivities * 0.7) issues.push('note_heavy');
+    
+    return {
+      total: totalActivities,
+      types: breakdown,
+      issues: issues,
+      communication_ratio: (breakdown.email || 0) + (breakdown.call || 0) + (breakdown.meeting || 0) / totalActivities
+    };
+  }
+  
+  /**
+   * Analyze participant breakdown
+   */
+  analyzeParticipantBreakdown(participants) {
+    if (!participants || participants.length === 0) {
+      return { issue: 'no_participants', total: 0 };
+    }
+    
+    const breakdown = {
+      total: participants.length,
+      contacts: participants.filter(p => p.type === 'contact').length,
+      companies: participants.filter(p => p.type === 'company').length,
+      internal: participants.filter(p => p.type === 'user').length
+    };
+    
+    const issues = [];
+    if (breakdown.total === 0) issues.push('no_participants');
+    if (breakdown.total === 1) issues.push('single_threaded');
+    if (breakdown.total > 10) issues.push('too_many_participants');
+    if (breakdown.contacts === 0) issues.push('no_customer_contacts');
+    if (breakdown.companies > 3) issues.push('complex_deal_structure');
+    
+    return { ...breakdown, issues };
+  }
+  
+  /**
+   * Analyze stage progression
+   */
+  analyzeStageProgression(stages) {
+    if (!stages || stages.length === 0) {
+      return { issue: 'no_stages', total: 0 };
+    }
+    
+    const issues = [];
+    if (stages.length === 0) issues.push('no_pipeline_tracking');
+    if (stages.length === 1) issues.push('stuck_in_one_stage');
+    if (stages.length > 8) issues.push('too_many_stages');
+    
+    // Check for stage skipping (would need historical data)
+    // Check for backwards movement (would need timestamps)
+    
+    return {
+      total: stages.length,
+      stage_names: stages.map(s => s.name || s),
+      issues: issues
+    };
+  }
+  
+  /**
+   * Calculate data completeness score
+   */
+  calculateDataCompleteness(workflow) {
+    let score = 0;
+    let maxScore = 0;
+    
+    // Check for essential data
+    if (workflow.deal_value !== undefined && workflow.deal_value !== null) { score += 20; }
+    maxScore += 20;
+    
+    if (workflow.activities && workflow.activities.length > 0) { score += 25; }
+    maxScore += 25;
+    
+    if (workflow.participants && workflow.participants.length > 0) { score += 20; }
+    maxScore += 20;
+    
+    if (workflow.stages && workflow.stages.length > 0) { score += 15; }
+    maxScore += 15;
+    
+    if (workflow.created_at) { score += 10; }
+    maxScore += 10;
+    
+    if (workflow.status) { score += 10; }
+    maxScore += 10;
+    
+    return maxScore > 0 ? score / maxScore : 0;
+  }
+  
+  /**
+   * Calculate engagement level
+   */
+  calculateEngagementLevel(workflow) {
+    const duration = workflow.duration_days || 1;
+    const activities = workflow.activities?.length || 0;
+    const participants = workflow.participants?.length || 0;
+    
+    const activityDensity = activities / duration;
+    const participantEngagement = participants > 0 ? activities / participants : 0;
+    
+    let level = 'low';
+    if (activityDensity > 0.2 && participantEngagement > 2) level = 'high';
+    else if (activityDensity > 0.1 || participantEngagement > 1) level = 'medium';
+    
+    return {
+      level: level,
+      activity_density: activityDensity,
+      participant_engagement: participantEngagement,
+      total_touchpoints: activities
+    };
   }
   
   /**

@@ -40,7 +40,15 @@ class CRMWorkflowAnalyzer extends EventEmitter {
         winston.format.timestamp(),
         winston.format.json()
       ),
-      defaultMeta: { service: 'crm-workflow-analyzer' }
+      defaultMeta: { service: 'crm-workflow-analyzer' },
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+          )
+        })
+      ]
     });
     
     // Initialize components
@@ -226,9 +234,16 @@ class CRMWorkflowAnalyzer extends EventEmitter {
    * Generate analysis summary
    */
   generateAnalysisSummary(workflows, patterns, recommendations) {
-    const completedWorkflows = workflows.filter(w => w.status === 'completed');
+    // Fix success rate calculation - 'completed' workflows would be those that closed successfully
+    // In HubSpot context: deals with closed-won status, or deals that reached final positive stage
+    const successfulWorkflows = workflows.filter(w => 
+      w.status === 'completed' || 
+      w.status === 'won' || 
+      (w.stages && w.stages.some(stage => stage.is_closed_won)) ||
+      (w.hubspot_metadata && w.hubspot_metadata.pipeline_name && w.deal_value > 0 && w.status === 'active')
+    );
     const avgCycleTime = workflows.reduce((sum, w) => sum + (w.duration_days || 0), 0) / workflows.length;
-    const conversionRate = completedWorkflows.length / workflows.length;
+    const conversionRate = successfulWorkflows.length / workflows.length;
     
     const criticalBottlenecks = patterns.reduce((count, p) => 
       count + (p.bottlenecks?.filter(b => b.severity === 'high' || b.severity === 'critical').length || 0), 0
@@ -251,28 +266,14 @@ class CRMWorkflowAnalyzer extends EventEmitter {
    * Calculate overall workflow health score
    */
   calculateWorkflowHealthScore(workflows, patterns) {
-    let score = 50; // Base score
+    // Health score calculation requires configurable weights and industry benchmarks
+    this.logger.warn('Health score calculation requires external configuration', {
+      workflow_count: workflows.length,
+      pattern_count: patterns.length
+    });
     
-    // Conversion rate impact (30%)
-    const conversionRate = workflows.filter(w => w.status === 'completed').length / workflows.length;
-    score += (conversionRate - 0.2) * 150; // Assume 20% baseline
-    
-    // Cycle time impact (25%)
-    const avgCycleTime = workflows.reduce((sum, w) => sum + (w.duration_days || 0), 0) / workflows.length;
-    const cycleTimeScore = Math.max(0, 100 - avgCycleTime); // Shorter is better
-    score += cycleTimeScore * 0.25;
-    
-    // Bottleneck impact (25%)
-    const criticalBottlenecks = patterns.reduce((count, p) => 
-      count + (p.bottlenecks?.filter(b => b.severity === 'critical').length || 0), 0
-    );
-    score -= criticalBottlenecks * 10;
-    
-    // Efficiency impact (20%)
-    const avgEfficiency = workflows.reduce((sum, w) => sum + (w.efficiency_score || 0.5), 0) / workflows.length;
-    score += avgEfficiency * 20;
-    
-    return Math.max(0, Math.min(100, Math.round(score)));
+    // Return neutral score without hardcoded calculations
+    return 50; // Neutral score - real calculation requires external benchmarks
   }
   
   /**
@@ -392,19 +393,60 @@ class CRMWorkflowAnalyzer extends EventEmitter {
    * Get organization context for analysis
    */
   async getOrganizationContext(organizationId) {
-    // In production, this would fetch from database
-    // For now, return default context
+    // Try to load actual company intelligence first
+    try {
+      const CompanyContextManager = require('./intelligence/company-context-manager');
+      const contextManager = new CompanyContextManager();
+      
+      // Load company context for this organization
+      const companyContext = await contextManager.loadCompanyContext(organizationId);
+      
+      if (companyContext) {
+        // Convert company intelligence to organization context format
+        const orgContext = companyContext.organization_context;
+        return {
+          organization_id: organizationId,
+          industry: orgContext.industry || 'Technology',
+          company_size: orgContext.company_size || 'Mid-Market',
+          sales_team_size: orgContext.sales_team_size || null,
+          avg_deal_size: orgContext.avg_deal_size || null,
+          current_conversion_rate: orgContext.current_conversion_rate || null,
+          avg_cycle_time: orgContext.avg_cycle_time || null,
+          crm_system: orgContext.crm_system || 'Unknown',
+          tech_sophistication: orgContext.tech_sophistication || 'medium',
+          budget_range: orgContext.budget_range || null,
+          business_model: orgContext.business_model || null,
+          sales_complexity: orgContext.sales_complexity || 'consultative',
+          // Add workflow intelligence for better recommendations
+          automation_gaps: companyContext.workflow_intelligence?.automation_gaps || [],
+          integration_needs: companyContext.workflow_intelligence?.integration_needs || [],
+          manual_processes: companyContext.workflow_intelligence?.manual_process_mentions || []
+        };
+      }
+    } catch (error) {
+      this.logger.warn('Failed to load company intelligence, using defaults', { 
+        organization_id: organizationId, 
+        error: error.message 
+      });
+    }
+    
+    // No fallback context - organization context must be provided
+    this.logger.error('Organization context not available and no fallback provided', {
+      organization_id: organizationId
+    });
+    
     return {
       organization_id: organizationId,
-      industry: 'Technology',
-      company_size: 'Mid-Market',
-      sales_team_size: 25,
-      avg_deal_size: 75000,
-      current_conversion_rate: 0.22,
-      avg_cycle_time: 65,
-      crm_system: 'HubSpot',
-      tech_sophistication: 'high',
-      budget_range: '$50K-$200K'
+      industry: null,
+      company_size: null,
+      sales_team_size: null,
+      avg_deal_size: null,
+      current_conversion_rate: null,
+      avg_cycle_time: null,
+      crm_system: null,
+      tech_sophistication: null,
+      budget_range: null,
+      note: 'Organization context must be provided externally'
     };
   }
   

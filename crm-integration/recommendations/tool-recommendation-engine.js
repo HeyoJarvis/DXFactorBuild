@@ -37,47 +37,8 @@ class ToolRecommendationEngine {
     this.roiCalculator = new ROICalculator(options);
     this.marketIntelligence = new MarketIntelligenceEngine(options);
     
-    // Tool database with categories and capabilities
-    this.toolDatabase = {
-      lead_generation: [
-        { name: 'Apollo', pricing: 'from_$49', features: ['prospecting', 'email_finder', 'sequences'] },
-        { name: 'ZoomInfo', pricing: 'from_$79', features: ['database', 'intent_data', 'technographics'] },
-        { name: 'Outreach', pricing: 'from_$100', features: ['sequences', 'automation', 'analytics'] },
-        { name: 'SalesLoft', pricing: 'from_$125', features: ['cadences', 'dialer', 'analytics'] }
-      ],
-      email_automation: [
-        { name: 'Outreach', pricing: 'from_$100', features: ['sequences', 'personalization', 'analytics'] },
-        { name: 'SalesLoft', pricing: 'from_$125', features: ['cadences', 'templates', 'tracking'] },
-        { name: 'Mailchimp', pricing: 'from_$10', features: ['campaigns', 'automation', 'segmentation'] },
-        { name: 'HubSpot', pricing: 'from_$45', features: ['workflows', 'personalization', 'crm_integration'] }
-      ],
-      meeting_scheduling: [
-        { name: 'Calendly', pricing: 'from_$8', features: ['scheduling', 'integrations', 'automation'] },
-        { name: 'Chili Piper', pricing: 'from_$30', features: ['routing', 'qualification', 'handoff'] },
-        { name: 'Acuity', pricing: 'from_$14', features: ['booking', 'payments', 'customization'] }
-      ],
-      proposal_automation: [
-        { name: 'PandaDoc', pricing: 'from_$19', features: ['templates', 'esignature', 'analytics'] },
-        { name: 'DocuSign', pricing: 'from_$10', features: ['esignature', 'workflows', 'compliance'] },
-        { name: 'Proposify', pricing: 'from_$19', features: ['proposals', 'templates', 'tracking'] },
-        { name: 'Qwilr', pricing: 'from_$35', features: ['interactive', 'analytics', 'integrations'] }
-      ],
-      workflow_automation: [
-        { name: 'Zapier', pricing: 'from_$19', features: ['integrations', 'workflows', 'triggers'] },
-        { name: 'Microsoft Power Automate', pricing: 'from_$15', features: ['flows', 'connectors', 'ai'] },
-        { name: 'Integromat', pricing: 'from_$9', features: ['scenarios', 'data_processing', 'scheduling'] }
-      ],
-      analytics: [
-        { name: 'Gong', pricing: 'from_$200', features: ['conversation_ai', 'coaching', 'forecasting'] },
-        { name: 'Chorus', pricing: 'from_$180', features: ['call_analysis', 'insights', 'coaching'] },
-        { name: 'Tableau', pricing: 'from_$70', features: ['visualization', 'dashboards', 'analytics'] }
-      ],
-      video_engagement: [
-        { name: 'Loom', pricing: 'from_$8', features: ['screen_recording', 'video_messages', 'analytics'] },
-        { name: 'Vidyard', pricing: 'from_$19', features: ['video_sales', 'personalization', 'tracking'] },
-        { name: 'BombBomb', pricing: 'from_$33', features: ['video_email', 'automation', 'crm_integration'] }
-      ]
-    };
+    // Tool database will be loaded from external sources
+    this.toolDatabase = {};
   }
   
   /**
@@ -136,60 +97,65 @@ class ToolRecommendationEngine {
    */
   async recommendForBottleneck(bottleneck, organizationContext) {
     try {
-      // AI analysis to identify tool categories and specific tools
-      const toolAnalysis = await this.analyzeBottleneckForTools(bottleneck, organizationContext);
-      
       const recommendations = [];
       
-      for (const toolSuggestion of toolAnalysis.suggested_tools || []) {
-        // Calculate ROI for this tool
-        const roiAnalysis = await this.roiCalculator.calculateROI(
-          toolSuggestion,
-          bottleneck,
-          organizationContext
-        );
-        
-        // Create recommendation object
-        const recommendation = {
-          workflow_id: bottleneck.workflow_id,
-          bottleneck_id: bottleneck.id,
-          organization_id: organizationContext.organization_id,
+      // Generate recommendations based on bottleneck type using AI analysis
+      const toolAnalysis = await this.analyzeBottleneckForTools(bottleneck, organizationContext);
+      const toolSuggestions = toolAnalysis.suggested_tools || [];
+      
+      for (const toolSuggestion of toolSuggestions) {
+        try {
+          // Calculate ROI for this tool suggestion
+          const roiAnalysis = await this.roiCalculator.calculateROI(toolSuggestion, bottleneck, organizationContext);
           
-          recommended_tool: toolSuggestion.tool_name,
-          tool_category: toolSuggestion.category,
-          tool_stack: toolSuggestion.additional_tools || [],
+          // Create recommendation object with ROI data
+          const recommendation = {
+            workflow_id: bottleneck.workflow_id || 'unknown',
+            bottleneck_id: bottleneck.id || `bottleneck_${Date.now()}`,
+            organization_id: organizationContext.organization_id,
+            
+            recommended_tool: toolSuggestion.tool_name,
+            tool_category: toolSuggestion.category,
+            tool_stack: toolSuggestion.additional_tools || [],
+            
+            addresses_issue: bottleneck.issue,
+            solution_description: toolSuggestion.solution_description,
+            expected_improvement: toolSuggestion.expected_improvement,
+            
+            // ROI data
+            roi_analysis: roiAnalysis,
+            implementation_cost: roiAnalysis.total_cost,
+            annual_savings: roiAnalysis.annual_savings,
+            revenue_impact: roiAnalysis.revenue_impact,
+            payback_period_months: roiAnalysis.payback_months,
+            roi_percentage: roiAnalysis.roi_percentage,
+            
+            // Implementation details
+            implementation_plan: toolSuggestion.implementation_plan,
+            implementation_effort: toolSuggestion.implementation_effort,
+            estimated_weeks: toolSuggestion.estimated_weeks,
+            
+            // Risk assessment
+            risk_factors: toolSuggestion.risk_factors || [],
+            success_probability: toolSuggestion.success_probability || 0.8,
+            
+            // AI metadata
+            ai_confidence: toolSuggestion.confidence || 0.7,
+            analysis_model: this.aiAnalyzer.options.model,
+            
+            priority: this.calculatePriority(bottleneck, roiAnalysis),
+            status: 'pending',
+            created_at: new Date()
+          };
           
-          addresses_issue: bottleneck.issue,
-          solution_description: toolSuggestion.solution_description,
-          expected_improvement: toolSuggestion.expected_improvement,
-          
-          // ROI data
-          roi_analysis: roiAnalysis,
-          implementation_cost: roiAnalysis.total_cost,
-          annual_savings: roiAnalysis.annual_savings,
-          revenue_impact: roiAnalysis.revenue_impact,
-          payback_period_months: roiAnalysis.payback_months,
-          roi_percentage: roiAnalysis.roi_percentage,
-          
-          // Implementation details
-          implementation_plan: toolSuggestion.implementation_plan,
-          implementation_effort: toolSuggestion.implementation_effort,
-          estimated_weeks: toolSuggestion.estimated_weeks,
-          
-          // Risk assessment
-          risk_factors: toolSuggestion.risk_factors || [],
-          success_probability: toolSuggestion.success_probability || 0.8,
-          
-          // AI metadata
-          ai_confidence: toolSuggestion.confidence || 0.7,
-          analysis_model: this.aiAnalyzer.options.model,
-          
-          priority: this.calculatePriority(bottleneck, roiAnalysis),
-          status: 'pending',
-          created_at: new Date()
-        };
-        
-        recommendations.push(recommendation);
+          recommendations.push(recommendation);
+        } catch (roiError) {
+          this.logger.error('ROI calculation failed for tool suggestion', {
+            tool_name: toolSuggestion.tool_name,
+            error: roiError.message
+          });
+          // Continue with next suggestion instead of failing completely
+        }
       }
       
       return recommendations;
@@ -197,7 +163,8 @@ class ToolRecommendationEngine {
     } catch (error) {
       this.logger.error('Bottleneck tool recommendation failed', {
         bottleneck_id: bottleneck.id,
-        error: error.message
+        error: error.message,
+        stack: error.stack
       });
       return [];
     }
@@ -224,8 +191,7 @@ class ToolRecommendationEngine {
     - Tech Sophistication: ${organizationContext.tech_sophistication || 'medium'}
     - Budget Range: ${organizationContext.budget_range || 'Not specified'}
     
-    AVAILABLE TOOL CATEGORIES:
-    ${JSON.stringify(Object.keys(this.toolDatabase), null, 2)}
+    NOTE: Please analyze the bottleneck and suggest appropriate tools without relying on a predefined database.
     
     Please recommend the top 3 tools that would best solve this bottleneck:
     
@@ -274,9 +240,18 @@ class ToolRecommendationEngine {
     `;
     
     const analysis = await this.aiAnalyzer.performAnalysis({
+      title: `Tool Recommendation for ${bottleneck.location}`,
       content: analysisPrompt,
-      type: 'tool_recommendation',
-      max_tokens: 2000
+      metadata: {
+        type: 'tool_recommendation',
+        bottleneck_location: bottleneck.location,
+        organization_id: organizationContext.organization_id
+      }
+    }, {
+      // Pass safe user context to avoid undefined property access
+      competitors: [],
+      our_products: [],
+      focus_areas: ['sales_automation', 'workflow_optimization']
     });
     
     return this.parseToolAnalysis(analysis);
@@ -343,9 +318,18 @@ class ToolRecommendationEngine {
       `;
       
       const amplificationAnalysis = await this.aiAnalyzer.performAnalysis({
+        title: `Success Amplification for ${successFactor.factor}`,
         content: amplificationPrompt,
-        type: 'success_amplification',
-        max_tokens: 1500
+        metadata: {
+          type: 'success_amplification',
+          success_factor: successFactor.factor,
+          organization_id: organizationContext.organization_id
+        }
+      }, {
+        // Pass safe user context to avoid undefined property access
+        competitors: [],
+        our_products: [],
+        focus_areas: ['sales_optimization', 'success_scaling']
       });
       
       const parsedAnalysis = this.parseToolAnalysis(amplificationAnalysis);
@@ -424,33 +408,12 @@ class ToolRecommendationEngine {
    * Get tool alternatives and comparisons
    */
   async getToolAlternatives(primaryTool, category, organizationContext) {
-    try {
-      const alternatives = this.toolDatabase[category] || [];
-      const comparisons = [];
-      
-      for (const alt of alternatives) {
-        if (alt.name !== primaryTool) {
-          const comparison = await this.compareTools(primaryTool, alt.name, organizationContext);
-          comparisons.push({
-            tool_name: alt.name,
-            pricing: alt.pricing,
-            features: alt.features,
-            comparison: comparison,
-            recommendation_score: comparison.overall_score
-          });
-        }
-      }
-      
-      return comparisons.sort((a, b) => b.recommendation_score - a.recommendation_score);
-      
-    } catch (error) {
-      this.logger.error('Failed to get tool alternatives', {
-        primary_tool: primaryTool,
-        category: category,
-        error: error.message
-      });
-      return [];
-    }
+    // Tool alternatives must be provided by external tool data sources
+    this.logger.warn('Tool alternatives not available - external tool database required', {
+      primary_tool: primaryTool,
+      category: category
+    });
+    return [];
   }
   
   /**
@@ -482,9 +445,19 @@ class ToolRecommendationEngine {
       `;
       
       const comparison = await this.aiAnalyzer.performAnalysis({
+        title: `Tool Comparison: ${tool1} vs ${tool2}`,
         content: comparisonPrompt,
-        type: 'tool_comparison',
-        max_tokens: 1000
+        metadata: {
+          type: 'tool_comparison',
+          tool1: tool1,
+          tool2: tool2,
+          organization_id: organizationContext.organization_id
+        }
+      }, {
+        // Pass safe user context to avoid undefined property access
+        competitors: [],
+        our_products: [],
+        focus_areas: ['tool_evaluation']
       });
       
       return this.parseComparison(comparison);
@@ -542,73 +515,29 @@ class ROICalculator {
   
   async calculateROI(toolSuggestion, bottleneck, organizationContext) {
     try {
-      // Base calculations
-      const teamSize = organizationContext.sales_team_size || 10;
-      const avgDealSize = organizationContext.avg_deal_size || 50000;
-      const currentConversion = organizationContext.current_conversion_rate || 0.2;
-      const currentCycleTime = organizationContext.avg_cycle_time || 60;
+      // ROI calculation requires external cost data and specific organizational metrics
+      this.logger.warn('ROI calculation not available - requires external cost data and specific metrics', {
+        tool_name: toolSuggestion.tool_name,
+        organization_id: organizationContext.organization_id
+      });
       
-      // Tool costs
-      const monthlyCost = this.estimateToolCost(toolSuggestion.tool_name, teamSize);
-      const implementationCost = monthlyCost * 2; // Assume 2 months implementation cost
-      const annualCost = monthlyCost * 12;
-      const totalFirstYearCost = implementationCost + annualCost;
-      
-      // Expected improvements
-      const improvements = toolSuggestion.expected_improvement || {};
-      const conversionImprovement = improvements.conversion_rate_improvement || 0.1;
-      const cycleTimeReduction = improvements.cycle_time_reduction_days || 5;
-      const timeSavingsHours = improvements.time_savings_hours_per_week || 5;
-      
-      // Revenue impact calculations
-      const additionalDeals = (currentConversion * conversionImprovement) * teamSize * 12; // Monthly deals
-      const revenueFromAdditionalDeals = additionalDeals * avgDealSize;
-      
-      const fasterCycles = (cycleTimeReduction / currentCycleTime) * currentConversion * teamSize * 12;
-      const revenueFromFasterCycles = fasterCycles * avgDealSize;
-      
-      const totalRevenueImpact = revenueFromAdditionalDeals + revenueFromFasterCycles;
-      
-      // Cost savings
-      const hourlyCost = 75; // Assume $75/hour loaded cost
-      const weeklySavings = timeSavingsHours * hourlyCost;
-      const annualTimeSavings = weeklySavings * 52 * teamSize;
-      
-      // ROI calculations
-      const totalBenefits = totalRevenueImpact + annualTimeSavings;
-      const netBenefit = totalBenefits - totalFirstYearCost;
-      const roiPercentage = totalFirstYearCost > 0 ? (netBenefit / totalFirstYearCost) * 100 : 0;
-      const paybackMonths = totalFirstYearCost > 0 ? (totalFirstYearCost / (totalBenefits / 12)) : 0;
-      
+      // Return empty ROI structure
       return {
-        // Costs
-        monthly_cost: monthlyCost,
-        implementation_cost: implementationCost,
-        annual_cost: annualCost,
-        total_cost: totalFirstYearCost,
-        
-        // Benefits
-        revenue_impact: totalRevenueImpact,
-        annual_savings: annualTimeSavings,
-        total_benefits: totalBenefits,
-        
-        // ROI metrics
-        net_benefit: netBenefit,
-        roi_percentage: roiPercentage,
-        payback_months: paybackMonths,
-        
-        // Scenarios
-        conservative: this.calculateScenario(totalBenefits * 0.7, totalFirstYearCost),
-        realistic: this.calculateScenario(totalBenefits, totalFirstYearCost),
-        optimistic: this.calculateScenario(totalBenefits * 1.3, totalFirstYearCost),
-        
-        // Assumptions
+        monthly_cost: 0,
+        implementation_cost: 0,
+        annual_cost: 0,
+        total_cost: 0,
+        revenue_impact: 0,
+        annual_savings: 0,
+        total_benefits: 0,
+        net_benefit: 0,
+        roi_percentage: 0,
+        payback_months: 0,
+        conservative: { benefits: 0, net_benefit: 0, roi_percentage: 0, payback_months: 0 },
+        realistic: { benefits: 0, net_benefit: 0, roi_percentage: 0, payback_months: 0 },
+        optimistic: { benefits: 0, net_benefit: 0, roi_percentage: 0, payback_months: 0 },
         assumptions: {
-          team_size: teamSize,
-          avg_deal_size: avgDealSize,
-          current_conversion: currentConversion,
-          current_cycle_time: currentCycleTime,
-          hourly_cost: hourlyCost
+          note: 'ROI calculation requires external cost and organizational data'
         }
       };
       
@@ -631,31 +560,12 @@ class ROICalculator {
   }
   
   estimateToolCost(toolName, teamSize) {
-    // Simple cost estimation - in production, this would use real pricing APIs
-    const baseCosts = {
-      'Apollo': 49,
-      'ZoomInfo': 79,
-      'Outreach': 100,
-      'SalesLoft': 125,
-      'Calendly': 8,
-      'Chili Piper': 30,
-      'PandaDoc': 19,
-      'DocuSign': 10,
-      'Zapier': 19,
-      'Gong': 200,
-      'Chorus': 180,
-      'Loom': 8,
-      'Vidyard': 19
-    };
-    
-    const baseCost = baseCosts[toolName] || 50;
-    
-    // Apply team size multiplier with volume discounts
-    let multiplier = teamSize;
-    if (teamSize > 50) multiplier = teamSize * 0.8; // 20% volume discount
-    if (teamSize > 100) multiplier = teamSize * 0.7; // 30% volume discount
-    
-    return baseCost * multiplier;
+    // Tool costs must be provided by external pricing sources
+    this.logger.warn('Tool cost estimation not available - external pricing API required', {
+      tool_name: toolName,
+      team_size: teamSize
+    });
+    return 0; // Cannot estimate without external data
   }
   
   async calculateAmplificationROI(toolSuggestion, successFactor, organizationContext) {
@@ -692,75 +602,40 @@ class MarketIntelligenceEngine {
   }
   
   async getToolData(toolName) {
-    try {
-      // In production, this would integrate with G2, Capterra, etc.
-      // For now, return mock data structure
-      return {
-        name: toolName,
-        category: 'sales_tool',
-        rating: 4.2 + Math.random() * 0.6, // Mock rating 4.2-4.8
-        review_count: Math.floor(Math.random() * 1000) + 100,
-        pricing: {
-          starting_price: Math.floor(Math.random() * 100) + 20,
-          pricing_model: 'per_user_monthly'
-        },
-        features: [],
-        integrations: [],
-        market_position: 'established',
-        vendor_stability: 0.8 + Math.random() * 0.2,
-        last_updated: new Date()
-      };
-      
-    } catch (error) {
-      this.logger.error('Failed to get tool market data', {
-        tool_name: toolName,
-        error: error.message
-      });
-      
-      return {
-        name: toolName,
-        rating: 4.0,
-        review_count: 0,
-        market_position: 'unknown',
-        vendor_stability: 0.7,
-        last_updated: new Date()
-      };
-    }
+    this.logger.warn('Tool market data not available - external market intelligence API required', {
+      tool_name: toolName
+    });
+    
+    return {
+      name: toolName,
+      category: 'unknown',
+      rating: null,
+      review_count: 0,
+      pricing: null,
+      features: [],
+      integrations: [],
+      market_position: 'unknown',
+      vendor_stability: null,
+      last_updated: new Date(),
+      note: 'Market data requires external integration'
+    };
   }
   
   async getPeerResults(recommendation, organizationContext) {
-    try {
-      // Mock peer results - in production, this would query a database of implementations
-      return {
-        similar_companies: Math.floor(Math.random() * 50) + 10,
-        avg_roi_achieved: (recommendation.roi_percentage || 0) * (0.8 + Math.random() * 0.4),
-        implementation_success_rate: 0.7 + Math.random() * 0.2,
-        avg_payback_period: (recommendation.payback_period_months || 6) * (0.9 + Math.random() * 0.2),
-        common_challenges: [
-          'User adoption',
-          'Integration complexity',
-          'Change management'
-        ],
-        success_factors: [
-          'Executive sponsorship',
-          'Comprehensive training',
-          'Phased rollout'
-        ]
-      };
-      
-    } catch (error) {
-      this.logger.error('Failed to get peer results', {
-        tool: recommendation.recommended_tool,
-        error: error.message
-      });
-      
-      return {
-        similar_companies: 0,
-        avg_roi_achieved: 0,
-        implementation_success_rate: 0.5,
-        avg_payback_period: 12
-      };
-    }
+    this.logger.warn('Peer results not available - external benchmarking database required', {
+      tool: recommendation.recommended_tool,
+      organization_id: organizationContext.organization_id
+    });
+    
+    return {
+      similar_companies: 0,
+      avg_roi_achieved: null,
+      implementation_success_rate: null,
+      avg_payback_period: null,
+      common_challenges: [],
+      success_factors: [],
+      note: 'Peer benchmarking requires external data sources'
+    };
   }
 }
 

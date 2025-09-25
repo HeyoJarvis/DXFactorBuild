@@ -52,13 +52,44 @@ class HubSpotAdapter extends BaseCRMAdapter {
     try {
       this.logger.info('Connecting to HubSpot API');
       
-      // Test connection by getting account info
-      const accountInfo = await this.hubspotClient.settings.users.usersApi.getById('me');
+      // Try different connection methods based on available permissions
+      let accountInfo = null;
+      
+      // Method 1: Try to get user info (requires settings.users.read)
+      try {
+        accountInfo = await this.hubspotClient.settings.users.usersApi.getById('me');
+        this.logger.info('Connected with full user permissions');
+      } catch (userError) {
+        this.logger.warn('User API not accessible, trying alternative connection test', {
+          error: userError.message
+        });
+        
+        // Method 2: Try to get account info (requires oauth scopes)
+        try {
+          const tokenInfo = await this.hubspotClient.oauth.accessTokensApi.get(this.crmConfig.access_token);
+          accountInfo = { id: 'unknown', email: 'unknown', tokenInfo };
+          this.logger.info('Connected with limited permissions');
+        } catch (tokenError) {
+          this.logger.warn('Token API not accessible, trying basic CRM access', {
+            error: tokenError.message
+          });
+          
+          // Method 3: Try a basic CRM call to test connectivity
+          try {
+            await this.hubspotClient.crm.deals.basicApi.getPage(1);
+            accountInfo = { id: 'unknown', email: 'unknown', access: 'basic_crm' };
+            this.logger.info('Connected with basic CRM permissions');
+          } catch (crmError) {
+            throw new Error(`No accessible HubSpot permissions: ${crmError.message}`);
+          }
+        }
+      }
       
       this.isConnected = true;
       this.logger.info('Successfully connected to HubSpot', {
         user_id: accountInfo.id,
-        user_email: accountInfo.email
+        user_email: accountInfo.email,
+        connection_method: accountInfo.access || 'full'
       });
       
       return accountInfo;
@@ -80,60 +111,103 @@ class HubSpotAdapter extends BaseCRMAdapter {
         after = null,
         dateRange = null,
         pipeline = null,
-        includeArchived = false
+        includeArchived = true // Include all deals to get more data
       } = options;
       
       this.logger.info('Fetching deals from HubSpot', { limit, after, dateRange });
       
+      // First, get deals with the most activity potential - sort by recent activity
       const searchRequest = {
-        limit,
-        after,
+        limit: Math.min(limit, 100), // HubSpot limit
         properties: this.hubspotConfig.dealProperties,
-        associations: ['contacts', 'companies']
+        associations: ['contacts', 'companies'],
+        sorts: [
+          { propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }
+        ]
       };
       
-      // Add filters if specified
-      if (dateRange || pipeline || !includeArchived) {
-        searchRequest.filterGroups = [];
-        
-        if (dateRange) {
-          searchRequest.filterGroups.push({
-            filters: [{
-              propertyName: 'createdate',
-              operator: 'GTE',
-              value: dateRange.start.getTime()
-            }, {
-              propertyName: 'createdate', 
-              operator: 'LTE',
-              value: dateRange.end.getTime()
-            }]
-          });
-        }
-        
-        if (pipeline) {
-          searchRequest.filterGroups.push({
-            filters: [{
-              propertyName: 'pipeline',
-              operator: 'EQ',
-              value: pipeline
-            }]
-          });
-        }
-        
-        if (!includeArchived) {
-          searchRequest.filterGroups.push({
-            filters: [{
-              propertyName: 'hs_is_closed',
-              operator: 'EQ',
-              value: 'false'
-            }]
-          });
-        }
+      // Only add after if it's not null
+      if (after) {
+        searchRequest.after = after;
       }
       
-      const response = await this.hubspotClient.crm.deals.searchApi.doSearch(searchRequest);
+      // Prefer deals that have associated contacts (more likely to have rich data)
+      searchRequest.filterGroups = [];
       
-      this.logger.info(`Retrieved ${response.results.length} deals from HubSpot`);
+      // Only get deals with at least 1 contact to ensure rich data
+      searchRequest.filterGroups.push({
+        filters: [{
+          propertyName: 'num_associated_contacts',
+          operator: 'GTE',
+          value: '1'
+        }]
+      });
+      
+      // Add additional filters if specified
+      if (dateRange) {
+        searchRequest.filterGroups.push({
+          filters: [{
+            propertyName: 'createdate',
+            operator: 'GTE',
+            value: dateRange.start.getTime()
+          }, {
+            propertyName: 'createdate', 
+            operator: 'LTE',
+            value: dateRange.end.getTime()
+          }]
+        });
+      }
+      
+      if (pipeline) {
+        searchRequest.filterGroups.push({
+          filters: [{
+            propertyName: 'pipeline',
+            operator: 'EQ',
+            value: pipeline
+          }]
+        });
+      }
+      
+      if (!includeArchived) {
+        searchRequest.filterGroups.push({
+          filters: [{
+            propertyName: 'hs_is_closed',
+            operator: 'EQ',
+            value: 'false'
+          }]
+        });
+      }
+      
+      let response;
+      
+      // Try search API first (requires crm.objects.deals.read)
+      try {
+        response = await this.hubspotClient.crm.deals.searchApi.doSearch(searchRequest);
+        this.logger.info(`Retrieved ${response.results.length} deals from HubSpot via Search API`);
+      } catch (searchError) {
+        this.logger.warn('Search API not accessible, trying Basic API', {
+          error: searchError.message
+        });
+        
+        // Fallback to basic API (requires basic crm permissions)
+        try {
+          response = await this.hubspotClient.crm.deals.basicApi.getPage(
+            limit,
+            after || undefined, // Don't pass null, use undefined
+            this.hubspotConfig.dealProperties,
+            undefined, // propertiesWithHistory
+            ['contacts', 'companies'], // associations
+            !includeArchived // archived
+          );
+          this.logger.info(`Retrieved ${response.results.length} deals from HubSpot via Basic API`);
+        } catch (basicError) {
+          this.logger.error('Both Search and Basic APIs failed', {
+            searchError: searchError.message,
+            basicError: basicError.message
+          });
+          throw basicError;
+        }
+      }
       
       return response.results.map(deal => this.normalizeDeal(deal));
       
@@ -150,37 +224,86 @@ class HubSpotAdapter extends BaseCRMAdapter {
     try {
       const activities = [];
       
-      // Get different types of activities
-      const activityPromises = this.hubspotConfig.activityTypes.map(async (activityType) => {
-        try {
-          const response = await this.hubspotClient.crm.objects.calls.associationsApi
-            .getAll(dealId, 'deals', activityType);
-          return response.results || [];
-        } catch (error) {
-          // Some activity types might not be available
-          this.logger.debug(`No ${activityType} found for deal ${dealId}`);
-          return [];
-        }
-      });
-      
-      const activityResults = await Promise.all(activityPromises);
-      activityResults.forEach(result => activities.push(...result));
-      
-      // Get engagement activities (emails, calls, meetings)
+      // Try to get associated calls
       try {
-        const engagements = await this.hubspotClient.crm.deals.associationsApi
-          .getAll(dealId, 'engagements');
+        const callsResponse = await this.hubspotClient.crm.associations.v4.basicApi
+          .getPage('deals', dealId, 'calls');
         
-        for (const engagement of engagements.results) {
-          const engagementDetail = await this.hubspotClient.engagements.engagementsApi
-            .getById(engagement.id);
-          activities.push(this.normalizeEngagement(engagementDetail));
+        for (const association of callsResponse.results || []) {
+          try {
+            const call = await this.hubspotClient.crm.objects.calls.basicApi
+              .getById(association.toObjectId, ['hs_call_title', 'hs_call_body', 'hs_call_duration', 'hs_call_status', 'hs_createdate']);
+            activities.push({
+              id: call.id,
+              type: 'call',
+              subject: call.properties.hs_call_title || 'Call',
+              description: call.properties.hs_call_body,
+              created_date: call.properties.hs_createdate,
+              duration: call.properties.hs_call_duration,
+              outcome: call.properties.hs_call_status,
+              source: 'hubspot_call'
+            });
+          } catch (error) {
+            this.logger.debug(`Failed to get call details for ${association.toObjectId}`);
+          }
         }
       } catch (error) {
-        this.logger.debug(`No engagements found for deal ${dealId}`);
+        this.logger.debug(`No calls found for deal ${dealId}`);
       }
       
-      return activities.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+      // Try to get associated emails
+      try {
+        const emailsResponse = await this.hubspotClient.crm.associations.v4.basicApi
+          .getPage('deals', dealId, 'emails');
+        
+        for (const association of emailsResponse.results || []) {
+          try {
+            const email = await this.hubspotClient.crm.objects.emails.basicApi
+              .getById(association.toObjectId, ['hs_email_subject', 'hs_email_text', 'hs_email_status', 'hs_createdate']);
+            activities.push({
+              id: email.id,
+              type: 'email',
+              subject: email.properties.hs_email_subject || 'Email',
+              description: email.properties.hs_email_text,
+              created_date: email.properties.hs_createdate,
+              outcome: email.properties.hs_email_status,
+              source: 'hubspot_email'
+            });
+          } catch (error) {
+            this.logger.debug(`Failed to get email details for ${association.toObjectId}`);
+          }
+        }
+      } catch (error) {
+        this.logger.debug(`No emails found for deal ${dealId}`);
+      }
+      
+      // Try to get associated meetings
+      try {
+        const meetingsResponse = await this.hubspotClient.crm.associations.v4.basicApi
+          .getPage('deals', dealId, 'meetings');
+        
+        for (const association of meetingsResponse.results || []) {
+          try {
+            const meeting = await this.hubspotClient.crm.objects.meetings.basicApi
+              .getById(association.toObjectId, ['hs_meeting_title', 'hs_meeting_body', 'hs_meeting_outcome', 'hs_createdate']);
+            activities.push({
+              id: meeting.id,
+              type: 'meeting',
+              subject: meeting.properties.hs_meeting_title || 'Meeting',
+              description: meeting.properties.hs_meeting_body,
+              created_date: meeting.properties.hs_createdate,
+              outcome: meeting.properties.hs_meeting_outcome,
+              source: 'hubspot_meeting'
+            });
+          } catch (error) {
+            this.logger.debug(`Failed to get meeting details for ${association.toObjectId}`);
+          }
+        }
+      } catch (error) {
+        this.logger.debug(`No meetings found for deal ${dealId}`);
+      }
+      
+      return activities.sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0));
       
     } catch (error) {
       this.logger.error('Failed to fetch deal activities', {
@@ -193,15 +316,15 @@ class HubSpotAdapter extends BaseCRMAdapter {
   
   async getDealContacts(dealId) {
     try {
-      const response = await this.hubspotClient.crm.deals.associationsApi
-        .getAll(dealId, 'contacts');
+      const response = await this.hubspotClient.crm.associations.v4.basicApi
+        .getPage('deals', dealId, 'contacts');
       
       const contacts = [];
       
       for (const association of response.results) {
         try {
           const contact = await this.hubspotClient.crm.contacts.basicApi
-            .getById(association.id, this.hubspotConfig.contactProperties);
+            .getById(association.toObjectId, this.hubspotConfig.contactProperties);
           contacts.push(this.normalizeContact(contact));
         } catch (error) {
           this.logger.warn('Failed to fetch contact details', {
@@ -224,15 +347,15 @@ class HubSpotAdapter extends BaseCRMAdapter {
   
   async getDealCompanies(dealId) {
     try {
-      const response = await this.hubspotClient.crm.deals.associationsApi
-        .getAll(dealId, 'companies');
+      const response = await this.hubspotClient.crm.associations.v4.basicApi
+        .getPage('deals', dealId, 'companies');
       
       const companies = [];
       
       for (const association of response.results) {
         try {
           const company = await this.hubspotClient.crm.companies.basicApi
-            .getById(association.id, this.hubspotConfig.companyProperties);
+            .getById(association.toObjectId, this.hubspotConfig.companyProperties);
           companies.push(this.normalizeCompany(company));
         } catch (error) {
           this.logger.warn('Failed to fetch company details', {
@@ -255,15 +378,15 @@ class HubSpotAdapter extends BaseCRMAdapter {
   
   async getDealNotes(dealId) {
     try {
-      const response = await this.hubspotClient.crm.deals.associationsApi
-        .getAll(dealId, 'notes');
+      const response = await this.hubspotClient.crm.associations.v4.basicApi
+        .getPage('deals', dealId, 'notes');
       
       const notes = [];
       
       for (const association of response.results) {
         try {
           const note = await this.hubspotClient.crm.objects.notes.basicApi
-            .getById(association.id, ['hs_note_body', 'hs_createdate', 'hs_lastmodifieddate']);
+            .getById(association.toObjectId, ['hs_note_body', 'hs_createdate', 'hs_lastmodifieddate']);
           notes.push(this.normalizeNote(note));
         } catch (error) {
           this.logger.warn('Failed to fetch note details', {
@@ -286,15 +409,15 @@ class HubSpotAdapter extends BaseCRMAdapter {
   
   async getDealTasks(dealId) {
     try {
-      const response = await this.hubspotClient.crm.deals.associationsApi
-        .getAll(dealId, 'tasks');
+      const response = await this.hubspotClient.crm.associations.v4.basicApi
+        .getPage('deals', dealId, 'tasks');
       
       const tasks = [];
       
       for (const association of response.results) {
         try {
           const task = await this.hubspotClient.crm.objects.tasks.basicApi
-            .getById(association.id, [
+            .getById(association.toObjectId, [
               'hs_task_subject', 'hs_task_body', 'hs_task_status', 
               'hs_task_priority', 'hs_createdate', 'hs_timestamp'
             ]);
@@ -482,10 +605,18 @@ class HubSpotAdapter extends BaseCRMAdapter {
       return stageHistory.sort((a, b) => a.timestamp - b.timestamp);
       
     } catch (error) {
-      this.logger.warn('Failed to fetch deal stage history', {
-        deal_id: dealId,
-        error: error.message
-      });
+      // Stage history is optional and often not available in basic HubSpot plans
+      // Don't spam logs with warnings for expected 404s
+      if (error.message.includes('404')) {
+        this.logger.debug('Deal stage history not available (normal for basic HubSpot plans)', {
+          deal_id: dealId
+        });
+      } else {
+        this.logger.warn('Failed to fetch deal stage history', {
+          deal_id: dealId,
+          error: error.message
+        });
+      }
       return [];
     }
   }
@@ -495,43 +626,65 @@ class HubSpotAdapter extends BaseCRMAdapter {
    */
   async extractWorkflowFromDeal(deal) {
     try {
-      // Get the base workflow
+      // Get the base workflow first (this is working)
       const workflow = await super.extractWorkflowFromDeal(deal);
       
       if (!workflow) return null;
       
-      // Add HubSpot-specific enhancements
-      const [pipelines, stageHistory] = await Promise.all([
-        this.getPipelines(),
-        this.getDealStageHistory(deal.id)
-      ]);
-      
-      // Enhance stages with pipeline information
-      const dealPipeline = pipelines.find(p => p.id === deal.pipeline);
-      if (dealPipeline) {
-        workflow.stages = this.enhanceStagesWithPipeline(workflow.stages, dealPipeline, stageHistory);
-        workflow.pattern_name = this.generatePatternName(workflow, dealPipeline);
+      // Try to enhance with pipeline information, but don't fail if it doesn't work
+      try {
+        const [pipelines, stageHistory] = await Promise.all([
+          this.getPipelines(),
+          this.getDealStageHistory(deal.id).catch(() => []) // Don't fail if stage history fails
+        ]);
+        
+        // Find the deal's pipeline
+        const dealPipeline = pipelines.find(p => p.id === deal.pipeline);
+        
+        if (dealPipeline) {
+          // Enhance workflow with pipeline information
+          workflow.pipeline_stages = dealPipeline.stages.map((stage, index) => ({
+            id: stage.id,
+            name: stage.label,
+            order: index + 1,
+            probability: stage.probability,
+            is_closed_won: stage.closed_won,
+            current: stage.id === deal.stage
+          }));
+          
+          // Enhance stages if they exist
+          if (workflow.stages && workflow.stages.length > 0) {
+            workflow.stages = this.enhanceStagesWithPipeline(workflow.stages, dealPipeline, stageHistory);
+          }
+          
+          workflow.pattern_name = this.generatePatternName(workflow, dealPipeline);
+        }
+        
+        // Add HubSpot-specific metadata
+        workflow.hubspot_metadata = {
+          pipeline_id: deal.pipeline,
+          pipeline_name: dealPipeline?.label,
+          current_stage_id: deal.stage,
+          source: deal.source,
+          contact_count: deal.contact_count,
+          probability: deal.probability
+        };
+        
+      } catch (enhancementError) {
+        this.logger.warn('Failed to enhance workflow with pipeline data, using base workflow', {
+          deal_id: deal.id,
+          error: enhancementError.message
+        });
       }
-      
-      // Add HubSpot-specific metadata
-      workflow.hubspot_metadata = {
-        pipeline_id: deal.pipeline,
-        pipeline_name: dealPipeline?.label,
-        source: deal.source,
-        contact_count: deal.contact_count,
-        probability: deal.probability
-      };
       
       return workflow;
       
     } catch (error) {
-      this.logger.error('Failed to extract enhanced HubSpot workflow', {
+      this.logger.error('Failed to extract HubSpot workflow', {
         deal_id: deal.id,
         error: error.message
       });
-      
-      // Fall back to base extraction
-      return await super.extractWorkflowFromDeal(deal);
+      return null;
     }
   }
   

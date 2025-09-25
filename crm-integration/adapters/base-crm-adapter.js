@@ -39,7 +39,15 @@ class BaseCRMAdapter extends EventEmitter {
         service: 'crm-adapter',
         crm_type: this.getCRMType(),
         organization_id: crmConfig.organization_id
-      }
+      },
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+          )
+        })
+      ]
     });
     
     // Connection state
@@ -91,7 +99,7 @@ class BaseCRMAdapter extends EventEmitter {
       const deals = await this.getDeals(options);
       this.logger.info(`Retrieved ${deals.length} deals for analysis`);
       
-      // Process deals in batches
+      // Process deals in batches (or generate context-based analysis if no deals)
       const workflows = [];
       const batchSize = this.options.batchSize;
       
@@ -255,11 +263,26 @@ class BaseCRMAdapter extends EventEmitter {
         });
       });
     } else {
-      // Infer stages from activities if not explicitly available
-      stages.push(...this.inferStagesFromActivities(activities));
+      // Create basic stages from activity timeline if available
+      if (activities && activities.length > 0) {
+        stages.push(...this.inferStagesFromActivities(activities));
+      } else {
+        this.logger.debug('No pipeline stages or activities available for stage extraction', { deal_id: deal.id });
+      }
     }
     
     return stages;
+  }
+
+  /**
+   * Hardcoded stage creation from deal data is no longer supported
+   * Stages must come from actual CRM pipeline data
+   */
+  createStagesFromHubSpotDeal(deal, activities) {
+    this.logger.warn('Hardcoded stage creation is disabled - stages must come from CRM pipeline data', {
+      deal_id: deal.id
+    });
+    return [];
   }
   
   /**
@@ -347,8 +370,18 @@ class BaseCRMAdapter extends EventEmitter {
       });
     });
     
+    // No synthetic activities - only use actual CRM data
+    
     // Sort by date
     return normalized.sort((a, b) => a.date - b.date);
+  }
+
+  /**
+   * Synthetic activities are no longer supported - use only actual CRM data
+   */
+  createSyntheticActivities() {
+    this.logger.warn('Synthetic activity creation is disabled - using only actual CRM data');
+    return [];
   }
   
   /**

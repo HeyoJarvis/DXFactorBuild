@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: https: http://localhost:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:* https:;">
+  <title>HeyJarvis Copilot Enhanced</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, 
+        rgba(10, 10, 15, 0.98) 0%, 
+        rgba(20, 25, 35, 0.95) 50%, 
+        rgba(15, 20, 30, 0.98) 100%);
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(40px) saturate(150%);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 212, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    /* Arc Reactor glow effect */
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, 
+        rgba(0, 212, 255, 0.03) 0%, 
+        rgba(0, 150, 200, 0.01) 30%, 
+        transparent 70%);
+      animation: pulse 4s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.05); }
+    }
+
+    /* Header */
+    .copilot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+      backdrop-filter: blur(20px);
+    }
+
+    .copilot-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #ffffff;
+    }
+
+    .copilot-icon {
+      font-size: 20px;
+      filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+    }
+
+    .copilot-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .control-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .control-btn.close:hover {
+      background: rgba(255, 59, 48, 0.8);
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+      display: flex;
+      background: rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+      padding: 0 8px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border-radius: 8px 8px 0 0;
+      margin: 0 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover {
+      color: rgba(255, 255, 255, 0.8);
+      background: rgba(0, 212, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      background: rgba(0, 212, 255, 0.1);
+      border-bottom: 2px solid #00d4ff;
+    }
+
+    /* Content Area */
+    .copilot-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .tab-content {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+      position: relative;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Chat Tab Styles */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .welcome-message {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 212, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 212, 255, 0.1);
+    }
+
+    .welcome-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.8));
+    }
+
+    .welcome-text {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .welcome-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 20px;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quick-action {
+      padding: 10px 16px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .quick-action:hover {
+      background: rgba(0, 212, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    /* CRM AI Assistant Styles */
+    .crm-assistant {
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      box-sizing: border-box;
+      min-height: 0;
+    }
+
+    .assistant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .assistant-title {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #00d4ff;
+    }
+
+    .refresh-btn {
+      padding: 8px 12px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 6px;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(0, 212, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .insights-container {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 60px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .critical-insight {
+      background: rgba(255, 59, 48, 0.1);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .warning-insight {
+      background: rgba(255, 149, 0, 0.1);
+      border: 1px solid rgba(255, 149, 0, 0.3);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .positive-insight {
+      background: rgba(52, 199, 89, 0.1);
+      border: 1px solid rgba(52, 199, 89, 0.3);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .insight-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .insight-text {
+      font-size: 12px;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .recommendations-section, .next-steps-section {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #00d4ff;
+    }
+
+    .recommendation-item, .next-step-item {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .recommendation-item:hover, .next-step-item:hover {
+      background: rgba(0, 212, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .recommendation-title, .step-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .recommendation-description, .step-description {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.3;
+    }
+
+    .roi-badge {
+      display: inline-block;
+      background: rgba(52, 199, 89, 0.2);
+      color: #34c759;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .urgency-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .urgency-high {
+      background: rgba(255, 59, 48, 0.2);
+      color: #ff3b30;
+    }
+
+    .urgency-medium {
+      background: rgba(255, 149, 0, 0.2);
+      color: #ff9500;
+    }
+
+    .urgency-low {
+      background: rgba(52, 199, 89, 0.2);
+      color: #34c759;
+    }
+
+    /* Input Container */
+    .input-container {
+      padding: 16px 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid rgba(0, 212, 255, 0.1);
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .message-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #ffffff;
+      font-size: 14px;
+      resize: none;
+      min-height: 44px;
+      max-height: 120px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .message-input:focus {
+      outline: none;
+      border-color: rgba(0, 212, 255, 0.5);
+      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+    }
+
+    .message-input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      border: none;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+    }
+
+    .send-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 212, 255, 0.4);
+    }
+
+    .send-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: none;
+      padding: 16px 20px;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0, 212, 255, 0.05);
+      border-top: 1px solid rgba(0, 212, 255, 0.1);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: #00d4ff;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* Message Styles */
+    .message {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+    }
+
+    .message.assistant .message-avatar {
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
+    .message-content {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 80%;
+    }
+
+    .message.user .message-content {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 204, 0.1));
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    .message-time {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 4px;
+    }
+
+    /* Minimized state */
+    body.minimized {
+      width: 60px !important;
+      height: 60px !important;
+      border-radius: 50% !important;
+      background: radial-gradient(circle at center, 
+        rgba(0, 212, 255, 0.8) 0%, 
+        rgba(0, 150, 200, 0.6) 50%, 
+        rgba(0, 100, 150, 0.8) 100%) !important;
+      box-shadow: 
+        0 0 30px rgba(0, 212, 255, 0.8),
+        0 0 60px rgba(0, 212, 255, 0.4),
+        inset 0 0 20px rgba(255, 255, 255, 0.2) !important;
+    }
+
+    body.minimized .copilot-header,
+    body.minimized .tab-navigation,
+    body.minimized .copilot-content,
+    body.minimized .input-container {
+      display: none !important;
+    }
+
+    /* Loading states */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+    }
+
+    .error-state {
+      background: rgba(255, 59, 48, 0.1);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px;
+      text-align: center;
+      color: #ff3b30;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 212, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 212, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="copilot-header">
+    <div class="copilot-title">
+      <div class="copilot-icon">🤖</div>
+      HeyJarvis Copilot
+    </div>
+    <div class="copilot-controls">
+      <button class="control-btn minimize" onclick="minimizeWindow(event)" title="Minimize">−</button>
+      <button class="control-btn close" onclick="closeWindow()" title="Close">×</button>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button class="tab-btn active" onclick="switchTab('chat')" data-tab="chat">
+      💬 Chat
+    </button>
+    <button class="tab-btn" onclick="switchTab('crm')" data-tab="crm">
+      📊 CRM
+    </button>
+  </div>
+
+  <div class="copilot-content">
+    <!-- Chat Tab -->
+    <div class="tab-content active" id="chatTab">
+      <div class="chat-container" id="chatContainer">
+        <div class="welcome-message">
+          <div class="welcome-icon">🤖</div>
+          <div class="welcome-text">Hello! I'm your AI copilot.</div>
+          <div class="welcome-subtitle">Ask me about competitors, market trends, or strategic insights.</div>
+          
+          <div class="quick-actions">
+            <div class="quick-action" onclick="sendQuickMessage('What are the latest competitor moves?')">
+              Latest competitor moves
+            </div>
+            <div class="quick-action" onclick="sendQuickMessage('Analyze market trends')">
+              Market trends
+            </div>
+            <div class="quick-action" onclick="sendQuickMessage('Show me recent signals')">
+              Recent signals
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-indicator" id="typingIndicator">
+        <span>HeyJarvis is thinking</span>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="input-wrapper">
+          <textarea 
+            class="message-input" 
+            id="messageInput" 
+            placeholder="Ask me anything about your competitive landscape..."
+            rows="1"
+          ></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRM Tab -->
+    <div class="tab-content" id="crmTab">
+      <div class="crm-assistant">
+        <div class="assistant-header">
+          <div class="assistant-title">
+            🧠 AI Workflow Assistant
+          </div>
+          <button class="refresh-btn" onclick="refreshCRMInsights()">
+            🔄 Analyze
+          </button>
+        </div>
+
+        <div class="insights-container" id="insightsContainer">
+          <div class="loading">Analyzing your CRM workflows...</div>
+        </div>
+
+        <div class="recommendations-section" id="recommendationsSection">
+          <div class="section-title">
+            💡 Smart Recommendations
+          </div>
+          <div id="recommendationsList">
+            <div class="loading">Generating AI recommendations...</div>
+          </div>
+        </div>
+
+        <div class="next-steps-section" id="nextStepsSection">
+          <div class="section-title">
+            🎯 Next Steps
+          </div>
+          <div id="nextStepsList">
+            <div class="loading">Preparing action items...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let isMinimized = false;
+    let chatHistory = [];
+    let currentTab = 'chat';
+    let crmData = null;
+    let crmUpdateInterval = null;
+
+    // DOM elements
+    const chatContainer = document.getElementById('chatContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    // Tab switching
+    function switchTab(tabName) {
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById(`${tabName}Tab`).classList.add('active');
+
+      currentTab = tabName;
+
+      // Load CRM data when switching to CRM tab
+      if (tabName === 'crm') {
+        loadCRMData();
+        startCRMUpdates();
+      } else {
+        stopCRMUpdates();
+      }
+    }
+
+    // CRM AI Insights Management
+    async function loadCRMData() {
+      try {
+        showCRMLoading();
+        
+        // Get AI insights and recommendations
+        const insightsResponse = await fetch('http://localhost:3001/insights/default_org');
+        if (!insightsResponse.ok) {
+          throw new Error(`Insights fetch failed: ${insightsResponse.status}`);
+        }
+        const insightsData = await insightsResponse.json();
+        
+        updateCRMInsights(insightsData);
+        
+      } catch (error) {
+        showCRMError(`AI Analysis failed: ${error.message}`);
+      }
+    }
+
+    function showCRMLoading() {
+      document.getElementById('insightsContainer').innerHTML = '<div class="loading">Analyzing your CRM workflows...</div>';
+      document.getElementById('recommendationsList').innerHTML = '<div class="loading">Generating AI recommendations...</div>';
+      document.getElementById('nextStepsList').innerHTML = '<div class="loading">Preparing action items...</div>';
+    }
+
+    function showCRMError(message) {
+      document.getElementById('insightsContainer').innerHTML = `<div class="error">❌ ${message}</div>`;
+      document.getElementById('recommendationsList').innerHTML = `<div class="error">❌ Unable to generate recommendations</div>`;
+      document.getElementById('nextStepsList').innerHTML = `<div class="error">❌ Unable to prepare action items</div>`;
+    }
+
+    function updateCRMInsights(insightsData) {
+      // Update insights
+      const insightsContainer = document.getElementById('insightsContainer');
+      if (insightsData.insights && insightsData.insights.length > 0) {
+        insightsContainer.innerHTML = insightsData.insights.map(insight => `
+          <div class="${insight.type}-insight">
+            <div class="insight-title">
+              ${getInsightIcon(insight.type)} ${insight.title}
+            </div>
+            <div class="insight-text">${insight.description}</div>
+          </div>
+        `).join('');
+      } else {
+        insightsContainer.innerHTML = '<div class="no-insights">No critical insights at this time</div>';
+      }
+      
+      // Update recommendations
+      const recommendationsList = document.getElementById('recommendationsList');
+      if (insightsData.recommendations && insightsData.recommendations.length > 0) {
+        recommendationsList.innerHTML = insightsData.recommendations.map(rec => `
+          <div class="recommendation-item" onclick="handleRecommendationClick('${rec.id}')">
+            <div class="recommendation-title">
+              🔧 ${rec.title}
+              ${rec.roi ? `<span class="roi-badge">ROI: ${rec.roi}</span>` : ''}
+            </div>
+            <div class="recommendation-description">${rec.description}</div>
+          </div>
+        `).join('');
+      } else {
+        recommendationsList.innerHTML = '<div class="no-recommendations">All workflows optimized!</div>';
+      }
+      
+      // Update next steps
+      const nextStepsList = document.getElementById('nextStepsList');
+      if (insightsData.nextSteps && insightsData.nextSteps.length > 0) {
+        nextStepsList.innerHTML = insightsData.nextSteps.map(step => `
+          <div class="next-step-item" onclick="handleStepClick('${step.id}')">
+            <div class="step-title">
+              ${getUrgencyIcon(step.urgency)} ${step.title}
+              <span class="urgency-badge urgency-${step.urgency}">${step.urgency.toUpperCase()}</span>
+            </div>
+            <div class="step-description">${step.description}</div>
+          </div>
+        `).join('');
+      } else {
+        nextStepsList.innerHTML = '<div class="no-steps">No immediate actions required</div>';
+      }
+
+      // Store data for future use
+      crmData = insightsData;
+    }
+
+    function getInsightIcon(type) {
+      switch(type) {
+        case 'critical': return '🚨';
+        case 'warning': return '⚠️';
+        case 'positive': return '✅';
+        default: return '💡';
+      }
+    }
+
+    function getUrgencyIcon(urgency) {
+      switch(urgency) {
+        case 'high': return '🔥';
+        case 'medium': return '⚡';
+        case 'low': return '📝';
+        default: return '📋';
+      }
+    }
+
+    function handleRecommendationClick(recId) {
+      // Handle recommendation click - could open details, start implementation, etc.
+      console.log('Recommendation clicked:', recId);
+    }
+
+    function handleStepClick(stepId) {
+      // Handle next step click - could mark as done, get more details, etc.
+      console.log('Next step clicked:', stepId);
+    }
+
+    function refreshCRMInsights() {
+      loadCRMData();
+    }
+
+    function startCRMUpdates() {
+      // Update CRM data every 2 minutes
+      crmUpdateInterval = setInterval(loadCRMData, 120000);
+    }
+
+    function stopCRMUpdates() {
+      if (crmUpdateInterval) {
+        clearInterval(crmUpdateInterval);
+        crmUpdateInterval = null;
+      }
+    }
+
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // Send message on Enter (but not Shift+Enter)
+    messageInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Window controls
+    function minimizeWindow(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      
+      console.log('🔄 Minimizing window...');
+      
+      // Toggle the minimized state directly
+      isMinimized = !isMinimized;
+      console.log('🔄 Toggling minimized state:', isMinimized);
+      document.body.classList.toggle('minimized', isMinimized);
+      
+      if (isMinimized) {
+        console.log('⚡ Arc Reactor mode activated!');
+        // Stop CRM updates when minimized
+        stopCRMUpdates();
+      } else {
+        console.log('🔄 Expanding back to full copilot...');
+        // Restart CRM updates if on CRM tab
+        if (currentTab === 'crm') {
+          startCRMUpdates();
+        }
+      }
+    }
+
+    function closeWindow() {
+      console.log('🔄 Closing copilot window...');
+      stopCRMUpdates();
+      if (window.electronAPI) {
+        window.electronAPI.closeWindow();
+      } else {
+        window.close();
+      }
+    }
+
+    // Chat functionality
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+
+      // Add user message to chat
+      addMessage(message, 'user');
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+
+      // Show typing indicator
+      showTypingIndicator();
+
+      try {
+        // Send to backend
+        let response;
+        if (window.electronAPI) {
+          response = await window.electronAPI.sendMessage(message);
+        } else {
+          // Fallback for testing
+          response = {
+            type: 'message',
+            content: 'I\'m here to help with competitive intelligence insights. What would you like to know?',
+            timestamp: new Date().toISOString()
+          };
+        }
+
+        // Add assistant response
+        hideTypingIndicator();
+        addMessage(response.content, 'assistant');
+
+      } catch (error) {
+        console.error('Error sending message:', error);
+        hideTypingIndicator();
+        addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+      }
+    }
+
+    function sendQuickMessage(message) {
+      messageInput.value = message;
+      sendMessage();
+    }
+
+    function addMessage(content, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      
+      const avatar = sender === 'user' ? '👤' : '🤖';
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      messageDiv.innerHTML = `
+        <div class="message-avatar">${avatar}</div>
+        <div class="message-content">
+          ${content}
+          <div class="message-time">${time}</div>
+        </div>
+      `;
+      
+      // Remove welcome message if it exists
+      const welcomeMessage = chatContainer.querySelector('.welcome-message');
+      if (welcomeMessage) {
+        welcomeMessage.remove();
+      }
+      
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      // Store in history
+      chatHistory.push({ content, sender, timestamp: new Date().toISOString() });
+    }
+
+    function showTypingIndicator() {
+      typingIndicator.style.display = 'flex';
+    }
+
+    function hideTypingIndicator() {
+      typingIndicator.style.display = 'none';
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 HeyJarvis Copilot Enhanced loaded');
+      
+      // Load initial data if on CRM tab
+      if (currentTab === 'crm') {
+        loadCRMData();
+      }
+    });
+
+    // Handle window clicks to restore from minimized state
+    document.addEventListener('click', function(e) {
+      if (isMinimized && !e.target.closest('.control-btn')) {
+        minimizeWindow();
+      }
+    });
+  </script>
+</body>
+</html>

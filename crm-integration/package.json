@@ -12,24 +12,26 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
     "@heyjarvis/core": "file:../core",
     "@heyjarvis/data": "file:../data",
     "@hubspot/api-client": "^10.2.0",
     "axios": "^1.6.7",
-    "lodash": "^4.17.21",
-    "uuid": "^9.0.1",
-    "winston": "^3.11.0",
     "bull": "^4.12.2",
-    "cron": "^3.1.6",
     "compromise": "^14.10.0",
+    "cron": "^3.1.6",
+    "dotenv": "^16.3.1",
+    "express": "^5.1.0",
+    "lodash": "^4.17.21",
     "natural": "^6.10.0",
-    "@anthropic-ai/sdk": "^0.24.3",
-    "dotenv": "^16.3.1"
+    "node-cron": "^4.2.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
+    "eslint": "^8.57.0",
     "jest": "^29.7.0",
-    "nodemon": "^3.0.3",
-    "eslint": "^8.57.0"
+    "nodemon": "^3.0.3"
   },
   "keywords": [
     "crm",

@@ -1,0 +1,140 @@
+{
+  "company_name": "Meta",
+  "website_url": "https://meta.com",
+  "organization_context": {
+    "organization_id": "meta_com",
+    "company_name": "Meta",
+    "industry": "Technology",
+    "sub_industry": "Consumer Electronics",
+    "target_market": null,
+    "company_size": "enterprise",
+    "employee_count_estimate": null,
+    "sales_team_size": null,
+    "avg_deal_size": null,
+    "budget_range": null,
+    "revenue_stage": null,
+    "current_conversion_rate": null,
+    "avg_cycle_time": null,
+    "tech_sophistication": "high",
+    "business_model": "B2C",
+    "sales_complexity": "transactional",
+    "crm_system": null
+  },
+  "description": "Shop the latest AI glasses and wearable technology from Meta. Explore Ray-Ban Meta, Oakley Meta, display glasses, and cutting-edge VR headsets.",
+  "workflow_intelligence": {
+    "sales_process_complexity": "transactional",
+    "sales_cycle_length_estimate": null,
+    "lead_qualification_process": null,
+    "manual_process_mentions": [],
+    "automation_gaps": [
+      "product discovery",
+      "purchase flow"
+    ],
+    "coordination_challenges": [],
+    "scheduling_complexity": "simple",
+    "document_process_maturity": "basic",
+    "integration_needs": [],
+    "team_coordination_mentions": [],
+    "remote_work_indicators": [],
+    "meeting_management_issues": []
+  },
+  "technology_stack": {
+    "crm_system": null,
+    "marketing_automation": null,
+    "email_platform": null,
+    "communication_tools": [],
+    "video_conferencing": [],
+    "project_management": [],
+    "scheduling_tools": [],
+    "document_tools": [],
+    "automation_tools": [],
+    "analytics_tools": [],
+    "api_sophistication": "medium",
+    "integration_mentions": [],
+    "webhook_usage": false,
+    "website_platform": null,
+    "cms_system": null,
+    "ecommerce_platform": null
+  },
+  "process_maturity": {
+    "process_sophistication": "advanced",
+    "documentation_quality": "medium",
+    "automation_level": "high",
+    "sales_process_documented": true,
+    "onboarding_process_defined": false,
+    "support_process_structured": false,
+    "change_management_capability": "medium",
+    "training_infrastructure": "basic",
+    "process_optimization_culture": true
+  },
+  "market_intelligence": {
+    "market_position": "Leader",
+    "competitive_advantages": [
+      "#1 selling AI glasses",
+      "Partnership with premium brands (Ray-Ban, Oakley)",
+      "Direct retail channel through Meta Store"
+    ],
+    "key_differentiators": [
+      "Integration of AI technology with established eyewear brands",
+      "Multiple product categories (AI glasses, VR headsets)",
+      "Expanded color options"
+    ],
+    "ideal_customer_segments": [
+      "Tech-savvy consumers",
+      "Fashion-conscious users",
+      "Early adopters of wearable technology"
+    ],
+    "customer_pain_points": [
+      "Need for stylish wearable tech",
+      "Desire for AI integration in everyday accessories"
+    ],
+    "value_propositions": [
+      "Premium brand partnerships",
+      "Latest technology",
+      "Fashion-forward design",
+      "Multiple product options"
+    ],
+    "growth_stage": "growth",
+    "funding_indicators": [],
+    "expansion_signals": [
+      "New color launches",
+      "Product line expansion",
+      "Multiple brand partnerships"
+    ]
+  },
+  "content_analysis": {
+    "content_depth": "shallow",
+    "content_freshness": "medium",
+    "seo_optimization": "medium",
+    "primary_themes": [],
+    "messaging_focus": [],
+    "brand_personality": null,
+    "page_count_estimate": null,
+    "blog_activity_level": "medium",
+    "case_study_presence": false,
+    "testimonial_presence": false
+  },
+  "scraping_metadata": {
+    "scraping_method": "aiohttp",
+    "scraping_success": true,
+    "content_length": 467500,
+    "scraping_duration_seconds": 2.3978185653686523,
+    "ai_model_used": "claude-3-5-sonnet-20241022",
+    "analysis_duration_seconds": 13.930819988250732,
+    "total_processing_time": 16.328638553619385,
+    "confidence_scores": {
+      "organization_context": 0.9,
+      "workflow_intelligence": 0.7,
+      "technology_stack": 0.8,
+      "process_maturity": 0.6,
+      "market_intelligence": 0.6,
+      "content_analysis": 0.7
+    },
+    "data_completeness": 0.0,
+    "reliability_score": 0.0,
+    "scraped_at": "2025-09-24T22:16:51.316723",
+    "analyzed_at": 1758773827.6455688,
+    "errors_encountered": [],
+    "warnings": []
+  }
+}

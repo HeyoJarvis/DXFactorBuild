@@ -28,7 +28,15 @@ class AIAnalyzer {
         winston.format.timestamp(),
         winston.format.json()
       ),
-      defaultMeta: { service: 'ai-analyzer' }
+      defaultMeta: { service: 'ai-analyzer' },
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+          )
+        })
+      ]
     });
     
     // Initialize Anthropic client
@@ -94,13 +102,13 @@ class AIAnalyzer {
    * Build analysis prompt for Claude
    */
   buildAnalysisPrompt(signal, userContext) {
-    const competitorsList = userContext.competitors ? 
+    const competitorsList = (userContext && userContext.competitors) ? 
       userContext.competitors.join(', ') : 'Not specified';
     
-    const productsList = userContext.our_products ? 
+    const productsList = (userContext && userContext.our_products) ? 
       userContext.our_products.map(p => p.name).join(', ') : 'Not specified';
     
-    const focusAreas = userContext.focus_areas ? 
+    const focusAreas = (userContext && userContext.focus_areas) ? 
       userContext.focus_areas.join(', ') : 'Not specified';
     
     return `You are a competitive intelligence analyst. Please analyze the following signal and provide structured insights.

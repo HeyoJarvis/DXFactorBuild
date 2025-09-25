@@ -1,0 +1,142 @@
+{
+  "company_name": "HubSpot",
+  "website_url": "https://hubspot.com",
+  "organization_context": {
+    "organization_id": "hubspot_com",
+    "company_name": "HubSpot",
+    "industry": "Technology",
+    "sub_industry": "Software",
+    "target_market": null,
+    "company_size": "smb",
+    "employee_count_estimate": null,
+    "sales_team_size": null,
+    "avg_deal_size": null,
+    "budget_range": null,
+    "revenue_stage": null,
+    "current_conversion_rate": null,
+    "avg_cycle_time": null,
+    "tech_sophistication": "medium",
+    "business_model": "B2B SaaS",
+    "sales_complexity": "consultative",
+    "crm_system": "HubSpot"
+  },
+  "description": "HubSpot's customer platform includes all the marketing, sales, customer service, and CRM software you need to grow your business.",
+  "workflow_intelligence": {
+    "sales_process_complexity": "transactional",
+    "sales_cycle_length_estimate": null,
+    "lead_qualification_process": null,
+    "manual_process_mentions": [],
+    "automation_gaps": [],
+    "coordination_challenges": [],
+    "scheduling_complexity": null,
+    "document_process_maturity": null,
+    "integration_needs": [
+      "CRM",
+      "marketing",
+      "sales",
+      "customer service"
+    ],
+    "team_coordination_mentions": [],
+    "remote_work_indicators": [],
+    "meeting_management_issues": []
+  },
+  "technology_stack": {
+    "crm_system": "HubSpot",
+    "marketing_automation": "HubSpot",
+    "email_platform": null,
+    "communication_tools": [],
+    "video_conferencing": [],
+    "project_management": [],
+    "scheduling_tools": [],
+    "document_tools": [],
+    "automation_tools": [],
+    "analytics_tools": [
+      "Google Analytics"
+    ],
+    "api_sophistication": "medium",
+    "integration_mentions": [],
+    "webhook_usage": false,
+    "website_platform": null,
+    "cms_system": null,
+    "ecommerce_platform": null
+  },
+  "process_maturity": {
+    "process_sophistication": "advanced",
+    "documentation_quality": "excellent",
+    "automation_level": "high",
+    "sales_process_documented": true,
+    "onboarding_process_defined": true,
+    "support_process_structured": true,
+    "change_management_capability": "high",
+    "training_infrastructure": "advanced",
+    "process_optimization_culture": true
+  },
+  "market_intelligence": {
+    "market_position": "Leader",
+    "competitive_advantages": [
+      "All-in-one platform",
+      "Integrated CRM foundation",
+      "Full customer lifecycle coverage"
+    ],
+    "key_differentiators": [
+      "Unified customer platform",
+      "Comprehensive suite of tools",
+      "Integrated marketing, sales, service and CRM"
+    ],
+    "ideal_customer_segments": [
+      "Growing businesses",
+      "Companies needing unified customer management",
+      "B2B organizations"
+    ],
+    "customer_pain_points": [
+      "Fragmented business software",
+      "Disconnected customer data",
+      "Complex growth management"
+    ],
+    "value_propositions": [
+      "All-in-one business software solution",
+      "Integrated customer management",
+      "Growth enablement tools"
+    ],
+    "growth_stage": "mature",
+    "funding_indicators": [],
+    "expansion_signals": [
+      "Platform expansion across multiple business functions"
+    ]
+  },
+  "content_analysis": {
+    "content_depth": "shallow",
+    "content_freshness": "medium",
+    "seo_optimization": "medium",
+    "primary_themes": [],
+    "messaging_focus": [],
+    "brand_personality": null,
+    "page_count_estimate": null,
+    "blog_activity_level": "medium",
+    "case_study_presence": false,
+    "testimonial_presence": false
+  },
+  "scraping_metadata": {
+    "scraping_method": "aiohttp",
+    "scraping_success": true,
+    "content_length": 500000,
+    "scraping_duration_seconds": 0.4594268798828125,
+    "ai_model_used": "claude-3-5-sonnet-20241022",
+    "analysis_duration_seconds": 15.304922819137573,
+    "total_processing_time": 15.764349699020386,
+    "confidence_scores": {
+      "organization_context": 0.9,
+      "workflow_intelligence": 0.7,
+      "technology_stack": 0.8,
+      "process_maturity": 0.6,
+      "market_intelligence": 0.6,
+      "content_analysis": 0.7
+    },
+    "data_completeness": 0.0,
+    "reliability_score": 0.0,
+    "scraped_at": "2025-09-24T22:25:54.609998",
+    "analyzed_at": 1758774370.374507,
+    "errors_encountered": [],
+    "warnings": []
+  }
+}
