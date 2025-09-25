@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeyJarvis - Workflow Analysis Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .simulation-panel {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .ceo-badge {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .member-badge {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-panel {
+            grid-column: span 2;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+            margin-top: 20px;
+        }
+
+        .analysis-result {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #4f46e5;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online { background: #10b981; }
+        .status-offline { background: #ef4444; }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .results-panel {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 HeyJarvis Workflow Analysis</h1>
+            <p>AI-Powered CEO-to-Member Communication Testing</p>
+        </div>
+
+        <div class="main-content">
+            <!-- CEO Panel -->
+            <div class="simulation-panel">
+                <div class="panel-title">
+                    <span class="status-indicator status-online"></span>
+                    Sundeep (CEO)
+                    <span class="user-badge ceo-badge">Admin</span>
+                </div>
+                
+                <form id="ceoForm">
+                    <div class="form-group">
+                        <label for="requestType">Request Type</label>
+                        <select id="requestType" name="request_type">
+                            <option value="task_assignment">Task Assignment</option>
+                            <option value="project_update">Project Update</option>
+                            <option value="information_request">Information Request</option>
+                            <option value="approval_needed">Approval Needed</option>
+                            <option value="urgent_issue">Urgent Issue</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priority">Priority Level</label>
+                        <select id="priority" name="priority">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ceoMessage">Outbound Request</label>
+                        <textarea id="ceoMessage" name="message" placeholder="Type your request to Avi..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expectedResponse">Expected Response Time</label>
+                        <select id="expectedResponse" name="expected_response_time">
+                            <option value="30 minutes">30 minutes</option>
+                            <option value="1 hour">1 hour</option>
+                            <option value="2 hours">2 hours</option>
+                            <option value="4 hours">4 hours</option>
+                            <option value="1 day">1 day</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn">Send Request & Analyze</button>
+                </form>
+            </div>
+
+            <!-- Member Panel -->
+            <div class="simulation-panel">
+                <div class="panel-title">
+                    <span class="status-indicator status-online"></span>
+                    Avi (Team Member)
+                    <span class="user-badge member-badge">Member</span>
+                </div>
+                
+                <form id="memberForm" style="display: none;">
+                    <div class="form-group">
+                        <label for="responseTime">Response Time (hours)</label>
+                        <input type="number" id="responseTime" name="response_time_hours" min="0.1" step="0.1" value="1.5">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="completionStatus">Completion Status</label>
+                        <select id="completionStatus" name="completion_status">
+                            <option value="completed">Completed</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="needs_clarification">Needs Clarification</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memberMessage">Response Message</label>
+                        <textarea id="memberMessage" name="message" placeholder="Type your response to Sundeep..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Send Response & Analyze</button>
+                </form>
+
+                <div id="waitingForRequest" style="text-align: center; padding: 40px; color: #6b7280;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
+                    <p>Waiting for CEO request...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel" id="resultsPanel" style="display: none;">
+            <div class="panel-title">📊 AI Analysis Results</div>
+            <div id="analysisResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // Get session token from localStorage or URL
+        const sessionToken = localStorage.getItem('heyjarvis_session') || 
+                            new URLSearchParams(window.location.search).get('token');
+
+        if (!sessionToken) {
+            alert('Please authenticate first by visiting the main page');
+            window.location.href = '/';
+        }
+
+        let currentRequestId = null;
+
+        // CEO Form Handler
+        document.getElementById('ceoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.action = 'create_outbound_request';
+            data.target_user = 'avi_member';
+
+            try {
+                showLoading('Analyzing CEO request...');
+                
+                const response = await fetch('/api/workflow-simulation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionToken}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentRequestId = result.request_id;
+                    showRequestAnalysis(result);
+                    enableMemberForm(data.message);
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        });
+
+        // Member Form Handler
+        document.getElementById('memberForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.action = 'simulate_member_response';
+            data.original_request = currentRequestId;
+
+            try {
+                showLoading('Analyzing member response...');
+                
+                const response = await fetch('/api/workflow-simulation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionToken}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResponseAnalysis(result);
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        });
+
+        function showLoading(message) {
+            const resultsPanel = document.getElementById('resultsPanel');
+            const analysisResults = document.getElementById('analysisResults');
+            
+            analysisResults.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            resultsPanel.style.display = 'block';
+        }
+
+        function showRequestAnalysis(result) {
+            const analysisResults = document.getElementById('analysisResults');
+            
+            analysisResults.innerHTML = `
+                <div class="analysis-result">
+                    <h3 style="color: #1e293b; margin-bottom: 15px;">🎯 CEO Request Analysis</h3>
+                    <div class="metric">
+                        <span>Clarity Score</span>
+                        <span class="metric-value">${(result.analysis.clarity_score * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Urgency Level</span>
+                        <span class="metric-value">${result.analysis.urgency_level.toUpperCase()}</span>
+                    </div>
+                    <div class="metric">
+                        <span>Estimated Response Time</span>
+                        <span class="metric-value">${result.analysis.estimated_response_time}</span>
+                    </div>
+                    <div style="margin-top: 15px; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                        <strong>AI Analysis:</strong>
+                        <p style="margin-top: 8px; line-height: 1.6;">${result.analysis.analysis}</p>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <strong>Suggestions for Improvement:</strong>
+                        <ul style="margin-top: 8px; padding-left: 20px;">
+                            ${result.analysis.suggestions.map(s => `<li style="margin: 4px 0;">${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showResponseAnalysis(result) {
+            const analysisResults = document.getElementById('analysisResults');
+            
+            analysisResults.innerHTML += `
+                <div class="analysis-result">
+                    <h3 style="color: #1e293b; margin-bottom: 15px;">📝 Member Response Analysis</h3>
+                    <div class="metric">
+                        <span>Response Quality</span>
+                        <span class="metric-value">${(result.analysis.response_quality_score * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Timeliness Score</span>
+                        <span class="metric-value">${(result.analysis.timeliness_score * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Completeness Score</span>
+                        <span class="metric-value">${(result.analysis.completeness_score * 100).toFixed(1)}%</span>
+                    </div>
+                    <div style="margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px;">
+                        <strong>AI Analysis:</strong>
+                        <p style="margin-top: 8px; line-height: 1.6;">${result.analysis.analysis}</p>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <strong>Feedback:</strong>
+                        <ul style="margin-top: 8px; padding-left: 20px;">
+                            ${result.analysis.feedback.map(f => `<li style="margin: 4px 0;">${f}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <div class="analysis-result">
+                    <h3 style="color: #1e293b; margin-bottom: 15px;">🔍 Workflow Insights</h3>
+                    <ul style="padding-left: 20px;">
+                        ${result.workflow_insights.map(insight => `<li style="margin: 8px 0; line-height: 1.6;">${insight}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function enableMemberForm(originalMessage) {
+            document.getElementById('waitingForRequest').style.display = 'none';
+            document.getElementById('memberForm').style.display = 'block';
+            
+            // Pre-fill some context
+            const memberMessage = document.getElementById('memberMessage');
+            memberMessage.placeholder = `Respond to: "${originalMessage.substring(0, 50)}..."`;
+        }
+    </script>
+</body>
+</html>
