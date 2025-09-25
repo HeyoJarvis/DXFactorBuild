@@ -18,6 +18,36 @@ app.use((req, res, next) => {
   next();
 });
 
+// Private Mode Authentication Middleware
+app.use((req, res, next) => {
+  // Skip if private mode is disabled
+  if (process.env.PRIVATE_MODE !== 'true') {
+    return next();
+  }
+
+  // Skip auth for API endpoints (so Slack can still reach them)
+  if (req.url.startsWith('/api/')) {
+    return next();
+  }
+
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="HeyJarvis"');
+    return res.status(401).send('Authentication required');
+  }
+
+  const credentials = Buffer.from(auth.slice(6), 'base64').toString();
+  const [username, password] = credentials.split(':');
+
+  // Your credentials
+  if (username === 'admin' && password === 'Jarvispassword-here') {
+    return next();
+  }
+
+  res.setHeader('WWW-Authenticate', 'Basic realm="HeyJarvis"');
+  res.status(401).send('Invalid credentials');
+});
+
 // Debug middleware for Slack requests
 app.use((req, res, next) => {
   if (req.url.includes('slack-events')) {
@@ -91,6 +121,7 @@ app.listen(PORT, () => {
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`💬 Chat interface: http://localhost:${PORT}/chat`);
   console.log(`🔗 Slack events: http://localhost:${PORT}/api/slack-events`);
+  console.log(`🔒 Private mode: ${process.env.PRIVATE_MODE === 'true' ? 'ENABLED' : 'DISABLED'}`);
   
   // Log environment info
   console.log(`📝 Environment loaded: ${Object.keys(process.env).length} variables`);
