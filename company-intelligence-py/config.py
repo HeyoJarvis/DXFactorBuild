@@ -67,3 +67,4 @@ def load_config_from_env() -> Dict[str, Any]:
                 config[config_key] = env_value
     
     return config
+

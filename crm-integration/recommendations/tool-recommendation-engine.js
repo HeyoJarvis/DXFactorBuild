@@ -30,7 +30,15 @@ class ToolRecommendationEngine {
         winston.format.timestamp(),
         winston.format.json()
       ),
-      defaultMeta: { service: 'tool-recommendation-engine' }
+      defaultMeta: { service: 'tool-recommendation-engine' },
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+          )
+        })
+      ]
     });
     
     this.aiAnalyzer = new AIAnalyzer(options);
@@ -52,6 +60,15 @@ class ToolRecommendationEngine {
       });
       
       const recommendations = [];
+      
+      // Generate company intelligence-driven recommendations first
+      if (organizationContext?.raw_intelligence) {
+        const intelligenceRecommendations = await this.generateIntelligenceBasedRecommendations(
+          organizationContext.raw_intelligence, 
+          organizationContext
+        );
+        recommendations.push(...intelligenceRecommendations);
+      }
       
       // Analyze each bottleneck
       for (const bottleneck of workflowAnalysis.bottlenecks || []) {
@@ -501,6 +518,279 @@ class ToolRecommendationEngine {
         recommendation: 'Comparison parsing failed'
       };
     }
+  }
+
+  /**
+   * Generate recommendations based on company intelligence data
+   */
+  async generateIntelligenceBasedRecommendations(companyIntelligence, organizationContext) {
+    const recommendations = [];
+    
+    try {
+      const workflowIntel = companyIntelligence.workflow_intelligence || {};
+      const techStack = companyIntelligence.technology_stack || {};
+      const processMaturity = companyIntelligence.process_maturity || {};
+      
+      // Automation gap recommendations
+      if (workflowIntel.automation_gaps?.length > 0) {
+        for (const gap of workflowIntel.automation_gaps.slice(0, 3)) {
+          const rec = await this.recommendForAutomationGap(gap, organizationContext);
+          if (rec) recommendations.push(rec);
+        }
+      }
+      
+      // Integration need recommendations
+      if (workflowIntel.integration_needs?.length > 0) {
+        const integrationRec = await this.recommendForIntegrationNeeds(
+          workflowIntel.integration_needs, 
+          organizationContext
+        );
+        if (integrationRec) recommendations.push(integrationRec);
+      }
+      
+      // Manual process recommendations
+      if (workflowIntel.manual_process_mentions?.length > 0) {
+        for (const process of workflowIntel.manual_process_mentions.slice(0, 2)) {
+          const rec = await this.recommendForManualProcess(process, organizationContext);
+          if (rec) recommendations.push(rec);
+        }
+      }
+      
+      // Technology stack gap analysis
+      const stackGaps = this.analyzeStackGaps(techStack, organizationContext);
+      for (const gap of stackGaps) {
+        const rec = await this.recommendForStackGap(gap, organizationContext);
+        if (rec) recommendations.push(rec);
+      }
+      
+      this.logger.info('Generated intelligence-based recommendations', {
+        automation_gaps: workflowIntel.automation_gaps?.length || 0,
+        integration_needs: workflowIntel.integration_needs?.length || 0,
+        recommendations_generated: recommendations.length
+      });
+      
+      return recommendations;
+      
+    } catch (error) {
+      this.logger.error('Failed to generate intelligence-based recommendations', {
+        error: error.message
+      });
+      return [];
+    }
+  }
+  
+  /**
+   * Recommend tools for automation gaps
+   */
+  async recommendForAutomationGap(gap, context) {
+    const gapLower = gap.toLowerCase();
+    
+    // Map automation gaps to tool categories
+    if (gapLower.includes('payment') || gapLower.includes('billing')) {
+      return {
+        tool_name: 'Stripe Billing',
+        category: 'payment_automation',
+        recommendation: `Automate ${gap} with Stripe Billing for recurring payments and dunning management`,
+        business_impact: 'Reduce manual payment processing by 80% and improve cash flow',
+        implementation_effort: 'medium',
+        estimated_cost: 2500,
+        projected_savings: 15000,
+        priority: 'high',
+        source: 'company_intelligence',
+        confidence: 0.8
+      };
+    }
+    
+    if (gapLower.includes('onboarding') || gapLower.includes('training')) {
+      return {
+        tool_name: 'Trainual',
+        category: 'process_automation',
+        recommendation: `Systematize ${gap} with Trainual for consistent, scalable training processes`,
+        business_impact: 'Reduce onboarding time by 50% and improve consistency',
+        implementation_effort: 'low',
+        estimated_cost: 1200,
+        projected_savings: 8000,
+        priority: 'medium',
+        source: 'company_intelligence',
+        confidence: 0.7
+      };
+    }
+    
+    if (gapLower.includes('scheduling') || gapLower.includes('appointment')) {
+      return {
+        tool_name: 'Calendly',
+        category: 'scheduling_automation',
+        recommendation: `Eliminate manual ${gap} with Calendly for automated booking and reminders`,
+        business_impact: 'Save 10+ hours per week on scheduling coordination',
+        implementation_effort: 'low',
+        estimated_cost: 600,
+        projected_savings: 12000,
+        priority: 'high',
+        source: 'company_intelligence',
+        confidence: 0.9
+      };
+    }
+    
+    // Generic automation recommendation
+    return {
+      tool_name: 'Zapier',
+      category: 'workflow_automation',
+      recommendation: `Automate ${gap} using Zapier to connect existing tools and eliminate manual work`,
+      business_impact: 'Reduce manual effort and improve process consistency',
+      implementation_effort: 'medium',
+      estimated_cost: 1500,
+      projected_savings: 10000,
+      priority: 'medium',
+      source: 'company_intelligence',
+      confidence: 0.6
+    };
+  }
+  
+  /**
+   * Recommend integration solutions
+   */
+  async recommendForIntegrationNeeds(integrationNeeds, context) {
+    if (integrationNeeds.length > 2) {
+      return {
+        tool_name: 'Zapier',
+        category: 'integration_platform',
+        recommendation: `Connect ${integrationNeeds.slice(0, 3).join(', ')} and other systems with Zapier for seamless data flow`,
+        business_impact: 'Eliminate data silos and reduce manual data entry by 70%',
+        implementation_effort: 'medium',
+        estimated_cost: 2000,
+        projected_savings: 18000,
+        priority: 'high',
+        source: 'company_intelligence',
+        confidence: 0.8,
+        integration_targets: integrationNeeds
+      };
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Recommend tools for manual processes
+   */
+  async recommendForManualProcess(process, context) {
+    const processLower = process.toLowerCase();
+    
+    if (processLower.includes('document') || processLower.includes('contract') || processLower.includes('proposal')) {
+      return {
+        tool_name: 'PandaDoc',
+        category: 'document_automation',
+        recommendation: `Automate ${process} with PandaDoc for template-based document generation and e-signatures`,
+        business_impact: 'Reduce document preparation time by 75% and accelerate approvals',
+        implementation_effort: 'medium',
+        estimated_cost: 3000,
+        projected_savings: 20000,
+        priority: 'high',
+        source: 'company_intelligence',
+        confidence: 0.8
+      };
+    }
+    
+    if (processLower.includes('follow') || processLower.includes('reminder') || processLower.includes('nurture')) {
+      return {
+        tool_name: 'HubSpot Sequences',
+        category: 'sales_automation',
+        recommendation: `Automate ${process} with HubSpot Sequences for consistent, personalized follow-up`,
+        business_impact: 'Increase response rates by 40% and ensure no leads fall through cracks',
+        implementation_effort: 'low',
+        estimated_cost: 800,
+        projected_savings: 15000,
+        priority: 'high',
+        source: 'company_intelligence',
+        confidence: 0.9
+      };
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Analyze technology stack gaps
+   */
+  analyzeStackGaps(techStack, context) {
+    const gaps = [];
+    
+    // Check for missing core tools
+    if (!techStack.scheduling_tools || techStack.scheduling_tools.length === 0) {
+      gaps.push({ type: 'scheduling', severity: 'high' });
+    }
+    
+    if (!techStack.document_tools || techStack.document_tools.length === 0) {
+      gaps.push({ type: 'document_management', severity: 'medium' });
+    }
+    
+    if (!techStack.automation_tools || techStack.automation_tools.length === 0) {
+      gaps.push({ type: 'workflow_automation', severity: 'high' });
+    }
+    
+    if (!techStack.project_management || techStack.project_management.length === 0) {
+      gaps.push({ type: 'project_management', severity: 'medium' });
+    }
+    
+    return gaps;
+  }
+  
+  /**
+   * Recommend tools for technology stack gaps
+   */
+  async recommendForStackGap(gap, context) {
+    const gapRecommendations = {
+      scheduling: {
+        tool_name: 'Calendly',
+        category: 'scheduling',
+        recommendation: 'Implement Calendly for automated scheduling and calendar management',
+        business_impact: 'Eliminate scheduling back-and-forth, save 10+ hours per week',
+        implementation_effort: 'low',
+        estimated_cost: 600,
+        projected_savings: 12000,
+        priority: gap.severity === 'high' ? 'high' : 'medium'
+      },
+      document_management: {
+        tool_name: 'PandaDoc',
+        category: 'document_automation',
+        recommendation: 'Add PandaDoc for professional document creation and e-signature workflows',
+        business_impact: 'Accelerate deal closure by 30% with faster document processes',
+        implementation_effort: 'medium',
+        estimated_cost: 3000,
+        projected_savings: 18000,
+        priority: gap.severity === 'high' ? 'high' : 'medium'
+      },
+      workflow_automation: {
+        tool_name: 'Zapier',
+        category: 'automation',
+        recommendation: 'Implement Zapier to automate repetitive tasks and connect existing tools',
+        business_impact: 'Reduce manual work by 60% and improve data consistency',
+        implementation_effort: 'medium',
+        estimated_cost: 1500,
+        projected_savings: 15000,
+        priority: gap.severity === 'high' ? 'high' : 'medium'
+      },
+      project_management: {
+        tool_name: 'Asana',
+        category: 'project_management',
+        recommendation: 'Add Asana for better project tracking and team coordination',
+        business_impact: 'Improve project delivery by 25% and team visibility',
+        implementation_effort: 'medium',
+        estimated_cost: 1200,
+        projected_savings: 10000,
+        priority: gap.severity === 'high' ? 'high' : 'medium'
+      }
+    };
+    
+    const recommendation = gapRecommendations[gap.type];
+    if (recommendation) {
+      return {
+        ...recommendation,
+        source: 'company_intelligence',
+        confidence: 0.7
+      };
+    }
+    
+    return null;
   }
 }
 

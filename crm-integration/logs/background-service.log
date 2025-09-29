@@ -160,3 +160,22 @@
 {"learning_patterns":4,"level":"info","memory_mb":53,"message":"💓 Health check","organizations":1,"processing_status":"idle","queue_size":0,"service":"intelligent-background-service","timestamp":"2025-09-25T19:00:00.009Z","uptime_hours":14}
 {"learning_patterns":4,"level":"info","memory_mb":53,"message":"💓 Health check","organizations":1,"processing_status":"idle","queue_size":0,"service":"intelligent-background-service","timestamp":"2025-09-25T20:00:00.109Z","uptime_hours":15}
 {"learning_patterns":4,"level":"info","memory_mb":52,"message":"💓 Health check","organizations":1,"processing_status":"idle","queue_size":0,"service":"intelligent-background-service","timestamp":"2025-09-25T21:00:00.076Z","uptime_hours":16}
+{"learning_patterns":4,"level":"info","memory_mb":53,"message":"💓 Health check","organizations":1,"processing_status":"idle","queue_size":0,"service":"intelligent-background-service","timestamp":"2025-09-25T22:00:00.122Z","uptime_hours":17}
+{"learning_patterns":4,"level":"info","memory_mb":53,"message":"💓 Health check","organizations":1,"processing_status":"idle","queue_size":0,"service":"intelligent-background-service","timestamp":"2025-09-25T23:00:00.061Z","uptime_hours":18}
+{"learning_patterns":4,"level":"info","memory_mb":53,"message":"💓 Health check","organizations":1,"processing_status":"idle","queue_size":0,"service":"intelligent-background-service","timestamp":"2025-09-26T00:00:00.082Z","uptime_hours":19}
+{"learning_patterns":4,"level":"info","memory_mb":53,"message":"💓 Health check","organizations":1,"processing_status":"idle","queue_size":0,"service":"intelligent-background-service","timestamp":"2025-09-26T01:00:00.032Z","uptime_hours":20}
+{"level":"info","message":"Learning state loaded","patterns_count":4,"service":"intelligent-background-service","snapshots_count":1,"timestamp":"2025-09-26T03:16:04.053Z"}
+{"level":"info","message":"🚀 Starting Intelligent CRM Background Service...","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:04.054Z"}
+{"level":"info","message":"✅ CRM configuration stored for intelligent analysis","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:04.054Z"}
+{"level":"info","message":"⏰ Periodic tasks scheduled","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:04.069Z"}
+{"level":"info","message":"✅ Background service started successfully","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:04.069Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3001/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:04.070Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3001/health","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:04.070Z"}
+{"level":"info","message":"🌐 Webhook server listening on port 3001","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:04.070Z"}
+{"level":"info","message":"🔍 Performing initial analysis...","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:09.075Z"}
+{"level":"info","message":"🎯 Triggering analysis for default_org","reason":"startup_analysis","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:09.076Z"}
+{"change_types":["startup_analysis"],"level":"info","message":"📊 1 significant changes detected","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:09.629Z"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:13.572Z"}
+{"level":"info","message":"💾 Saving learning state...","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:13.573Z"}
+{"level":"info","message":"🌐 Webhook server closed","service":"intelligent-background-service","timestamp":"2025-09-26T03:16:13.575Z"}
+{"level":"info","message":"Learning state saved","patterns_count":4,"service":"intelligent-background-service","snapshots_count":1,"timestamp":"2025-09-26T03:16:13.585Z"}

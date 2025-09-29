@@ -10,6 +10,7 @@
  */
 
 const { ipcMain } = require('electron');
+const fetch = require('node-fetch');
 
 class IPCHandlers {
   constructor(appLifecycle) {
@@ -28,6 +29,7 @@ class IPCHandlers {
       this.setupWindowHandlers();
       this.setupPerformanceHandlers();
       this.setupNotificationHandlers();
+      this.setupCRMHandlers();
       
       this.logger.info('IPC handlers setup complete');
       
@@ -345,6 +347,167 @@ class IPCHandlers {
         'Consider partnership opportunities'
       ]
     };
+  }
+
+  /**
+   * Setup CRM-related IPC handlers
+   */
+  setupCRMHandlers() {
+    const INTELLIGENT_SERVICE_URL = 'http://localhost:3002';
+    
+    // Get CRM data
+    ipcMain.handle('crm:getData', async (event) => {
+      try {
+        const response = await fetch(`${INTELLIGENT_SERVICE_URL}/analysis/latest/default_org`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        this.logger.debug('CRM data retrieved', { 
+          patterns: data.patterns?.length || 0,
+          recommendations: data.recommendations?.length || 0 
+        });
+        
+        return data;
+      } catch (error) {
+        this.logger.error('Failed to get CRM data', { error: error.message });
+        return { error: error.message, patterns: [], recommendations: [], workflows: [] };
+      }
+    });
+    
+    // Refresh CRM data
+    ipcMain.handle('crm:refresh', async (event) => {
+      try {
+        const response = await fetch(`${INTELLIGENT_SERVICE_URL}/analysis/trigger`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            website: process.env.COMPANY_WEBSITE || 'https://dxfactor.com',
+            organization_id: 'default_org'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        
+        this.logger.info('CRM refresh triggered', { 
+          analysis_id: result.analysis_id,
+          recommendations: result.recommendations || 0,
+          patterns: result.patterns || 0
+        });
+        
+        return result;
+      } catch (error) {
+        this.logger.error('Failed to refresh CRM data', { error: error.message });
+        return { error: error.message };
+      }
+    });
+    
+    // Trigger analysis for specific organization
+    ipcMain.handle('crm:triggerAnalysis', async (event, orgId) => {
+      try {
+        const response = await fetch(`${INTELLIGENT_SERVICE_URL}/analysis/trigger`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            website: process.env.COMPANY_WEBSITE || 'https://dxfactor.com',
+            organization_id: orgId || 'default_org'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        
+        this.logger.info('Analysis triggered', { 
+          organization_id: orgId,
+          analysis_id: result.analysis_id 
+        });
+        
+        return result;
+      } catch (error) {
+        this.logger.error('Failed to trigger analysis', { 
+          organization_id: orgId,
+          error: error.message 
+        });
+        return { error: error.message };
+      }
+    });
+    
+    // Get recommendations
+    ipcMain.handle('crm:getRecommendations', async (event, orgId = 'default_org') => {
+      try {
+        const response = await fetch(`${INTELLIGENT_SERVICE_URL}/recommendations/${orgId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        this.logger.debug('Recommendations retrieved', { 
+          organization_id: orgId,
+          count: data.recommendations?.length || 0 
+        });
+        
+        return data;
+      } catch (error) {
+        this.logger.error('Failed to get recommendations', { 
+          organization_id: orgId,
+          error: error.message 
+        });
+        return { error: error.message, recommendations: [] };
+      }
+    });
+    
+    // Get company intelligence
+    ipcMain.handle('crm:getIntelligence', async (event, orgId = 'default_org') => {
+      try {
+        const response = await fetch(`${INTELLIGENT_SERVICE_URL}/intelligence/${orgId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        this.logger.debug('Company intelligence retrieved', { 
+          organization_id: orgId,
+          company: data.company?.name 
+        });
+        
+        return data;
+      } catch (error) {
+        this.logger.error('Failed to get company intelligence', { 
+          organization_id: orgId,
+          error: error.message 
+        });
+        return { error: error.message };
+      }
+    });
+    
+    // Health check
+    ipcMain.handle('crm:healthCheck', async (event) => {
+      try {
+        const response = await fetch(`${INTELLIGENT_SERVICE_URL}/health`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        this.logger.debug('Service health checked', { 
+          status: data.status,
+          uptime: data.uptime 
+        });
+        
+        return data;
+      } catch (error) {
+        this.logger.error('Failed to check service health', { error: error.message });
+        return { status: 'unhealthy', error: error.message };
+      }
+    });
   }
 }
 

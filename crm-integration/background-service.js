@@ -17,7 +17,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 // Import existing components
-const CRMWorkflowAnalyzer = require('./index');
+const IntelligentCRMAnalyzer = require('./intelligent-crm-analyzer');
 
 class IntelligentBackgroundService {
   constructor(options = {}) {
@@ -35,7 +35,7 @@ class IntelligentBackgroundService {
     this.setupLogging();
     
     // Initialize components
-    this.analyzer = new CRMWorkflowAnalyzer({ logLevel: 'error' });
+    this.analyzer = new IntelligentCRMAnalyzer({ logLevel: 'error' });
     
     // State management
     this.eventQueue = [];
@@ -260,14 +260,9 @@ class IntelligentBackgroundService {
       if (!crmConfigs[0].access_token) {
         this.logger.warn('No HubSpot API key found - CRM integration will be limited');
       } else {
-        try {
-          await this.analyzer.initialize(crmConfigs);
-          this.logger.info('✅ CRM analyzer initialized');
-        } catch (error) {
-          this.logger.warn('⚠️ CRM analyzer failed to initialize - continuing without full CRM integration', {
-            error: error.message
-          });
-        }
+        // Store CRM config for later use
+        this.crmConfig = crmConfigs[0];
+        this.logger.info('✅ CRM configuration stored for intelligent analysis');
       }
       
       // Start webhook server

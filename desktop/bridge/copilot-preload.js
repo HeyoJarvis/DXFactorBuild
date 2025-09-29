@@ -23,6 +23,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getCRMData: () => ipcRenderer.invoke('crm:getData'),
   refreshCRM: () => ipcRenderer.invoke('crm:refresh'),
   triggerAnalysis: (orgId) => ipcRenderer.invoke('crm:triggerAnalysis', orgId),
+  getRecommendations: (orgId) => ipcRenderer.invoke('crm:getRecommendations', orgId),
+  getIntelligence: (orgId) => ipcRenderer.invoke('crm:getIntelligence', orgId),
+  healthCheck: () => ipcRenderer.invoke('crm:healthCheck'),
   
   // Settings
   updateSettings: (settings) => ipcRenderer.invoke('copilot:updateSettings', settings),

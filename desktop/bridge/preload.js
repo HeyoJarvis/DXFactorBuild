@@ -44,6 +44,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     toggle: (enabled) => ipcRenderer.invoke('notifications:toggle', enabled)
   },
   
+  // CRM functionality
+  crm: {
+    getData: () => ipcRenderer.invoke('crm:getData'),
+    refresh: () => ipcRenderer.invoke('crm:refresh'),
+    triggerAnalysis: (orgId) => ipcRenderer.invoke('crm:triggerAnalysis', orgId),
+    getRecommendations: (orgId) => ipcRenderer.invoke('crm:getRecommendations', orgId),
+    getIntelligence: (orgId) => ipcRenderer.invoke('crm:getIntelligence', orgId),
+    healthCheck: () => ipcRenderer.invoke('crm:healthCheck')
+  },
+  
   // Event listeners
   on: (channel, callback) => {
     const validChannels = [

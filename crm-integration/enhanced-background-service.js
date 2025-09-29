@@ -18,7 +18,7 @@ const path = require('path');
 const { EventEmitter } = require('events');
 
 // Import existing components
-const CRMWorkflowAnalyzer = require('./index');
+const IntelligentCRMAnalyzer = require('./intelligent-crm-analyzer');
 
 // Import new intelligence components
 const CompanyIntelligenceBridge = require('./intelligence/company-intelligence-bridge');
@@ -43,7 +43,7 @@ class EnhancedIntelligentBackgroundService extends EventEmitter {
     this.setupLogging();
     
     // Initialize components
-    this.analyzer = new CRMWorkflowAnalyzer({ logLevel: 'error' });
+    this.analyzer = new IntelligentCRMAnalyzer({ logLevel: 'error' });
     this.intelligenceBridge = new CompanyIntelligenceBridge();
     this.contextManager = new CompanyContextManager();
     

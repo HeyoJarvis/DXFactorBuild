@@ -771,18 +771,79 @@
       try {
         showCRMLoading();
         
-        // Get AI insights and recommendations
-        const insightsResponse = await fetch('http://localhost:3001/insights/default_org');
+        // Get AI insights and recommendations from intelligent service
+        const insightsResponse = await fetch('http://localhost:3002/analysis/latest/default_org');
+        
+        if (insightsResponse.status === 404) {
+          // No analysis data yet - trigger a new analysis
+          showCRMMessage('No analysis data found. Triggering new analysis...');
+          await triggerNewAnalysis();
+          return;
+        }
+        
         if (!insightsResponse.ok) {
           throw new Error(`Insights fetch failed: ${insightsResponse.status}`);
         }
+        
         const insightsData = await insightsResponse.json();
+        
+        // Check if we got an error response
+        if (insightsData.error) {
+          if (insightsData.error === 'No analysis found') {
+            showCRMMessage('No analysis data available. Triggering new analysis...');
+            await triggerNewAnalysis();
+            return;
+          }
+          throw new Error(insightsData.error);
+        }
         
         updateCRMInsights(insightsData);
         
       } catch (error) {
         showCRMError(`AI Analysis failed: ${error.message}`);
       }
+    }
+
+    async function triggerNewAnalysis() {
+      try {
+        showCRMMessage('🧠 Starting intelligent analysis... This may take 2-3 minutes.');
+        
+        const response = await fetch('http://localhost:3002/analysis/trigger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            website: 'https://dxfactor.com',
+            organization_id: 'default_org'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Analysis trigger failed: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        showCRMMessage(`✅ Analysis started (ID: ${result.analysis_id}). Refreshing in 30 seconds...`);
+        
+        // Wait and then try to load data again
+        setTimeout(() => {
+          loadCRMData();
+        }, 30000);
+        
+      } catch (error) {
+        showCRMError(`Failed to trigger analysis: ${error.message}`);
+      }
+    }
+
+    function showCRMMessage(message) {
+      document.getElementById('insightsContainer').innerHTML = `
+        <div class="info-message" style="padding: 20px; text-align: center; color: #4A90E2;">
+          <div style="font-size: 16px; margin-bottom: 10px;">${message}</div>
+          <button onclick="loadCRMData()" style="padding: 8px 16px; background: #4A90E2; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            🔄 Refresh
+          </button>
+        </div>
+      `;
     }
 
     function showCRMLoading() {
