@@ -1,0 +1,183 @@
+{
+  "company_name": "DXFactor",
+  "website_url": "https://dxfactor.com",
+  "organization_context": {
+    "organization_id": "dxfactor_com",
+    "company_name": "DXFactor",
+    "industry": "Technology",
+    "sub_industry": "Fitness Technology",
+    "target_market": "Fitness & Wellness Operators",
+    "company_size": "smb",
+    "employee_count_estimate": null,
+    "sales_team_size": null,
+    "avg_deal_size": null,
+    "budget_range": null,
+    "revenue_stage": null,
+    "current_conversion_rate": null,
+    "avg_cycle_time": null,
+    "tech_sophistication": "high",
+    "business_model": "B2B SaaS",
+    "sales_complexity": "consultative",
+    "crm_system": "Hubspot"
+  },
+  "description": "Deploy AI agents that grow revenue, cut churn and automate gym ops—trusted by Chuze, Crunch, Fitness SF and more.",
+  "workflow_intelligence": {
+    "sales_process_complexity": "consultative",
+    "sales_cycle_length_estimate": null,
+    "lead_qualification_process": "automated",
+    "manual_process_mentions": [
+      "staff training",
+      "payment collections",
+      "cancellation processing",
+      "front desk workload"
+    ],
+    "automation_gaps": [
+      "staff onboarding",
+      "member query handling",
+      "payment collections",
+      "cancellation processing"
+    ],
+    "coordination_challenges": [
+      "front desk operations",
+      "staff training standardization"
+    ],
+    "scheduling_complexity": "medium",
+    "document_process_maturity": "medium",
+    "integration_needs": [
+      "ABC",
+      "Ignite",
+      "Glofox",
+      "Club Automation",
+      "MOSO",
+      "ASF",
+      "Hubspot",
+      "Gymsales"
+    ],
+    "team_coordination_mentions": [
+      "staff training",
+      "front desk operations"
+    ],
+    "remote_work_indicators": [],
+    "meeting_management_issues": [
+      "appointment booking"
+    ]
+  },
+  "technology_stack": {
+    "crm_system": null,
+    "marketing_automation": "HubSpot",
+    "email_platform": null,
+    "communication_tools": [],
+    "video_conferencing": [],
+    "project_management": [],
+    "scheduling_tools": [],
+    "document_tools": [],
+    "automation_tools": [],
+    "analytics_tools": [
+      "Google Analytics"
+    ],
+    "api_sophistication": "medium",
+    "integration_mentions": [
+      "Native API Integrations"
+    ],
+    "webhook_usage": false,
+    "website_platform": null,
+    "cms_system": null,
+    "ecommerce_platform": null
+  },
+  "process_maturity": {
+    "process_sophistication": "advanced",
+    "documentation_quality": "excellent",
+    "automation_level": "high",
+    "sales_process_documented": true,
+    "onboarding_process_defined": true,
+    "support_process_structured": true,
+    "change_management_capability": "high",
+    "training_infrastructure": "advanced",
+    "process_optimization_culture": true
+  },
+  "market_intelligence": {
+    "market_position": "Leader",
+    "competitive_advantages": [
+      "AI-specific platform for fitness industry",
+      "Proven track record with major fitness brands",
+      "Integration with multiple fitness management systems",
+      "Years of fitness industry experience",
+      "Measurable outcomes focus"
+    ],
+    "key_differentiators": [
+      "Purpose-built AI agents for fitness sector",
+      "No-code customization capabilities",
+      "Micro-agents architecture",
+      "Industry-specific solutions",
+      "Integrated analytics platform"
+    ],
+    "ideal_customer_segments": [
+      "Fitness clubs",
+      "Gym chains",
+      "Wellness centers",
+      "Athletic clubs"
+    ],
+    "customer_pain_points": [
+      "Member retention/churn",
+      "Operational efficiency",
+      "Staff training time",
+      "Payment collections",
+      "Customer support workload",
+      "Data analysis complexity"
+    ],
+    "value_propositions": [
+      "Revenue growth ($2B+ outcomes delivered)",
+      "Reduced operational costs",
+      "Automated member engagement",
+      "Improved collection rates",
+      "Faster staff onboarding",
+      "24/7 automated support"
+    ],
+    "growth_stage": "growth",
+    "funding_indicators": [
+      "120% Net Revenue Retention",
+      "$2B+ in outcomes delivered"
+    ],
+    "expansion_signals": [
+      "100+ operators as clients",
+      "Multiple major brand partnerships",
+      "Expanding product suite",
+      "Integration with multiple industry platforms"
+    ]
+  },
+  "content_analysis": {
+    "content_depth": "medium",
+    "content_freshness": "medium",
+    "seo_optimization": "medium",
+    "primary_themes": [],
+    "messaging_focus": [],
+    "brand_personality": null,
+    "page_count_estimate": null,
+    "blog_activity_level": "medium",
+    "case_study_presence": false,
+    "testimonial_presence": false
+  },
+  "scraping_metadata": {
+    "scraping_method": "aiohttp",
+    "scraping_success": true,
+    "content_length": 154593,
+    "scraping_duration_seconds": 0.4745514392852783,
+    "ai_model_used": "claude-3-5-sonnet-20241022",
+    "analysis_duration_seconds": 19.696046352386475,
+    "total_processing_time": 20.170597791671753,
+    "confidence_scores": {
+      "organization_context": 0.9,
+      "workflow_intelligence": 0.7,
+      "technology_stack": 0.8,
+      "process_maturity": 0.6,
+      "market_intelligence": 0.6,
+      "content_analysis": 0.7
+    },
+    "data_completeness": 0.0,
+    "reliability_score": 0.0,
+    "scraped_at": "2025-09-24T22:40:08.933274",
+    "analyzed_at": 1758775229.1040184,
+    "errors_encountered": [],
+    "warnings": []
+  }
+}

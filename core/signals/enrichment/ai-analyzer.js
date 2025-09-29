@@ -28,7 +28,15 @@ class AIAnalyzer {
         winston.format.timestamp(),
         winston.format.json()
       ),
-      defaultMeta: { service: 'ai-analyzer' }
+      defaultMeta: { service: 'ai-analyzer' },
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+          )
+        })
+      ]
     });
     
     // Initialize Anthropic client

@@ -1,0 +1,178 @@
+---
+globs: *.js,*.jsx,*.ts,*.tsx
+---
+
+# HeyJarvis Coding Standards & Patterns
+
+## 🎯 Code Style Guidelines
+
+### Class Structure Pattern
+All classes follow this consistent structure pattern:
+
+```javascript
+/**
+ * Class Description - Brief purpose and key features
+ * 
+ * Features:
+ * 1. Feature one
+ * 2. Feature two
+ * 3. Feature three
+ */
+
+const dependencies = require('modules');
+
+class ClassName {
+  constructor(options = {}) {
+    // 1. Set default options with spread
+    this.options = {
+      defaultOption: 'value',
+      ...options
+    };
+    
+    // 2. Initialize logger with winston
+    this.logger = winston.createLogger({
+      level: this.options.logLevel || 'info',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      ),
+      defaultMeta: { service: 'service-name' }
+    });
+    
+    // 3. Initialize instance variables
+    // 4. Setup event handlers if EventEmitter
+  }
+}
+```
+
+### Error Handling Pattern
+Always use structured error handling with proper logging:
+
+```javascript
+try {
+  // Operation
+  this.logger.info('Operation started', { context });
+  
+} catch (error) {
+  this.logger.error('Operation failed', { 
+    error: error.message,
+    stack: error.stack,
+    context 
+  });
+  
+  // Re-throw or handle appropriately
+  throw new Error(`Failed to perform operation: ${error.message}`);
+}
+```
+
+### Async/Await Pattern
+- Always use `async/await` over Promises
+- Handle errors with try/catch blocks
+- Log both success and failure cases
+- Include relevant context in logs
+
+### Method Documentation
+Use JSDoc comments for all public methods:
+
+```javascript
+/**
+ * Method description
+ * @param {Object} param - Parameter description
+ * @param {string} param.property - Property description
+ * @returns {Promise<Object>} Return value description
+ */
+async methodName(param) {
+  // Implementation
+}
+```
+
+## 🏗️ Architecture Patterns
+
+### Dependency Injection
+Use constructor injection for dependencies:
+
+```javascript
+class ServiceClass {
+  constructor(dependencies = {}) {
+    this.userRepository = dependencies.userRepository || new UserRepository();
+    this.logger = dependencies.logger || winston.createLogger();
+  }
+}
+```
+
+### Event-Driven Architecture
+Extend EventEmitter for components that need to communicate:
+
+```javascript
+const EventEmitter = require('events');
+
+class SignalProcessor extends EventEmitter {
+  async processSignal(signal) {
+    // Process signal
+    this.emit('signal_processed', { signal, result });
+  }
+}
+```
+
+### Configuration Management
+Use options pattern with sensible defaults:
+
+```javascript
+constructor(options = {}) {
+  this.options = {
+    timeout: 30000,
+    maxRetries: 3,
+    retryDelay: 5000,
+    ...options
+  };
+}
+```
+
+## 📝 Naming Conventions
+
+- **Classes**: PascalCase (`UserModel`, `SignalProcessor`)
+- **Methods**: camelCase (`calculateRelevance`, `processSignal`)
+- **Constants**: UPPER_SNAKE_CASE (`MAX_RETRIES`, `DEFAULT_TIMEOUT`)
+- **Private methods**: Prefix with underscore (`_validateInput`)
+- **Files**: kebab-case for utilities, PascalCase for classes
+
+## 🔧 Module Exports
+
+Always use CommonJS module.exports:
+
+```javascript
+class ClassName {
+  // Implementation
+}
+
+module.exports = ClassName;
+```
+
+For utilities, export an object:
+
+```javascript
+const UtilityHelpers = {
+  method1() {},
+  method2() {}
+};
+
+module.exports = UtilityHelpers;
+```
+
+## 🧪 Testing Patterns
+
+When writing tests (use Jest):
+- One test file per class/module
+- Use descriptive test names
+- Group related tests with `describe` blocks
+- Mock external dependencies
+- Test both success and error cases
+
+## 🚫 Code Smells to Avoid
+
+- Long parameter lists (use options object)
+- Deep nesting (extract methods)
+- Magic numbers (use named constants)
+- Callback hell (use async/await)
+- Missing error handling
+- Inconsistent logging levels

@@ -1,50 +1,52 @@
-#!/usr/bin/env node
-
 /**
- * HeyJarvis Desktop App Entry Point
+ * Simple Electron Main Entry Point
+ * Loads the copilot-enhanced.html directly without webpack
  */
 
-// Load environment variables
-require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
-
 const { app, BrowserWindow } = require('electron');
-const AppLifecycle = require('./main/app-lifecycle');
+const path = require('path');
 
-let appLifecycle = null;
+let mainWindow;
 
-// Handle app ready
-app.whenReady().then(async () => {
-  console.log('🚀 HeyJarvis Desktop starting...');
-  
-  // Create app lifecycle instance
-  appLifecycle = new AppLifecycle();
-  
-  // Initialize the app
-  await appLifecycle.initialize();
-  
-  console.log('✅ HeyJarvis Desktop ready!');
-  console.log('📱 Press Cmd+Shift+J (or Ctrl+Shift+J) to toggle the AI Copilot');
-});
+function createWindow() {
+  // Create the browser window
+  mainWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
+      preload: path.join(__dirname, 'bridge/copilot-preload.js')
+    },
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: true
+  });
 
-// Handle app activation (macOS)
-app.on('activate', () => {
-  // On macOS, re-create window when dock icon is clicked
-  if (BrowserWindow.getAllWindows().length === 0 && appLifecycle) {
-    appLifecycle.showMainWindow();
+  // Load the copilot HTML file directly
+  mainWindow.loadFile(path.join(__dirname, 'renderer/copilot-enhanced.html'));
+
+  // Open DevTools in development
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools();
   }
-});
+}
 
-// Handle all windows closed
+// This method will be called when Electron has finished initialization
+app.whenReady().then(createWindow);
+
+// Quit when all windows are closed
 app.on('window-all-closed', () => {
-  // On macOS, apps typically stay active even when all windows are closed
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-// Handle before quit
-app.on('before-quit', () => {
-  console.log('👋 HeyJarvis Desktop shutting down...');
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
-
-module.exports = app;

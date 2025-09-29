@@ -1,0 +1,54 @@
+{"level":"info","message":"🚀 Enhanced CRM Background Service initialized with Company Intelligence","timestamp":"2025-09-25T04:53:44.832Z"}
+{"level":"info","message":"🔄 Starting Enhanced CRM Background Service...","timestamp":"2025-09-25T04:53:44.834Z"}
+{"level":"info","message":"🔍 Initializing Company Intelligence...","timestamp":"2025-09-25T04:53:44.834Z"}
+{"level":"info","message":"✅ Loaded existing company context: Meta","timestamp":"2025-09-25T04:53:44.844Z"}
+{"level":"info","message":"📚 No existing learning state found, starting fresh","timestamp":"2025-09-25T04:53:45.513Z"}
+{"level":"info","message":"🌟 Enhanced CRM Service running on port 3001","timestamp":"2025-09-25T04:53:45.515Z"}
+{"level":"info","message":"📊 Company Intelligence: Ready","timestamp":"2025-09-25T04:53:45.515Z"}
+{"level":"info","message":"🏢 Company Context: undefined (undefined)","timestamp":"2025-09-25T04:53:45.515Z"}
+{"level":"info","message":"🛑 Stopping Enhanced CRM Background Service...","timestamp":"2025-09-25T05:14:15.836Z"}
+{"level":"info","message":"💾 Learning state saved successfully","timestamp":"2025-09-25T05:14:15.838Z"}
+{"level":"info","message":"🚀 Enhanced CRM Background Service initialized with Company Intelligence","timestamp":"2025-09-25T05:24:00.657Z"}
+{"level":"info","message":"🔄 Starting Enhanced CRM Background Service...","timestamp":"2025-09-25T05:24:00.658Z"}
+{"level":"info","message":"🔍 Initializing Company Intelligence...","timestamp":"2025-09-25T05:24:00.659Z"}
+{"level":"info","message":"❓ No company context found","timestamp":"2025-09-25T05:24:00.661Z"}
+{"level":"info","message":"🚀 Welcome to the Enhanced CRM Intelligence System!","timestamp":"2025-09-25T05:24:00.661Z"}
+{"level":"info","message":"","timestamp":"2025-09-25T05:24:00.661Z"}
+{"level":"info","message":"To get started, please provide your company website URL.","timestamp":"2025-09-25T05:24:00.661Z"}
+{"level":"info","message":"This will be used to gather intelligence about your company","timestamp":"2025-09-25T05:24:00.661Z"}
+{"level":"info","message":"and provide personalized CRM recommendations.","timestamp":"2025-09-25T05:24:00.661Z"}
+{"level":"info","message":"","timestamp":"2025-09-25T05:24:00.662Z"}
+{"level":"info","message":"🔍 Gathering intelligence for: https://dxfactor.com","timestamp":"2025-09-25T05:24:00.672Z"}
+{"level":"info","message":"🔍 Gathering company intelligence for: https://dxfactor.com","timestamp":"2025-09-25T05:24:00.672Z"}
+{"level":"error","message":"❌ Failed to gather company intelligence: this.emit is not a function","stack":"TypeError: this.emit is not a function\n    at EnhancedIntelligentBackgroundService.gatherCompanyIntelligence (/home/sdalal/test/BeachBaby/crm-integration/enhanced-background-service.js:197:12)\n    at /home/sdalal/test/BeachBaby/crm-integration/enhanced-background-service.js:180:22\n    at [_onLine] [as _onLine] (node:internal/readline/interface:417:7)\n    at [_line] [as _line] (node:internal/readline/interface:890:18)\n    at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1279:24)\n    at Socket.onkeypress (node:internal/readline/interface:267:20)\n    at Socket.emit (node:events:524:28)\n    at emitKeys (node:internal/readline/utils:371:14)\n    at emitKeys.next (<anonymous>)\n    at Socket.onData (node:internal/readline/emitKeypressEvents:64:36)","timestamp":"2025-09-25T05:24:00.673Z"}
+{"level":"error","message":"❌ Failed to gather company intelligence:","timestamp":"2025-09-25T05:24:00.673Z"}
+{"level":"info","message":"💡 Starting without company intelligence. You can try again later.","timestamp":"2025-09-25T05:24:00.674Z"}
+{"level":"info","message":"📚 Loaded learning state: 0 patterns","timestamp":"2025-09-25T05:24:01.342Z"}
+{"level":"info","message":"🌟 Enhanced CRM Service running on port 3001","timestamp":"2025-09-25T05:24:01.344Z"}
+{"level":"info","message":"📊 Company Intelligence: Not Available","timestamp":"2025-09-25T05:24:01.344Z"}
+{"level":"info","message":"🛑 Stopping Enhanced CRM Background Service...","timestamp":"2025-09-25T05:24:28.694Z"}
+{"level":"info","message":"💾 Learning state saved successfully","timestamp":"2025-09-25T05:24:28.696Z"}
+{"level":"info","message":"🚀 Enhanced CRM Background Service initialized with Company Intelligence","timestamp":"2025-09-25T05:25:56.102Z"}
+{"level":"info","message":"🔄 Starting Enhanced CRM Background Service...","timestamp":"2025-09-25T05:25:56.104Z"}
+{"level":"info","message":"🔍 Initializing Company Intelligence...","timestamp":"2025-09-25T05:25:56.104Z"}
+{"level":"info","message":"❓ No company context found","timestamp":"2025-09-25T05:25:56.106Z"}
+{"level":"info","message":"🚀 Welcome to the Enhanced CRM Intelligence System!","timestamp":"2025-09-25T05:25:56.106Z"}
+{"level":"info","message":"","timestamp":"2025-09-25T05:25:56.107Z"}
+{"level":"info","message":"To get started, please provide your company website URL.","timestamp":"2025-09-25T05:25:56.107Z"}
+{"level":"info","message":"This will be used to gather intelligence about your company","timestamp":"2025-09-25T05:25:56.107Z"}
+{"level":"info","message":"and provide personalized CRM recommendations.","timestamp":"2025-09-25T05:25:56.107Z"}
+{"level":"info","message":"","timestamp":"2025-09-25T05:25:56.107Z"}
+{"level":"info","message":"🔍 Gathering intelligence for: https://dxfactor.com","timestamp":"2025-09-25T05:25:56.116Z"}
+{"level":"info","message":"🔍 Gathering company intelligence for: https://dxfactor.com","timestamp":"2025-09-25T05:25:56.116Z"}
+{"level":"info","message":"✅ Company intelligence gathered successfully","timestamp":"2025-09-25T05:26:18.062Z"}
+{"level":"info","message":"🏢 Company: DXFactor","timestamp":"2025-09-25T05:26:18.063Z"}
+{"level":"info","message":"🏭 Industry: Technology","timestamp":"2025-09-25T05:26:18.063Z"}
+{"level":"info","message":"📏 Size: smb","timestamp":"2025-09-25T05:26:18.063Z"}
+{"level":"info","message":"💼 Business Model: B2B SaaS","timestamp":"2025-09-25T05:26:18.063Z"}
+{"level":"info","message":"✅ Company intelligence setup complete!","timestamp":"2025-09-25T05:26:18.063Z"}
+{"level":"info","message":"📚 Loaded learning state: 0 patterns","timestamp":"2025-09-25T05:26:18.720Z"}
+{"level":"info","message":"🌟 Enhanced CRM Service running on port 3001","timestamp":"2025-09-25T05:26:18.722Z"}
+{"level":"info","message":"📊 Company Intelligence: Ready","timestamp":"2025-09-25T05:26:18.722Z"}
+{"level":"info","message":"🏢 Company Context: DXFactor (Technology)","timestamp":"2025-09-25T05:26:18.722Z"}
+{"level":"info","message":"🛑 Stopping Enhanced CRM Background Service...","timestamp":"2025-09-25T05:26:25.617Z"}
+{"level":"info","message":"💾 Learning state saved successfully","timestamp":"2025-09-25T05:26:25.619Z"}

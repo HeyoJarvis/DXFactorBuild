@@ -1,0 +1,60 @@
+---
+alwaysApply: true
+---
+
+# HeyJarvis Project Structure Guide
+
+HeyJarvis is an AI-powered competitive intelligence platform with a modular monorepo architecture. The main entry point is [package.json](mdc:package.json) which defines workspaces for each module.
+
+## 🏗️ Architecture Overview
+
+The project follows a modular architecture with clear separation of concerns:
+
+```
+heyjarvis/
+├── desktop/                    # Electron Desktop Dashboard
+│   ├── main/                   # Main process (Node.js)
+│   ├── renderer/               # Renderer process (React)
+│   └── bridge/                 # IPC communication layer
+├── delivery/                   # Workflow Integrations (Slack, Teams)
+│   └── slack/                  # Slack bot implementation
+├── core/                       # Business Logic & AI Engine
+│   ├── signals/                # Signal processing pipeline
+│   └── relevance/              # AI relevance scoring
+├── data/                       # Data Models & Storage
+│   ├── models/                 # Database schemas
+│   ├── repositories/           # Data access layer
+│   └── storage/                # Database clients
+└── tests/                      # Testing suite (when created)
+```
+
+## 📦 Workspace Structure
+
+Each workspace is a separate npm package with its own [package.json](mdc:package.json):
+- **Desktop**: [desktop/package.json](mdc:desktop/package.json) - Electron app
+- **Delivery**: [delivery/package.json](mdc:delivery/package.json) - Slack/Teams integrations  
+- **Core**: [core/package.json](mdc:core/package.json) - Business logic and AI
+- **Data**: [data/package.json](mdc:data/package.json) - Data models and storage
+
+## 🔧 Key Entry Points
+
+- **Desktop App**: [desktop/main/app-lifecycle.js](mdc:desktop/main/app-lifecycle.js)
+- **Slack Bot**: [delivery/slack/app.js](mdc:delivery/slack/app.js)
+- **Data Layer**: [data/index.js](mdc:data/index.js)
+- **Signal Processing**: [core/signals/ingestion/scheduler.js](mdc:core/signals/ingestion/scheduler.js)
+
+## 🎯 Development Commands
+
+- `npm run dev` - Start all services in development mode
+- `npm run dev:desktop` - Desktop app only
+- `npm run dev:delivery` - Slack bot only
+- `npm run setup` - Install all workspace dependencies
+
+## 📋 File Naming Conventions
+
+- **Classes**: PascalCase files (e.g., `AppLifecycle.js`, `UserModel.js`)
+- **Utilities**: kebab-case (e.g., `signal-repository.js`, `supabase-client.js`)
+- **Schemas**: `.schema.js` suffix (e.g., `user.schema.js`, `signal.schema.js`)
+- **Configs**: `.config.js` suffix for configuration files
+
+When working with this codebase, always consider the workspace boundaries and use the appropriate npm scripts for cross-workspace operations.

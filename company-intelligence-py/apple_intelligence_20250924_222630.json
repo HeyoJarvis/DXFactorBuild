@@ -1,0 +1,151 @@
+{
+  "company_name": "Apple",
+  "website_url": "https://apple.com",
+  "organization_context": {
+    "organization_id": "apple_com",
+    "company_name": "Apple",
+    "industry": "Technology",
+    "sub_industry": "Consumer Electronics",
+    "target_market": "B2C",
+    "company_size": "enterprise",
+    "employee_count_estimate": null,
+    "sales_team_size": null,
+    "avg_deal_size": null,
+    "budget_range": null,
+    "revenue_stage": "Mature",
+    "current_conversion_rate": null,
+    "avg_cycle_time": null,
+    "tech_sophistication": "high",
+    "business_model": "B2C",
+    "sales_complexity": "transactional",
+    "crm_system": null
+  },
+  "description": null,
+  "workflow_intelligence": {
+    "sales_process_complexity": "transactional",
+    "sales_cycle_length_estimate": 1,
+    "lead_qualification_process": "automated",
+    "manual_process_mentions": [
+      "trade-in device evaluation"
+    ],
+    "automation_gaps": [
+      "trade-in value assessment",
+      "condition verification"
+    ],
+    "coordination_challenges": [],
+    "scheduling_complexity": "simple",
+    "document_process_maturity": "basic",
+    "integration_needs": [
+      "carrier systems",
+      "trade-in programs"
+    ],
+    "team_coordination_mentions": [],
+    "remote_work_indicators": [],
+    "meeting_management_issues": []
+  },
+  "technology_stack": {
+    "crm_system": null,
+    "marketing_automation": null,
+    "email_platform": null,
+    "communication_tools": [],
+    "video_conferencing": [],
+    "project_management": [],
+    "scheduling_tools": [],
+    "document_tools": [],
+    "automation_tools": [],
+    "analytics_tools": [],
+    "api_sophistication": "medium",
+    "integration_mentions": [],
+    "webhook_usage": false,
+    "website_platform": null,
+    "cms_system": null,
+    "ecommerce_platform": null
+  },
+  "process_maturity": {
+    "process_sophistication": "advanced",
+    "documentation_quality": "excellent",
+    "automation_level": "high",
+    "sales_process_documented": true,
+    "onboarding_process_defined": true,
+    "support_process_structured": true,
+    "change_management_capability": "high",
+    "training_infrastructure": "advanced",
+    "process_optimization_culture": true
+  },
+  "market_intelligence": {
+    "market_position": "Leader",
+    "competitive_advantages": [
+      "Integrated ecosystem across devices",
+      "Premium brand positioning",
+      "Innovation in product design",
+      "Strong trade-in program"
+    ],
+    "key_differentiators": [
+      "World's best in-ear Active Noise Cancellation",
+      "Thinnest iPhone design",
+      "Pro-level technology",
+      "Health monitoring capabilities"
+    ],
+    "ideal_customer_segments": [
+      "Education sector",
+      "Professional users",
+      "Health-conscious consumers",
+      "Premium market consumers"
+    ],
+    "customer_pain_points": [
+      "Device affordability",
+      "Health monitoring",
+      "Audio quality",
+      "Device performance"
+    ],
+    "value_propositions": [
+      "Education savings",
+      "Trade-in value up to $700",
+      "Premium features (Pro models)",
+      "Health tracking capabilities",
+      "Entertainment integration (Apple TV+)"
+    ],
+    "growth_stage": "mature",
+    "funding_indicators": [],
+    "expansion_signals": [
+      "New product launches (Series 11, Ultra 3)",
+      "Education market focus",
+      "Entertainment content expansion"
+    ]
+  },
+  "content_analysis": {
+    "content_depth": "shallow",
+    "content_freshness": "medium",
+    "seo_optimization": "medium",
+    "primary_themes": [],
+    "messaging_focus": [],
+    "brand_personality": null,
+    "page_count_estimate": 11,
+    "blog_activity_level": "medium",
+    "case_study_presence": false,
+    "testimonial_presence": false
+  },
+  "scraping_metadata": {
+    "scraping_method": "aiohttp",
+    "scraping_success": true,
+    "content_length": 216365,
+    "scraping_duration_seconds": 0.24381732940673828,
+    "ai_model_used": "claude-3-5-sonnet-20241022",
+    "analysis_duration_seconds": 15.187908411026001,
+    "total_processing_time": 15.43172574043274,
+    "confidence_scores": {
+      "organization_context": 0.9,
+      "workflow_intelligence": 0.7,
+      "technology_stack": 0.8,
+      "process_maturity": 0.6,
+      "market_intelligence": 0.6,
+      "content_analysis": 0.7
+    },
+    "data_completeness": 0.0,
+    "reliability_score": 0.0,
+    "scraped_at": "2025-09-24T22:26:15.301185",
+    "analyzed_at": 1758774390.733065,
+    "errors_encountered": [],
+    "warnings": []
+  }
+}

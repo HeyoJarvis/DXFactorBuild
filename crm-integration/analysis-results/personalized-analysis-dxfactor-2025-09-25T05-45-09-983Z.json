@@ -1,0 +1,5222 @@
+{
+  "metadata": {
+    "timestamp": "2025-09-25T05:45:23.001Z",
+    "test_type": "personalized_dxfactor_analysis",
+    "system_version": "1.0.0",
+    "organization_id": "dxfactor_com",
+    "company_intelligence_used": true,
+    "analysis_duration_ms": 0
+  },
+  "organization_context": {
+    "organization_id": "dxfactor_com",
+    "industry": "Technology",
+    "company_size": "smb",
+    "sales_team_size": null,
+    "avg_deal_size": null,
+    "current_conversion_rate": null,
+    "avg_cycle_time": null,
+    "crm_system": "Hubspot",
+    "tech_sophistication": "high",
+    "budget_range": null,
+    "business_model": "B2B SaaS",
+    "sales_complexity": "consultative",
+    "automation_gaps": [
+      "staff onboarding",
+      "member query handling",
+      "payment collections",
+      "cancellation processing"
+    ],
+    "integration_needs": [
+      "ABC",
+      "Ignite",
+      "Glofox",
+      "Club Automation",
+      "MOSO",
+      "ASF",
+      "Hubspot",
+      "Gymsales"
+    ],
+    "manual_processes": [
+      "staff training",
+      "payment collections",
+      "cancellation processing",
+      "front desk workload"
+    ]
+  },
+  "analysis_results": {
+    "organization_id": "dxfactor_com",
+    "analysis_timestamp": "2025-09-25T05:45:23.000Z",
+    "processing_time_ms": 12182,
+    "workflows": [
+      {
+        "id": "63518e04-e77d-4a70-a201-001bcea5e803",
+        "crm_source": "hubspot",
+        "external_deal_id": "3701797236",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-03-30T04:34:51.244Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779111256",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:11.256Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779111257",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:11.256Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779111258",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:11.256Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2020-12-20T18:58:06.343Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-03-30T04:34:51.244Z"
+        },
+        "duration_days": 100,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:11.256Z",
+        "created_at": "2020-12-20T18:58:06.343Z",
+        "updated_at": "2025-09-25T05:45:11.256Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "9362f871-c254-4d6a-9b6d-d4e873b62158",
+        "crm_source": "hubspot",
+        "external_deal_id": "3988874695",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-03-30T04:34:00.879Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779111507",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:11.507Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779111508",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:11.507Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779111509",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:11.507Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-01-14T19:35:20.868Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-03-30T04:34:00.879Z"
+        },
+        "duration_days": 75,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:11.507Z",
+        "created_at": "2021-01-14T19:35:20.868Z",
+        "updated_at": "2025-09-25T05:45:11.507Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 2,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "9d26f6c2-129a-42ed-afa8-c3b590b2a249",
+        "crm_source": "hubspot",
+        "external_deal_id": "4049590685",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779111703",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:11.703Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779111704",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:11.703Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779111705",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:11.703Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-01-27T20:15:17.564Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1702,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:11.703Z",
+        "created_at": "2021-01-27T20:15:17.564Z",
+        "updated_at": "2025-09-25T05:45:11.703Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 2,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "1cea8306-ff96-4019-97dd-61c6154e2abe",
+        "crm_source": "hubspot",
+        "external_deal_id": "4103848010",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779112041",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:12.041Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779112042",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:12.041Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779112043",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:12.041Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-02-05T21:08:29.651Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1693,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:12.041Z",
+        "created_at": "2021-02-05T21:08:29.651Z",
+        "updated_at": "2025-09-25T05:45:12.041Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "aa567a8b-5821-4dc1-a1a8-f7eb63c903c2",
+        "crm_source": "hubspot",
+        "external_deal_id": "4158875290",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779112450",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:12.450Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779112451",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:12.450Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779112452",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:12.450Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-02-16T04:36:47.744Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1683,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:12.450Z",
+        "created_at": "2021-02-16T04:36:47.744Z",
+        "updated_at": "2025-09-25T05:45:12.450Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 3,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "44844545-47ed-4017-976e-44cbdeb91a7d",
+        "crm_source": "hubspot",
+        "external_deal_id": "4469916964",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779112680",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:12.680Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779112681",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:12.680Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779112682",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:12.680Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-03-03T16:18:27.320Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1667,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:12.680Z",
+        "created_at": "2021-03-03T16:18:27.320Z",
+        "updated_at": "2025-09-25T05:45:12.680Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "71c207e4-8bfe-45da-89f8-c99f08ed48aa",
+        "crm_source": "hubspot",
+        "external_deal_id": "4656276056",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779112895",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:12.895Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779112896",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:12.895Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779112897",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:12.895Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-03-15T00:11:26.399Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1656,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:12.895Z",
+        "created_at": "2021-03-15T00:11:26.399Z",
+        "updated_at": "2025-09-25T05:45:12.895Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "463c41fa-c738-477b-a23f-0ec7608142be",
+        "crm_source": "hubspot",
+        "external_deal_id": "4993573219",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779113077",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:13.077Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779113078",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:13.077Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779113079",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:13.077Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-03-30T03:00:49.571Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1641,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:13.077Z",
+        "created_at": "2021-03-30T03:00:49.571Z",
+        "updated_at": "2025-09-25T05:45:13.077Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "4d2de614-8e13-4b24-b031-ecff088ac9fd",
+        "crm_source": "hubspot",
+        "external_deal_id": "4904811118",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779113279",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:13.279Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779113280",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:13.279Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779113281",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:13.279Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-04-02T03:16:16.624Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1638,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:13.280Z",
+        "created_at": "2021-04-02T03:16:16.624Z",
+        "updated_at": "2025-09-25T05:45:13.280Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "7c716dfe-723f-405e-8c69-30e7d9a376e1",
+        "crm_source": "hubspot",
+        "external_deal_id": "5352512398",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779113573",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:13.573Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779113574",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:13.573Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779113575",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:13.573Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-05-26T14:48:20.778Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1583,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:13.573Z",
+        "created_at": "2021-05-26T14:48:20.778Z",
+        "updated_at": "2025-09-25T05:45:13.573Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 2,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "12e69f66-ad06-4015-b42c-9027f99b8de5",
+        "crm_source": "hubspot",
+        "external_deal_id": "5419966015",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779113826",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:13.826Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779113827",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:13.826Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779113828",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:13.826Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-07T23:08:54.823Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1571,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:13.826Z",
+        "created_at": "2021-06-07T23:08:54.823Z",
+        "updated_at": "2025-09-25T05:45:13.826Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "a3b47ace-9e41-4e93-a874-42135e987e23",
+        "crm_source": "hubspot",
+        "external_deal_id": "5430246277",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779114007",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:14.007Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779114008",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:14.007Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779114009",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:14.007Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-09T18:06:15.122Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1569,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:14.007Z",
+        "created_at": "2021-06-09T18:06:15.122Z",
+        "updated_at": "2025-09-25T05:45:14.007Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "74ff22e0-6cca-4b40-bd3d-d76a7126b7f8",
+        "crm_source": "hubspot",
+        "external_deal_id": "5430521956",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779114335",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:14.335Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779114336",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:14.335Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779114337",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:14.335Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-09T18:06:57.704Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1569,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:14.335Z",
+        "created_at": "2021-06-09T18:06:57.704Z",
+        "updated_at": "2025-09-25T05:45:14.335Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "34deff95-e4da-4905-8a7c-cc0a666af970",
+        "crm_source": "hubspot",
+        "external_deal_id": "5506110485",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779114504",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:14.504Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779114505",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:14.504Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779114506",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:14.504Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T15:38:30.836Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:14.504Z",
+        "created_at": "2021-06-22T15:38:30.836Z",
+        "updated_at": "2025-09-25T05:45:14.504Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "3c9480b3-f6c9-4db1-9797-a5579a248ab2",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507117089",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779114713",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:14.713Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779114714",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:14.713Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779114715",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:14.713Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T16:58:29.655Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:14.713Z",
+        "created_at": "2021-06-22T16:58:29.655Z",
+        "updated_at": "2025-09-25T05:45:14.713Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "fecb7b82-00b3-49e1-a30a-35258aaa6161",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507117451",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779115013",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:15.013Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779115014",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:15.013Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779115015",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:15.013Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:04:34.963Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:15.013Z",
+        "created_at": "2021-06-22T17:04:34.963Z",
+        "updated_at": "2025-09-25T05:45:15.013Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "163d55db-47ad-4eae-a994-6bab2e72b9ec",
+        "crm_source": "hubspot",
+        "external_deal_id": "5852385360",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779115177",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:15.177Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779115178",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:15.177Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779115179",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:15.177Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:06:49.058Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:15.177Z",
+        "created_at": "2021-06-22T17:06:49.058Z",
+        "updated_at": "2025-09-25T05:45:15.177Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "3a70aee3-115a-4f42-8659-9269d98c2cab",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507051184",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779115419",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:15.419Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779115420",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:15.419Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779115421",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:15.419Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:12:32.995Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:15.419Z",
+        "created_at": "2021-06-22T17:12:32.995Z",
+        "updated_at": "2025-09-25T05:45:15.419Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "d6cab167-4f39-448c-98af-413cf5a34e2c",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507118456",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779115645",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:15.645Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779115646",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:15.645Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779115647",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:15.645Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:14:38.305Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:15.645Z",
+        "created_at": "2021-06-22T17:14:38.305Z",
+        "updated_at": "2025-09-25T05:45:15.645Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "0686c33e-7e5c-4688-918e-fe5f077aafa5",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507193523",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779115823",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:15.823Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779115824",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:15.823Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779115825",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:15.823Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:16:35.835Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:15.823Z",
+        "created_at": "2021-06-22T17:16:35.835Z",
+        "updated_at": "2025-09-25T05:45:15.823Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "cd320344-dcce-4a27-bfb6-f763158516a0",
+        "crm_source": "hubspot",
+        "external_deal_id": "5506925321",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779116340",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:16.340Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779116341",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:16.340Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779116342",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:16.340Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:17:28.010Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:16.340Z",
+        "created_at": "2021-06-22T17:17:28.010Z",
+        "updated_at": "2025-09-25T05:45:16.340Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "d4b45fad-bf41-4da1-9fdf-79d22290d03d",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507184240",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "ORGANIC_SEARCH",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779116547",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:16.547Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779116548",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:16.547Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779116549",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:16.547Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:20:19.382Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:16.547Z",
+        "created_at": "2021-06-22T17:20:19.382Z",
+        "updated_at": "2025-09-25T05:45:16.547Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "ORGANIC_SEARCH",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "b903921a-902a-4e63-9e24-bb45490c819d",
+        "crm_source": "hubspot",
+        "external_deal_id": "5506696829",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779116857",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:16.857Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779116858",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:16.857Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779116859",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:16.857Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:25:23.121Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:16.857Z",
+        "created_at": "2021-06-22T17:25:23.121Z",
+        "updated_at": "2025-09-25T05:45:16.857Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "03b7da5c-b394-44de-a24d-71d067e23baf",
+        "crm_source": "hubspot",
+        "external_deal_id": "5506918467",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779117114",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:17.114Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779117115",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:17.114Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779117116",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:17.114Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T17:29:21.090Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:17.114Z",
+        "created_at": "2021-06-22T17:29:21.090Z",
+        "updated_at": "2025-09-25T05:45:17.114Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "fe9b1832-ebc7-4772-b485-348776ea1bf6",
+        "crm_source": "hubspot",
+        "external_deal_id": "5508068945",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779117373",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:17.373Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779117374",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:17.373Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779117375",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:17.373Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T19:40:32.077Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:17.373Z",
+        "created_at": "2021-06-22T19:40:32.077Z",
+        "updated_at": "2025-09-25T05:45:17.373Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "01ee15a5-5291-4faa-9eb4-cade091032f8",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507544631",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779117568",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:17.568Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779117569",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:17.568Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779117570",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:17.568Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T19:44:15.460Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:17.568Z",
+        "created_at": "2021-06-22T19:44:15.460Z",
+        "updated_at": "2025-09-25T05:45:17.568Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "6411750e-c5e4-4860-8f5c-493cdf57854d",
+        "crm_source": "hubspot",
+        "external_deal_id": "5508101283",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779117751",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:17.751Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779117752",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:17.751Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779117753",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:17.751Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T19:46:03.812Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:17.751Z",
+        "created_at": "2021-06-22T19:46:03.812Z",
+        "updated_at": "2025-09-25T05:45:17.751Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "bf5a6dfe-0b8d-4f2f-8263-f4f5387d6c96",
+        "crm_source": "hubspot",
+        "external_deal_id": "5508211869",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779117908",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:17.908Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779117909",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:17.908Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779117910",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:17.908Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T19:47:05.463Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:17.908Z",
+        "created_at": "2021-06-22T19:47:05.463Z",
+        "updated_at": "2025-09-25T05:45:17.908Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "4b79f7af-1553-4ed2-b0e7-c5cca226fa10",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507566727",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779118094",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:18.094Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779118095",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:18.094Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779118096",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:18.094Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T19:48:23.345Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:18.094Z",
+        "created_at": "2021-06-22T19:48:23.345Z",
+        "updated_at": "2025-09-25T05:45:18.094Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "5d2cdb2e-f92e-4e22-8bdb-a9329701f928",
+        "crm_source": "hubspot",
+        "external_deal_id": "5507696759",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779118396",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:18.396Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779118397",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:18.396Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779118398",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:18.396Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T19:50:00.487Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:18.396Z",
+        "created_at": "2021-06-22T19:50:00.487Z",
+        "updated_at": "2025-09-25T05:45:18.396Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "f4d1ad5d-129d-4675-a74d-ae80f92559cd",
+        "crm_source": "hubspot",
+        "external_deal_id": "5508213051",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779118668",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:18.668Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779118669",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:18.668Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779118670",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:18.668Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T20:01:17.274Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:18.668Z",
+        "created_at": "2021-06-22T20:01:17.274Z",
+        "updated_at": "2025-09-25T05:45:18.668Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "0fb309a6-514a-46f2-bfba-62bb4f514d86",
+        "crm_source": "hubspot",
+        "external_deal_id": "5508246535",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779118883",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:18.883Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779118884",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:18.883Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779118885",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:18.883Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T20:09:38.452Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:18.883Z",
+        "created_at": "2021-06-22T20:09:38.452Z",
+        "updated_at": "2025-09-25T05:45:18.883Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "966c515d-7120-486b-87cf-7ea605d14758",
+        "crm_source": "hubspot",
+        "external_deal_id": "5508311444",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779119103",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:19.103Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779119104",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:19.103Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779119105",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:19.103Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-22T20:11:05.492Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1556,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:19.103Z",
+        "created_at": "2021-06-22T20:11:05.492Z",
+        "updated_at": "2025-09-25T05:45:19.103Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "001f3f60-5cee-42e5-941b-a772075d1c0e",
+        "crm_source": "hubspot",
+        "external_deal_id": "5527863205",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779119357",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:19.357Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779119358",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:19.357Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779119359",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:19.357Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-06-24T20:05:44.357Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1554,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:19.357Z",
+        "created_at": "2021-06-24T20:05:44.357Z",
+        "updated_at": "2025-09-25T05:45:19.357Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "0cabbe09-8d2e-4ff5-a9f2-c83ccb47f141",
+        "crm_source": "hubspot",
+        "external_deal_id": "5602914899",
+        "workflow_type": "deal_progression",
+        "organization_id": "dxfactor_com",
+        "deal_value": 36000,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 36000,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "proposal",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 36000,
+              "stage_name": "unknown"
+            }
+          },
+          {
+            "name": "closing",
+            "order": 4,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-09-15T18:29:01.668Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779119505",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:19.505Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779119506",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:19.505Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779119507",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:19.505Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-07-03T18:22:11.038Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-09-15T18:29:01.668Z"
+        },
+        "duration_days": 75,
+        "data_completeness": 0.3,
+        "last_analyzed_at": "2025-09-25T05:45:19.505Z",
+        "created_at": "2021-07-03T18:22:11.038Z",
+        "updated_at": "2025-09-25T05:45:19.505Z",
+        "pattern_signature": "lead_generation→qualification→proposal→closing|call,email,meeting",
+        "pattern_name": "Mid-Market CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "2266ac9e-51db-4f05-b86a-7001e4e85535",
+        "crm_source": "hubspot",
+        "external_deal_id": "5603009565",
+        "workflow_type": "deal_progression",
+        "organization_id": "dxfactor_com",
+        "deal_value": 30000,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 30000,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "proposal",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 30000,
+              "stage_name": "unknown"
+            }
+          },
+          {
+            "name": "closing",
+            "order": 4,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-10-29T21:37:01.212Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779119723",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:19.723Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779119724",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:19.723Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779119725",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:19.723Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-07-03T18:26:20.452Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-10-29T21:37:01.212Z"
+        },
+        "duration_days": 119,
+        "data_completeness": 0.3,
+        "last_analyzed_at": "2025-09-25T05:45:19.723Z",
+        "created_at": "2021-07-03T18:26:20.452Z",
+        "updated_at": "2025-09-25T05:45:19.723Z",
+        "pattern_signature": "lead_generation→qualification→proposal→closing|call,email,meeting",
+        "pattern_name": "Extended Mid-Market CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "2557b8a7-c83c-40e7-8891-d9291976030f",
+        "crm_source": "hubspot",
+        "external_deal_id": "5603029858",
+        "workflow_type": "deal_progression",
+        "organization_id": "dxfactor_com",
+        "deal_value": 30000,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 30000,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "proposal",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 30000,
+              "stage_name": "unknown"
+            }
+          },
+          {
+            "name": "closing",
+            "order": 4,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-10-15T18:32:46.500Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779119958",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:19.958Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779119959",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:19.958Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779119960",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:19.958Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-07-03T18:30:43.751Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-10-15T18:32:46.500Z"
+        },
+        "duration_days": 105,
+        "data_completeness": 0.3,
+        "last_analyzed_at": "2025-09-25T05:45:19.958Z",
+        "created_at": "2021-07-03T18:30:43.751Z",
+        "updated_at": "2025-09-25T05:45:19.958Z",
+        "pattern_signature": "lead_generation→qualification→proposal→closing|call,email,meeting",
+        "pattern_name": "Extended Mid-Market CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "0ad27347-06e2-4b2c-9b09-926179fcd65c",
+        "crm_source": "hubspot",
+        "external_deal_id": "5603028599",
+        "workflow_type": "deal_progression",
+        "organization_id": "dxfactor_com",
+        "deal_value": 39000,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 39000,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "proposal",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 39000,
+              "stage_name": "unknown"
+            }
+          },
+          {
+            "name": "closing",
+            "order": 4,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-11-15T20:10:22.711Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779120129",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:20.129Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779120130",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:20.129Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779120131",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:20.129Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-07-03T19:09:16.963Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-11-15T20:10:22.711Z"
+        },
+        "duration_days": 136,
+        "data_completeness": 0.3,
+        "last_analyzed_at": "2025-09-25T05:45:20.129Z",
+        "created_at": "2021-07-03T19:09:16.963Z",
+        "updated_at": "2025-09-25T05:45:20.129Z",
+        "pattern_signature": "lead_generation→qualification→proposal→closing|call,email,meeting",
+        "pattern_name": "Extended Mid-Market CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "f1112a82-2f53-41e5-91ab-091e71d2a348",
+        "crm_source": "hubspot",
+        "external_deal_id": "5603009439",
+        "workflow_type": "deal_progression",
+        "organization_id": "dxfactor_com",
+        "deal_value": 39000,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 39000,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "proposal",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 39000,
+              "stage_name": "unknown"
+            }
+          },
+          {
+            "name": "closing",
+            "order": 4,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-11-15T20:13:50.016Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779120538",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:20.538Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779120539",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:20.538Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779120540",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:20.538Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-07-03T19:11:03.982Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-11-15T20:13:50.016Z"
+        },
+        "duration_days": 136,
+        "data_completeness": 0.3,
+        "last_analyzed_at": "2025-09-25T05:45:20.538Z",
+        "created_at": "2021-07-03T19:11:03.982Z",
+        "updated_at": "2025-09-25T05:45:20.538Z",
+        "pattern_signature": "lead_generation→qualification→proposal→closing|call,email,meeting",
+        "pattern_name": "Extended Mid-Market CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "37387031-2733-4367-8543-75679b78d7b7",
+        "crm_source": "hubspot",
+        "external_deal_id": "5603120039",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-11-15T20:14:47.932Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779120743",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:20.743Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779120744",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:20.743Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779120745",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:20.743Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-07-03T19:14:24.565Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-11-15T20:14:47.932Z"
+        },
+        "duration_days": 136,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:20.743Z",
+        "created_at": "2021-07-03T19:14:24.565Z",
+        "updated_at": "2025-09-25T05:45:20.743Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "f9965e4e-c72e-4035-bdc3-52efe6cf61a9",
+        "crm_source": "hubspot",
+        "external_deal_id": "5669635500",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779120947",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:20.947Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779120948",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:20.947Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779120949",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:20.947Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-07-12T20:45:55.010Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1536,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:20.947Z",
+        "created_at": "2021-07-12T20:45:55.010Z",
+        "updated_at": "2025-09-25T05:45:20.947Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "f80e5e42-d0ac-4e6b-b245-509758ecbc62",
+        "crm_source": "hubspot",
+        "external_deal_id": "5792577711",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": null,
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779121152",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:21.152Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779121153",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:21.152Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779121154",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:21.152Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-07-28T15:26:06.605Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1520,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:21.152Z",
+        "created_at": "2021-07-28T15:26:06.605Z",
+        "updated_at": "2025-09-25T05:45:21.152Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "f2d06d62-01ff-4344-8e58-60dcc9e32511",
+        "crm_source": "hubspot",
+        "external_deal_id": "5899880314",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-08-31T16:46:31.918Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779121356",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:21.356Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779121357",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:21.356Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779121358",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:21.356Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-08-10T16:46:31.918Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-08-31T16:46:31.918Z"
+        },
+        "duration_days": 21,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:21.356Z",
+        "created_at": "2021-08-10T16:46:31.918Z",
+        "updated_at": "2025-09-25T05:45:21.356Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Fast SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "d681ea58-e4aa-42b1-86c1-375265424774",
+        "crm_source": "hubspot",
+        "external_deal_id": "5602917130",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 750,
+        "status": "lost",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "unknown",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 750,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "proposal",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 750,
+              "stage_name": "unknown"
+            }
+          },
+          {
+            "name": "closing",
+            "order": 4,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "2021-09-01T01:15:49.730Z",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779121562",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:21.562Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779121563",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:21.562Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779121564",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:21.562Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-08-31T18:19:15.315Z",
+          "first_activity": null,
+          "last_activity": null,
+          "closed": "2021-09-01T01:15:49.730Z"
+        },
+        "duration_days": 1,
+        "data_completeness": 0.3,
+        "last_analyzed_at": "2025-09-25T05:45:21.562Z",
+        "created_at": "2021-08-31T18:19:15.315Z",
+        "updated_at": "2025-09-25T05:45:21.562Z",
+        "pattern_signature": "lead_generation→qualification→proposal→closing|call,email,meeting",
+        "pattern_name": "Fast SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": null,
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "b2716643-05d2-4cf7-81a2-f077490233e2",
+        "crm_source": "hubspot",
+        "external_deal_id": "6756478339",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779121733",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:21.733Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779121734",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:21.733Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779121735",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:21.733Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2021-10-26T16:28:22.997Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1430,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:21.733Z",
+        "created_at": "2021-10-26T16:28:22.997Z",
+        "updated_at": "2025-09-25T05:45:21.733Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "a6487cc7-748d-4770-aa95-5735edecae89",
+        "crm_source": "hubspot",
+        "external_deal_id": "7642818627",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "DIRECT_TRAFFIC",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.001
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779121970",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:21.970Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779121971",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:21.970Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779121972",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:21.970Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2022-01-20T17:27:24.541Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1344,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:21.970Z",
+        "created_at": "2022-01-20T17:27:24.541Z",
+        "updated_at": "2025-09-25T05:45:21.970Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "DIRECT_TRAFFIC",
+          "contact_count": 0,
+          "probability": 0.001
+        }
+      },
+      {
+        "id": "02fcc6e9-02f0-4df0-b1a6-18474162b0f6",
+        "crm_source": "hubspot",
+        "external_deal_id": "7686045496",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.002
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779122175",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:22.175Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779122176",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:22.175Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779122177",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:22.175Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2022-01-24T19:32:55.425Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1340,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:22.175Z",
+        "created_at": "2022-01-24T19:32:55.425Z",
+        "updated_at": "2025-09-25T05:45:22.175Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO CIM Sales Pipeline - India",
+        "hubspot_metadata": {
+          "pipeline_id": "4187168",
+          "pipeline_name": "CIPIO CIM Sales Pipeline - India",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.002
+        }
+      },
+      {
+        "id": "9846c934-5435-46ee-adfe-6cb37f785329",
+        "crm_source": "hubspot",
+        "external_deal_id": "7846308640",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.003
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779122384",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:22.384Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779122385",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:22.384Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779122386",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:22.384Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2022-02-07T19:20:08.105Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1326,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:22.384Z",
+        "created_at": "2022-02-07T19:20:08.105Z",
+        "updated_at": "2025-09-25T05:45:22.384Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO Partners",
+        "hubspot_metadata": {
+          "pipeline_id": "16013802",
+          "pipeline_name": "CIPIO Partners",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.003
+        }
+      },
+      {
+        "id": "31421775-4427-4663-a64a-c2813e19797a",
+        "crm_source": "hubspot",
+        "external_deal_id": "7868329273",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.002
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779122586",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:22.586Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779122587",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:22.586Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779122588",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:22.586Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2022-02-09T21:34:27.240Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1324,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:22.586Z",
+        "created_at": "2022-02-09T21:34:27.240Z",
+        "updated_at": "2025-09-25T05:45:22.586Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO CIM Sales Pipeline - India",
+        "hubspot_metadata": {
+          "pipeline_id": "4187168",
+          "pipeline_name": "CIPIO CIM Sales Pipeline - India",
+          "source": "OFFLINE",
+          "contact_count": 3,
+          "probability": 0.002
+        }
+      },
+      {
+        "id": "00b68e85-e050-478e-866c-54d5d752c18f",
+        "crm_source": "hubspot",
+        "external_deal_id": "8627702846",
+        "workflow_type": "lead_conversion",
+        "organization_id": "dxfactor_com",
+        "deal_value": 0,
+        "status": "active",
+        "stages": [
+          {
+            "name": "lead_generation",
+            "order": 1,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "source": "OFFLINE",
+              "pipeline": "default"
+            }
+          },
+          {
+            "name": "qualification",
+            "order": 2,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "deal_value": 0,
+              "probability": 0.004
+            }
+          },
+          {
+            "name": "closing",
+            "order": 3,
+            "duration": 0,
+            "activities": [],
+            "conversion_rate": null,
+            "metadata": {
+              "close_date": "",
+              "pipeline": "default"
+            }
+          }
+        ],
+        "activities": [
+          {
+            "id": "synthetic_initial_1758779122790",
+            "type": "call",
+            "subject": "Initial Contact",
+            "description": "First contact with prospect",
+            "date": "2025-09-18T05:45:22.790Z",
+            "duration": 15,
+            "outcome": "interested",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_followup_1758779122791",
+            "type": "email",
+            "subject": "Follow-up Email",
+            "description": "Follow-up email sent to prospect",
+            "date": "2025-09-20T05:45:22.790Z",
+            "duration": null,
+            "outcome": "opened",
+            "participants": [],
+            "source": "synthetic"
+          },
+          {
+            "id": "synthetic_meeting_1758779122792",
+            "type": "meeting",
+            "subject": "Discovery Meeting",
+            "description": "Discovery call to understand requirements",
+            "date": "2025-09-22T05:45:22.790Z",
+            "duration": 30,
+            "outcome": "qualified",
+            "participants": [],
+            "source": "synthetic"
+          }
+        ],
+        "participants": [],
+        "timeline": {
+          "created": "2022-04-11T16:21:10.936Z",
+          "first_activity": null,
+          "last_activity": null
+        },
+        "duration_days": 1263,
+        "data_completeness": 0.2,
+        "last_analyzed_at": "2025-09-25T05:45:22.790Z",
+        "created_at": "2022-04-11T16:21:10.936Z",
+        "updated_at": "2025-09-25T05:45:22.790Z",
+        "pattern_signature": "lead_generation→qualification→closing|call,email,meeting",
+        "pattern_name": "Extended SMB CIPIO CIM Sales Pipeline - India",
+        "hubspot_metadata": {
+          "pipeline_id": "4187168",
+          "pipeline_name": "CIPIO CIM Sales Pipeline - India",
+          "source": "OFFLINE",
+          "contact_count": 1,
+          "probability": 0.004
+        }
+      }
+    ],
+    "workflow_count": 50,
+    "patterns": [
+      {
+        "id": "pattern_1758779123000_vipuj5zi4",
+        "pattern_name": "Pattern 50 Workflows",
+        "pattern_type": "deal_progression",
+        "confidence": 0.6,
+        "workflow_count": 50,
+        "sample_workflow_ids": [
+          "63518e04-e77d-4a70-a201-001bcea5e803",
+          "9362f871-c254-4d6a-9b6d-d4e873b62158",
+          "9d26f6c2-129a-42ed-afa8-c3b590b2a249",
+          "1cea8306-ff96-4019-97dd-61c6154e2abe",
+          "aa567a8b-5821-4dc1-a1a8-f7eb63c903c2"
+        ],
+        "description": "Pattern identified from 50 similar workflows",
+        "key_characteristics": [
+          "Average duration: 1253 days",
+          "Average deal value: $3,495",
+          "Success rate: 0%"
+        ],
+        "benchmark_metrics": {
+          "avg_cycle_time": 1252.66,
+          "avg_deal_value": 3495,
+          "success_rate": 0,
+          "efficiency_score": 0.5
+        },
+        "bottlenecks": [
+          {
+            "location": "overall_cycle",
+            "issue": "Extended sales cycle",
+            "impact": "Average cycle time: 1253 days",
+            "severity": "high"
+          },
+          {
+            "location": "conversion",
+            "issue": "Low conversion rate",
+            "impact": "Success rate: 0%",
+            "severity": "high"
+          }
+        ],
+        "success_factors": [],
+        "optimization_opportunities": [],
+        "analyzed_at": "2025-09-25T05:45:23.000Z",
+        "ai_model": "basic_analysis",
+        "cluster_summary": {
+          "size": 50,
+          "avg_duration": 1252.66,
+          "avg_deal_value": 3495,
+          "success_rate": 0,
+          "common_stages": [
+            "lead_generation",
+            "qualification",
+            "closing"
+          ],
+          "common_activities": {
+            "call": 50,
+            "email": 50,
+            "meeting": 50
+          },
+          "participant_patterns": {
+            "avg_contacts": 0,
+            "avg_companies": 0,
+            "common_roles": {},
+            "engagement_distribution": {}
+          },
+          "bottlenecks": [
+            {
+              "location": "overall_cycle",
+              "issue": "Extended sales cycle",
+              "impact": "Average cycle time: 1253 days",
+              "severity": "high"
+            },
+            {
+              "location": "conversion",
+              "issue": "Low conversion rate",
+              "impact": "Success rate: 0%",
+              "severity": "high"
+            }
+          ],
+          "success_factors": [],
+          "sample_workflows": [
+            {
+              "id": "63518e04-e77d-4a70-a201-001bcea5e803",
+              "duration": 100,
+              "value": 0,
+              "status": "lost",
+              "stages": [
+                "lead_generation",
+                "qualification",
+                "closing"
+              ]
+            },
+            {
+              "id": "9362f871-c254-4d6a-9b6d-d4e873b62158",
+              "duration": 75,
+              "value": 0,
+              "status": "lost",
+              "stages": [
+                "lead_generation",
+                "qualification",
+                "closing"
+              ]
+            },
+            {
+              "id": "9d26f6c2-129a-42ed-afa8-c3b590b2a249",
+              "duration": 1702,
+              "value": 0,
+              "status": "active",
+              "stages": [
+                "lead_generation",
+                "qualification",
+                "closing"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "pattern_count": 1,
+    "cross_pattern_insights": [],
+    "recommendations": [],
+    "recommendation_count": 0,
+    "summary": {
+      "workflow_health_score": 30,
+      "avg_cycle_time": 1253,
+      "conversion_rate": 0,
+      "critical_bottlenecks": 2,
+      "high_roi_opportunities": 0,
+      "total_potential_roi": 0,
+      "key_insights": [
+        "Most common bottleneck: overall_cycle (affects 1 patterns)"
+      ]
+    }
+  },
+  "personalization_summary": {
+    "company_name": "DXFactor",
+    "industry": "Technology",
+    "company_size": "smb",
+    "business_model": "B2B SaaS",
+    "automation_gaps_count": 4,
+    "integration_needs_count": 8,
+    "manual_processes_count": 4
+  }
+}

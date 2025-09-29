@@ -1,0 +1,387 @@
+---
+globs: **/delivery/slack/**,**/blocks/**
+---
+
+# Slack Integration Patterns
+
+## 🤖 Slack Bolt Framework
+
+### App Initialization
+The main Slack app is configured in [delivery/slack/app.js](mdc:delivery/slack/app.js) using Slack Bolt framework:
+
+```javascript
+const { App } = require('@slack/bolt');
+
+this.slackApp = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: process.env.SLACK_SOCKET_MODE === 'true',
+  appToken: process.env.SLACK_APP_TOKEN,
+  port: this.options.port,
+  logger: {
+    debug: (...msgs) => this.logger.debug(msgs.join(' ')),
+    info: (...msgs) => this.logger.info(msgs.join(' ')),
+    warn: (...msgs) => this.logger.warn(msgs.join(' ')),
+    error: (...msgs) => this.logger.error(msgs.join(' '))
+  }
+});
+```
+
+### Environment Configuration
+Required Slack environment variables:
+```bash
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+SLACK_SIGNING_SECRET=your-signing-secret
+SLACK_APP_TOKEN=xapp-your-app-token
+SLACK_SOCKET_MODE=true
+```
+
+## 📱 Block Kit UI Components
+
+### Alert Card Pattern
+Create rich interactive cards for signal delivery:
+
+```javascript
+// In delivery/slack/blocks/alert-card.js
+function createAlertCard(signal, user) {
+  return {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*${signal.title}*\n${signal.summary}`
+    },
+    accessory: {
+      type: "button",
+      text: {
+        type: "plain_text",
+        text: "View Details"
+      },
+      action_id: "view_signal_details",
+      value: signal.id
+    }
+  };
+}
+```
+
+### Feedback Collection
+Implement feedback buttons for learning:
+
+```javascript
+function createFeedbackButtons(signalId) {
+  return {
+    type: "actions",
+    elements: [
+      {
+        type: "button",
+        text: { type: "plain_text", text: "👍 Relevant" },
+        action_id: "feedback_relevant",
+        value: signalId,
+        style: "primary"
+      },
+      {
+        type: "button", 
+        text: { type: "plain_text", text: "👎 Not Relevant" },
+        action_id: "feedback_irrelevant",
+        value: signalId
+      },
+      {
+        type: "button",
+        text: { type: "plain_text", text: "🔇 Mute Source" },
+        action_id: "mute_source",
+        value: signalId,
+        style: "danger"
+      }
+    ]
+  };
+}
+```
+
+## 🎯 Event Handling Patterns
+
+### Message Events
+Handle incoming messages and mentions:
+
+```javascript
+// Listen for app mentions
+app.event('app_mention', async ({ event, client, logger }) => {
+  try {
+    const response = await processUserQuery(event.text, event.user);
+    
+    await client.chat.postMessage({
+      channel: event.channel,
+      thread_ts: event.ts,
+      blocks: createResponseBlocks(response)
+    });
+    
+  } catch (error) {
+    logger.error('Failed to handle mention', { error: error.message });
+  }
+});
+```
+
+### Button Interactions
+Handle button clicks and interactive elements:
+
+```javascript
+// Handle feedback buttons
+app.action('feedback_relevant', async ({ ack, body, client }) => {
+  await ack();
+  
+  try {
+    const signalId = body.actions[0].value;
+    const userId = body.user.id;
+    
+    await processFeedback({
+      signal_id: signalId,
+      user_id: userId,
+      feedback_type: 'relevant',
+      timestamp: Date.now()
+    });
+    
+    // Update message to show feedback received
+    await client.chat.update({
+      channel: body.channel.id,
+      ts: body.message.ts,
+      blocks: updateBlocksWithFeedback(body.message.blocks, 'relevant')
+    });
+    
+  } catch (error) {
+    logger.error('Failed to process feedback', { error: error.message });
+  }
+});
+```
+
+### Slash Commands
+Implement custom slash commands:
+
+```javascript
+// /jarvis command handler
+app.command('/jarvis', async ({ command, ack, respond }) => {
+  await ack();
+  
+  try {
+    const action = command.text.split(' ')[0];
+    const params = command.text.split(' ').slice(1);
+    
+    switch (action) {
+      case 'status':
+        await respond(await getStatusReport(command.user_id));
+        break;
+        
+      case 'settings':
+        await respond(await getUserSettings(command.user_id));
+        break;
+        
+      case 'mute':
+        await muteKeyword(command.user_id, params.join(' '));
+        await respond(`Muted keyword: "${params.join(' ')}"`);
+        break;
+        
+      default:
+        await respond(getHelpMessage());
+    }
+    
+  } catch (error) {
+    await respond(`Error: ${error.message}`);
+  }
+});
+```
+
+## 📤 Message Delivery Patterns
+
+### Signal Broadcasting
+Send signals to appropriate channels:
+
+```javascript
+async deliverSignal(signal, user, urgency = 'normal') {
+  const channel = this.getDeliveryChannel(user, urgency);
+  const blocks = this.createSignalBlocks(signal, user);
+  
+  try {
+    const result = await this.slackApp.client.chat.postMessage({
+      channel: channel,
+      blocks: blocks,
+      text: `New signal: ${signal.title}`, // Fallback text
+      metadata: {
+        event_type: 'signal_delivery',
+        event_payload: {
+          signal_id: signal.id,
+          user_id: user.id,
+          urgency: urgency
+        }
+      }
+    });
+    
+    // Track delivery for analytics
+    await this.trackDelivery({
+      signal_id: signal.id,
+      user_id: user.id,
+      channel: channel,
+      message_ts: result.ts,
+      urgency: urgency
+    });
+    
+    return result;
+    
+  } catch (error) {
+    this.logger.error('Failed to deliver signal', {
+      signal_id: signal.id,
+      user_id: user.id,
+      error: error.message
+    });
+    throw error;
+  }
+}
+```
+
+### Batch Delivery (Digest Mode)
+Send multiple signals as a digest:
+
+```javascript
+async deliverDigest(signals, user, period = 'daily') {
+  const digestBlocks = [
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: `📊 Your ${period} competitive intelligence digest`
+      }
+    },
+    {
+      type: "context",
+      elements: [{
+        type: "mrkdwn",
+        text: `${signals.length} signals • Generated ${new Date().toLocaleString()}`
+      }]
+    },
+    { type: "divider" }
+  ];
+  
+  // Add signal summaries
+  signals.forEach(signal => {
+    digestBlocks.push(this.createDigestSignalBlock(signal));
+  });
+  
+  // Add action buttons
+  digestBlocks.push({
+    type: "actions",
+    elements: [
+      {
+        type: "button",
+        text: { type: "plain_text", text: "View All Signals" },
+        action_id: "view_all_signals",
+        url: `${process.env.DESKTOP_APP_URL}/signals`
+      },
+      {
+        type: "button",
+        text: { type: "plain_text", text: "Adjust Settings" },
+        action_id: "adjust_settings"
+      }
+    ]
+  });
+  
+  return await this.slackApp.client.chat.postMessage({
+    channel: user.slack_channel || user.slack_user_id,
+    blocks: digestBlocks
+  });
+}
+```
+
+## 🔧 Utility Functions
+
+### Channel Management
+```javascript
+getDeliveryChannel(user, urgency) {
+  switch (urgency) {
+    case 'critical':
+      return user.slack_user_id; // Direct message
+    case 'high':
+      return user.preferred_channel || user.slack_user_id;
+    case 'normal':
+      return user.digest_channel || user.preferred_channel;
+    default:
+      return user.slack_user_id;
+  }
+}
+```
+
+### User Context Enrichment
+```javascript
+async enrichUserContext(slackUserId) {
+  try {
+    const userInfo = await this.slackApp.client.users.info({
+      user: slackUserId
+    });
+    
+    return {
+      slack_user_id: slackUserId,
+      display_name: userInfo.user.real_name,
+      email: userInfo.user.profile.email,
+      timezone: userInfo.user.tz,
+      avatar_url: userInfo.user.profile.image_192
+    };
+    
+  } catch (error) {
+    this.logger.error('Failed to enrich user context', { 
+      slack_user_id: slackUserId,
+      error: error.message 
+    });
+    return { slack_user_id: slackUserId };
+  }
+}
+```
+
+## 🔄 Error Handling & Retry Logic
+
+### Rate Limit Handling
+```javascript
+async sendWithRetry(method, params, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await this.slackApp.client[method](params);
+      
+    } catch (error) {
+      if (error.code === 'slack_webapi_rate_limited') {
+        const delay = error.retryAfter * 1000;
+        this.logger.warn('Rate limited, retrying', { 
+          attempt, 
+          delay,
+          method 
+        });
+        
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      
+      // Exponential backoff for other errors
+      const delay = Math.min(1000 * Math.pow(2, attempt - 1), 30000);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
+```
+
+## 📊 Analytics & Tracking
+
+### Interaction Tracking
+```javascript
+async trackInteraction(interactionType, payload) {
+  const event = {
+    type: interactionType,
+    user_id: payload.user_id,
+    signal_id: payload.signal_id,
+    timestamp: Date.now(),
+    metadata: payload.metadata || {}
+  };
+  
+  // Send to analytics service
+  await this.analyticsService.track(event);
+  
+  // Update user engagement metrics
+  await this.updateUserEngagement(payload.user_id, interactionType);
+}
+```

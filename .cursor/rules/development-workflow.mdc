@@ -1,0 +1,184 @@
+---
+alwaysApply: true
+---
+
+# Development Workflow & Environment
+
+## 🚀 Development Setup
+
+### Prerequisites
+- Node.js 18+ (specified in [package.json](mdc:package.json))
+- npm 8+
+- Redis (for job queues)
+- PostgreSQL (for production data)
+- Supabase (configured in [data/storage/supabase-client.js](mdc:data/storage/supabase-client.js))
+
+### Quick Start Commands
+```bash
+# Initial setup
+npm run setup              # Install all workspace dependencies
+npm run setup:workspaces   # Setup individual workspaces
+
+# Development
+npm run dev               # Start all services
+npm run dev:desktop       # Desktop app only  
+npm run dev:delivery      # Slack bot only
+npm run dev:admin         # Admin portal only
+
+# Building
+npm run build            # Build all workspaces
+npm run build:desktop    # Desktop app only
+npm run build:delivery   # Delivery services only
+
+# Testing
+npm run test            # Run all tests
+npm run test:e2e        # End-to-end tests
+npm run test:load       # Load testing
+npm run test:compliance # Compliance tests
+```
+
+## 🏗️ Workspace Development
+
+### Desktop App ([desktop/](mdc:desktop/))
+- **Main Process**: [desktop/main/app-lifecycle.js](mdc:desktop/main/app-lifecycle.js)
+- **Renderer**: React app with Webpack
+- **Bridge**: IPC communication in [desktop/bridge/](mdc:desktop/bridge/)
+- **Development**: `npm run dev:desktop` starts Electron with hot reload
+
+### Slack Integration ([delivery/slack/](mdc:delivery/slack/))
+- **Entry Point**: [delivery/slack/app.js](mdc:delivery/slack/app.js)
+- **Blocks**: UI components in [delivery/slack/blocks/](mdc:delivery/slack/blocks/)
+- **Development**: Uses Slack Bolt framework with socket mode
+
+### Core Engine ([core/](mdc:core/))
+- **Signal Processing**: [core/signals/](mdc:core/signals/)
+- **AI Relevance**: [core/relevance/](mdc:core/relevance/)
+- **Development**: `nodemon` for auto-restart
+
+### Data Layer ([data/](mdc:data/))
+- **Models**: Schema definitions in [data/models/](mdc:data/models/)
+- **Storage**: Supabase client and SQL in [data/storage/](mdc:data/storage/)
+- **Repositories**: Data access layer
+
+## 🔧 Environment Configuration
+
+### Environment Variables
+Create `.env` files for each workspace:
+
+```bash
+# Root .env
+NODE_ENV=development
+LOG_LEVEL=debug
+
+# Desktop specific
+ELECTRON_DEV_TOOLS=true
+
+# Slack specific  
+SLACK_BOT_TOKEN=xoxb-...
+SLACK_SIGNING_SECRET=...
+SLACK_APP_TOKEN=xapp-...
+SLACK_SOCKET_MODE=true
+
+# Database
+SUPABASE_URL=...
+SUPABASE_ANON_KEY=...
+```
+
+### Development vs Production
+- **Development**: Uses `NODE_ENV=development` for debug logging and dev tools
+- **Production**: Minified builds, error reporting, auto-updater enabled
+
+## 📁 File Organization
+
+### When Creating New Files
+- **Classes**: Use PascalCase (e.g., `NewProcessor.js`)
+- **Utilities**: Use kebab-case (e.g., `new-helper.js`)
+- **Schemas**: Add `.schema.js` suffix (e.g., `new-model.schema.js`)
+- **Tests**: Mirror source structure with `.test.js` suffix
+
+### Import Patterns
+Use workspace-relative imports:
+```javascript
+// Within same workspace
+const Helper = require('./utils/helper');
+
+// Cross-workspace (use package names)
+const { UserHelpers } = require('@heyjarvis/data');
+const SignalProcessor = require('@heyjarvis/core');
+```
+
+## 🧪 Testing Strategy
+
+### Unit Tests
+- Test individual classes and functions
+- Mock external dependencies
+- Focus on business logic
+
+### Integration Tests  
+- Test API endpoints
+- Database operations
+- Cross-service communication
+
+### E2E Tests
+- Complete user workflows
+- Desktop app interactions
+- Slack bot conversations
+
+## 🔍 Debugging
+
+### Desktop App
+- Use Electron DevTools (auto-opens in development)
+- Main process logs in `userData/logs/main.log`
+- Renderer process uses browser DevTools
+
+### Slack Bot
+- Use ngrok for local webhook testing
+- Check Slack app logs in workspace settings
+- Monitor console output for Bolt framework logs
+
+### Core Services
+- Winston logs to console and files
+- Use `DEBUG=*` environment variable for verbose logging
+- Monitor job queues with Redis CLI
+
+## 📦 Dependency Management
+
+### Adding Dependencies
+```bash
+# Root level (affects all workspaces)
+npm install package-name
+
+# Workspace specific
+cd workspace-name && npm install package-name
+
+# Development dependencies
+npm install --save-dev package-name
+```
+
+### Workspace Dependencies
+Reference other workspaces using `file:` protocol in package.json:
+```json
+{
+  "dependencies": {
+    "@heyjarvis/core": "file:../core",
+    "@heyjarvis/data": "file:../data"
+  }
+}
+```
+
+## 🚢 Deployment Preparation
+
+### Building for Production
+```bash
+npm run build          # Build all workspaces
+npm run package        # Create distributable packages
+```
+
+### Docker Support
+Use `docker-compose up -d` for containerized development environment.
+
+### CI/CD
+GitHub Actions workflows handle:
+- Automated testing
+- Security scanning  
+- Deployment to staging/production

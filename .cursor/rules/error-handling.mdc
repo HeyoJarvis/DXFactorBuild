@@ -1,0 +1,233 @@
+---
+globs: *.js,*.jsx,*.ts,*.tsx
+---
+
+# Error Handling & Logging Standards
+
+## 🚨 Error Handling Patterns
+
+### Winston Logger Configuration
+All modules use Winston for structured logging with this standard configuration:
+
+```javascript
+const winston = require('winston');
+
+this.logger = winston.createLogger({
+  level: this.options.logLevel || 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'logs/service-name.log' })
+  ],
+  defaultMeta: { 
+    service: 'service-name',
+    source_id: this.source?.id,
+    user_id: this.user?.id
+  }
+});
+```
+
+### Structured Error Logging
+Always log errors with structured context:
+
+```javascript
+try {
+  // Operation
+  this.logger.info('Operation started', { 
+    operation: 'operation_name',
+    input: sanitizedInput,
+    timestamp: Date.now()
+  });
+  
+} catch (error) {
+  this.logger.error('Operation failed', {
+    operation: 'operation_name',
+    error_type: error.name || 'UnknownError',
+    error_message: error.message,
+    error_stack: error.stack,
+    input: sanitizedInput,
+    processing_time_ms: processingTime,
+    consecutive_errors: this.consecutiveErrors
+  });
+  
+  // Emit error event for monitoring
+  this.emit('operation_error', {
+    error: error.message,
+    context: { operation: 'operation_name' }
+  });
+  
+  throw error; // Re-throw or handle appropriately
+}
+```
+
+### Error Classification
+Use consistent error types and handling:
+
+```javascript
+// Network/HTTP errors
+if (error.response?.status) {
+  errorInfo.http_status = error.response.status;
+  errorInfo.error_type = 'HTTPError';
+}
+
+// Validation errors
+if (error.name === 'ValidationError') {
+  errorInfo.validation_errors = error.details;
+}
+
+// Database errors
+if (error.code && error.code.startsWith('23')) {
+  errorInfo.error_type = 'DatabaseConstraintError';
+}
+```
+
+## 📊 Metrics and Monitoring
+
+### Success Metrics
+Track successful operations:
+
+```javascript
+updateSuccessMetrics(result, processingTime) {
+  this.consecutiveErrors = 0;
+  this.lastSuccessTime = Date.now();
+  
+  this.logger.info('Operation completed successfully', {
+    operation: 'operation_name',
+    processing_time_ms: processingTime,
+    result_count: result.length,
+    success_rate: this.calculateSuccessRate()
+  });
+  
+  this.emit('metrics_update', {
+    source_id: this.source.id,
+    success: true,
+    processing_time: processingTime
+  });
+}
+```
+
+### Error Tracking
+Track consecutive errors for circuit breaker patterns:
+
+```javascript
+handleError(error, context) {
+  this.consecutiveErrors++;
+  this.lastErrorTime = Date.now();
+  
+  // Circuit breaker logic
+  if (this.consecutiveErrors >= this.options.maxConsecutiveErrors) {
+    this.logger.warn('Circuit breaker triggered', {
+      consecutive_errors: this.consecutiveErrors,
+      source_id: this.source.id
+    });
+    
+    this.emit('circuit_breaker_open', { source_id: this.source.id });
+  }
+}
+```
+
+## 🔄 Retry Logic Patterns
+
+### Exponential Backoff
+Implement retry with exponential backoff:
+
+```javascript
+async executeWithRetry(operation, maxRetries = 3) {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await operation();
+      
+      if (attempt > 1) {
+        this.logger.info('Operation succeeded after retry', {
+          attempt,
+          total_attempts: maxRetries
+        });
+      }
+      
+      return result;
+      
+    } catch (error) {
+      lastError = error;
+      
+      if (attempt === maxRetries) {
+        this.logger.error('Operation failed after all retries', {
+          final_attempt: attempt,
+          total_attempts: maxRetries,
+          error: error.message
+        });
+        break;
+      }
+      
+      const delay = Math.min(1000 * Math.pow(2, attempt - 1), 30000);
+      
+      this.logger.warn('Operation failed, retrying', {
+        attempt,
+        total_attempts: maxRetries,
+        retry_delay_ms: delay,
+        error: error.message
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError;
+}
+```
+
+## 🎯 Context Preservation
+
+### Request Context
+Maintain context throughout async operations:
+
+```javascript
+async processWithContext(signal, context = {}) {
+  const operationId = uuidv4();
+  const startTime = Date.now();
+  
+  const enrichedContext = {
+    operation_id: operationId,
+    signal_id: signal.id,
+    user_id: context.user_id,
+    source_id: signal.source_id,
+    ...context
+  };
+  
+  try {
+    this.logger.info('Processing started', enrichedContext);
+    
+    const result = await this.doProcessing(signal, enrichedContext);
+    
+    this.logger.info('Processing completed', {
+      ...enrichedContext,
+      processing_time_ms: Date.now() - startTime,
+      result_size: result.length
+    });
+    
+    return result;
+    
+  } catch (error) {
+    this.logger.error('Processing failed', {
+      ...enrichedContext,
+      processing_time_ms: Date.now() - startTime,
+      error: error.message
+    });
+    
+    throw error;
+  }
+}
+```
+
+## 🚫 Anti-Patterns to Avoid
+
+- Silent failures (always log errors)
+- Generic error messages without context
+- Logging sensitive data (passwords, tokens)
+- Excessive logging in tight loops
+- Missing error boundaries in async operations
+- Not preserving original error stack traces

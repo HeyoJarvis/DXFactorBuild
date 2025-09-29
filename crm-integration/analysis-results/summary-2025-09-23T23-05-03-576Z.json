@@ -1,0 +1,193 @@
+{
+  "metadata": {
+    "timestamp": "2025-09-23T23:05:03.577Z",
+    "test_type": "real_hubspot_analysis",
+    "system_version": "1.0.0",
+    "api_permissions": [
+      {
+        "endpoint": "contacts",
+        "status": "accessible",
+        "error": null
+      },
+      {
+        "endpoint": "companies",
+        "status": "accessible",
+        "error": null
+      },
+      {
+        "endpoint": "deals",
+        "status": "accessible",
+        "error": null
+      },
+      {
+        "endpoint": "tickets",
+        "status": "restricted",
+        "error": "HTTP-Code: 403\nMessage: An error occurred.\nBody: {\"status\":\"error\",\"message\":\"The scope needed for this API call isn't available for public use. If you have questions, contact support or post in our developer forum.\",\"correlationId\":\"ee48b372-4041-4f0b-8f2f-4e098a601b3e\",\"links\":{\"support\":\"https://help.hubspot.com/\",\"forum\":\"https://community.hubspot.com/t5/APIs-Integrations/bd-p/integrations\"},\"category\":\"MISSING_SCOPES\"}\nHeaders: {\"access-control-allow-credentials\":\"false\",\"cf-cache-status\":\"DYNAMIC\",\"cf-ray\":\"983daf4d89cce76b-DEN\",\"connection\":\"keep-alive\",\"content-encoding\":\"gzip\",\"content-type\":\"application/json;charset=utf-8\",\"date\":\"Tue, 23 Sep 2025 23:05:05 GMT\",\"nel\":\"{\\\"success_fraction\\\":0.01,\\\"report_to\\\":\\\"cf-nel\\\",\\\"max_age\\\":604800}\",\"report-to\":\"{\\\"endpoints\\\":[{\\\"url\\\":\\\"https:\\\\/\\\\/a.nel.cloudflare.com\\\\/report\\\\/v4?s=%2Butp2ZHXx5xCZjhss0LsHgtpFkVLVrkA2V7zqpEmGYrx5NHBftfqgAKSUJWS3KTHVuX6WKUC9tzQhowoRuwTQbvRZ1txGIdNTPqWdWAtn5AexVw%2FFLWLKU9eS1JkWkkq\\\"}],\\\"group\\\":\\\"cf-nel\\\",\\\"max_age\\\":604800}\",\"server\":\"cloudflare\",\"set-cookie\":\"__cf_bm=I3j7niPFGubuyXddcmvbPJncBFwNNinZ6y96qF1KfmA-1758668705-1.0.1.1-fLx8.uwU6IB.DhpaHOdf5bUEAxWNf.Yvxh_hTPdhafRRj7_5ExEgwXCc1QHFRnyJgauuU7s1w7niKGPRdp.Uwy.4Hrqhshizb6blivTONb0; path=/; expires=Tue, 23-Sep-25 23:35:05 GMT; domain=.hubapi.com; HttpOnly; Secure; SameSite=None\",\"strict-transport-security\":\"max-age=31536000; includeSubDomains; preload\",\"transfer-encoding\":\"chunked\",\"vary\":\"origin, Accept-Encoding\",\"x-content-type-options\":\"nosniff\",\"x-hubspot-correlation-id\":\"ee48b372-4041-4f0b-8f2f-4e098a601b3e\",\"x-hubspot-ratelimit-daily\":\"625000\",\"x-hubspot-ratelimit-daily-remaining\":\"624990\",\"x-hubspot-ratelimit-interval-milliseconds\":\"10000\",\"x-hubspot-ratelimit-max\":\"190\",\"x-hubspot-ratelimit-remaining\":\"186\",\"x-hubspot-ratelimit-secondly\":\"19\",\"x-hubspot-ratelimit-secondly-remaining\":\"18\"}"
+      },
+      {
+        "endpoint": "products",
+        "status": "restricted",
+        "error": "HTTP-Code: 403\nMessage: An error occurred.\nBody: {\"status\":\"error\",\"message\":\"This app hasn't been granted all required scopes to make this call. Read more about required scopes here: https://developers.hubspot.com/scopes.\",\"correlationId\":\"1a060d0d-0bc2-4338-b2b7-1bb29aaf0df2\",\"errors\":[{\"message\":\"One or more of the following scopes are required.\",\"context\":{\"requiredGranularScopes\":[\"crm.objects.products.read\"]}}],\"links\":{\"scopes\":\"https://developers.hubspot.com/scopes\"},\"category\":\"MISSING_SCOPES\"}\nHeaders: {\"access-control-allow-credentials\":\"false\",\"cf-cache-status\":\"DYNAMIC\",\"cf-ray\":\"983daf4f3962e76b-DEN\",\"connection\":\"keep-alive\",\"content-encoding\":\"gzip\",\"content-type\":\"application/json;charset=utf-8\",\"date\":\"Tue, 23 Sep 2025 23:05:05 GMT\",\"nel\":\"{\\\"success_fraction\\\":0.01,\\\"report_to\\\":\\\"cf-nel\\\",\\\"max_age\\\":604800}\",\"report-to\":\"{\\\"endpoints\\\":[{\\\"url\\\":\\\"https:\\\\/\\\\/a.nel.cloudflare.com\\\\/report\\\\/v4?s=iLyd9lxJjy96v8Ocx%2BEsHV4BdCHrkoCDjOgfjgNthw8mbxuzfbETFu6VeW7ecyS4Rq5MnaI0eJ%2B5tPZ%2BuDbl49LVVSesAQljdoOCYsscTC%2FrEHCri4aihyhSdtOCa57b\\\"}],\\\"group\\\":\\\"cf-nel\\\",\\\"max_age\\\":604800}\",\"server\":\"cloudflare\",\"set-cookie\":\"__cf_bm=IZxGGjsowN1lfgOXp7Fq.jFPXGYZVbC8PCMXKt_GnVc-1758668705-1.0.1.1-_R9bzxdMuHzpthGrBkrTzd3ZtDXy4Z1kb7xkdC5dWp2mFCyv_2X0Sb5ciaeu0mxcT4b1aOGjiuzogU22BQ6jvCOyJF.ABXJbRBl9n_wMwq0; path=/; expires=Tue, 23-Sep-25 23:35:05 GMT; domain=.hubapi.com; HttpOnly; Secure; SameSite=None\",\"strict-transport-security\":\"max-age=31536000; includeSubDomains; preload\",\"transfer-encoding\":\"chunked\",\"vary\":\"origin, Accept-Encoding\",\"x-content-type-options\":\"nosniff\",\"x-hubspot-correlation-id\":\"1a060d0d-0bc2-4338-b2b7-1bb29aaf0df2\",\"x-hubspot-ratelimit-daily\":\"625000\",\"x-hubspot-ratelimit-daily-remaining\":\"624989\",\"x-hubspot-ratelimit-interval-milliseconds\":\"10000\",\"x-hubspot-ratelimit-max\":\"190\",\"x-hubspot-ratelimit-remaining\":\"185\",\"x-hubspot-ratelimit-secondly\":\"19\",\"x-hubspot-ratelimit-secondly-remaining\":\"18\"}"
+      }
+    ],
+    "analysis_duration_ms": 3008
+  },
+  "summary": {
+    "data_extraction": {
+      "success": true,
+      "deals_count": 50,
+      "companies_count": 25,
+      "contacts_count": 25
+    },
+    "pipeline_health": {
+      "overall_score": 0,
+      "health_category": "Critical",
+      "key_issues": [
+        "All deals are stagnant (>60 days old)",
+        "Extremely long deal cycles detected",
+        "High percentage of low-probability deals",
+        "High concentration of deals in single stage"
+      ],
+      "recommendations": [
+        "Implement automated follow-up sequences for stagnant deals",
+        "Improve lead qualification processes",
+        "Focus on deal velocity acceleration tactics"
+      ]
+    },
+    "key_findings": [
+      "50 deals are stagnant (>60 days old)",
+      "Average deal age of 1580 days indicates significant process issues",
+      "$187,700 total pipeline value needs optimization"
+    ],
+    "priority_actions": [
+      {
+        "priority": "High",
+        "category": "Deal Management",
+        "action": "Review and qualify stagnant deals",
+        "description": "50 deals have been inactive for >60 days",
+        "timeline": "1 week",
+        "owner": "Sales Management",
+        "expected_outcome": "Clear pipeline of unqualified opportunities"
+      },
+      {
+        "priority": "Medium",
+        "category": "Process Improvement",
+        "action": "Analyze bottleneck in \"16013803\" stage",
+        "description": "88% of deals are concentrated in one stage",
+        "timeline": "2 weeks",
+        "owner": "Sales Operations",
+        "expected_outcome": "Identify and resolve stage progression barriers"
+      }
+    ],
+    "investment_recommendations": [
+      {
+        "tool": "Outreach or SalesLoft",
+        "category": "Sales Automation",
+        "problem": "50 stagnant deals need reactivation",
+        "solution": "Automated follow-up sequences and deal progression tracking",
+        "roi_percentage": 180,
+        "payback_months": 3,
+        "implementation_effort": "Medium",
+        "expected_impact": "Reactivate 40-60% of stagnant deals",
+        "confidence": 0.8
+      },
+      {
+        "tool": "Gong or Chorus",
+        "category": "Deal Intelligence",
+        "problem": "Average deal age of 1580 days indicates slow progression",
+        "solution": "AI-powered deal insights and coaching to accelerate cycles",
+        "roi_percentage": 250,
+        "payback_months": 4,
+        "implementation_effort": "High",
+        "expected_impact": "Reduce cycle time by 25-35%",
+        "confidence": 0.75
+      },
+      {
+        "tool": "HubSpot Sales Hub Professional",
+        "category": "Pipeline Management",
+        "problem": "Need advanced deal tracking and forecasting capabilities",
+        "solution": "Enhanced pipeline visibility, forecasting, and deal progression tracking",
+        "roi_percentage": 200,
+        "payback_months": 6,
+        "implementation_effort": "Low",
+        "expected_impact": "Improved pipeline accuracy and deal visibility",
+        "confidence": 0.9
+      }
+    ],
+    "next_steps": [
+      "Review stagnant deals for qualification status",
+      "Implement automated follow-up processes",
+      "Analyze stage progression bottlenecks",
+      "Consider tool investments for process automation"
+    ]
+  },
+  "key_metrics": {
+    "pipeline_velocity": {
+      "deals_per_month": 4.166666666666667,
+      "avg_deal_age": 1579.7
+    },
+    "conversion_metrics": {
+      "total_deals": 50,
+      "won_deals": 0,
+      "lost_deals": 0,
+      "in_progress": 50
+    },
+    "revenue_metrics": {
+      "total_pipeline_value": 187700,
+      "weighted_pipeline_value": 289.25,
+      "avg_deal_size": 3754
+    },
+    "efficiency_indicators": {
+      "stagnant_deal_percentage": 100,
+      "low_probability_percentage": 100
+    }
+  },
+  "top_recommendations": [
+    {
+      "tool": "Outreach or SalesLoft",
+      "category": "Sales Automation",
+      "problem": "50 stagnant deals need reactivation",
+      "solution": "Automated follow-up sequences and deal progression tracking",
+      "roi_percentage": 180,
+      "payback_months": 3,
+      "implementation_effort": "Medium",
+      "expected_impact": "Reactivate 40-60% of stagnant deals",
+      "confidence": 0.8
+    },
+    {
+      "tool": "Gong or Chorus",
+      "category": "Deal Intelligence",
+      "problem": "Average deal age of 1580 days indicates slow progression",
+      "solution": "AI-powered deal insights and coaching to accelerate cycles",
+      "roi_percentage": 250,
+      "payback_months": 4,
+      "implementation_effort": "High",
+      "expected_impact": "Reduce cycle time by 25-35%",
+      "confidence": 0.75
+    },
+    {
+      "tool": "HubSpot Sales Hub Professional",
+      "category": "Pipeline Management",
+      "problem": "Need advanced deal tracking and forecasting capabilities",
+      "solution": "Enhanced pipeline visibility, forecasting, and deal progression tracking",
+      "roi_percentage": 200,
+      "payback_months": 6,
+      "implementation_effort": "Low",
+      "expected_impact": "Improved pipeline accuracy and deal visibility",
+      "confidence": 0.9
+    }
+  ],
+  "critical_alerts": [
+    {
+      "id": "CRITICAL_STAGNATION",
+      "type": "Pipeline Health",
+      "urgency": "Critical",
+      "title": "All Deals Stagnant",
+      "description": "All 50 deals have been inactive for more than 60 days",
+      "impact": "Pipeline requires immediate attention and cleanup",
+      "recommended_action": "Conduct comprehensive pipeline review and qualification",
+      "affected_deals": 50,
+      "revenue_at_risk": 187700
+    }
+  ]
+}

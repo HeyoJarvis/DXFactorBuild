@@ -1,0 +1,1179 @@
+{
+  "patterns": [
+    [
+      "initial_analysis_default_org",
+      {
+        "occurrences": 1,
+        "outcomes": [
+          {
+            "change": {
+              "type": "initial_analysis",
+              "organization_id": "default_org",
+              "data_summary": {
+                "deals_count": 0
+              },
+              "timestamp": "2025-09-24T03:40:30.531Z",
+              "significance": 1,
+              "reason": "First time analysis for organization"
+            },
+            "timestamp": "2025-09-24T03:40:30.532Z"
+          }
+        ],
+        "confidence": 0.1,
+        "first_seen": "2025-09-24T03:40:30.532Z",
+        "last_seen": "2025-09-24T03:40:30.532Z"
+      }
+    ],
+    [
+      "startup_analysis_default_org",
+      {
+        "occurrences": 4,
+        "outcomes": [
+          {
+            "change": {
+              "type": "startup_analysis",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 0.5,
+              "reason": "Manual analysis trigger"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "startup_analysis",
+              "timestamp": "2025-09-24T04:17:30.460Z",
+              "significance": 0.5,
+              "reason": "Manual analysis trigger"
+            },
+            "timestamp": "2025-09-24T04:17:30.460Z"
+          },
+          {
+            "change": {
+              "type": "startup_analysis",
+              "timestamp": "2025-09-24T04:18:26.447Z",
+              "significance": 0.5,
+              "reason": "Manual analysis trigger"
+            },
+            "timestamp": "2025-09-24T04:18:26.448Z"
+          },
+          {
+            "change": {
+              "type": "startup_analysis",
+              "timestamp": "2025-09-26T03:16:09.628Z",
+              "significance": 0.5,
+              "reason": "Manual analysis trigger"
+            },
+            "timestamp": "2025-09-26T03:16:09.630Z"
+          }
+        ],
+        "confidence": 0.4,
+        "first_seen": "2025-09-24T03:57:50.550Z",
+        "last_seen": "2025-09-26T03:16:09.630Z"
+      }
+    ],
+    [
+      "deal_became_stagnant_default_org",
+      {
+        "occurrences": 50,
+        "outcomes": [
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "3547070082",
+              "days_stagnant": 592,
+              "last_activity": "2024-02-09T18:18:51.712Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (592 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "3547140688",
+              "days_stagnant": 592,
+              "last_activity": "2024-02-09T18:18:51.128Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (592 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "3701797236",
+              "days_stagnant": 592,
+              "last_activity": "2024-02-09T18:18:51.206Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (592 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "3988874695",
+              "days_stagnant": 592,
+              "last_activity": "2024-02-09T18:18:51.139Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (592 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "4049590685",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T23:05:02.942Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "4103848010",
+              "days_stagnant": 407,
+              "last_activity": "2024-08-12T10:32:55.214Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (407 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "4158875290",
+              "days_stagnant": 265,
+              "last_activity": "2025-01-01T20:52:46.922Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (265 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "4469916964",
+              "days_stagnant": 391,
+              "last_activity": "2024-08-28T22:42:26.475Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (391 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "4610929465",
+              "days_stagnant": 592,
+              "last_activity": "2024-02-09T18:18:51.616Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (592 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "4656276056",
+              "days_stagnant": 402,
+              "last_activity": "2024-08-17T05:09:58.013Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (402 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "4904811118",
+              "days_stagnant": 407,
+              "last_activity": "2024-08-12T19:57:11.110Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (407 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "4993573219",
+              "days_stagnant": 592,
+              "last_activity": "2024-02-09T18:18:51.342Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (592 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5332387083",
+              "days_stagnant": 592,
+              "last_activity": "2024-02-09T18:18:51.737Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (592 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5352512398",
+              "days_stagnant": 147,
+              "last_activity": "2025-04-29T04:07:57.255Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (147 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5419966015",
+              "days_stagnant": 390,
+              "last_activity": "2024-08-29T06:33:31.027Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (390 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5430246277",
+              "days_stagnant": 138,
+              "last_activity": "2025-05-08T23:07:13.620Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (138 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5430521956",
+              "days_stagnant": 148,
+              "last_activity": "2025-04-28T12:28:46.273Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (148 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5506110485",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T20:38:11.707Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5506696829",
+              "days_stagnant": 152,
+              "last_activity": "2025-04-24T10:22:02.605Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (152 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5506918467",
+              "days_stagnant": 603,
+              "last_activity": "2024-01-29T14:52:50.520Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (603 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5506925321",
+              "days_stagnant": 152,
+              "last_activity": "2025-04-24T22:37:59.647Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (152 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507051184",
+              "days_stagnant": 355,
+              "last_activity": "2024-10-03T21:42:59.438Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (355 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507117089",
+              "days_stagnant": 147,
+              "last_activity": "2025-04-29T04:21:11.096Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (147 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507117451",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T21:19:38.459Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507118456",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T18:29:47.485Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507184240",
+              "days_stagnant": 401,
+              "last_activity": "2024-08-18T15:28:45.832Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (401 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507193523",
+              "days_stagnant": 390,
+              "last_activity": "2024-08-29T06:47:32.486Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (390 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507544631",
+              "days_stagnant": 151,
+              "last_activity": "2025-04-25T23:59:59.861Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (151 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507566727",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T15:37:46.632Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5507696759",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T19:58:11.957Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5508068945",
+              "days_stagnant": 118,
+              "last_activity": "2025-05-29T03:08:00.604Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (118 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5508101283",
+              "days_stagnant": 147,
+              "last_activity": "2025-04-29T05:47:59.922Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (147 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5508211869",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T04:03:41.474Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5508213051",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T16:03:27.969Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5508246535",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-28T01:02:48.682Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5508311444",
+              "days_stagnant": 151,
+              "last_activity": "2025-04-25T20:57:36.839Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (151 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5527863205",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T16:26:03.351Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5584393142",
+              "days_stagnant": 496,
+              "last_activity": "2024-05-15T18:37:38.642Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (496 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5602914899",
+              "days_stagnant": 148,
+              "last_activity": "2025-04-29T01:51:54.221Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (148 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5602917130",
+              "days_stagnant": 408,
+              "last_activity": "2024-08-12T01:05:53.797Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (408 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5603009439",
+              "days_stagnant": 148,
+              "last_activity": "2025-04-28T07:52:17.187Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (148 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5603009565",
+              "days_stagnant": 391,
+              "last_activity": "2024-08-29T01:20:46.459Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (391 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5603028599",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-27T12:45:27.575Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5603029858",
+              "days_stagnant": 152,
+              "last_activity": "2025-04-25T02:22:30.956Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (152 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5603120039",
+              "days_stagnant": 608,
+              "last_activity": "2024-01-24T13:25:21.730Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (608 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5669635500",
+              "days_stagnant": 149,
+              "last_activity": "2025-04-28T02:15:39.634Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (149 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5792577711",
+              "days_stagnant": 336,
+              "last_activity": "2024-10-22T15:51:19.724Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (336 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5852385360",
+              "days_stagnant": 390,
+              "last_activity": "2024-08-29T11:06:41.897Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (390 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "5899880314",
+              "days_stagnant": 404,
+              "last_activity": "2024-08-15T10:02:04.042Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (404 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          },
+          {
+            "change": {
+              "type": "deal_became_stagnant",
+              "deal_id": "6021642773",
+              "days_stagnant": 592,
+              "last_activity": "2024-02-09T18:18:51.271Z",
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Deal became stagnant (592 days)"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          }
+        ],
+        "confidence": 1,
+        "first_seen": "2025-09-24T03:57:50.550Z",
+        "last_seen": "2025-09-24T03:57:50.550Z"
+      }
+    ],
+    [
+      "health_score_change_default_org",
+      {
+        "occurrences": 1,
+        "outcomes": [
+          {
+            "change": {
+              "type": "health_score_change",
+              "from_score": 50,
+              "to_score": 0,
+              "delta": -50,
+              "timestamp": "2025-09-24T03:57:50.549Z",
+              "significance": 1,
+              "reason": "Health score changed by 50 points"
+            },
+            "timestamp": "2025-09-24T03:57:50.550Z"
+          }
+        ],
+        "confidence": 0.1,
+        "first_seen": "2025-09-24T03:57:50.550Z",
+        "last_seen": "2025-09-24T03:57:50.550Z"
+      }
+    ]
+  ],
+  "snapshots": [
+    [
+      "default_org",
+      {
+        "deals": [
+          {
+            "id": "3547070082",
+            "name": "Xponential - Subscriber Intelligence",
+            "amount": 2000,
+            "stage": "2017608",
+            "created_at": "2020-12-01T03:13:35.745Z",
+            "updated_at": "2024-02-09T18:18:51.712Z",
+            "probability": 1
+          },
+          {
+            "id": "3547140688",
+            "name": "World Gym (Fitman Group - VA & MD) - Member Intelligence - 3 locations",
+            "amount": 1800,
+            "stage": "2017608",
+            "created_at": "2020-12-01T03:08:12.264Z",
+            "updated_at": "2024-02-09T18:18:51.128Z",
+            "probability": 1
+          },
+          {
+            "id": "3701797236",
+            "name": "Masterfit Partner Agreement",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2020-12-20T18:58:06.343Z",
+            "updated_at": "2024-02-09T18:18:51.206Z",
+            "probability": 0.1
+          },
+          {
+            "id": "3988874695",
+            "name": "Intelivideo Partner Agreement",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-01-14T19:35:20.868Z",
+            "updated_at": "2024-02-09T18:18:51.139Z",
+            "probability": 0.1
+          },
+          {
+            "id": "4049590685",
+            "name": "Exerp Partnership",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-01-27T20:15:17.564Z",
+            "updated_at": "2025-04-27T23:05:02.942Z",
+            "probability": 0.1
+          },
+          {
+            "id": "4103848010",
+            "name": "Morpheous Partnership - Eric Malzone (Adam Zeitsiff)",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-02-05T21:08:29.651Z",
+            "updated_at": "2024-08-12T10:32:55.214Z",
+            "probability": 0.1
+          },
+          {
+            "id": "4158875290",
+            "name": "MXM Partnership",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-02-16T04:36:47.744Z",
+            "updated_at": "2025-01-01T20:52:46.922Z",
+            "probability": 0.1
+          },
+          {
+            "id": "4469916964",
+            "name": "Jonas Partner Agreement",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-03-03T16:18:27.320Z",
+            "updated_at": "2024-08-28T22:42:26.475Z",
+            "probability": 0.1
+          },
+          {
+            "id": "4610929465",
+            "name": "Physique57 Retention Data App (Intelivideo)",
+            "amount": 1400,
+            "stage": "2017608",
+            "created_at": "2021-07-22T17:30:33.940Z",
+            "updated_at": "2024-02-09T18:18:51.616Z",
+            "probability": 1
+          },
+          {
+            "id": "4656276056",
+            "name": "Avidon Health Partnership",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-03-15T00:11:26.399Z",
+            "updated_at": "2024-08-17T05:09:58.013Z",
+            "probability": 0.1
+          },
+          {
+            "id": "4904811118",
+            "name": "Avidon Health (Partner)",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-04-02T03:16:16.624Z",
+            "updated_at": "2024-08-12T19:57:11.110Z",
+            "probability": 0.1
+          },
+          {
+            "id": "4993573219",
+            "name": "Zype Partner Agreement",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-03-30T03:00:49.571Z",
+            "updated_at": "2024-02-09T18:18:51.342Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5332387083",
+            "name": "MBS Highway - New Deal",
+            "amount": 5000,
+            "stage": "2017608",
+            "created_at": "2021-05-23T16:02:08.131Z",
+            "updated_at": "2024-02-09T18:18:51.737Z",
+            "probability": 1
+          },
+          {
+            "id": "5352512398",
+            "name": "FORTË",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-05-26T14:48:20.778Z",
+            "updated_at": "2025-04-29T04:07:57.255Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5419966015",
+            "name": "ASF & Club OS (Partner)",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-07T23:08:54.823Z",
+            "updated_at": "2024-08-29T06:33:31.027Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5430246277",
+            "name": "Kaltura - Partner (Bion ABS)",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-09T18:06:15.122Z",
+            "updated_at": "2025-05-08T23:07:13.620Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5430521956",
+            "name": "Hulu - Partner (Charlotte at SuperNode)",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-09T18:06:57.704Z",
+            "updated_at": "2025-04-28T12:28:46.273Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5506110485",
+            "name": "Sample Partner",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T15:38:30.836Z",
+            "updated_at": "2025-04-27T20:38:11.707Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5506696829",
+            "name": "ClubReady",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:25:23.121Z",
+            "updated_at": "2025-04-24T10:22:02.605Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5506918467",
+            "name": "Club Automation",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:29:21.090Z",
+            "updated_at": "2024-01-29T14:52:50.520Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5506925321",
+            "name": "Kiswe Studio",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:17:28.010Z",
+            "updated_at": "2025-04-24T22:37:59.647Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507051184",
+            "name": "Muvi",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:12:32.995Z",
+            "updated_at": "2024-10-03T21:42:59.438Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507117089",
+            "name": "Tulix - OTT",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T16:58:29.655Z",
+            "updated_at": "2025-04-29T04:21:11.096Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507117451",
+            "name": "UScreen",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:04:34.963Z",
+            "updated_at": "2025-04-27T21:19:38.459Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507118456",
+            "name": "Vodevolution",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:14:38.305Z",
+            "updated_at": "2025-04-27T18:29:47.485Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507184240",
+            "name": "ABC Fitness",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:20:19.382Z",
+            "updated_at": "2024-08-18T15:28:45.832Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507193523",
+            "name": "MAZ",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:16:35.835Z",
+            "updated_at": "2024-08-29T06:47:32.486Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507544631",
+            "name": "wowza",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T19:44:15.460Z",
+            "updated_at": "2025-04-25T23:59:59.861Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507566727",
+            "name": "VIXY Video Platform",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T19:48:23.345Z",
+            "updated_at": "2025-04-27T15:37:46.632Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5507696759",
+            "name": "Powr",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T19:50:00.487Z",
+            "updated_at": "2025-04-27T19:58:11.957Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5508068945",
+            "name": "MINDBODY",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T19:40:32.077Z",
+            "updated_at": "2025-05-29T03:08:00.604Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5508101283",
+            "name": "JW Player",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T19:46:03.812Z",
+            "updated_at": "2025-04-29T05:47:59.922Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5508211869",
+            "name": "TradeCast.TV",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T19:47:05.463Z",
+            "updated_at": "2025-04-27T04:03:41.474Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5508213051",
+            "name": "VPlayed",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T20:01:17.274Z",
+            "updated_at": "2025-04-27T16:03:27.969Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5508246535",
+            "name": "Glofox",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T20:09:38.452Z",
+            "updated_at": "2025-04-28T01:02:48.682Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5508311444",
+            "name": "Pike13",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T20:11:05.492Z",
+            "updated_at": "2025-04-25T20:57:36.839Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5527863205",
+            "name": "CSI Spectrum",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-24T20:05:44.357Z",
+            "updated_at": "2025-04-27T16:26:03.351Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5584393142",
+            "name": "Newtown Athletic",
+            "amount": 1500,
+            "stage": "2017609",
+            "created_at": "2021-07-01T10:32:45.430Z",
+            "updated_at": "2024-05-15T18:37:38.642Z",
+            "probability": 0
+          },
+          {
+            "id": "5602914899",
+            "name": "Intelivideo - 3 net new Data Apps",
+            "amount": 36000,
+            "stage": "16013803",
+            "created_at": "2021-07-03T18:22:11.038Z",
+            "updated_at": "2025-04-29T01:51:54.221Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5602917130",
+            "name": "Intelivideo - 5 net new CI",
+            "amount": 750,
+            "stage": "16013803",
+            "created_at": "2021-08-31T18:19:15.315Z",
+            "updated_at": "2024-08-12T01:05:53.797Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5603009439",
+            "name": "Zype Q4 Growth - 5 CI and 2 Data Apps",
+            "amount": 39000,
+            "stage": "16013803",
+            "created_at": "2021-07-03T19:11:03.982Z",
+            "updated_at": "2025-04-28T07:52:17.187Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5603009565",
+            "name": "Zype - 10 net new CI",
+            "amount": 30000,
+            "stage": "16013803",
+            "created_at": "2021-07-03T18:26:20.452Z",
+            "updated_at": "2024-08-29T01:20:46.459Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5603028599",
+            "name": "Intelivideo Q4 Growth - 5 CI and 2 Data Apps",
+            "amount": 39000,
+            "stage": "16013803",
+            "created_at": "2021-07-03T19:09:16.963Z",
+            "updated_at": "2025-04-27T12:45:27.575Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5603029858",
+            "name": "Jonas - 10 net new CI",
+            "amount": 30000,
+            "stage": "16013803",
+            "created_at": "2021-07-03T18:30:43.751Z",
+            "updated_at": "2025-04-25T02:22:30.956Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5603120039",
+            "name": "Jonas Q4 Growth - 5 CI and 2 Data Apps",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-07-03T19:14:24.565Z",
+            "updated_at": "2024-01-24T13:25:21.730Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5669635500",
+            "name": "Alpha OTT",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-07-12T20:45:55.010Z",
+            "updated_at": "2025-04-28T02:15:39.634Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5792577711",
+            "name": "Mux - Partner Opp",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-07-28T15:26:06.605Z",
+            "updated_at": "2024-10-22T15:51:19.724Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5852385360",
+            "name": "Brightcove",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-06-22T17:06:49.058Z",
+            "updated_at": "2024-08-29T11:06:41.897Z",
+            "probability": 0.1
+          },
+          {
+            "id": "5899880314",
+            "name": "Mariana Tek",
+            "amount": 0,
+            "stage": "16013803",
+            "created_at": "2021-08-10T16:46:31.918Z",
+            "updated_at": "2024-08-15T10:02:04.042Z",
+            "probability": 0.1
+          },
+          {
+            "id": "6021642773",
+            "name": "World Gym (Fitman Corp) - Social Data App",
+            "amount": 1250,
+            "stage": "2017608",
+            "created_at": "2021-08-24T14:56:13.951Z",
+            "updated_at": "2024-02-09T18:18:51.271Z",
+            "probability": 1
+          }
+        ],
+        "summary": {
+          "total_deals": 50,
+          "total_value": 187700,
+          "avg_deal_size": 3754,
+          "avg_age_days": 1581.8,
+          "stagnant_deals_count": 50,
+          "workflow_health_score": 0
+        },
+        "timestamp": "2025-09-26T03:16:09.628Z",
+        "snapshot_time": "2025-09-26T03:16:09.630Z"
+      }
+    ]
+  ],
+  "saved_at": "2025-09-26T03:16:13.574Z"
+}
