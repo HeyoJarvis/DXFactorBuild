@@ -9,7 +9,7 @@
  * 5. Real-time tool data integration
  */
 
-const AIAnalyzer = require('@heyjarvis/core/signals/enrichment/ai-analyzer');
+const AIAnalyzer = require('../../core/ai/anthropic-analyzer');
 const axios = require('axios');
 const winston = require('winston');
 const { ToolRecommendationHelpers } = require('../models/tool-recommendation.schema');
@@ -256,19 +256,13 @@ class ToolRecommendationEngine {
     5. Have strong market reputation and support
     `;
     
-    const analysis = await this.aiAnalyzer.performAnalysis({
-      title: `Tool Recommendation for ${bottleneck.location}`,
-      content: analysisPrompt,
+    const analysis = await this.aiAnalyzer.analyzeText(analysisPrompt, {
+      analysisType: 'tool_recommendation',
+      prompt: analysisPrompt,
       metadata: {
-        type: 'tool_recommendation',
         bottleneck_location: bottleneck.location,
         organization_id: organizationContext.organization_id
       }
-    }, {
-      // Pass safe user context to avoid undefined property access
-      competitors: [],
-      our_products: [],
-      focus_areas: ['sales_automation', 'workflow_optimization']
     });
     
     return this.parseToolAnalysis(analysis);
@@ -334,7 +328,7 @@ class ToolRecommendationEngine {
       Format response as JSON with tool recommendations and scaling strategies.
       `;
       
-      const amplificationAnalysis = await this.aiAnalyzer.performAnalysis({
+      const amplificationAnalysis = await this.aiAnalyzer.analyzeText(amplificationPrompt, {
         title: `Success Amplification for ${successFactor.factor}`,
         content: amplificationPrompt,
         metadata: {
@@ -461,7 +455,7 @@ class ToolRecommendationEngine {
       Provide scores (0-1) for each dimension and overall recommendation.
       `;
       
-      const comparison = await this.aiAnalyzer.performAnalysis({
+      const comparison = await this.aiAnalyzer.analyzeText(comparisonPrompt, {
         title: `Tool Comparison: ${tool1} vs ${tool2}`,
         content: comparisonPrompt,
         metadata: {
@@ -485,7 +479,7 @@ class ToolRecommendationEngine {
         error: error.message
       });
       
-      return {
+      return { 
         overall_score: 0.5,
         dimensions: {},
         recommendation: 'Manual evaluation required'
@@ -580,217 +574,269 @@ class ToolRecommendationEngine {
   }
   
   /**
-   * Recommend tools for automation gaps
+   * Recommend tools for automation gaps - uses real data with intelligent fallbacks
    */
   async recommendForAutomationGap(gap, context) {
     const gapLower = gap.toLowerCase();
     
-    // Map automation gaps to tool categories
-    if (gapLower.includes('payment') || gapLower.includes('billing')) {
-      return {
-        tool_name: 'Stripe Billing',
-        category: 'payment_automation',
-        recommendation: `Automate ${gap} with Stripe Billing for recurring payments and dunning management`,
-        business_impact: 'Reduce manual payment processing by 80% and improve cash flow',
-        implementation_effort: 'medium',
-        estimated_cost: 2500,
-        projected_savings: 15000,
-        priority: 'high',
-        source: 'company_intelligence',
-        confidence: 0.8
-      };
+    // Use AI analysis if available
+    if (this.aiAnalyzer && context?.raw_intelligence) {
+      try {
+        const analysis = await this.aiAnalyzer.analyzeText(`Analyze this automation gap: ${gap}`, {
+          analysisType: 'automation_gap_analysis',
+          context: context.raw_intelligence
+        });
+        
+        if (analysis && typeof analysis === 'object') {
+          return {
+            gap_identified: gap,
+            category: 'automation_gap',
+            recommendation: analysis.recommendation || `Address automation gap: ${gap}`,
+            suggested_approach: analysis.approach,
+            business_impact: analysis.impact,
+            source: 'ai_analysis',
+            confidence: analysis.confidence || 0.7
+          };
+        }
+      } catch (error) {
+        this.logger?.warn('AI analysis failed for automation gap', { gap, error: error.message });
+      }
     }
+    
+    // Intelligent fallback based on gap type
+    let category = 'process_automation';
+    let approach = 'Identify and implement automation solution';
+    let impact = 'Improve efficiency and reduce manual work';
     
     if (gapLower.includes('onboarding') || gapLower.includes('training')) {
-      return {
-        tool_name: 'Trainual',
-        category: 'process_automation',
-        recommendation: `Systematize ${gap} with Trainual for consistent, scalable training processes`,
-        business_impact: 'Reduce onboarding time by 50% and improve consistency',
-        implementation_effort: 'low',
-        estimated_cost: 1200,
-        projected_savings: 8000,
-        priority: 'medium',
-        source: 'company_intelligence',
-        confidence: 0.7
-      };
+      category = 'training_automation';
+      approach = 'Implement structured onboarding and training workflows';
+      impact = 'Reduce onboarding time and improve consistency';
+    } else if (gapLower.includes('payment') || gapLower.includes('billing')) {
+      category = 'payment_automation';
+      approach = 'Automate payment processing and billing workflows';
+      impact = 'Reduce payment delays and manual processing errors';
+    } else if (gapLower.includes('query') || gapLower.includes('support')) {
+      category = 'support_automation';
+      approach = 'Implement automated query handling and support workflows';
+      impact = 'Improve response times and customer satisfaction';
     }
     
-    if (gapLower.includes('scheduling') || gapLower.includes('appointment')) {
-      return {
-        tool_name: 'Calendly',
-        category: 'scheduling_automation',
-        recommendation: `Eliminate manual ${gap} with Calendly for automated booking and reminders`,
-        business_impact: 'Save 10+ hours per week on scheduling coordination',
-        implementation_effort: 'low',
-        estimated_cost: 600,
-        projected_savings: 12000,
-        priority: 'high',
-        source: 'company_intelligence',
-        confidence: 0.9
-      };
-    }
-    
-    // Generic automation recommendation
     return {
-      tool_name: 'Zapier',
-      category: 'workflow_automation',
-      recommendation: `Automate ${gap} using Zapier to connect existing tools and eliminate manual work`,
-      business_impact: 'Reduce manual effort and improve process consistency',
-      implementation_effort: 'medium',
-      estimated_cost: 1500,
-      projected_savings: 10000,
-      priority: 'medium',
-      source: 'company_intelligence',
+      gap_identified: gap,
+      category: category,
+      recommendation: `Address ${gap} through ${approach.toLowerCase()}`,
+      suggested_approach: approach,
+      business_impact: impact,
+      source: 'intelligent_fallback',
       confidence: 0.6
     };
   }
   
   /**
-   * Recommend integration solutions
+   * Recommend integration solutions - uses real data with intelligent fallbacks
    */
   async recommendForIntegrationNeeds(integrationNeeds, context) {
-    if (integrationNeeds.length > 2) {
-      return {
-        tool_name: 'Zapier',
-        category: 'integration_platform',
-        recommendation: `Connect ${integrationNeeds.slice(0, 3).join(', ')} and other systems with Zapier for seamless data flow`,
-        business_impact: 'Eliminate data silos and reduce manual data entry by 70%',
-        implementation_effort: 'medium',
-        estimated_cost: 2000,
-        projected_savings: 18000,
-        priority: 'high',
-        source: 'company_intelligence',
-        confidence: 0.8,
-        integration_targets: integrationNeeds
-      };
+    if (!integrationNeeds || integrationNeeds.length === 0) {
+      return null;
     }
     
-    return null;
+    // Use AI analysis if available
+    if (this.aiAnalyzer && context?.raw_intelligence) {
+      try {
+        const analysis = await this.aiAnalyzer.analyzeText(
+          `Analyze integration needs: ${integrationNeeds.join(', ')}`, {
+          analysisType: 'integration_analysis',
+          context: context.raw_intelligence
+        });
+        
+        if (analysis && typeof analysis === 'object') {
+          return {
+            integration_needs: integrationNeeds,
+            category: 'integration_solution',
+            recommendation: analysis.recommendation || `Integrate with: ${integrationNeeds.slice(0, 3).join(', ')}`,
+            suggested_approach: analysis.approach,
+            business_impact: analysis.impact,
+            priority_integrations: integrationNeeds.slice(0, 3),
+            source: 'ai_analysis',
+            confidence: analysis.confidence || 0.7
+          };
+        }
+      } catch (error) {
+        this.logger?.warn('AI analysis failed for integration needs', { integrationNeeds, error: error.message });
+      }
+    }
+    
+    // Intelligent fallback
+    const priorityIntegrations = integrationNeeds.slice(0, 3);
+    return {
+      integration_needs: integrationNeeds,
+      category: 'integration_solution',
+      recommendation: `Prioritize integration with ${priorityIntegrations.join(', ')} to streamline operations`,
+      suggested_approach: 'Implement phased integration approach starting with highest-impact systems',
+      business_impact: 'Eliminate data silos and improve operational efficiency',
+      priority_integrations: priorityIntegrations,
+      source: 'intelligent_fallback',
+      confidence: 0.6
+    };
   }
   
   /**
-   * Recommend tools for manual processes
+   * Recommend tools for manual processes - uses real data with intelligent fallbacks
    */
   async recommendForManualProcess(process, context) {
     const processLower = process.toLowerCase();
     
-    if (processLower.includes('document') || processLower.includes('contract') || processLower.includes('proposal')) {
-      return {
-        tool_name: 'PandaDoc',
-        category: 'document_automation',
-        recommendation: `Automate ${process} with PandaDoc for template-based document generation and e-signatures`,
-        business_impact: 'Reduce document preparation time by 75% and accelerate approvals',
-        implementation_effort: 'medium',
-        estimated_cost: 3000,
-        projected_savings: 20000,
-        priority: 'high',
-        source: 'company_intelligence',
-        confidence: 0.8
-      };
+    // Use AI analysis if available
+    if (this.aiAnalyzer && context?.raw_intelligence) {
+      try {
+        const analysis = await this.aiAnalyzer.analyzeText(
+          `Analyze manual process for automation: ${process}`, {
+          analysisType: 'process_automation_analysis',
+          context: context.raw_intelligence
+        });
+        
+        if (analysis && typeof analysis === 'object') {
+          return {
+            manual_process: process,
+            category: 'process_automation',
+            recommendation: analysis.recommendation || `Automate ${process} to improve efficiency`,
+            suggested_approach: analysis.approach,
+            business_impact: analysis.impact,
+            automation_potential: analysis.automation_potential || 'high',
+            source: 'ai_analysis',
+            confidence: analysis.confidence || 0.7
+          };
+        }
+      } catch (error) {
+        this.logger?.warn('AI analysis failed for manual process', { process, error: error.message });
+      }
     }
     
-    if (processLower.includes('follow') || processLower.includes('reminder') || processLower.includes('nurture')) {
-      return {
-        tool_name: 'HubSpot Sequences',
-        category: 'sales_automation',
-        recommendation: `Automate ${process} with HubSpot Sequences for consistent, personalized follow-up`,
-        business_impact: 'Increase response rates by 40% and ensure no leads fall through cracks',
-        implementation_effort: 'low',
-        estimated_cost: 800,
-        projected_savings: 15000,
-        priority: 'high',
-        source: 'company_intelligence',
-        confidence: 0.9
-      };
+    // Intelligent fallback based on process type
+    let category = 'process_automation';
+    let approach = 'Implement automated workflow';
+    let impact = 'Reduce manual effort and improve consistency';
+    let automationPotential = 'medium';
+    
+    if (processLower.includes('training') || processLower.includes('onboarding')) {
+      category = 'training_automation';
+      approach = 'Create standardized training modules and automated onboarding workflows';
+      impact = 'Ensure consistent training delivery and reduce trainer workload';
+      automationPotential = 'high';
+    } else if (processLower.includes('document') || processLower.includes('paperwork')) {
+      category = 'document_automation';
+      approach = 'Digitize and automate document processing workflows';
+      impact = 'Eliminate paper-based processes and reduce processing time';
+      automationPotential = 'high';
+    } else if (processLower.includes('scheduling') || processLower.includes('appointment')) {
+      category = 'scheduling_automation';
+      approach = 'Implement automated scheduling and booking system';
+      impact = 'Reduce scheduling conflicts and improve customer experience';
+      automationPotential = 'high';
     }
     
-    return null;
+    return {
+      manual_process: process,
+      category: category,
+      recommendation: `Automate ${process} through ${approach.toLowerCase()}`,
+      suggested_approach: approach,
+      business_impact: impact,
+      automation_potential: automationPotential,
+      source: 'intelligent_fallback',
+      confidence: 0.6
+    };
   }
   
   /**
-   * Analyze technology stack gaps
+   * Analyze technology stack gaps - only identifies what's missing
    */
   analyzeStackGaps(techStack, context) {
+    if (!techStack) {
+      return [];
+    }
+    
     const gaps = [];
     
-    // Check for missing core tools
-    if (!techStack.scheduling_tools || techStack.scheduling_tools.length === 0) {
-      gaps.push({ type: 'scheduling', severity: 'high' });
-    }
-    
-    if (!techStack.document_tools || techStack.document_tools.length === 0) {
-      gaps.push({ type: 'document_management', severity: 'medium' });
-    }
-    
-    if (!techStack.automation_tools || techStack.automation_tools.length === 0) {
-      gaps.push({ type: 'workflow_automation', severity: 'high' });
-    }
-    
-    if (!techStack.project_management || techStack.project_management.length === 0) {
-      gaps.push({ type: 'project_management', severity: 'medium' });
-    }
+    // Only identify gaps, don't recommend specific tools
+    Object.keys(techStack).forEach(category => {
+      if (!techStack[category] || (Array.isArray(techStack[category]) && techStack[category].length === 0)) {
+        gaps.push({ 
+          category: category,
+          gap_type: 'missing_tool_category',
+          source: 'technology_stack_analysis'
+        });
+      }
+    });
     
     return gaps;
   }
   
   /**
-   * Recommend tools for technology stack gaps
+   * Recommend tools for technology stack gaps - uses real data with intelligent fallbacks
    */
   async recommendForStackGap(gap, context) {
-    const gapRecommendations = {
-      scheduling: {
-        tool_name: 'Calendly',
-        category: 'scheduling',
-        recommendation: 'Implement Calendly for automated scheduling and calendar management',
-        business_impact: 'Eliminate scheduling back-and-forth, save 10+ hours per week',
-        implementation_effort: 'low',
-        estimated_cost: 600,
-        projected_savings: 12000,
-        priority: gap.severity === 'high' ? 'high' : 'medium'
-      },
-      document_management: {
-        tool_name: 'PandaDoc',
-        category: 'document_automation',
-        recommendation: 'Add PandaDoc for professional document creation and e-signature workflows',
-        business_impact: 'Accelerate deal closure by 30% with faster document processes',
-        implementation_effort: 'medium',
-        estimated_cost: 3000,
-        projected_savings: 18000,
-        priority: gap.severity === 'high' ? 'high' : 'medium'
-      },
-      workflow_automation: {
-        tool_name: 'Zapier',
-        category: 'automation',
-        recommendation: 'Implement Zapier to automate repetitive tasks and connect existing tools',
-        business_impact: 'Reduce manual work by 60% and improve data consistency',
-        implementation_effort: 'medium',
-        estimated_cost: 1500,
-        projected_savings: 15000,
-        priority: gap.severity === 'high' ? 'high' : 'medium'
-      },
-      project_management: {
-        tool_name: 'Asana',
-        category: 'project_management',
-        recommendation: 'Add Asana for better project tracking and team coordination',
-        business_impact: 'Improve project delivery by 25% and team visibility',
-        implementation_effort: 'medium',
-        estimated_cost: 1200,
-        projected_savings: 10000,
-        priority: gap.severity === 'high' ? 'high' : 'medium'
+    // Use AI analysis if available
+    if (this.aiAnalyzer && context?.raw_intelligence) {
+      try {
+        const analysis = await this.aiAnalyzer.analyzeText(
+          `Analyze technology stack gap: ${gap.category}`, {
+          analysisType: 'tech_stack_gap_analysis',
+          context: context.raw_intelligence
+        });
+        
+        if (analysis && typeof analysis === 'object') {
+          return {
+            gap_category: gap.category,
+            gap_type: gap.gap_type,
+            recommendation: analysis.recommendation || `Address ${gap.category} technology gap`,
+            suggested_approach: analysis.approach,
+            business_impact: analysis.impact,
+            implementation_priority: analysis.priority || 'medium',
+            source: 'ai_analysis',
+            confidence: analysis.confidence || 0.7
+          };
+        }
+      } catch (error) {
+        this.logger?.warn('AI analysis failed for stack gap', { gap, error: error.message });
       }
-    };
-    
-    const recommendation = gapRecommendations[gap.type];
-    if (recommendation) {
-      return {
-        ...recommendation,
-        source: 'company_intelligence',
-        confidence: 0.7
-      };
     }
     
-    return null;
+    // Intelligent fallback based on gap category
+    let approach = 'Evaluate and implement appropriate technology solution';
+    let impact = 'Improve operational capabilities';
+    let priority = 'medium';
+    
+    const category = gap.category?.toLowerCase() || '';
+    
+    if (category.includes('crm') || category.includes('customer')) {
+      approach = 'Implement customer relationship management system to centralize customer data';
+      impact = 'Improve customer tracking and relationship management';
+      priority = 'high';
+    } else if (category.includes('automation') || category.includes('workflow')) {
+      approach = 'Deploy workflow automation tools to streamline processes';
+      impact = 'Reduce manual work and improve process consistency';
+      priority = 'high';
+    } else if (category.includes('communication') || category.includes('collaboration')) {
+      approach = 'Implement communication and collaboration platform';
+      impact = 'Improve team coordination and information sharing';
+      priority = 'medium';
+    } else if (category.includes('analytics') || category.includes('reporting')) {
+      approach = 'Deploy analytics and reporting solution for data insights';
+      impact = 'Enable data-driven decision making';
+      priority = 'medium';
+    }
+    
+    return {
+      gap_category: gap.category,
+      gap_type: gap.gap_type,
+      recommendation: `Address ${gap.category} gap through ${approach.toLowerCase()}`,
+      suggested_approach: approach,
+      business_impact: impact,
+      implementation_priority: priority,
+      source: 'intelligent_fallback',
+      confidence: 0.6
+    };
   }
 }
 

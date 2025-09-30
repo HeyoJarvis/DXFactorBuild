@@ -98,6 +98,147 @@ Only include insights with high confidence. Focus on actionable intelligence.`;
   }
 
   /**
+   * Generic text analysis method for task intelligence
+   */
+  async analyzeText(text, options = {}) {
+    if (!this.apiKey) {
+      this.logger.warn('No Anthropic API key - using fallback analysis');
+      return this.getFallbackAnalysis(text, options);
+    }
+
+    try {
+      const prompt = options.prompt || this.buildGenericPrompt(text, options);
+      const response = await this.callClaude(prompt);
+
+      // Check if response looks like HTML (API error)
+      if (typeof response === 'string' && response.trim().startsWith('<')) {
+        this.logger.warn('Claude returned HTML instead of JSON - using fallback');
+        return this.getFallbackAnalysis(text, options);
+      }
+
+      // Try to parse as JSON first, if that fails return as text
+      try {
+        return JSON.parse(response);
+      } catch (parseError) {
+        // If it's not JSON but also not HTML, try to extract JSON from the response
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            return JSON.parse(jsonMatch[0]);
+          } catch (innerError) {
+            this.logger.warn('Failed to extract JSON from Claude response - using fallback');
+            return this.getFallbackAnalysis(text, options);
+          }
+        }
+        return response;
+      }
+
+    } catch (error) {
+      this.logger.error('Claude text analysis failed', {
+        error: error.message,
+        analysisType: options.analysisType
+      });
+      return this.getFallbackAnalysis(text, options);
+    }
+  }
+
+  /**
+   * Build generic analysis prompt
+   */
+  buildGenericPrompt(text, options) {
+    if (options.prompt) {
+      return options.prompt;
+    }
+    
+    // Default prompt for task analysis
+    return `Analyze this text: "${text}"
+    
+Please provide analysis in JSON format with relevant insights based on the context.`;
+  }
+
+  /**
+   * Fallback analysis when AI is not available
+   */
+  getFallbackAnalysis(text, options) {
+    const analysisType = options.analysisType || 'generic';
+    
+    switch (analysisType) {
+      case 'task_extraction':
+        return this.getFallbackTaskExtraction(text);
+      case 'entity_matching':
+        return { matches: [], overall_confidence: 0.3 };
+      case 'task_crm_analysis':
+        return {
+          context_analysis: { criticality: 'medium', risks: [] },
+          recommended_approach: { strategy: 'Standard approach', tools_needed: [], preparation: [] },
+          success_factors: { key_factors: [], cautions: [] },
+          confidence: 0.3
+        };
+      default:
+        return { analysis: 'Fallback analysis', confidence: 0.3 };
+    }
+  }
+
+  /**
+   * Fallback task extraction
+   */
+  getFallbackTaskExtraction(text) {
+    const taskKeywords = ['task', 'assigned', 'todo', 'deadline', 'can you', 'please', 'need you to', 'schedule', 'set up', 'arrange'];
+    const urgencyKeywords = ['asap', 'urgent', 'immediately', 'today', 'tomorrow', 'by friday', 'by monday'];
+    const meetingKeywords = ['demo', 'meeting', 'call', 'presentation', 'interview', 'consultation'];
+    const followUpKeywords = ['follow up', 'check in', 'update', 'status', 'progress'];
+
+    const lowerText = text.toLowerCase();
+    const isTask = taskKeywords.some(keyword => lowerText.includes(keyword));
+    const urgency = urgencyKeywords.some(keyword => lowerText.includes(keyword)) ? 'high' : 'medium';
+
+    // Determine task type based on content
+    let taskType = 'general';
+    if (meetingKeywords.some(keyword => lowerText.includes(keyword))) {
+      taskType = 'meeting';
+    } else if (followUpKeywords.some(keyword => lowerText.includes(keyword))) {
+      taskType = 'follow_up';
+    } else if (lowerText.includes('update') || lowerText.includes('crm')) {
+      taskType = 'data_entry';
+    }
+
+    // Try to extract assignee
+    let assignee = null;
+    const assigneeMatch = text.match(/(?:hey|hi)\s+(\w+)/i) || text.match(/(\w+),?\s+(?:can you|please|could you)/i);
+    if (assigneeMatch) {
+      assignee = assigneeMatch[1];
+    }
+
+    // Extract action from the text
+    let action = text;
+    if (lowerText.includes('schedule')) {
+      action = text.replace(/.*?(schedule.*?)(\.|$)/i, '$1').trim();
+    } else if (lowerText.includes('follow up')) {
+      action = text.replace(/.*?(follow up.*?)(\.|$)/i, '$1').trim();
+    }
+
+    // Higher confidence for clear task patterns
+    let confidence = 0.3;
+    if (isTask && assignee) {
+      confidence = 0.7;
+    } else if (isTask) {
+      confidence = 0.5;
+    }
+
+    return {
+      is_task: isTask,
+      assignee: assignee,
+      task_type: taskType,
+      action_required: action,
+      mentioned_entities: [],
+      deadline: null,
+      urgency: urgency,
+      context: text,
+      confidence: confidence
+    };
+  }
+
+  /**
    * Call Claude API
    */
   async callClaude(prompt) {

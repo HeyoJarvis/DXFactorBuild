@@ -3,3 +3,4 @@ node_modules
 .gitignore
 dxfactor*
 analysis-results/
+__pycache__/

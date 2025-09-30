@@ -729,17 +729,9 @@ ${analytics.time_patterns.most_active_hours.slice(0, 3).map(h => `• ${h.hour}:
    * Generate tool recommendations based on user patterns
    */
   generateToolRecommendations(topIntents) {
-    const toolMap = {
-      'task_automation': ['Zapier', 'Microsoft Power Automate', 'IFTTT'],
-      'tool_recommendation': ['Notion', 'Airtable', 'ClickUp'],
-      'integration_help': ['Zapier', 'Integromat', 'Pipedream'],
-      'workflow_optimization': ['Asana', 'Monday.com', 'Linear'],
-      'information_seeking': ['Notion', 'Obsidian', 'Roam Research']
-    };
-
+    // No hardcoded tool recommendations - only intent analysis
     return topIntents.map((intent, index) => {
-      const tools = toolMap[intent.intent] || ['General productivity tools'];
-      return `${index + 1}. For *${intent.intent.replace('_', ' ')}* (${intent.count}x): ${tools.join(', ')}`;
+      return `${index + 1}. Intent: *${intent.intent.replace('_', ' ')}* (${intent.count}x) - requires company-specific tool analysis`;
     }).join('\n\n');
   }
 

@@ -1,0 +1,43 @@
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":53,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-29T22:20:10.549Z"}
+{"error":"this.aiAnalyzer.analyzeText is not a function","level":"warn","message":"AI task extraction failed, using fallback","service":"task-orchestrator","timestamp":"2025-09-29T22:20:10.550Z"}
+{"error":"CRM analysis fetch failed: 404","level":"warn","message":"Failed to get CRM context","service":"task-orchestrator","timestamp":"2025-09-29T22:20:10.553Z"}
+{"error":"this.aiAnalyzer.analyzeText is not a function","level":"warn","message":"Task-CRM relationship analysis failed","service":"task-orchestrator","timestamp":"2025-09-29T22:20:10.553Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"general","timestamp":"2025-09-29T22:20:10.553Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":51,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-29T22:21:10.773Z"}
+{"error":"this.aiAnalyzer.analyzeText is not a function","level":"warn","message":"AI task extraction failed, using fallback","service":"task-orchestrator","timestamp":"2025-09-29T22:21:10.775Z"}
+{"error":"CRM analysis fetch failed: 404","level":"warn","message":"Failed to get CRM context","service":"task-orchestrator","timestamp":"2025-09-29T22:21:10.777Z"}
+{"error":"this.aiAnalyzer.analyzeText is not a function","level":"warn","message":"Task-CRM relationship analysis failed","service":"task-orchestrator","timestamp":"2025-09-29T22:21:10.777Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"general","timestamp":"2025-09-29T22:21:10.777Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":51,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-29T22:26:37.154Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-29T22:26:38.236Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-29T22:48:59.158Z"}
+{"error":"CRM analysis fetch failed: 404","level":"warn","message":"Failed to get CRM context","service":"task-orchestrator","timestamp":"2025-09-29T22:49:00.363Z"}
+{"confidence":0.5,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-29T22:49:03.377Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-29T23:10:00.942Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"follow_up","timestamp":"2025-09-29T23:10:01.549Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T00:05:40.248Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T00:05:41.475Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T00:51:20.900Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T00:51:22.156Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T01:15:01.723Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T01:15:02.855Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T01:21:38.839Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T01:21:40.168Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":68,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T02:09:22.464Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T02:09:23.723Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T02:14:02.893Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T02:14:04.067Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T02:17:58.904Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T02:18:00.142Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T02:22:12.543Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T02:22:13.846Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T02:22:41.168Z"}
+{"confidence":0.3,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T02:22:42.273Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T02:24:07.181Z"}
+{"error":"crmEntities is not defined","level":"warn","message":"Entity matching failed","service":"task-orchestrator","timestamp":"2025-09-30T02:24:08.232Z"}
+{"confidence":0.5,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T02:24:08.233Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":56,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T02:24:34.510Z"}
+{"error":"crmEntities is not defined","level":"warn","message":"Entity matching failed","service":"task-orchestrator","timestamp":"2025-09-30T02:24:35.578Z"}
+{"confidence":0.5,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"meeting","timestamp":"2025-09-30T02:24:35.579Z"}
+{"channel_id":"C1234567890","level":"info","message":"Starting task enrichment","message_length":49,"organization_id":"default_org","service":"task-orchestrator","timestamp":"2025-09-30T02:27:50.990Z"}
+{"confidence":0.5,"crm_matches":0,"level":"info","message":"Task enrichment completed","service":"task-orchestrator","task_type":"research","timestamp":"2025-09-30T02:27:52.127Z"}

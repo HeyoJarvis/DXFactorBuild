@@ -818,7 +818,7 @@ class IntelligentCRMAnalyzer {
         analysis_metadata: report.analysis_metadata,
         company_intelligence_summary: report.company_intelligence_summary,
         key_metrics: report.workflow_analysis.performance_metrics,
-        top_recommendations: report.contextual_recommendations.high_priority?.slice(0, 5) || [],
+        top_recommendations: report.raw_data?.recommendations?.slice(0, 5) || [],
         implementation_roadmap: report.contextual_recommendations.implementation_roadmap
       };
       await fs.writeFile(summaryPath, JSON.stringify(summary, null, 2));

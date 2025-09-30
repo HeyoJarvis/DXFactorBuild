@@ -179,6 +179,140 @@ class IntelligentBackgroundService extends EventEmitter {
         res.status(500).json({ error: error.message });
       }
     });
+    
+    // NEW: Task analysis endpoint
+    this.app.post('/tasks/analyze', async (req, res) => {
+      try {
+        const { task_message, message_context, organization_id } = req.body;
+        
+        if (!task_message) {
+          return res.status(400).json({ error: 'task_message is required' });
+        }
+        
+        this.logger.info('Processing task analysis request', {
+          organization_id: organization_id || 'default_org',
+          message_length: task_message.length
+        });
+        
+        // Import and use TaskContextOrchestrator
+        const TaskContextOrchestrator = require('../core/orchestration/task-context-orchestrator');
+        const orchestrator = new TaskContextOrchestrator({
+          crmServiceUrl: `http://localhost:${this.options.port}`
+        });
+        
+        // Enrich task with context
+        const enrichedContext = await orchestrator.enrichTaskWithContext(
+          task_message,
+          message_context || {},
+          organization_id || 'default_org'
+        );
+        
+        res.json({
+          success: true,
+          task_id: enrichedContext.task_id,
+          enriched_context: enrichedContext,
+          processed_at: new Date()
+        });
+        
+      } catch (error) {
+        this.logger.error('Task analysis failed', { error: error.message });
+        res.status(500).json({ error: error.message });
+      }
+    });
+    
+    // NEW: Task recommendations endpoint
+    this.app.post('/tasks/recommendations', async (req, res) => {
+      try {
+        const { enriched_task_context } = req.body;
+        
+        if (!enriched_task_context) {
+          return res.status(400).json({ error: 'enriched_task_context is required' });
+        }
+        
+        this.logger.info('Generating task recommendations', {
+          task_id: enriched_task_context.task_id,
+          task_type: enriched_task_context.task_type
+        });
+        
+        // Import and use AITaskRecommendationGenerator
+        const AITaskRecommendationGenerator = require('../core/recommendations/ai-task-recommendation-generator');
+        const generator = new AITaskRecommendationGenerator();
+        
+        // Generate recommendations
+        const recommendations = await generator.generateTaskRecommendations(enriched_task_context);
+        
+        res.json({
+          success: true,
+          recommendations: recommendations,
+          generated_at: new Date()
+        });
+        
+      } catch (error) {
+        this.logger.error('Task recommendations generation failed', { error: error.message });
+        res.status(500).json({ error: error.message });
+      }
+    });
+    
+    // NEW: Complete task processing endpoint (analyze + recommend)
+    this.app.post('/tasks/process', async (req, res) => {
+      try {
+        const { task_message, message_context, organization_id } = req.body;
+        
+        if (!task_message) {
+          return res.status(400).json({ error: 'task_message is required' });
+        }
+        
+        this.logger.info('Processing complete task workflow', {
+          organization_id: organization_id || 'default_org',
+          message_length: task_message.length
+        });
+        
+        // Step 1: Analyze task context
+        const TaskContextOrchestrator = require('../core/orchestration/task-context-orchestrator');
+        const orchestrator = new TaskContextOrchestrator({
+          crmServiceUrl: `http://localhost:${this.options.port}`
+        });
+        
+        const enrichedContext = await orchestrator.enrichTaskWithContext(
+          task_message,
+          message_context || {},
+          organization_id || 'default_org'
+        );
+        
+        // Step 2: Generate recommendations (only if it's actually a task)
+        let recommendations = null;
+           if (enrichedContext.is_task && enrichedContext.confidence_score >= 0.3) {
+          const AITaskRecommendationGenerator = require('../core/recommendations/ai-task-recommendation-generator');
+          const generator = new AITaskRecommendationGenerator();
+          
+          recommendations = await generator.generateTaskRecommendations(enrichedContext);
+        }
+        
+        const result = {
+          success: true,
+          task_id: enrichedContext.task_id,
+          is_task: enrichedContext.is_task,
+          confidence_score: enrichedContext.confidence_score,
+          enriched_context: enrichedContext,
+          recommendations: recommendations,
+          processed_at: new Date()
+        };
+        
+        // Log successful processing
+        this.logger.info('Task processing completed', {
+          task_id: enrichedContext.task_id,
+          is_task: enrichedContext.is_task,
+          has_recommendations: !!recommendations,
+          confidence: enrichedContext.confidence_score
+        });
+        
+        res.json(result);
+        
+      } catch (error) {
+        this.logger.error('Complete task processing failed', { error: error.message });
+        res.status(500).json({ error: error.message });
+      }
+    });
   }
   
   async handleHubSpotWebhook(payload) {

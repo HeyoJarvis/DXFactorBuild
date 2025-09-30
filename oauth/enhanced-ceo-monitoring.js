@@ -40,6 +40,16 @@ class EnhancedCEOMonitoring {
     this.messageCollector = new MessageCollector(this.oauthManager);
     this.workflowIntelligence = new WorkflowIntelligenceSystem();
     
+    // Initialize task processing pipeline
+    const TaskProcessingPipeline = require('../core/pipelines/task-processing-pipeline');
+    this.taskPipeline = new TaskProcessingPipeline({
+      logLevel: this.options.logLevel,
+      taskServiceUrl: 'http://localhost:3002'
+    });
+    
+    // Setup task pipeline event handlers
+    this.setupTaskPipelineHandlers();
+    
     // Initialize Slack app for commands
     this.slackApp = new App({
       token: process.env.SLACK_BOT_TOKEN,
@@ -578,7 +588,48 @@ class EnhancedCEOMonitoring {
   }
 
   /**
-   * Process new OAuth user for workflow intelligence
+   * Setup task pipeline event handlers
+   */
+  setupTaskPipelineHandlers() {
+    // Handle task processing completion
+    this.taskPipeline.on('task_processed', (result) => {
+      this.logger.info('Task processed successfully', {
+        task_id: result.task_id,
+        assignee: result.assignee,
+        confidence: result.confidence_score,
+        has_recommendations: result.has_recommendations
+      });
+      
+      // Store task result for CEO dashboard
+      this.storeTaskResult(result);
+    });
+    
+    // Handle processing errors
+    this.taskPipeline.on('processing_error', (error) => {
+      this.logger.error('Task processing error', {
+        message_id: error.messageId,
+        error: error.error.message
+      });
+    });
+    
+    // Handle desktop delivery requests
+    this.taskPipeline.on('desktop_delivery', (deliveryData) => {
+      this.handleDesktopDelivery(deliveryData);
+    });
+    
+    // Handle Slack DM delivery requests
+    this.taskPipeline.on('slack_dm_delivery', (deliveryData) => {
+      this.handleSlackDMDelivery(deliveryData);
+    });
+    
+    // Handle Slack thread delivery requests
+    this.taskPipeline.on('slack_thread_delivery', (deliveryData) => {
+      this.handleSlackThreadDelivery(deliveryData);
+    });
+  }
+
+  /**
+   * Process new OAuth user for workflow intelligence and task detection
    */
   async processNewOAuthUser(userId, slackUserId) {
     try {
@@ -588,10 +639,11 @@ class EnhancedCEOMonitoring {
       // Collect their messages
       await this.messageCollector.initializeUserCollection(userId);
       
-      // Process messages for workflow intelligence
+      // Process messages for workflow intelligence AND task detection
       const userMessages = this.messageCollector.getUserMessages(userId) || [];
       
       for (const message of userMessages.slice(-50)) { // Process last 50 messages
+        // Existing workflow intelligence processing
         await this.workflowIntelligence.captureInboundRequest(
           userId,
           message.channel_id,
@@ -602,9 +654,12 @@ class EnhancedCEOMonitoring {
             conversation_type: message.conversation_type
           }
         );
+        
+        // NEW: Process through task pipeline for task detection
+        await this.processMessageForTasks(message, userId, slackUserId);
       }
       
-      this.logger.info('Processed new OAuth user for workflow intelligence', {
+      this.logger.info('Processed new OAuth user for workflow intelligence and task detection', {
         userId,
         slackUserId,
         messagesProcessed: Math.min(50, userMessages.length)
@@ -616,12 +671,248 @@ class EnhancedCEOMonitoring {
   }
 
   /**
+   * Process individual message for task detection
+   */
+  async processMessageForTasks(message, userId, slackUserId) {
+    try {
+      // Prepare message data for task pipeline
+      const messageData = {
+        text: message.text,
+        ts: message.ts,
+        thread_ts: message.thread_ts,
+        user: message.user
+      };
+      
+      const messageContext = {
+        channel_id: message.channel_id,
+        channel_name: message.channel_name,
+        user_id: slackUserId,
+        timestamp: message.timestamp,
+        conversation_type: message.conversation_type,
+        organization_id: 'default_org'
+      };
+      
+      // Process through task pipeline (async, non-blocking)
+      setImmediate(async () => {
+        try {
+          await this.taskPipeline.processMessage(messageData, messageContext);
+        } catch (error) {
+          this.logger.debug('Task processing failed for message', {
+            message_id: message.ts,
+            error: error.message
+          });
+        }
+      });
+      
+    } catch (error) {
+      this.logger.debug('Failed to process message for tasks', {
+        message_ts: message.ts,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Store task result for CEO dashboard
+   */
+  storeTaskResult(taskResult) {
+    // Store in memory for dashboard access
+    if (!this.taskResults) {
+      this.taskResults = new Map();
+    }
+    
+    this.taskResults.set(taskResult.task_id, {
+      ...taskResult,
+      stored_at: new Date()
+    });
+    
+    // Keep only last 100 task results
+    if (this.taskResults.size > 100) {
+      const oldestKey = this.taskResults.keys().next().value;
+      this.taskResults.delete(oldestKey);
+    }
+  }
+
+  /**
+   * Handle desktop delivery
+   */
+  handleDesktopDelivery(deliveryData) {
+    this.logger.info('Desktop delivery requested', {
+      task_id: deliveryData.task_id,
+      assignee: deliveryData.assignee,
+      urgency: deliveryData.urgency
+    });
+    
+    // Desktop delivery will be handled by the desktop app
+    // through IPC or WebSocket connections
+  }
+
+  /**
+   * Handle Slack DM delivery
+   */
+  async handleSlackDMDelivery(deliveryData) {
+    try {
+      // Find user ID for assignee
+      const assigneeUserId = await this.findSlackUserByName(deliveryData.assignee);
+      
+      if (!assigneeUserId) {
+        this.logger.warn('Could not find Slack user for assignee', {
+          assignee: deliveryData.assignee,
+          task_id: deliveryData.task_id
+        });
+        return;
+      }
+      
+      // Create task guidance message
+      const message = this.createTaskGuidanceMessage(deliveryData);
+      
+      // Send DM
+      await this.slackApp.client.chat.postMessage({
+        channel: assigneeUserId,
+        blocks: message.blocks,
+        text: message.text
+      });
+      
+      this.logger.info('Task guidance sent via Slack DM', {
+        task_id: deliveryData.task_id,
+        assignee: deliveryData.assignee,
+        user_id: assigneeUserId
+      });
+      
+    } catch (error) {
+      this.logger.error('Failed to send Slack DM', {
+        task_id: deliveryData.task_id,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Handle Slack thread delivery
+   */
+  async handleSlackThreadDelivery(deliveryData) {
+    try {
+      const message = this.createTaskGuidanceMessage(deliveryData, true);
+      
+      await this.slackApp.client.chat.postMessage({
+        channel: deliveryData.channel_id,
+        thread_ts: deliveryData.thread_ts,
+        blocks: message.blocks,
+        text: message.text
+      });
+      
+      this.logger.info('Task guidance sent via Slack thread', {
+        task_id: deliveryData.task_id,
+        channel_id: deliveryData.channel_id
+      });
+      
+    } catch (error) {
+      this.logger.error('Failed to send Slack thread message', {
+        task_id: deliveryData.task_id,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Create task guidance message for Slack
+   */
+  createTaskGuidanceMessage(deliveryData, isThread = false) {
+    const urgencyEmoji = deliveryData.urgency === 'high' ? '🚨' : 
+                        deliveryData.urgency === 'medium' ? '⚡' : '📋';
+    
+    const blocks = [
+      {
+        type: "header",
+        text: {
+          type: "plain_text",
+          text: `${urgencyEmoji} Task Guidance${deliveryData.assignee ? ` for ${deliveryData.assignee}` : ''}`
+        }
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*Task:* ${deliveryData.task_summary}\n*Urgency:* ${deliveryData.urgency.toUpperCase()}`
+        }
+      }
+    ];
+    
+    // Add recommendations if available
+    if (deliveryData.recommendations && deliveryData.recommendations.tool_recommendations) {
+      const topTools = deliveryData.recommendations.tool_recommendations.slice(0, 3);
+      const toolText = topTools.map(tool => 
+        `• *${tool.tool_name}*: ${tool.reasoning}`
+      ).join('\n');
+      
+      blocks.push({
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*Recommended Tools:*\n${toolText}`
+        }
+      });
+    }
+    
+    // Add personalized message if available
+    if (deliveryData.recommendations && deliveryData.recommendations.personalized_message) {
+      blocks.push({
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: deliveryData.recommendations.personalized_message
+        }
+      });
+    }
+    
+    return {
+      blocks: blocks,
+      text: `Task guidance: ${deliveryData.task_summary}`
+    };
+  }
+
+  /**
+   * Find Slack user by name
+   */
+  async findSlackUserByName(name) {
+    if (!name) return null;
+    
+    try {
+      // Simple implementation - in production, you'd want to maintain a user mapping
+      const users = await this.slackApp.client.users.list();
+      const user = users.members.find(member => 
+        member.real_name?.toLowerCase().includes(name.toLowerCase()) ||
+        member.display_name?.toLowerCase().includes(name.toLowerCase()) ||
+        member.name?.toLowerCase().includes(name.toLowerCase())
+      );
+      
+      return user?.id || null;
+    } catch (error) {
+      this.logger.error('Failed to find Slack user', { name, error: error.message });
+      return null;
+    }
+  }
+
+  /**
+   * Get task results for dashboard
+   */
+  getTaskResults() {
+    if (!this.taskResults) return [];
+    return Array.from(this.taskResults.values()).sort((a, b) => 
+      new Date(b.processed_at) - new Date(a.processed_at)
+    );
+  }
+
+  /**
    * Start the enhanced CEO monitoring system
    */
   async start() {
     try {
       await this.initialize();
       await this.slackApp.start();
+      
+      // Start task processing pipeline
+      this.taskPipeline.start();
       
       console.log('\n🚀 Enhanced CEO Monitoring System Running!');
       console.log('\n👑 Available CEO Commands:');
@@ -634,12 +925,18 @@ class EnhancedCEOMonitoring {
       console.log('   • Private channel visibility');
       console.log('   • Cross-conversation task tracking');
       console.log('   • Comprehensive workflow intelligence');
+      console.log('\n🤖 AI Task Intelligence:');
+      console.log('   • Automatic task detection from conversations');
+      console.log('   • AI-powered tool recommendations');
+      console.log('   • Personalized task completion guidance');
+      console.log('   • Real-time delivery to assignees');
       console.log('\n📊 System Status:');
       console.log(`   CEO User ID: ${this.options.ceoUserId}`);
       console.log(`   Organization: ${this.options.organizationName}`);
       console.log(`   Session ID: ${this.ceoSession?.sessionId}`);
+      console.log(`   Task Pipeline: Active`);
       
-      this.logger.info('Enhanced CEO monitoring system started successfully');
+      this.logger.info('Enhanced CEO monitoring system with AI task intelligence started successfully');
       
     } catch (error) {
       this.logger.error('Failed to start enhanced CEO monitoring', { error: error.message });

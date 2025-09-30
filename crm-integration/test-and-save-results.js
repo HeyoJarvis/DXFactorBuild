@@ -564,52 +564,32 @@ function generateHealthRecommendations(patterns, deals) {
 }
 
 function generateToolRecommendations(patterns, deals) {
+  // No hardcoded tool recommendations - only issue identification
   const recommendations = [];
   
-  // Stagnation issues
   if (patterns.temporal.stagnant_deals_count > 0) {
     recommendations.push({
-      tool: 'Outreach or SalesLoft',
-      category: 'Sales Automation',
-      problem: `${patterns.temporal.stagnant_deals_count} stagnant deals need reactivation`,
-      solution: 'Automated follow-up sequences and deal progression tracking',
-      roi_percentage: 180,
-      payback_months: 3,
-      implementation_effort: 'Medium',
-      expected_impact: `Reactivate 40-60% of stagnant deals`,
-      confidence: 0.8
+      issue: `${patterns.temporal.stagnant_deals_count} stagnant deals need attention`,
+      category: 'deal_stagnation',
+      requires_analysis: true
     });
   }
   
-  // Long cycle times
   if (patterns.temporal.avg_age_days > 90) {
     recommendations.push({
-      tool: 'Gong or Chorus',
-      category: 'Deal Intelligence',
-      problem: `Average deal age of ${patterns.temporal.avg_age_days} days indicates slow progression`,
-      solution: 'AI-powered deal insights and coaching to accelerate cycles',
-      roi_percentage: 250,
-      payback_months: 4,
-      implementation_effort: 'High',
-      expected_impact: 'Reduce cycle time by 25-35%',
-      confidence: 0.75
+      issue: `Long deal cycle time: ${patterns.temporal.avg_age_days} days average`,
+      category: 'cycle_time',
+      requires_analysis: true
     });
   }
   
-  // Pipeline management
   recommendations.push({
-    tool: 'HubSpot Sales Hub Professional',
-    category: 'Pipeline Management',
-    problem: 'Need advanced deal tracking and forecasting capabilities',
-    solution: 'Enhanced pipeline visibility, forecasting, and deal progression tracking',
-    roi_percentage: 200,
-    payback_months: 6,
-    implementation_effort: 'Low',
-    expected_impact: 'Improved pipeline accuracy and deal visibility',
-    confidence: 0.9
+    issue: 'Pipeline tracking and forecasting analysis needed',
+    category: 'pipeline_management',
+    requires_analysis: true
   });
   
-  return recommendations.slice(0, 5); // Top 5 recommendations
+  return recommendations;
 }
 
 function generateActionRecommendations(deals, patterns) {

@@ -1021,7 +1021,7 @@ class WorkflowPatternDetector {
       Format as JSON array of insight objects with type, description, and recommendations.
       `;
       
-      const aiInsights = await this.aiAnalyzer.performAnalysis({
+      const aiInsights = await this.aiAnalyzer.analyzeText(crossPatternPrompt, {
         content: insightsPrompt,
         type: 'cross_pattern_analysis'
       });

@@ -237,12 +237,9 @@ async function testBasicFunctionality() {
       // Test recommendation validation
       const testRecommendation = {
         workflow_id: 'workflow-123',
-        recommended_tool: 'Calendly',
-        addresses_issue: 'Meeting scheduling bottleneck',
-        organization_id: 'test-org-123',
-        roi_percentage: 250,
-        payback_period_months: 3,
-        implementation_effort: 5
+        recommended_tool: 'Test Tool',
+        addresses_issue: 'Test issue',
+        organization_id: 'test-org-123'
       };
       
       const validatedRecommendation = ToolRecommendationHelpers.validate(testRecommendation);
