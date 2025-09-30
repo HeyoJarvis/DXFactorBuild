@@ -20,6 +20,7 @@ const NotificationEngine = require('./notification-engine');
 const PerformanceMonitor = require('./performance-monitor');
 const IPCHandlers = require('../bridge/ipc-handlers');
 const CopilotOverlay = require('./copilot-overlay');
+const UltimateContextHandlers = require('../bridge/ultimate-context-handlers');
 
 class AppLifecycle {
   constructor() {
@@ -61,6 +62,7 @@ class AppLifecycle {
     this.performanceMonitor = new PerformanceMonitor(this);
     this.ipcHandlers = new IPCHandlers(this);
     this.copilotOverlay = new CopilotOverlay(this);
+    this.ultimateContextHandlers = new UltimateContextHandlers();
     
     // Setup event handlers
     this.setupAppEvents();
@@ -207,8 +209,11 @@ class AppLifecycle {
       // Start performance monitoring
       this.performanceMonitor.start();
       
-      // Setup IPC handlers
-      this.ipcHandlers.setup();
+    // Setup IPC handlers
+    this.ipcHandlers.setup();
+    
+    // Setup ultimate context IPC handlers
+    this.setupUltimateContextHandlers();
       
       // Register global shortcuts
       this.registerGlobalShortcuts();
@@ -293,6 +298,67 @@ class AppLifecycle {
     });
     
     this.logger.info('Main window created', { bounds });
+  }
+
+  /**
+   * Create the ultimate context chat window
+   */
+  createUltimateContextWindow() {
+    if (this.ultimateContextWindow) {
+      this.ultimateContextWindow.focus();
+      return;
+    }
+
+    this.ultimateContextWindow = new BrowserWindow({
+      width: 1000,
+      height: 700,
+      minWidth: 800,
+      minHeight: 600,
+      show: false,
+      title: 'HeyJarvis - Ultimate Context Chat',
+      titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        enableRemoteModule: false,
+        preload: path.join(__dirname, '../bridge/preload.js')
+      }
+    });
+
+    // Load the ultimate context chat interface
+    this.ultimateContextWindow.loadFile(path.join(__dirname, '../renderer/ultimate-context-chat.html'));
+
+    // Show window when ready
+    this.ultimateContextWindow.once('ready-to-show', () => {
+      this.ultimateContextWindow.show();
+      
+      if (this.isDevelopment) {
+        this.ultimateContextWindow.webContents.openDevTools();
+      }
+    });
+
+    // Handle window closed
+    this.ultimateContextWindow.on('closed', () => {
+      this.ultimateContextWindow = null;
+    });
+
+    // Handle external links
+    this.ultimateContextWindow.webContents.setWindowOpenHandler(({ url }) => {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    });
+
+    this.logger.info('Ultimate context window created');
+  }
+
+  /**
+   * Setup ultimate context IPC handlers
+   */
+  setupUltimateContextHandlers() {
+    // Open ultimate context window
+    ipcMain.handle('open-ultimate-context', () => {
+      this.createUltimateContextWindow();
+    });
   }
   
   /**

@@ -406,6 +406,192 @@
       color: #34c759;
     }
 
+    /* Slack Tab Styles */
+    .slack-container {
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      box-sizing: border-box;
+      min-height: 0;
+    }
+
+    .slack-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+    }
+
+    .slack-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff3b30;
+      box-shadow: 0 0 6px rgba(255, 59, 48, 0.6);
+    }
+
+    .status-dot.online {
+      background: #34c759;
+      box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+    }
+
+    .status-dot.offline {
+      background: #8e8e93;
+      box-shadow: 0 0 6px rgba(142, 142, 147, 0.6);
+    }
+
+    .slack-toggle {
+      padding: 6px 12px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 6px;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s ease;
+    }
+
+    .slack-toggle:hover {
+      background: rgba(0, 212, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .slack-toggle.stop {
+      background: rgba(255, 59, 48, 0.1);
+      border-color: rgba(255, 59, 48, 0.3);
+    }
+
+    .slack-toggle.stop:hover {
+      background: rgba(255, 59, 48, 0.2);
+    }
+
+    .slack-stats {
+      display: flex;
+      gap: 16px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .stat-label {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .stat-value {
+      color: #00d4ff;
+      font-weight: 600;
+    }
+
+    .slack-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .no-messages {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .no-messages-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+
+    .no-messages-text {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .no-messages-subtitle {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .slack-message {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 6px;
+    }
+
+    .slack-message.mention {
+      border-color: rgba(255, 149, 0, 0.4);
+      background: rgba(255, 149, 0, 0.05);
+    }
+
+    .slack-message.urgent {
+      border-color: rgba(255, 59, 48, 0.4);
+      background: rgba(255, 59, 48, 0.05);
+    }
+
+    .message-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .message-user {
+      color: #00d4ff;
+      font-weight: 600;
+    }
+
+    .message-time {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .message-type {
+      background: rgba(0, 212, 255, 0.2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .message-type.mention {
+      background: rgba(255, 149, 0, 0.2);
+      color: #ff9500;
+    }
+
+    .message-text {
+      font-size: 12px;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .message-channel {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 4px;
+    }
+
     /* Input Container */
     .input-container {
       padding: 16px 20px;
@@ -642,6 +828,9 @@
     <button class="tab-btn" onclick="switchTab('crm')" data-tab="crm">
       📊 CRM
     </button>
+    <button class="tab-btn" onclick="switchTab('slack')" data-tab="slack">
+      💬 Slack
+    </button>
   </div>
 
   <div class="copilot-content">
@@ -726,6 +915,40 @@
         </div>
       </div>
     </div>
+
+    <!-- Slack Tab -->
+    <div class="tab-content" id="slackTab">
+      <div class="slack-container">
+        <div class="slack-header">
+          <div class="slack-status" id="slackStatus">
+            <span class="status-dot offline" id="slackStatusDot"></span>
+            <span id="slackStatusText">Connecting...</span>
+          </div>
+          <button class="slack-toggle" id="slackToggle" onclick="toggleSlackMonitoring()">
+            Start Monitoring
+          </button>
+        </div>
+        
+        <div class="slack-stats" id="slackStats" style="display: none;">
+          <div class="stat-item">
+            <span class="stat-label">Messages:</span>
+            <span class="stat-value" id="messageCount">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Mentions:</span>
+            <span class="stat-value" id="mentionCount">0</span>
+          </div>
+        </div>
+        
+        <div class="slack-messages" id="slackMessages">
+          <div class="no-messages" id="noMessages">
+            <div class="no-messages-icon">📱</div>
+            <div class="no-messages-text">No Slack messages yet</div>
+            <div class="no-messages-subtitle">Start monitoring to see @hj2 mentions and messages</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -734,6 +957,9 @@
     let currentTab = 'chat';
     let crmData = null;
     let crmUpdateInterval = null;
+    let slackConnected = false;
+    let slackMessages = [];
+    let slackUpdateInterval = null;
 
     // DOM elements
     const chatContainer = document.getElementById('chatContainer');
@@ -954,6 +1180,179 @@
       }
     }
 
+    // Slack Functions
+    async function toggleSlackMonitoring() {
+      const toggleBtn = document.getElementById('slackToggle');
+      const statusDot = document.getElementById('slackStatusDot');
+      const statusText = document.getElementById('slackStatusText');
+      
+      try {
+        if (slackConnected) {
+          // Stop monitoring
+          statusText.textContent = 'Stopping...';
+          const result = await window.electronAPI.slack.stopMonitoring();
+          
+          if (result.success) {
+            slackConnected = false;
+            statusDot.className = 'status-dot offline';
+            statusText.textContent = 'Disconnected';
+            toggleBtn.textContent = 'Start Monitoring';
+            toggleBtn.classList.remove('stop');
+            stopSlackUpdates();
+          }
+        } else {
+          // Start monitoring
+          statusText.textContent = 'Connecting...';
+          const result = await window.electronAPI.slack.startMonitoring();
+          
+          if (result.success) {
+            slackConnected = true;
+            statusDot.className = 'status-dot online';
+            statusText.textContent = 'Connected';
+            toggleBtn.textContent = 'Stop Monitoring';
+            toggleBtn.classList.add('stop');
+            startSlackUpdates();
+            loadSlackMessages();
+          } else {
+            statusText.textContent = 'Connection Failed';
+            console.error('Failed to start Slack monitoring:', result.error);
+          }
+        }
+      } catch (error) {
+        console.error('Error toggling Slack monitoring:', error);
+        statusText.textContent = 'Error';
+      }
+    }
+
+    async function loadSlackMessages() {
+      try {
+        const messages = await window.electronAPI.slack.getRecentMessages(20);
+        const status = await window.electronAPI.slack.getStatus();
+        
+        slackMessages = messages;
+        updateSlackUI(messages, status);
+      } catch (error) {
+        console.error('Error loading Slack messages:', error);
+      }
+    }
+
+    function updateSlackUI(messages, status) {
+      const messagesContainer = document.getElementById('slackMessages');
+      const noMessages = document.getElementById('noMessages');
+      const slackStats = document.getElementById('slackStats');
+      const messageCount = document.getElementById('messageCount');
+      const mentionCount = document.getElementById('mentionCount');
+      
+      // Update stats
+      if (status) {
+        messageCount.textContent = status.messageCount || 0;
+        mentionCount.textContent = status.mentionCount || 0;
+        slackStats.style.display = slackConnected ? 'flex' : 'none';
+      }
+      
+      if (messages.length === 0) {
+        noMessages.style.display = 'block';
+        return;
+      }
+      
+      noMessages.style.display = 'none';
+      
+      // Clear existing messages
+      messagesContainer.innerHTML = '';
+      
+      // Add messages
+      messages.forEach(message => {
+        const messageEl = createSlackMessageElement(message);
+        messagesContainer.appendChild(messageEl);
+      });
+    }
+
+    function createSlackMessageElement(message) {
+      const messageEl = document.createElement('div');
+      messageEl.className = `slack-message ${message.type}`;
+      
+      if (message.urgent) {
+        messageEl.classList.add('urgent');
+      }
+      
+      const time = new Date(message.timestamp).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      
+      messageEl.innerHTML = `
+        <div class="message-header">
+          <div class="message-user">@${message.user}</div>
+          <div class="message-time">${time}</div>
+          <div class="message-type ${message.type}">${message.type}</div>
+        </div>
+        <div class="message-text">${escapeHtml(message.text)}</div>
+        <div class="message-channel">Channel: ${message.channel}</div>
+      `;
+      
+      return messageEl;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function startSlackUpdates() {
+      // Update Slack messages every 10 seconds
+      slackUpdateInterval = setInterval(loadSlackMessages, 10000);
+    }
+
+    function stopSlackUpdates() {
+      if (slackUpdateInterval) {
+        clearInterval(slackUpdateInterval);
+        slackUpdateInterval = null;
+      }
+    }
+
+    function onSlackMention(message) {
+      console.log('🔔 New Slack mention:', message);
+      slackMessages.unshift(message);
+      
+      // Keep only last 50 messages
+      if (slackMessages.length > 50) {
+        slackMessages = slackMessages.slice(0, 50);
+      }
+      
+      // Update UI if on Slack tab
+      if (currentTab === 'slack') {
+        loadSlackMessages();
+      }
+      
+      // Show notification badge or alert
+      showSlackNotification(message);
+    }
+
+    function onSlackMessage(message) {
+      console.log('💬 New Slack message:', message);
+      slackMessages.unshift(message);
+      
+      if (slackMessages.length > 50) {
+        slackMessages = slackMessages.slice(0, 50);
+      }
+      
+      if (currentTab === 'slack') {
+        loadSlackMessages();
+      }
+    }
+
+    function showSlackNotification(message) {
+      // Add visual indicator for new mentions
+      const slackTab = document.querySelector('[data-tab="slack"]');
+      if (slackTab && currentTab !== 'slack') {
+        slackTab.style.background = 'rgba(255, 149, 0, 0.2)';
+        setTimeout(() => {
+          slackTab.style.background = '';
+        }, 3000);
+      }
+    }
+
     // Auto-resize textarea
     messageInput.addEventListener('input', function() {
       this.style.height = 'auto';
@@ -1091,6 +1490,58 @@
       // Load initial data if on CRM tab
       if (currentTab === 'crm') {
         loadCRMData();
+      }
+      
+      // Setup Slack event listeners
+      if (window.electronAPI && window.electronAPI.onSlackMention) {
+        window.electronAPI.onSlackMention(onSlackMention);
+        window.electronAPI.onSlackMessage(onSlackMessage);
+        
+        window.electronAPI.onSlackConnected(() => {
+          console.log('🔗 Slack connected');
+          slackConnected = true;
+          const statusDot = document.getElementById('slackStatusDot');
+          const statusText = document.getElementById('slackStatusText');
+          const toggleBtn = document.getElementById('slackToggle');
+          
+          if (statusDot) statusDot.className = 'status-dot online';
+          if (statusText) statusText.textContent = 'Connected';
+          if (toggleBtn) {
+            toggleBtn.textContent = 'Stop Monitoring';
+            toggleBtn.classList.add('stop');
+          }
+          
+          startSlackUpdates();
+          loadSlackMessages();
+        });
+        
+        window.electronAPI.onSlackDisconnected(() => {
+          console.log('🔌 Slack disconnected');
+          slackConnected = false;
+          const statusDot = document.getElementById('slackStatusDot');
+          const statusText = document.getElementById('slackStatusText');
+          const toggleBtn = document.getElementById('slackToggle');
+          
+          if (statusDot) statusDot.className = 'status-dot offline';
+          if (statusText) statusText.textContent = 'Disconnected';
+          if (toggleBtn) {
+            toggleBtn.textContent = 'Start Monitoring';
+            toggleBtn.classList.remove('stop');
+          }
+          
+          stopSlackUpdates();
+        });
+        
+        window.electronAPI.onSlackError((error) => {
+          console.error('❌ Slack error:', error);
+          const statusText = document.getElementById('slackStatusText');
+          if (statusText) statusText.textContent = 'Error: ' + error;
+        });
+      }
+      
+      // Load initial Slack status
+      if (window.electronAPI && window.electronAPI.slack) {
+        loadSlackMessages();
       }
     });
 

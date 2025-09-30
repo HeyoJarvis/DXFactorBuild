@@ -21,6 +21,9 @@
   "dependencies": {
     "@heyjarvis/core": "file:../core",
     "@heyjarvis/data": "file:../data",
+    "@slack/bolt": "^4.4.0",
+    "@slack/web-api": "^7.10.0",
+    "dotenv": "^17.2.2",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.7",
     "winston": "^3.11.0",

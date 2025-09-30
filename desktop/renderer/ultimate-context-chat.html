@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeyJarvis - Ultimate Context Chat</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a0a0f 0%, #141923 50%, #0f141e 100%);
+      color: #ffffff;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .header {
+      background: rgba(20, 25, 35, 0.9);
+      border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+      padding: 20px;
+      backdrop-filter: blur(20px);
+    }
+
+    .header h1 {
+      color: #00d4ff;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .context-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .organization-select {
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      min-width: 200px;
+    }
+
+    .organization-select option {
+      background: #1a1f2e;
+      color: #ffffff;
+    }
+
+    .context-status {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .context-status.success {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .context-status.warning {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .context-status.error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .context-status.loading {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .control-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.02);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn.secondary {
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
+    .btn.danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 15px 20px;
+      border-radius: 12px;
+      word-wrap: break-word;
+    }
+
+    .message.user {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .message.assistant {
+      background: rgba(20, 25, 35, 0.8);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      align-self: flex-start;
+    }
+
+    .message.system {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #f59e0b;
+      align-self: center;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .message.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      align-self: center;
+      text-align: center;
+    }
+
+    .message.typing {
+      opacity: 0.7;
+    }
+
+    .message-content {
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .input-container {
+      background: rgba(20, 25, 35, 0.9);
+      border-top: 1px solid rgba(0, 212, 255, 0.2);
+      padding: 20px;
+      backdrop-filter: blur(20px);
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .message-input {
+      flex: 1;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      color: #ffffff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: none;
+      min-height: 44px;
+      max-height: 120px;
+      font-family: inherit;
+    }
+
+    .message-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .message-input:focus {
+      outline: none;
+      border-color: #00d4ff;
+      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+    }
+
+    .send-button {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s;
+      min-width: 80px;
+    }
+
+    .send-button:hover {
+      transform: scale(1.02);
+    }
+
+    .send-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .welcome-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .welcome-message h2 {
+      color: #00d4ff;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+
+    .welcome-message p {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .feature {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .feature h3 {
+      color: #00d4ff;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .feature p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    @media (max-width: 768px) {
+      .context-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .organization-select {
+        min-width: auto;
+      }
+
+      .control-buttons {
+        justify-content: center;
+      }
+
+      .message {
+        max-width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="header">
+      <h1>🤖 HeyJarvis Ultimate Context Chat</h1>
+      <div class="context-controls">
+        <select id="organization-select" class="organization-select">
+          <option value="">Select Organization</option>
+        </select>
+        <div class="context-status" id="context-status">No organization selected</div>
+        <div class="control-buttons">
+          <button id="refresh-context" class="btn">Refresh Context</button>
+          <button id="clear-context" class="btn secondary">Clear Context</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="messages-container" id="messages-container">
+      <div class="welcome-message">
+        <h2>Welcome to Ultimate Context Chat</h2>
+        <p>This AI assistant has complete understanding of your business through:</p>
+        <div class="features">
+          <div class="feature">
+            <h3>📊 CRM Analysis</h3>
+            <p>Real-time analysis of your HubSpot data, deals, contacts, and sales pipeline</p>
+          </div>
+          <div class="feature">
+            <h3>💬 Slack Workflows</h3>
+            <p>Understanding of your team's communication patterns and workflow efficiency</p>
+          </div>
+          <div class="feature">
+            <h3>🧠 AI Intelligence</h3>
+            <p>Combined context provides ultimate business intelligence and recommendations</p>
+          </div>
+        </div>
+        <p><strong>To get started:</strong> Select your organization above and refresh to load your data.</p>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <div class="input-wrapper">
+        <textarea 
+          id="message-input" 
+          class="message-input" 
+          placeholder="Ask about your business processes, CRM data, or Slack workflows..."
+          rows="1"
+        ></textarea>
+        <button id="send-button" class="send-button">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="ultimate-context-chat.js"></script>
+</body>
+</html>

@@ -27,6 +27,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getIntelligence: (orgId) => ipcRenderer.invoke('crm:getIntelligence', orgId),
   healthCheck: () => ipcRenderer.invoke('crm:healthCheck'),
   
+  // Slack functionality
+  slack: {
+    getStatus: () => ipcRenderer.invoke('slack:getStatus'),
+    getRecentMessages: (limit) => ipcRenderer.invoke('slack:getRecentMessages', limit),
+    sendMessage: (channel, message) => ipcRenderer.invoke('slack:sendMessage', channel, message),
+    startMonitoring: () => ipcRenderer.invoke('slack:startMonitoring'),
+    stopMonitoring: () => ipcRenderer.invoke('slack:stopMonitoring'),
+    getUserInfo: (userId) => ipcRenderer.invoke('slack:getUserInfo', userId),
+    getChannelInfo: (channelId) => ipcRenderer.invoke('slack:getChannelInfo', channelId)
+  },
+  
   // Settings
   updateSettings: (settings) => ipcRenderer.invoke('copilot:updateSettings', settings),
   
@@ -50,6 +61,27 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   onCRMUpdate: (callback) => {
     ipcRenderer.on('crm:dataUpdate', (event, data) => callback(data));
+  },
+
+  // Slack event listeners
+  onSlackMention: (callback) => {
+    ipcRenderer.on('slack:mention', (event, message) => callback(message));
+  },
+  
+  onSlackMessage: (callback) => {
+    ipcRenderer.on('slack:message', (event, message) => callback(message));
+  },
+  
+  onSlackConnected: (callback) => {
+    ipcRenderer.on('slack:connected', () => callback());
+  },
+
+  onSlackDisconnected: (callback) => {
+    ipcRenderer.on('slack:disconnected', () => callback());
+  },
+
+  onSlackError: (callback) => {
+    ipcRenderer.on('slack:error', (event, error) => callback(error));
   }
 });
 

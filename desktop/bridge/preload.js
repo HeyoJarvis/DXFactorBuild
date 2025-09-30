@@ -26,7 +26,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     show: () => ipcRenderer.invoke('window:show'),
     hide: () => ipcRenderer.invoke('window:hide'),
     toggleCopilot: () => ipcRenderer.invoke('window:toggleCopilot'),
-    getStatus: () => ipcRenderer.invoke('window:getStatus')
+    getStatus: () => ipcRenderer.invoke('window:getStatus'),
+    openUltimateContext: () => ipcRenderer.invoke('open-ultimate-context')
   },
   
   // Performance monitoring
@@ -44,6 +45,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
     toggle: (enabled) => ipcRenderer.invoke('notifications:toggle', enabled)
   },
   
+  // Ultimate Context System
+  ultimateContext: {
+    initialize: (organizationId, crmConfig) => ipcRenderer.invoke('ultimate-context:initialize', { organizationId, crmConfig }),
+    processSession: (organizationId, sessionId, freshSlackWorkflows) => ipcRenderer.invoke('ultimate-context:process-session', { organizationId, sessionId, freshSlackWorkflows }),
+    generateRecommendations: (organizationId, userQuery, sessionId) => ipcRenderer.invoke('ultimate-context:generate-recommendations', { organizationId, userQuery, sessionId }),
+    getContext: (organizationId) => ipcRenderer.invoke('ultimate-context:get-context', { organizationId }),
+    getSummary: (organizationId) => ipcRenderer.invoke('ultimate-context:get-summary', { organizationId }),
+    refresh: (organizationId, crmConfig) => ipcRenderer.invoke('ultimate-context:refresh', { organizationId, crmConfig }),
+    clear: (organizationId) => ipcRenderer.invoke('ultimate-context:clear', { organizationId }),
+    getCachedOrganizations: () => ipcRenderer.invoke('ultimate-context:get-cached-organizations'),
+    exists: (organizationId) => ipcRenderer.invoke('ultimate-context:exists', { organizationId })
+  },
+
   // API integration with Vercel backend
   api: {
     getInsights: (userId) => ipcRenderer.invoke('api:getInsights', userId),
