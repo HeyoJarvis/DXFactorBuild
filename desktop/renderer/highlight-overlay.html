@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fact Check Highlights</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      overflow: hidden;
+      pointer-events: none; /* Make body completely click-through */
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Make sure ONLY highlights and buttons are clickable */
+    body * {
+      pointer-events: none;
+    }
+    
+    .highlight, .clear-button {
+      pointer-events: auto !important;
+    }
+    
+    .highlight {
+      position: absolute;
+      background: rgba(255, 59, 48, 0.4); /* More visible */
+      border: 3px solid rgba(255, 59, 48, 1); /* Thicker, more visible border */
+      border-radius: 8px;
+      cursor: pointer;
+      pointer-events: auto; /* Make highlights clickable */
+      transition: all 0.2s ease;
+      z-index: 9999;
+      box-shadow: 0 4px 16px rgba(255, 59, 48, 0.5); /* Stronger shadow */
+      /* Subtle pulsing animation to indicate persistence */
+      animation: persistentGlow 2s ease-in-out infinite; /* Faster pulse */
+      min-width: 100px; /* Ensure minimum clickable area */
+      min-height: 30px;
+    }
+    
+    .highlight:hover {
+      background: rgba(255, 59, 48, 0.3);
+      border-color: rgba(255, 59, 48, 0.8);
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+    }
+    
+    .highlight.medium-risk {
+      background: rgba(255, 149, 0, 0.2);
+      border-color: rgba(255, 149, 0, 0.6);
+    }
+    
+    .highlight.medium-risk:hover {
+      background: rgba(255, 149, 0, 0.3);
+      border-color: rgba(255, 149, 0, 0.8);
+      box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+    }
+    
+    .highlight.low-risk {
+      background: rgba(255, 204, 0, 0.15);
+      border-color: rgba(255, 204, 0, 0.5);
+    }
+    
+    .highlight.low-risk:hover {
+      background: rgba(255, 204, 0, 0.25);
+      border-color: rgba(255, 204, 0, 0.7);
+      box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+    }
+    
+    .highlight-tooltip {
+      position: absolute;
+      background: rgba(28, 28, 30, 0.95);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 10000;
+      opacity: 0;
+      transform: translateY(-100%) translateX(-50%);
+      transition: opacity 0.2s ease;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .highlight:hover .highlight-tooltip {
+      opacity: 1;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .fade-out {
+      animation: fadeOut 0.3s ease-out forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.9); }
+    }
+    
+    @keyframes persistentGlow {
+      0%, 100% { 
+        box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+        border-color: rgba(255, 59, 48, 0.8);
+      }
+      50% { 
+        box-shadow: 0 2px 12px rgba(255, 59, 48, 0.5);
+        border-color: rgba(255, 59, 48, 1);
+      }
+    }
+    
+    .clear-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(28, 28, 30, 0.9);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      pointer-events: auto; /* Make button clickable */
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+      z-index: 10001; /* Above highlights */
+    }
+    
+    .clear-button:hover {
+      background: rgba(28, 28, 30, 1);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <button class="clear-button" onclick="clearHighlights()">✕ Dismiss All Highlights</button>
+  
+  <script>
+    let highlights = [];
+    
+    console.log('🎨 Highlight overlay script loaded');
+    console.log('🔌 electronAPI available:', !!window.electronAPI);
+    
+    // Listen for highlights from main process
+    window.electronAPI.onShowHighlights((highlightData) => {
+      console.log('📨 Received show-highlights message with', highlightData.length, 'highlights');
+      showHighlights(highlightData);
+    });
+    
+    // Listen for selective click setup
+    if (window.electronAPI && window.electronAPI.onSetupSelectiveClicks) {
+      window.electronAPI.onSetupSelectiveClicks((highlights) => {
+        console.log('📨 Received setup-selective-clicks message with', highlights.length, 'highlights');
+        setupSelectiveClicking(highlights);
+      });
+    } else {
+      console.log('⚠️ onSetupSelectiveClicks not available');
+    }
+    
+    function showHighlights(highlightData) {
+      console.log('🎨 Overlay received highlights:', highlightData);
+      
+      // Clear existing highlight elements only (don't hide overlay)
+      clearHighlightElements();
+      
+      highlights = highlightData;
+      
+      highlightData.forEach((highlight, index) => {
+        console.log(`🎯 Creating highlight ${index}:`, {
+          text: highlight.text?.substring(0, 30),
+          x: highlight.x,
+          y: highlight.y,
+          width: highlight.width,
+          height: highlight.height
+        });
+        createHighlightElement(highlight, index);
+      });
+      
+      console.log(`✨ Created ${highlightData.length} highlight elements on overlay`);
+    }
+    
+    function createHighlightElement(highlight, index) {
+      console.log(`🎨 Creating highlight element ${index}:`, highlight);
+      
+      const element = document.createElement('div');
+      element.className = `highlight ${getRiskClass(highlight.confidence)} fade-in`;
+      element.style.left = highlight.x + 'px';
+      element.style.top = highlight.y + 'px';
+      element.style.width = highlight.width + 'px';
+      element.style.height = highlight.height + 'px';
+      element.dataset.highlightId = highlight.id;
+      
+      // Use debug color if available, otherwise default red
+      if (highlight.debugColor) {
+        element.style.backgroundColor = `rgba(255, 0, 0, 0.6)`; // Semi-transparent for debug
+        element.style.border = `4px solid ${highlight.debugColor}`;
+        element.style.boxShadow = `0 0 20px ${highlight.debugColor}`;
+      } else {
+        // Make it very visible for debugging
+        element.style.backgroundColor = 'rgba(255, 0, 0, 0.8)'; // Bright red
+        element.style.border = '3px solid red';
+      }
+      element.style.zIndex = '99999';
+      
+      console.log(`📍 Positioning highlight at: left=${highlight.x}px, top=${highlight.y}px, width=${highlight.width}px, height=${highlight.height}px`);
+      
+      // Add coordinate display for debugging
+      const coordDisplay = document.createElement('div');
+      coordDisplay.style.position = 'absolute';
+      coordDisplay.style.top = '2px';
+      coordDisplay.style.left = '2px';
+      coordDisplay.style.fontSize = '10px';
+      coordDisplay.style.color = 'white';
+      coordDisplay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      coordDisplay.style.padding = '2px 4px';
+      coordDisplay.style.borderRadius = '2px';
+      coordDisplay.textContent = `(${highlight.x}, ${highlight.y})`;
+      element.appendChild(coordDisplay);
+      
+      // Add tooltip
+      const tooltip = document.createElement('div');
+      tooltip.className = 'highlight-tooltip';
+      tooltip.style.left = '50%';
+      tooltip.style.top = '0px';
+      tooltip.textContent = highlight.debugColor ? 
+        `DEBUG: ${highlight.text} • (${highlight.x}, ${highlight.y})` :
+        `Click for explanation • Risk: ${Math.round(highlight.confidence * 100)}% • Persistent`;
+      element.appendChild(tooltip);
+      
+      // Click handler with visual feedback
+      element.addEventListener('click', async (e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        console.log(`🖱️ Highlight clicked! ID: ${highlight.id}, Text: ${highlight.text?.substring(0, 50)}`);
+        
+        try {
+          console.log(`🔍 Explaining highlight: ${highlight.id}`);
+          
+          // Visual feedback
+          element.style.transform = 'scale(0.95)';
+          element.style.backgroundColor = 'rgba(255, 59, 48, 0.8)'; // Flash brighter
+          setTimeout(() => {
+            element.style.transform = 'scale(1)';
+            element.style.backgroundColor = 'rgba(255, 59, 48, 0.25)';
+          }, 150);
+          
+          await window.electronAPI.explainHighlight(highlight.id);
+          console.log('✅ Explanation request sent');
+        } catch (error) {
+          console.error('❌ Failed to explain highlight:', error);
+        }
+      });
+      
+      // Add mouseover debugging
+      element.addEventListener('mouseover', () => {
+        console.log(`🖱️ Mouse over highlight: ${highlight.id}`);
+      });
+      
+      // Ensure highlight is clickable
+      element.style.pointerEvents = 'auto';
+      element.style.cursor = 'pointer';
+      
+      document.body.appendChild(element);
+    }
+    
+    function getRiskClass(confidence) {
+      if (confidence >= 0.7) return 'high-risk';
+      if (confidence >= 0.4) return 'medium-risk';
+      return 'low-risk';
+    }
+    
+    function clearHighlightElements() {
+      // Only clear DOM elements, don't hide overlay
+      const existingHighlights = document.querySelectorAll('.highlight');
+      existingHighlights.forEach(highlight => {
+        highlight.classList.add('fade-out');
+        setTimeout(() => {
+          if (highlight.parentNode) {
+            highlight.parentNode.removeChild(highlight);
+          }
+        }, 300);
+      });
+    }
+    
+    function clearHighlights() {
+      // Clear elements and hide overlay (for manual dismissal)
+      clearHighlightElements();
+      
+      // Hide the overlay after animation
+      setTimeout(() => {
+        window.electronAPI.hideHighlights();
+      }, 300);
+    }
+    
+    // Highlights persist until manually cleared
+    // No auto-clear timeout - user controls when to dismiss highlights
+    
+    function setupSelectiveClicking(highlights) {
+      console.log('🎯 Selective clicking setup - overlay is click-through except for highlights');
+      // No complex click handling needed - CSS pointer-events handles this
+    }
+  </script>
+</body>
+</html>

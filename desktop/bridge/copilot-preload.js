@@ -132,6 +132,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // AI analysis API
   ai: {
     simpleAnalyze: (prompt) => ipcRenderer.invoke('ai:simple-analyze', prompt)
+  },
+  
+  // Highlight system API
+  highlights: {
+    show: (highlights) => ipcRenderer.invoke('highlights:show', highlights),
+    hide: () => ipcRenderer.invoke('highlights:hide'),
+    test: () => ipcRenderer.invoke('highlights:test'),
+    findHeyjarvis: () => ipcRenderer.invoke('highlights:find-heyjarvis'),
+    calibrate: () => ipcRenderer.invoke('highlights:calibrate')
+  },
+  
+  // Listen for explanation requests
+  onShowExplanation: (callback) => {
+    ipcRenderer.on('show-explanation', (event, data) => callback(data));
   }
 });
 

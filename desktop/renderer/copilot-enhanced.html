@@ -715,8 +715,8 @@
       <div class="activity-summary" id="activitySummary">
         <span class="activity-text">All systems ready</span>
       </div>
-    </div>
-    
+  </div>
+
     <!-- Chat Interface -->
     <div class="chat-interface">
       <div class="chat-container" id="chatContainer">
@@ -741,6 +741,22 @@
             <div class="quick-action" onclick="startFactCheck()">
               <div class="action-icon">🔍</div>
               <div class="action-text">Fact Check Screen</div>
+          </div>
+            <div class="quick-action" onclick="testHighlights()">
+              <div class="action-icon">🧪</div>
+              <div class="action-text">Test Highlights</div>
+            </div>
+            <div class="quick-action" onclick="findHeyjarvisText()">
+              <div class="action-icon">🔍</div>
+              <div class="action-text">Find "HeyJarvis" Text</div>
+            </div>
+            <div class="quick-action" onclick="calibrateHighlights()">
+              <div class="action-icon">🎯</div>
+              <div class="action-text">Calibrate Positioning</div>
+            </div>
+            <div class="quick-action" onclick="testSimpleHighlights()">
+              <div class="action-icon">🔴</div>
+              <div class="action-text">Simple Test Highlights</div>
             </div>
           </div>
         </div>
@@ -750,10 +766,10 @@
         <div class="typing-avatar">✨</div>
         <div class="typing-content">
           <span class="typing-text">HeyJarvis is thinking</span>
-          <div class="typing-dots">
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
           </div>
         </div>
       </div>
@@ -814,7 +830,7 @@
           console.log('✅ Slack auto-initialized');
           updateStatusIndicator('slack', 'online', 'Connected');
           startSlackUpdates();
-        } else {
+      } else {
           console.log('⚠️ Slack initialization failed:', slackResult.error);
           updateStatusIndicator('slack', 'offline', 'Failed');
         }
@@ -878,9 +894,9 @@
         
         if (!response.success) {
           throw new Error(response.error || 'Failed to load CRM data');
-        }
-        
-        // Store data for future use
+      }
+
+      // Store data for future use
         crmData = response.data;
         
       } catch (error) {
@@ -961,7 +977,7 @@
       }
       
       // Update UI
-      loadSlackMessages();
+        loadSlackMessages();
     }
 
     function onSlackMessage(message) {
@@ -972,23 +988,23 @@
         slackMessages = slackMessages.slice(0, 50);
       }
       
-      loadSlackMessages();
+        loadSlackMessages();
     }
 
     // Auto-resize textarea (for bottom input)
     if (messageInput) {
-      messageInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-      });
+    messageInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
 
-      // Send message on Enter (but not Shift+Enter)
-      messageInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          sendMessage();
-        }
-      });
+    // Send message on Enter (but not Shift+Enter)
+    messageInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
     }
 
     // Header chat input event listeners
@@ -1088,8 +1104,8 @@
     function sendQuickMessage(message) {
       // Use the appropriate input based on current state
       if (isExpanded && messageInput) {
-        messageInput.value = message;
-        sendMessage();
+      messageInput.value = message;
+      sendMessage();
       } else if (headerChatInput) {
         headerChatInput.value = message;
         sendHeaderMessage();
@@ -1263,10 +1279,10 @@
             console.error('❌ Slack error:', error);
             updateStatusIndicator('slack', 'offline', 'Error');
             updateActivitySummary();
-          });
-        }
+        });
       }
-      
+    }
+
       // Services will auto-initialize
       console.log('🎯 HeyJarvis ready - services will auto-initialize');
     });
@@ -1290,40 +1306,58 @@
     
     async function startFactCheck() {
       try {
-        addMessage('assistant', '📸 Capturing screen content...');
-        showTypingIndicator();
+        addMessage('assistant', '🔍 Scanning screen for text content...');
+          showTypingIndicator();
         
-        // Method 1: Try screen capture with OCR
-        let screenText = await captureAndExtractText();
+        // Get text content from screen using multiple methods
+        let textBlocks = await captureAndExtractTextBlocks();
         
-        // Method 2: Fallback to clipboard
-        if (!screenText || screenText.length < 10) {
-          addMessage('assistant', '📋 Checking clipboard content...');
-          screenText = await getClipboardContent();
-        }
-        
-        if (!screenText || screenText.length < 10) {
-          addMessage('assistant', '❌ No readable text found. Try copying some text first, then click Fact Check.');
+        if (!textBlocks || textBlocks.length === 0) {
+          addMessage('assistant', '❌ No readable text found on screen. Make sure there\'s text content visible and try again.');
           return;
         }
         
-        addMessage('assistant', `✅ Found ${screenText.length} characters. Analyzing for misinformation...`);
+        addMessage('assistant', `📝 Found ${textBlocks.length} text blocks. Analyzing for misinformation...`);
         
-        // Analyze with AI
-        const analysis = await analyzeWithAI(screenText);
+        // Analyze each text block with AI
+        const suspiciousBlocks = [];
         
-        // Show results
-        displayFactCheckResults(analysis, screenText);
+        for (const block of textBlocks) {
+          const analysis = await analyzeTextBlock(block.text);
+          if (analysis && analysis.length > 0) {
+            // Add positioning info to analysis
+            analysis.forEach((issue, index) => {
+              suspiciousBlocks.push({
+                id: `highlight-${Date.now()}-${index}`,
+                text: issue.text,
+                reason: issue.reason,
+                confidence: issue.confidence || 0.7,
+                x: block.x,
+                y: block.y,
+                width: block.width,
+                height: block.height
+              });
+            });
+          }
+        }
         
-      } catch (error) {
+        // Show results as screen highlights
+        if (suspiciousBlocks.length > 0) {
+          addMessage('assistant', `🚨 Found ${suspiciousBlocks.length} potentially suspicious claims. Red highlights are now showing on your screen - click them for details!`);
+          await window.electronAPI.highlights.show(suspiciousBlocks);
+        } else {
+          addMessage('assistant', '✅ No obvious misinformation detected in the scanned content.');
+        }
+        
+        } catch (error) {
         console.error('Fact check error:', error);
         addMessage('assistant', '❌ Fact check failed. Please try again.');
       } finally {
-        hideTypingIndicator();
+          hideTypingIndicator();
       }
     }
     
-    async function captureAndExtractText() {
+    async function captureAndExtractTextBlocks() {
       try {
         if (!window.electronAPI?.factCheck) {
           console.log('Fact check API not available, using clipboard fallback');
@@ -1338,7 +1372,7 @@
           return null;
         }
         
-        // Extract text with OCR
+        // Extract text blocks with positioning
         const textResult = await window.electronAPI.factCheck.extractText(capture.image);
         
         if (!textResult.success) {
@@ -1346,11 +1380,103 @@
           return null;
         }
         
-        return textResult.text;
+        return textResult.textBlocks;
         
       } catch (error) {
         console.error('Screen capture and OCR failed:', error);
         return null;
+      }
+    }
+    
+    function createMockTextBlocks(text) {
+      // Create mock positioned text blocks for clipboard content
+      // Try to position them more realistically based on typical content areas
+      const blocks = [];
+      
+      // Split into sentences and paragraphs
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+      
+      // Get screen dimensions for better positioning
+      const screenWidth = window.screen.width;
+      const screenHeight = window.screen.height;
+      
+      // Common content area (center 70% of screen, avoiding edges)
+      const contentStartX = Math.floor(screenWidth * 0.15);
+      const contentEndX = Math.floor(screenWidth * 0.85);
+      const contentStartY = Math.floor(screenHeight * 0.15);
+      const contentEndY = Math.floor(screenHeight * 0.85);
+      
+      sentences.forEach((sentence, index) => {
+        const trimmed = sentence.trim();
+        if (trimmed.length > 10) {
+          // Distribute blocks across typical content areas
+          const row = Math.floor(index / 2);
+          const col = index % 2;
+          
+          blocks.push({
+            text: trimmed,
+            x: contentStartX + (col * Math.floor((contentEndX - contentStartX) / 2)),
+            y: contentStartY + (row * 60), // 60px between rows
+            width: Math.min(trimmed.length * 7, Math.floor((contentEndX - contentStartX) / 2) - 20),
+            height: 40 // Taller for better visibility
+          });
+        }
+      });
+      
+      // If no sentences, create blocks from paragraphs
+      if (blocks.length === 0) {
+        const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 20);
+        paragraphs.forEach((paragraph, index) => {
+          blocks.push({
+            text: paragraph.trim(),
+            x: contentStartX,
+            y: contentStartY + (index * 100),
+            width: Math.min(paragraph.length * 6, contentEndX - contentStartX - 40),
+            height: 60
+          });
+        });
+      }
+      
+      return blocks;
+    }
+    
+    async function analyzeTextBlock(text) {
+      // Analyze individual text block (same as before but for single block)
+      try {
+        const prompt = `Analyze this specific text for potential misinformation, exaggerations, or suspicious claims:
+        
+        Text: "${text}"
+        
+        If you find issues, respond with a JSON array containing objects with:
+        - "text": the exact suspicious part (keep under 50 chars)
+        - "reason": brief explanation why it's suspicious
+        - "confidence": number from 0-1 (how confident you are it's problematic)
+        
+        If no issues found, return empty array []. Only return valid JSON.`;
+        
+        const response = await window.electronAPI.ai.simpleAnalyze(prompt);
+        
+        // Try to parse as JSON
+        try {
+          const parsed = JSON.parse(response);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (parseError) {
+          // Fallback: check if response indicates issues
+          if (response.toLowerCase().includes('suspicious') || 
+              response.toLowerCase().includes('problematic') ||
+              response.toLowerCase().includes('unverifiable')) {
+            return [{
+              text: text.substring(0, 50) + (text.length > 50 ? '...' : ''),
+              reason: response,
+              confidence: 0.6
+            }];
+          }
+          return [];
+        }
+        
+      } catch (error) {
+        console.error('Text block analysis failed:', error);
+        return [];
       }
     }
     
@@ -1457,6 +1583,164 @@
       `;
       
       addMessage('assistant', detailHtml);
+    }
+    
+    // OCR-based text detection function
+    async function findHeyjarvisText() {
+      try {
+        addMessage('assistant', '🔍 <strong>Finding "HeyJarvis" text using OCR...</strong><br><br>This will:<br>• 📸 Capture your current screen<br>• 🤖 Run OCR (Optical Character Recognition)<br>• 🎯 Find all instances of "heyjarvis", "jarvis", or "hey"<br>• 📍 Highlight them at their exact positions<br><br>Please wait while I scan your screen...');
+        showTypingIndicator();
+        
+        const result = await window.electronAPI.highlights.findHeyjarvis();
+        
+        if (result.success) {
+          let methodDescription = '';
+          switch (result.method) {
+            case 'ocr':
+              methodDescription = 'using real OCR text detection with coordinate scaling';
+              break;
+            case 'ocr-smart-positioning':
+              methodDescription = 'using OCR detection with smart positioning (hybrid approach)';
+              break;
+            case 'text-flow-positioning':
+              methodDescription = 'using text flow analysis for intelligent positioning';
+              break;
+            case 'manual-positioning':
+              methodDescription = 'using manual positioning based on ChatGPT layout analysis';
+              break;
+            case 'known-locations':
+              methodDescription = 'using known "jarvis" text locations (OCR fallback)';
+              break;
+            default:
+              methodDescription = 'using text detection';
+          }
+          
+          addMessage('assistant', `✅ <strong>Success!</strong> Found ${result.found} instances of "jarvis" text ${methodDescription}.<br><br>🎯 <strong>Red highlights should now be visible</strong> on your screen with <strong>improved coordinate mapping</strong>!<br><br>• Click any highlight for details<br>• Coordinates are now scaled to match your screen<br>• Method used: ${result.method}<br>• Check console for detailed coordinate mapping logs<br><br>The highlights should now appear much closer to the actual text! 🚀`);
+        } else {
+          addMessage('assistant', `⚠️ <strong>Text detection had issues:</strong><br><br>${result.error}<br><br>You should still see a fallback highlight. This could mean:<br>• OCR processing failed<br>• No "jarvis" text is visible on screen<br>• Screen capture had issues<br><br>The system will keep trying to improve detection. Check the console for detailed logs.`);
+        }
+        
+      } catch (error) {
+        console.error('OCR text detection error:', error);
+        addMessage('assistant', '❌ OCR text detection failed. This could be due to:<br>• Screen capture permissions<br>• OCR processing error<br>• System compatibility issue<br><br>Check the console for detailed error information.');
+      } finally {
+        hideTypingIndicator();
+      }
+    }
+
+    // Calibration function to help fine-tune positioning
+    async function calibrateHighlights() {
+      try {
+        addMessage('assistant', '🎯 <strong>Starting Coordinate Calibration...</strong><br><br>This will show:<br>• 🟢 <strong>Lime green grid</strong> - 3x3 calibration points with exact coordinates<br>• 🔵 <strong>Cyan corner markers</strong> - Screen corner reference points<br>• 📍 Each shows its exact (x, y) position<br><br>Use this to verify highlight positioning accuracy!');
+        showTypingIndicator();
+        
+        const result = await window.electronAPI.highlights.calibrate();
+        
+        if (result.success) {
+          addMessage('assistant', `✅ <strong>Calibration Grid Active!</strong><br><br>🎯 You should now see <strong>${result.found} calibration points</strong> on your screen:<br><br>• <strong>Lime green boxes</strong> = Grid points with coordinates<br>• <strong>Cyan boxes</strong> = Corner markers<br>• Screen dimensions: ${result.screenDimensions.width}x${result.screenDimensions.height}<br><br>If these appear in the right places, the coordinate system is working correctly! Use this to compare with OCR positioning.`);
+        } else {
+          addMessage('assistant', `❌ <strong>Calibration failed:</strong> ${result.error}<br><br>Check the console for details.`);
+        }
+        
+      } catch (error) {
+        console.error('Calibration error:', error);
+        addMessage('assistant', '❌ Calibration system failed. Check console for details.');
+      } finally {
+        hideTypingIndicator();
+      }
+    }
+
+    // Simple test highlights function - bypasses OCR completely
+    async function testSimpleHighlights() {
+      try {
+        addMessage('assistant', '🔴 <strong>Testing Simple Highlights...</strong><br><br>This bypasses all OCR and creates highlights at hardcoded positions to test the overlay system directly.');
+        showTypingIndicator();
+        
+        // Create simple test highlights at known positions
+        const simpleHighlights = [
+          {
+            id: 'simple-test-1',
+            text: 'TEST 1',
+            reason: 'Simple test highlight at (500, 200)',
+            confidence: 1.0,
+            x: 500,
+            y: 200,
+            width: 100,
+            height: 30
+          },
+          {
+            id: 'simple-test-2', 
+            text: 'TEST 2',
+            reason: 'Simple test highlight at (600, 300)',
+            confidence: 1.0,
+            x: 600,
+            y: 300,
+            width: 100,
+            height: 30
+          },
+          {
+            id: 'simple-test-3',
+            text: 'TEST 3',
+            reason: 'Simple test highlight at (700, 400)',
+            confidence: 1.0,
+            x: 700,
+            y: 400,
+            width: 100,
+            height: 30
+          }
+        ];
+        
+        // Send directly to highlight system
+        await window.electronAPI.highlights.show(simpleHighlights);
+        
+        addMessage('assistant', `✅ <strong>Simple Test Complete!</strong><br><br>Created 3 test highlights at:<br>• (500, 200) - TEST 1<br>• (600, 300) - TEST 2<br>• (700, 400) - TEST 3<br><br>If these appear at the correct positions, the overlay system is working and the issue is with coordinate calculation in the OCR system.`);
+        
+      } catch (error) {
+        console.error('Simple test error:', error);
+        addMessage('assistant', '❌ Simple test failed. Check console for details.');
+      } finally {
+        hideTypingIndicator();
+      }
+    }
+
+    // Test highlights function
+    async function testHighlights() {
+      try {
+        addMessage('assistant', '🧪 Testing highlight overlay system...<br><br>This will:<br>• Try to detect "heyjarvis" text using accessibility APIs<br>• Show debug highlights at key screen positions<br>• Display coordinates to help debug positioning<br><br>Look for colorful boxes with coordinates appearing on your screen!');
+        showTypingIndicator();
+        
+        const result = await window.electronAPI.highlights.test();
+        
+        if (result.success) {
+          addMessage('assistant', `🎯 Test complete! Created ${result.found} highlights.<br><br><strong>What to look for:</strong><br>• Colored boxes at corners and center of screen<br>• Each box shows coordinates like "(x, y)"<br>• Different colors indicate different test areas<br>• If you see these, the overlay system is working!<br><br>If highlights appear in wrong places, we can adjust the positioning logic.`);
+        } else {
+          addMessage('assistant', `⚠️ Test completed with issues: ${result.error}<br><br>But you should still see fallback debug highlights on your screen. Check the console for detailed logs.`);
+        }
+        
+      } catch (error) {
+        console.error('Test highlights error:', error);
+        addMessage('assistant', '❌ Test highlights failed. Check console for details.');
+      } finally {
+        hideTypingIndicator();
+      }
+    }
+    
+    // Listen for explanation requests from highlights
+    if (window.electronAPI?.onShowExplanation) {
+      window.electronAPI.onShowExplanation((data) => {
+        const explanationHtml = `
+          <div style="background: rgba(255, 59, 48, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 3px solid #ff3b30;">
+            <strong>🚨 Suspicious Content Detected</strong><br><br>
+            <strong>Highlighted Text:</strong><br>
+            <em>"${data.text}"</em><br><br>
+            <strong>Why This Might Be Problematic:</strong><br>
+            ${data.reason}<br><br>
+            <small style="color: #ff3b30;">Confidence: ${Math.round(data.confidence * 100)}%</small>
+          </div>
+        `;
+        
+        addMessage('assistant', explanationHtml);
+      });
     }
     
   </script>
