@@ -4,6 +4,18 @@
  */
 
 module.exports = async (req, res) => {
+console.log('🔍 INCOMING REQUEST:', {
+    method: req.method,
+    url: req.url,
+    headers: {
+      'content-type': req.headers['content-type'],
+      'user-agent': req.headers['user-agent'],
+      'x-slack-signature': req.headers['x-slack-signature'] ? 'present' : 'missing'
+    },
+    bodyType: typeof req.body,
+    bodyKeys: req.body ? Object.keys(req.body) : 'no body'
+  });
+
   try {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -58,6 +70,67 @@ module.exports = async (req, res) => {
       // Keep only last 50 events
       if (global.slackEvents.length > 50) {
         global.slackEvents = global.slackEvents.slice(0, 50);
+      }
+
+      // Work request detection (skip messages from admin user)
+      if (event.type === 'message' && event.text && event.user !== 'U08NCU64UKH') {
+        console.log('🔍 Checking for work request:', { 
+          user: event.user, 
+          text: event.text.substring(0, 50) + '...' 
+        });
+        
+        const text = event.text.toLowerCase();
+        const workRequestPatterns = [
+          'can you', 'could you', 'please help', 'need you to', 'urgent', 'asap',
+          'would you', 'help me', 'assist me', 'i need', 'request', 'task',
+          'fix', 'bug', 'issue', 'problem', 'implement', 'build', 'create'
+        ];
+        
+        const matchedPatterns = workRequestPatterns.filter(pattern => text.includes(pattern));
+        const isWorkRequest = matchedPatterns.length > 0;
+        
+        console.log('🔍 Pattern check result:', { 
+          isWorkRequest, 
+          matchedPatterns,
+          totalPatterns: workRequestPatterns.length 
+        });
+        
+        if (isWorkRequest) {
+          // Determine urgency
+          let urgency = 'medium';
+          if (/urgent|asap|emergency|critical|immediate/.test(text)) {
+            urgency = 'urgent';
+          } else if (/important|soon|quickly|priority/.test(text)) {
+            urgency = 'high';
+          } else if (/when you can|no rush|whenever/.test(text)) {
+            urgency = 'low';
+          }
+
+          // Determine work type
+          let workType = 'other';
+          if (/code|develop|program|build|implement|debug|fix/.test(text)) {
+            workType = 'coding';
+          } else if (/design|ui|ux|mockup/.test(text)) {
+            workType = 'design';
+          } else if (/analyze|research|investigate|review/.test(text)) {
+            workType = 'analysis';
+          } else if (/help|support|assist|explain/.test(text)) {
+            workType = 'support';
+          }
+
+          console.log('🔔 WORK REQUEST DETECTED:', {
+            user: event.user,
+            channel: event.channel,
+            message: event.text.substring(0, 100) + (event.text.length > 100 ? '...' : ''),
+            urgency: urgency,
+            workType: workType,
+            confidence: Math.min(0.5 + (matchedPatterns.length * 0.2), 1.0),
+            matchedPatterns: matchedPatterns,
+            timestamp: new Date().toISOString()
+          });
+        }
+      } else if (event.type === 'message' && event.user === 'U08NCU64UKH') {
+        console.log('🔍 Skipping message from admin user (you)');
       }
 
       return res.json({ 

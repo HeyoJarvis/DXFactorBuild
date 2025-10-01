@@ -305,66 +305,282 @@ async function handleFallbackMode(req, res, method, query) {
 }
 
 /**
- * Generate AI response using Anthropic
+ * Generate AI response using Joint CRM + Slack Context Pipeline
  */
 async function generateAIResponse(userMessage, conversation, userContext) {
   const startTime = Date.now();
   
   try {
-    // Import AI analyzer
-    const AIAnalyzer = require('../../core/signals/enrichment/ai-analyzer');
-    const aiAnalyzer = new AIAnalyzer();
+    // Check if this is a recommendation request that needs CRM + Slack context
+    if (isRecommendationRequest(userMessage)) {
+      return await generateJointContextResponse(userMessage, conversation, userContext, startTime);
+    }
 
-    const systemPrompt = getGeneralAssistantPrompt();
+    // Import Enhanced Business Intelligence System for other queries
+    const EnhancedBusinessIntelligenceSystem = require('../../enhanced-business-intelligence-system');
+    const biSystem = new EnhancedBusinessIntelligenceSystem();
 
-    // Create conversation context for AI
-    const messages = (conversation.messages || []).slice(-10).map(msg => ({
-      role: msg.role === 'assistant' ? 'assistant' : 'user',
-      content: msg.content
-    }));
-
-    // Add current message
-    messages.push({
-      role: 'user',
-      content: userMessage
+    // Process message through business intelligence system
+    const biResponse = await biSystem.processMessage(userMessage, {
+      userId: userContext.id,
+      userName: userContext.name,
+      organizationId: userContext.organization_id || 'default_org'
     });
 
-    // Use AI analyzer for response
-    const mockSignal = {
-      id: 'chat_' + Date.now(),
-      title: `Chat: ${userMessage.substring(0, 50)}...`,
-      content: userMessage,
-      url: 'internal://chat',
-      metadata: {
-        user_context: userContext,
-        conversation_history: messages.slice(0, -1)
+    // Format response based on type
+    let formattedResponse = '';
+    
+    switch (biResponse.type) {
+      case 'task_assignment':
+        formattedResponse = formatTaskAssignmentResponse(biResponse);
+        break;
+      case 'tool_comparison':
+        formattedResponse = formatToolComparisonResponse(biResponse);
+        break;
+      case 'workflow_analysis':
+        formattedResponse = formatWorkflowAnalysisResponse(biResponse);
+        break;
+      case 'general_business_query':
+        formattedResponse = formatGeneralBusinessResponse(biResponse);
+        break;
+      default:
+        formattedResponse = biResponse.response || 'I can help you with business intelligence, task management, and tool recommendations. What would you like to explore?';
+    }
+
+    return {
+      content: formattedResponse,
+      model: 'enhanced-bi-system',
+      tokens: 0,
+      processing_time: Date.now() - startTime,
+      bi_metadata: {
+        response_type: biResponse.type,
+        confidence: biResponse.confidence,
+        classification: biResponse.classification
       }
     };
 
-    const analysis = await aiAnalyzer.analyzeSignal(mockSignal, {
-      systemPrompt,
-      messages,
-      maxTokens: 1000,
-      temperature: 0.7
-    });
-
-    return {
-      content: analysis.summary || 'I apologize, but I encountered an issue generating a response. Please try again.',
-      model: 'claude-3-sonnet',
-      tokens: analysis.metadata?.tokens_used || 0,
-      processing_time: Date.now() - startTime
-    };
-
   } catch (error) {
-    console.error('AI response generation error:', error);
+    console.error('Enhanced BI response generation error:', error);
+    
+    // Fallback to basic AI analyzer
+    try {
+      const AIAnalyzer = require('../../core/signals/enrichment/ai-analyzer');
+      const aiAnalyzer = new AIAnalyzer();
+
+      const systemPrompt = getGeneralAssistantPrompt();
+
+      // Create conversation context for AI
+      const messages = (conversation.messages || []).slice(-10).map(msg => ({
+        role: msg.role === 'assistant' ? 'assistant' : 'user',
+        content: msg.content
+      }));
+
+      // Add current message
+      messages.push({
+        role: 'user',
+        content: userMessage
+      });
+
+      // Use AI analyzer for response
+      const mockSignal = {
+        id: 'chat_' + Date.now(),
+        title: `Chat: ${userMessage.substring(0, 50)}...`,
+        content: userMessage,
+        url: 'internal://chat',
+        metadata: {
+          user_context: userContext,
+          conversation_history: messages.slice(0, -1)
+        }
+      };
+
+      const analysis = await aiAnalyzer.analyzeSignal(mockSignal, {
+        systemPrompt,
+        messages,
+        maxTokens: 1000,
+        temperature: 0.7
+      });
+
+      return {
+        content: analysis.summary || 'I apologize, but I encountered an issue generating a response. Please try again.',
+        model: 'claude-3-sonnet',
+        tokens: analysis.metadata?.tokens_used || 0,
+        processing_time: Date.now() - startTime
+      };
+
+    } catch (fallbackError) {
+      console.error('Fallback AI response generation error:', fallbackError);
+      
+      return {
+        content: 'I apologize, but I encountered an issue processing your request. Please try again.',
+        model: 'fallback',
+        tokens: 0,
+        processing_time: Date.now() - startTime
+      };
+    }
+  }
+}
+
+/**
+ * Check if the user message is a recommendation request
+ */
+function isRecommendationRequest(message) {
+  const recommendationKeywords = [
+    'recommend', 'suggestion', 'tool', 'software', 'automation',
+    'workflow', 'process', 'optimize', 'improve', 'efficiency',
+    'productivity', 'integrate', 'connect', 'sync', 'crm', 'slack'
+  ];
+  
+  const lowerMessage = message.toLowerCase();
+  return recommendationKeywords.some(keyword => lowerMessage.includes(keyword));
+}
+
+/**
+ * Generate response using Ultimate Context System
+ */
+async function generateJointContextResponse(userMessage, conversation, userContext, startTime) {
+  try {
+    console.log('Using Ultimate Context System for recommendation request');
+    
+    // Import the Ultimate Context System
+    const { UltimateContextSystem } = require('../../integrate-existing-systems');
+    const system = new UltimateContextSystem();
+    
+    const organizationId = userContext.organization_id || 'default_org';
+    
+    // Check if we already have ultimate context for this organization
+    let ultimateContext;
+    try {
+      ultimateContext = system.getUltimateContext(organizationId);
+    } catch (error) {
+      // If no context exists, we need to process it first
+      console.log('No ultimate context found, processing complete intelligence...');
+      
+      // This would need to be configured with actual CRM config
+      const crmConfig = {
+        type: 'hubspot',
+        organization_id: organizationId,
+        access_token: process.env.HUBSPOT_ACCESS_TOKEN
+      };
+      
+      // For now, use a placeholder website URL
+      const websiteUrl = 'https://example.com';
+      
+      const results = await system.processCompleteIntelligence(websiteUrl, crmConfig, organizationId);
+      ultimateContext = results.pipeline.ultimate_context;
+    }
+    
+    // Generate recommendations using the ultimate context
+    const recommendations = await system.generateIntelligentRecommendations(
+      organizationId, 
+      userMessage
+    );
     
     return {
-      content: 'I apologize, but I encountered an issue processing your request. Please try again.',
-      model: 'fallback',
+      content: recommendations.recommendations.recommendations,
+      model: 'ultimate-context-system',
+      tokens: 0,
+      processing_time: Date.now() - startTime,
+      ultimate_metadata: {
+        organization_id: organizationId,
+        has_crm_context: ultimateContext.metadata.hasCRMContext,
+        has_slack_context: ultimateContext.metadata.hasSlackContext,
+        has_combined_context: ultimateContext.metadata.hasCombinedContext,
+        context_length: ultimateContext.ultimateContext.length
+      }
+    };
+    
+  } catch (error) {
+    console.error('Ultimate context system error:', error);
+    
+    // Fallback to basic recommendation response
+    return {
+      content: `I understand you're looking for recommendations. While I'm having trouble accessing your complete business context right now, I can still help with general business tool recommendations. Could you tell me more about what specific process or workflow you'd like to optimize?`,
+      model: 'fallback-recommendation',
       tokens: 0,
       processing_time: Date.now() - startTime
     };
   }
+}
+
+/**
+ * Get CRM data from the CRM integration
+ */
+async function getCRMData(organizationId) {
+  try {
+    // This would integrate with your existing CRM analyzer
+    // For now, return mock data structure
+    return {
+      organization_id: organizationId,
+      deals: [],
+      contacts: [],
+      companies: [],
+      workflows: [],
+      patterns: [],
+      recommendations: []
+    };
+  } catch (error) {
+    console.error('Failed to get CRM data:', error);
+    return null;
+  }
+}
+
+/**
+ * Get Slack workflow data
+ */
+async function getSlackWorkflowData(organizationId) {
+  try {
+    // This would integrate with your existing Slack workflow capture
+    // For now, return mock data structure
+    return [
+      {
+        workflow_id: 'slack_workflow_1',
+        organization_id: organizationId,
+        type: 'communication',
+        participants: [],
+        duration_days: 0,
+        efficiency_score: 0.8
+      }
+    ];
+  } catch (error) {
+    console.error('Failed to get Slack workflow data:', error);
+    return [];
+  }
+}
+
+/**
+ * Format joint recommendations response
+ */
+function formatJointRecommendationsResponse(recommendations) {
+  let response = '🎯 **AI-Driven Recommendations**\n\n';
+  
+  if (recommendations.recommendations && recommendations.recommendations.length > 0) {
+    recommendations.recommendations.forEach((rec, index) => {
+      response += `**${index + 1}. ${rec.title || 'Recommendation'}**\n`;
+      response += `${rec.description || rec.justification}\n\n`;
+      
+      if (rec.roi_estimates) {
+        response += `💰 **ROI**: ${rec.roi_estimates}\n`;
+      }
+      if (rec.time_savings) {
+        response += `⏱️ **Time Saved**: ${rec.time_savings}\n`;
+      }
+      if (rec.implementation_complexity) {
+        response += `🔧 **Complexity**: ${rec.implementation_complexity}\n`;
+      }
+      response += '\n';
+    });
+  }
+  
+  if (recommendations.follow_up_questions && recommendations.follow_up_questions.length > 0) {
+    response += '**💬 Follow-up Questions You Can Ask:**\n';
+    recommendations.follow_up_questions.forEach((question, index) => {
+      response += `${index + 1}. ${question}\n`;
+    });
+  }
+  
+  response += '\n*Ask me about pricing, implementation details, or alternatives for any recommendation!*';
+  
+  return response;
 }
 
 /**
@@ -383,6 +599,114 @@ function getGeneralAssistantPrompt() {
 - Process improvement
 
 Be concise, practical, and actionable. Focus on helping the user be more productive. When possible, provide specific steps or code examples.`;
+}
+
+/**
+ * Format task assignment response
+ */
+function formatTaskAssignmentResponse(biResponse) {
+  let response = '🎯 **Task Assignment Detected**\n\n';
+  
+  if (biResponse.task_context) {
+    const task = biResponse.task_context;
+    if (task.assignee) response += `👤 **Assignee:** ${task.assignee}\n`;
+    if (task.deadline) response += `📅 **Deadline:** ${task.deadline}\n`;
+    if (task.priority) response += `⚡ **Priority:** ${task.priority}\n`;
+  }
+  
+  if (biResponse.actionable_items?.length > 0) {
+    response += '\n✅ **Action Items:**\n';
+    biResponse.actionable_items.forEach((item, index) => {
+      response += `${index + 1}. ${item}\n`;
+    });
+  }
+  
+  if (biResponse.recommendations?.tools?.length > 0) {
+    response += '\n🛠️ **Recommended Tools:**\n';
+    biResponse.recommendations.tools.forEach(tool => {
+      response += `• ${tool}\n`;
+    });
+  }
+  
+  return response;
+}
+
+/**
+ * Format tool comparison response
+ */
+function formatToolComparisonResponse(biResponse) {
+  let response = '🔧 **Tool Analysis & Recommendations**\n\n';
+  
+  response += biResponse.analysis + '\n\n';
+  
+  if (biResponse.comparison_factors?.length > 0) {
+    response += '📊 **Key Comparison Factors:**\n';
+    biResponse.comparison_factors.forEach(factor => {
+      response += `• ${factor}\n`;
+    });
+    response += '\n';
+  }
+  
+  if (biResponse.next_steps?.length > 0) {
+    response += '🚀 **Next Steps:**\n';
+    biResponse.next_steps.forEach((step, index) => {
+      response += `${index + 1}. ${step}\n`;
+    });
+  }
+  
+  return response;
+}
+
+/**
+ * Format workflow analysis response
+ */
+function formatWorkflowAnalysisResponse(biResponse) {
+  let response = '⚙️ **Workflow Analysis & Optimization**\n\n';
+  
+  response += biResponse.analysis + '\n\n';
+  
+  if (biResponse.optimization_areas?.length > 0) {
+    response += '🎯 **Optimization Opportunities:**\n';
+    biResponse.optimization_areas.forEach(area => {
+      response += `• ${area}\n`;
+    });
+    response += '\n';
+  }
+  
+  if (biResponse.recommended_actions?.length > 0) {
+    response += '💡 **Recommended Actions:**\n';
+    biResponse.recommended_actions.forEach((action, index) => {
+      response += `${index + 1}. ${action}\n`;
+    });
+  }
+  
+  return response;
+}
+
+/**
+ * Format general business response
+ */
+function formatGeneralBusinessResponse(biResponse) {
+  let response = '💼 **Business Intelligence Insights**\n\n';
+  
+  response += biResponse.response + '\n\n';
+  
+  if (biResponse.related_topics?.length > 0) {
+    response += '🔗 **Related Topics:**\n';
+    biResponse.related_topics.forEach(topic => {
+      response += `• ${topic}\n`;
+    });
+    response += '\n';
+  }
+  
+  if (biResponse.data_sources?.length > 0) {
+    response += '📊 **Relevant Data Sources:**\n';
+    biResponse.data_sources.forEach(source => {
+      response += `• ${source}\n`;
+    });
+  }
+  
+  return response;
 }
 
 /**

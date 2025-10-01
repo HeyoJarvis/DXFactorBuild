@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeyJarvis - Workflow Tools Integration Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+        
+        .chat-section {
+            padding: 30px;
+            border-right: 1px solid #eee;
+        }
+        
+        .tools-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chat-container {
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .message.user {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .message.assistant {
+            background: white;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+        
+        .message.system {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-style: italic;
+            text-align: center;
+            margin: 10px auto;
+            max-width: 90%;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background: white;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .chat-input button:hover {
+            background: #0056b3;
+        }
+        
+        .chat-input button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .tool-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+        
+        .tool-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .tool-card h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .tool-card p {
+            margin: 0 0 15px 0;
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .tool-category {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-panel {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .status-value {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .test-btn {
+            padding: 10px 16px;
+            border: 1px solid #007bff;
+            background: white;
+            color: #007bff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .test-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tool-results {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .tool-results pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-section {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 HeyJarvis</h1>
+            <p>Workflow → Tool Output Integration Test</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="chat-section">
+                <div class="section-title">
+                    💬 Chat Interface
+                </div>
+                
+                <div class="test-buttons">
+                    <button class="test-btn" onclick="sendTestMessage('research')">🔍 Research Request</button>
+                    <button class="test-btn" onclick="sendTestMessage('email')">📧 Email Draft</button>
+                    <button class="test-btn" onclick="sendTestMessage('analysis')">📊 Analysis</button>
+                    <button class="test-btn" onclick="sendTestMessage('competitor')">🏢 Competitor</button>
+                </div>
+                
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message system">
+                            Welcome! Try sending a message that requires tools, like "research our competitors" or "draft an email to the team"
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                        <button onclick="sendMessage()" id="sendButton">Send</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tools-section">
+                <div class="section-title">
+                    🛠️ Available Tools
+                </div>
+                
+                <div class="status-panel">
+                    <div class="status-item">
+                        <span class="status-label">System Status</span>
+                        <span class="status-value" id="systemStatus">Loading...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Available Tools</span>
+                        <span class="status-value" id="toolCount">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Running Tools</span>
+                        <span class="status-value" id="runningTools">0</span>
+                    </div>
+                </div>
+                
+                <div class="tools-grid" id="toolsGrid">
+                    <!-- Tools will be loaded here -->
+                </div>
+                
+                <div class="tool-results" id="toolResults" style="display: none;">
+                    <h4>Latest Tool Execution Results:</h4>
+                    <pre id="resultsContent"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLoading = false;
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStatus();
+            loadAvailableTools();
+        });
+        
+        // Load system status
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/api/workflow-tools?action=status');
+                const data = await response.json();
+                
+                document.getElementById('systemStatus').textContent = data.status || 'Unknown';
+                document.getElementById('runningTools').textContent = data.execution_status?.running_tools || 0;
+            } catch (error) {
+                console.error('Failed to load system status:', error);
+                document.getElementById('systemStatus').textContent = 'Error';
+            }
+        }
+        
+        // Load available tools
+        async function loadAvailableTools() {
+            try {
+                const response = await fetch('/api/workflow-tools?action=tools');
+                const data = await response.json();
+                
+                document.getElementById('toolCount').textContent = data.count || 0;
+                
+                const toolsGrid = document.getElementById('toolsGrid');
+                toolsGrid.innerHTML = '';
+                
+                if (data.tools && data.tools.length > 0) {
+                    data.tools.forEach(tool => {
+                        const toolCard = document.createElement('div');
+                        toolCard.className = 'tool-card';
+                        toolCard.innerHTML = `
+                            <h3>${tool.name}</h3>
+                            <p>${tool.description}</p>
+                            <span class="tool-category">${tool.category}</span>
+                        `;
+                        toolsGrid.appendChild(toolCard);
+                    });
+                } else {
+                    toolsGrid.innerHTML = '<p>No tools available</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load tools:', error);
+                document.getElementById('toolsGrid').innerHTML = '<p>Error loading tools</p>';
+            }
+        }
+        
+        // Handle key press in chat input
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        // Send test messages
+        function sendTestMessage(type) {
+            const testMessages = {
+                research: "Can you research our main competitors in the AI assistant space?",
+                email: "Draft an email to the team about our Q4 goals and priorities",
+                analysis: "Analyze our workflow patterns from the last week",
+                competitor: "Compare our features with ChatGPT and Claude"
+            };
+            
+            const message = testMessages[type];
+            if (message) {
+                document.getElementById('messageInput').value = message;
+                sendMessage();
+            }
+        }
+        
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || isLoading) return;
+            
+            isLoading = true;
+            input.value = '';
+            document.getElementById('sendButton').disabled = true;
+            document.getElementById('sendButton').innerHTML = '<div class="loading"></div>';
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            
+            try {
+                // First, analyze the message for tools
+                addMessage('Analyzing message for tool requirements...', 'system');
+                
+                const analyzeResponse = await fetch('/api/workflow-tools?action=analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        channelId: 'chat-test',
+                        context: { source: 'test-interface' }
+                    })
+                });
+                
+                const analyzeData = await analyzeResponse.json();
+                
+                if (analyzeData.recommendations && analyzeData.recommendations.length > 0) {
+                    addMessage(`🔧 Found ${analyzeData.recommendations.length} relevant tools: ${analyzeData.recommendations.map(r => r.tool_id).join(', ')}`, 'system');
+                    
+                    // Execute workflow tools
+                    addMessage('Executing workflow tools...', 'system');
+                    
+                    const executeResponse = await fetch('/api/workflow-tools?action=execute', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            channelId: 'chat-test',
+                            context: { source: 'test-interface' }
+                        })
+                    });
+                    
+                    const executeData = await executeResponse.json();
+                    
+                    if (executeData.success) {
+                        // Show execution results
+                        let resultMessage = `✅ **Tools Executed Successfully**\n\n`;
+                        resultMessage += `**Tools Used**: ${executeData.tools_executed.join(', ')}\n`;
+                        resultMessage += `**Execution Time**: ${executeData.execution_time}ms\n\n`;
+                        
+                        if (executeData.output) {
+                            resultMessage += `**Summary**: ${executeData.output.summary}\n\n`;
+                            
+                            if (executeData.output.key_findings) {
+                                resultMessage += `**Key Findings**:\n${executeData.output.key_findings.map(f => `• ${f}`).join('\n')}\n\n`;
+                            }
+                            
+                            if (executeData.output.recommendations) {
+                                resultMessage += `**Recommendations**:\n${executeData.output.recommendations.map(r => `• ${r}`).join('\n')}\n\n`;
+                            }
+                            
+                            if (executeData.output.next_steps) {
+                                resultMessage += `**Next Steps**:\n${executeData.output.next_steps.map(s => `• ${s}`).join('\n')}`;
+                            }
+                        }
+                        
+                        addMessage(resultMessage, 'assistant');
+                        
+                        // Show detailed results in the tools panel
+                        showToolResults(executeData);
+                        
+                    } else {
+                        addMessage(`❌ Tool execution failed: ${executeData.error}`, 'system');
+                    }
+                } else {
+                    addMessage('No specific tools needed for this message. Providing general response...', 'system');
+                    
+                    // Send to regular chat API
+                    const chatResponse = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action: 'send_message',
+                            conversation_id: 'test_conversation',
+                            message: message
+                        })
+                    });
+                    
+                    if (chatResponse.ok) {
+                        const chatData = await chatResponse.json();
+                        addMessage(chatData.ai_message?.content || 'Response received', 'assistant');
+                    } else {
+                        addMessage('Chat response failed', 'system');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage(`Error: ${error.message}`, 'system');
+            } finally {
+                isLoading = false;
+                document.getElementById('sendButton').disabled = false;
+                document.getElementById('sendButton').textContent = 'Send';
+                
+                // Update status
+                loadSystemStatus();
+            }
+        }
+        
+        // Add message to chat
+        function addMessage(content, type) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            // Convert markdown-like formatting to HTML
+            let htmlContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            
+            messageDiv.innerHTML = htmlContent;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Show tool results in the tools panel
+        function showToolResults(executeData) {
+            const toolResults = document.getElementById('toolResults');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsContent.textContent = JSON.stringify(executeData, null, 2);
+            toolResults.style.display = 'block';
+        }
+        
+        // Refresh tools every 30 seconds
+        setInterval(() => {
+            if (!isLoading) {
+                loadSystemStatus();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
+

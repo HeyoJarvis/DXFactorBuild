@@ -16,7 +16,7 @@ class TaskContextOrchestrator {
     this.options = {
       logLevel: 'info',
       crmServiceUrl: 'http://localhost:3002',
-      confidenceThreshold: 0.3,
+      confidenceThreshold: 0.2, // Lower threshold for broader detection
       ...options
     };
     

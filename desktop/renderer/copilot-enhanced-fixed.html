@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: https: http://localhost:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:* https:;">
+  <title>HeyJarvis Copilot Enhanced</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: rgba(28, 28, 30, 0.95); /* Apple's dark mode background */
+      color: #ffffff;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(20px) saturate(180%);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      border-radius: 16px; /* More Apple-like radius */
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Top bar collapsed state */
+    body.collapsed {
+      height: 60px; /* Apple-like height */
+      background: rgba(28, 28, 30, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+    }
+
+    /* Top bar expanded state */
+    body.expanded {
+      height: 680px;
+      background: rgba(28, 28, 30, 0.95);
+      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(40px) saturate(200%);
+    }
+
+    /* Subtle Apple-inspired ambient glow */
+    body::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -20%;
+      width: 140%;
+      height: 140%;
+      background: radial-gradient(circle at center, 
+        rgba(0, 122, 255, 0.02) 0%, 
+        rgba(88, 86, 214, 0.01) 40%, 
+        transparent 70%);
+      animation: breathe 6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Collapsed state - hide main content */
+    body.collapsed .copilot-content,
+    body.collapsed .input-container {
+      display: none !important;
+    }
+
+    /* Expanded state - show all content */
+    body.expanded .copilot-content,
+    body.expanded .input-container {
+      display: flex !important;
+    }
+
+    /* Content area styling */
+    .copilot-content {
+      flex: 1;
+      display: none; /* Hidden by default, shown when expanded */
+      overflow-y: auto;
+    }
+
+    /* REMOVED DUPLICATE .input-container DEFINITION HERE - This was causing the issue */
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.02); }
+    }
+
+    /* Top Bar Header */
+    .copilot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 32px;
+      height: 60px;
+      background: transparent;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border-radius: 16px;
+      gap: 20px;
+      position: relative;
+    }
+
+    /* Header Chat Container */
+    .header-chat-container {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      max-width: 300px;
+      gap: 8px;
+      -webkit-app-region: no-drag; /* Prevent dragging on chat area */
+    }
+
+    .header-chat-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 10px 18px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      min-width: 0;
+      -webkit-app-region: no-drag;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .header-chat-input:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(0, 122, 255, 0.6);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      transform: scale(1.02);
+    }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      -webkit-app-region: no-drag;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    }
+
+    .send-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+    }
+
+    .send-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Dragging state */
+    body.dragging {
+      cursor: move !important;
+      box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3) !important;
+    }
+
+    body.dragging .copilot-header {
+      background: rgba(0, 212, 255, 0.1) !important;
+    }
+
+    /* Manual positioning indicator */
+    .position-indicator {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 6px;
+      height: 6px;
+      background: rgba(0, 212, 255, 0.6);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    body.manually-positioned .position-indicator {
+      opacity: 1;
+    }
+
+    /* Hide header content when collapsed except for the main title */
+    body.collapsed .copilot-header .copilot-controls,
+    body.collapsed .tab-navigation {
+      display: none;
+    }
+
+    body.collapsed .copilot-title {
+      font-size: 15px; /* Slightly larger for taller bar */
+      font-weight: 500;
+    }
+
+    .copilot-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #ffffff;
+      cursor: move;
+      padding: 10px 16px;
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      user-select: none;
+      -webkit-app-region: drag;
+      letter-spacing: -0.02em;
+    }
+
+    .copilot-title:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .copilot-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .copilot-icon:hover {
+      filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.6));
+      transform: scale(1.05);
+    }
+
+    .copilot-controls {
+      display: flex;
+      gap: 8px;
+      -webkit-app-region: no-drag; /* Prevent dragging on controls */
+    }
+
+    .control-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      -webkit-app-region: no-drag;
+      backdrop-filter: blur(10px);
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .control-btn.close:hover {
+      background: rgba(255, 69, 58, 0.8);
+      color: #ffffff;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+    }
+
+    .status-indicators {
+      display: flex;
+      gap: 20px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(142, 142, 147, 0.8);
+      transition: all 0.3s ease;
+    }
+
+    .status-dot.online {
+      background: #34C759;
+      box-shadow: 0 0 8px rgba(52, 199, 89, 0.4);
+    }
+
+    .status-dot.loading {
+      background: #FF9F0A;
+      animation: pulse-status 2s ease-in-out infinite;
+    }
+
+    .status-label {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+    }
+
+    .activity-summary {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    @keyframes pulse-status {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Content Area */
+    .copilot-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-interface {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Enhanced Chat Styles */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth;
+    }
+
+    .welcome-message {
+      text-align: center;
+      padding: 32px 24px;
+      background: rgba(0, 122, 255, 0.04);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+    }
+
+    .welcome-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 2px 8px rgba(0, 122, 255, 0.3));
+    }
+
+    .welcome-text {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .welcome-subtitle {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .quick-action {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      text-align: left;
+      backdrop-filter: blur(10px);
+    }
+
+    .quick-action:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(0, 122, 255, 0.3);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-icon {
+      font-size: 18px;
+      opacity: 0.8;
+    }
+
+    .action-text {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    /* Enhanced Typing Indicator */
+    .typing-indicator {
+      display: none;
+      padding: 20px 24px;
+      align-items: center;
+      gap: 16px;
+      background: rgba(0, 122, 255, 0.04);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .typing-avatar {
+      font-size: 20px;
+      opacity: 0.8;
+    }
+
+    .typing-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .typing-text {
+      font-weight: 500;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #007AFF;
+      border-radius: 50%;
+      animation: typing 1.6s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.9); opacity: 0.4; }
+      40% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Message Styles */
+    .message {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+    }
+
+    .message.assistant .message-avatar {
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
+    .message-content {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 80%;
+    }
+
+    .message.user .message-content {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 204, 0.1));
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    .message-time {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 4px;
+    }
+
+    .message-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 16px 20px;
+      color: #ffffff;
+      font-size: 15px;
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      resize: none;
+      min-height: 50px;
+      max-height: 140px;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      backdrop-filter: blur(10px);
+    }
+
+    .message-input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(0, 122, 255, 0.6);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      transform: scale(1.01);
+    }
+
+    .message-input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Enhanced Input Container - This is the correct one that should remain */
+    .input-container {
+      padding: 20px 24px;
+      background: rgba(0, 0, 0, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .send-btn {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      border: none;
+      border-radius: 50%;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+    }
+
+    .send-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+    }
+
+    .send-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Minimized state */
+    body.minimized {
+      width: 60px !important;
+      height: 60px !important;
+      border-radius: 50% !important;
+      background: radial-gradient(circle at center, 
+        rgba(0, 212, 255, 0.8) 0%, 
+        rgba(0, 150, 200, 0.6) 50%, 
+        rgba(0, 100, 150, 0.8) 100%) !important;
+      box-shadow: 
+        0 0 30px rgba(0, 212, 255, 0.8),
+        0 0 60px rgba(0, 212, 255, 0.4),
+        inset 0 0 20px rgba(255, 255, 255, 0.2) !important;
+    }
+
+    body.minimized .copilot-header,
+    body.minimized .tab-navigation,
+    body.minimized .copilot-content,
+    body.minimized .input-container {
+      display: none !important;
+    }
+
+    /* Loading states */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 212, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 212, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="copilot-header">
+    <div class="copilot-title" id="dragHandle">
+      <img src="/Users/jarvis/Code/HeyJarvis/Jarvis.png" alt="Jarvis" class="copilot-icon">
+      HeyJarvis
+    </div>
+    
+    <div class="header-chat-container">
+      <input type="text" 
+             class="header-chat-input" 
+             id="headerChatInput"
+             placeholder="Ask me anything..." 
+             autocomplete="off"
+             spellcheck="false">
+      <button class="send-btn" id="headerSendBtn" onclick="sendHeaderMessage()">
+        <span>→</span>
+      </button>
+    </div>
+    
+    <div class="copilot-controls">
+      <button class="control-btn minimize" onclick="collapseTopBar()" title="Collapse">−</button>
+      <button class="control-btn close" onclick="closeWindow()" title="Hide">×</button>
+    </div>
+  </div>
+  
+  <!-- Position indicator -->
+  <div class="position-indicator" title="Manually positioned - double-click to reset"></div>
+
+  <!-- Removed tab navigation - single chat interface -->
+
+  <div class="copilot-content">
+    <!-- Enhanced Chat Interface -->
+    <div class="chat-interface">
+      <!-- Status Bar -->
+      <div class="status-bar" id="statusBar">
+        <div class="status-indicators">
+          <div class="status-item" id="slackStatus">
+            <div class="status-dot" id="slackStatusDot"></div>
+            <span class="status-label">Slack</span>
+          </div>
+          <div class="status-item" id="crmStatus">
+            <div class="status-dot" id="crmStatusDot"></div>
+            <span class="status-label">CRM</span>
+          </div>
+        </div>
+        <div class="activity-summary" id="activitySummary">
+          <span class="activity-text">All systems ready</span>
+        </div>
+      </div>
+      
+      <div class="chat-container" id="chatContainer">
+        <div class="welcome-message">
+          <div class="welcome-icon">✨</div>
+          <div class="welcome-text">Hello! I'm your AI copilot.</div>
+          <div class="welcome-subtitle">I can help with competitive intelligence, CRM insights, and Slack monitoring.</div>
+          
+          <div class="quick-actions">
+            <div class="quick-action" onclick="sendQuickMessage('What are the latest competitor moves?')">
+              <div class="action-icon">📊</div>
+              <div class="action-text">Latest competitor moves</div>
+            </div>
+            <div class="quick-action" onclick="sendQuickMessage('Analyze my CRM data')">
+              <div class="action-icon">🧠</div>
+              <div class="action-text">CRM insights</div>
+            </div>
+            <div class="quick-action" onclick="sendQuickMessage('Show Slack activity')">
+              <div class="action-icon">💬</div>
+              <div class="action-text">Slack activity</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-avatar">✨</div>
+        <div class="typing-content">
+          <span class="typing-text">HeyJarvis is thinking</span>
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="input-wrapper">
+          <textarea 
+            class="message-input" 
+            id="messageInput" 
+            placeholder="Ask me anything about your business..."
+            rows="1"
+          ></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m22 2-7 20-4-9-9-4z"/>
+              <path d="M22 2 11 13"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Removed CRM and Slack tabs - functionality integrated into chat -->
+  </div>
+
+  <script>
+    let isMinimized = false;
+    let chatHistory = [];
+    let crmData = null;
+    let crmUpdateInterval = null;
+    let slackConnected = false;
+    let slackMessages = [];
+    let slackUpdateInterval = null;
+    let servicesInitialized = false;
+
+    // DOM elements
+    const chatContainer = document.getElementById('chatContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    // Auto-initialize services on app launch
+    async function initializeServices() {
+      if (servicesInitialized) return;
+      
+      console.log('🚀 Auto-initializing services...');
+      servicesInitialized = true;
+      
+      // Update status indicators
+      updateStatusIndicator('slack', 'loading', 'Connecting...');
+      updateStatusIndicator('crm', 'loading', 'Loading...');
+      
+      // Auto-start Slack monitoring
+      try {
+        const slackResult = await window.electronAPI.slack.startMonitoring();
+        if (slackResult.success) {
+          console.log('✅ Slack auto-initialized');
+          updateStatusIndicator('slack', 'online', 'Connected');
+          startSlackUpdates();
+        } else {
+          console.log('⚠️ Slack initialization failed:', slackResult.error);
+          updateStatusIndicator('slack', 'offline', 'Failed');
+        }
+      } catch (error) {
+        console.log('❌ Slack auto-init error:', error);
+        updateStatusIndicator('slack', 'offline', 'Error');
+      }
+      
+      // Auto-load CRM data
+      try {
+        await loadCRMData();
+        console.log('✅ CRM auto-initialized');
+        updateStatusIndicator('crm', 'online', 'Ready');
+        startCRMUpdates();
+      } catch (error) {
+        console.log('❌ CRM auto-init error:', error);
+        updateStatusIndicator('crm', 'offline', 'Error');
+      }
+      
+      // Update activity summary
+      updateActivitySummary();
+    }
+    
+    function updateStatusIndicator(service, status, message) {
+      const statusDot = document.getElementById(`${service}StatusDot`);
+      if (statusDot) {
+        statusDot.className = `status-dot ${status}`;
+      }
+    }
+    
+    function updateActivitySummary() {
+      const summaryEl = document.getElementById('activitySummary');
+      if (!summaryEl) return;
+      
+      let summary = 'All systems ready';
+      if (!slackConnected && !crmData?.connected) {
+        summary = 'Services initializing...';
+      } else if (!slackConnected) {
+        summary = 'CRM ready • Slack offline';
+      } else if (!crmData?.connected) {
+        summary = 'Slack ready • CRM loading';
+      }
+      
+      summaryEl.textContent = summary;
+    }
+
+    // CRM AI Insights Management
+    async function loadCRMData() {
+      try {
+        if (!window.electronAPI) {
+          throw new Error('Electron API not available');
+        }
+        
+        // Get CRM data from the startup service via Electron API
+        const response = await window.electronAPI.getCRMData();
+        
+        if (response.isLoading) {
+          // Show loading progress if still loading
+          return;
+        }
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to load CRM data');
+        }
+        
+        // Store data for future use
+        crmData = response.data;
+        
+      } catch (error) {
+        console.error('❌ Failed to load CRM data:', error);
+      }
+    }
+
+    function startCRMUpdates() {
+      // Update CRM data every 2 minutes
+      crmUpdateInterval = setInterval(loadCRMData, 120000);
+    }
+
+    function stopCRMUpdates() {
+      if (crmUpdateInterval) {
+        clearInterval(crmUpdateInterval);
+        crmUpdateInterval = null;
+      }
+    }
+
+    // Slack Functions (now auto-initialized)
+    async function toggleSlackMonitoring() {
+      // This function is kept for compatibility but Slack auto-starts now
+      try {
+        if (slackConnected) {
+          const result = await window.electronAPI.slack.stopMonitoring();
+          if (result.success) {
+            slackConnected = false;
+            updateStatusIndicator('slack', 'offline', 'Disconnected');
+            stopSlackUpdates();
+            updateActivitySummary();
+          }
+        } else {
+          const result = await window.electronAPI.slack.startMonitoring();
+          if (result.success) {
+            slackConnected = true;
+            updateStatusIndicator('slack', 'online', 'Connected');
+            startSlackUpdates();
+            loadSlackMessages();
+            updateActivitySummary();
+          }
+        }
+      } catch (error) {
+        console.error('Error toggling Slack monitoring:', error);
+        updateStatusIndicator('slack', 'offline', 'Error');
+      }
+    }
+
+    async function loadSlackMessages() {
+      try {
+        const messages = await window.electronAPI.slack.getRecentMessages(20);
+        const status = await window.electronAPI.slack.getStatus();
+        
+        slackMessages = messages;
+      } catch (error) {
+        console.error('Error loading Slack messages:', error);
+      }
+    }
+
+    function startSlackUpdates() {
+      // Update Slack messages every 10 seconds
+      slackUpdateInterval = setInterval(loadSlackMessages, 10000);
+    }
+
+    function stopSlackUpdates() {
+      if (slackUpdateInterval) {
+        clearInterval(slackUpdateInterval);
+        slackUpdateInterval = null;
+      }
+    }
+
+    function onSlackMention(message) {
+      console.log('🔔 New Slack mention:', message);
+      slackMessages.unshift(message);
+      
+      // Keep only last 50 messages
+      if (slackMessages.length > 50) {
+        slackMessages = slackMessages.slice(0, 50);
+      }
+      
+      // Update UI
+      loadSlackMessages();
+    }
+
+    function onSlackMessage(message) {
+      console.log('💬 New Slack message:', message);
+      slackMessages.unshift(message);
+      
+      if (slackMessages.length > 50) {
+        slackMessages = slackMessages.slice(0, 50);
+      }
+      
+      loadSlackMessages();
+    }
+
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // Send message on Enter (but not Shift+Enter)
+    messageInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Window controls
+    function minimizeWindow(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      
+      console.log('📦 Collapsing top bar...');
+      collapseTopBar();
+    }
+
+    function closeWindow() {
+      console.log('🔄 Closing copilot window...');
+      stopCRMUpdates();
+      if (window.electronAPI) {
+        window.electronAPI.closeWindow();
+      } else {
+        window.close();
+      }
+    }
+
+    // Chat functionality
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+
+      // Add user message to chat
+      addMessage(message, 'user');
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+
+      // Show typing indicator
+      showTypingIndicator();
+
+      try {
+        // Send to backend
+        let response;
+        if (window.electronAPI) {
+          response = await window.electronAPI.sendMessage(message);
+        } else {
+          // Fallback for testing
+          response = {
+            type: 'message',
+            content: 'I\'m here to help with competitive intelligence insights. What would you like to know?',
+            timestamp: new Date().toISOString()
+          };
+        }
+
+        // Add assistant response
+        hideTypingIndicator();
+        addMessage(response.content, 'assistant');
+
+      } catch (error) {
+        console.error('Error sending message:', error);
+        hideTypingIndicator();
+        addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+      }
+    }
+
+    function sendQuickMessage(message) {
+      messageInput.value = message;
+      sendMessage();
+    }
+
+    function addMessage(content, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      
+      const avatar = sender === 'user' ? '👤' : '🤖';
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      messageDiv.innerHTML = `
+        <div class="message-avatar">${avatar}</div>
+        <div class="message-content">
+          ${content}
+          <div class="message-time">${time}</div>
+        </div>
+      `;
+      
+      // Remove welcome message if it exists
+      const welcomeMessage = chatContainer.querySelector('.welcome-message');
+      if (welcomeMessage) {
+        welcomeMessage.remove();
+      }
+      
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      // Store in history
+      chatHistory.push({ content, sender, timestamp: new Date().toISOString() });
+    }
+
+    function showTypingIndicator() {
+      typingIndicator.style.display = 'flex';
+    }
+
+    function hideTypingIndicator() {
+      typingIndicator.style.display = 'none';
+    }
+
+    // Top bar management
+    let isExpanded = false;
+
+    function toggleTopBar() {
+      if (isExpanded) {
+        collapseTopBar();
+      } else {
+        expandTopBar();
+      }
+    }
+
+    function expandTopBar() {
+      if (!isExpanded) {
+        isExpanded = true;
+        document.body.classList.remove('collapsed');
+        document.body.classList.add('expanded');
+        console.log('📖 Expanded top bar');
+        
+        if (window.electronAPI && window.electronAPI.expandTopBar) {
+          window.electronAPI.expandTopBar();
+        }
+      }
+    }
+
+    function collapseTopBar() {
+      if (isExpanded) {
+        isExpanded = false;
+        document.body.classList.remove('expanded');
+        document.body.classList.add('collapsed');
+        console.log('📦 Collapsed top bar');
+        
+        if (window.electronAPI && window.electronAPI.collapseTopBar) {
+          window.electronAPI.collapseTopBar();
+        }
+      }
+    }
+
+    // Manual positioning management
+    let isManuallyPositioned = false;
+
+    function handleManualPositioning(manual) {
+      isManuallyPositioned = manual;
+      if (manual) {
+        document.body.classList.add('manually-positioned');
+        console.log('🎯 Bar is now manually positioned');
+      } else {
+        document.body.classList.remove('manually-positioned');
+        console.log('🔄 Bar returned to auto-positioning');
+      }
+    }
+
+    // Reset position to auto-center
+    async function resetPosition() {
+      if (window.electronAPI && window.electronAPI.resetPosition) {
+        const result = await window.electronAPI.resetPosition();
+        if (result.success) {
+          handleManualPositioning(false);
+          console.log('✅ Position reset to auto-center');
+        }
+      }
+    }
+
+    // Header chat functionality
+    function sendHeaderMessage() {
+      const input = document.getElementById('headerChatInput');
+      const message = input.value.trim();
+      
+      if (message) {
+        console.log('📤 Sending header message:', message);
+        
+        // Expand the interface to show the full chat
+        if (!isExpanded) {
+          expandTopBar();
+        }
+        
+        // No need to switch tabs - single interface
+        
+        // Send the message using existing chat functionality
+        sendCopilotMessage(message);
+        
+        // Clear the header input
+        input.value = '';
+        input.blur();
+      }
+    }
+
+    // Auto-expand on typing
+    function setupHeaderChatInput() {
+      const input = document.getElementById('headerChatInput');
+      
+      if (input) {
+        // Expand when user starts typing
+        input.addEventListener('focus', () => {
+          if (!isExpanded) {
+            console.log('🔍 Auto-expanding due to chat input focus');
+            expandTopBar();
+          }
+        });
+
+        // Send message on Enter
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            sendHeaderMessage();
+          }
+        });
+
+        // Prevent event bubbling to avoid conflicts
+        input.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+    }
+
+    // Send copilot message (reuse existing functionality)
+    async function sendCopilotMessage(message) {
+      if (window.electronAPI && window.electronAPI.sendMessage) {
+        try {
+          showTypingIndicator();
+          const response = await window.electronAPI.sendMessage(message);
+          hideTypingIndicator();
+          
+          if (response && response.content) {
+            addMessage(message, 'user');
+            addMessage(response.content, 'assistant');
+          }
+        } catch (error) {
+          hideTypingIndicator();
+          console.error('❌ Failed to send message:', error);
+          addMessage(message, 'user');
+          addMessage('Sorry, I encountered an error processing your message.', 'assistant');
+        }
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 HeyJarvis Top Bar loaded');
+      
+      // Start in collapsed mode
+      document.body.classList.add('collapsed');
+      
+      // Setup header chat input
+      setupHeaderChatInput();
+      
+      // Add double-click to reset position
+      const positionIndicator = document.querySelector('.position-indicator');
+      if (positionIndicator) {
+        positionIndicator.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
+          resetPosition();
+        });
+      }
+      
+      // Auto-initialize all services
+      initializeServices();
+      
+      // Setup event listeners
+      if (window.electronAPI) {
+        // Setup top bar event listeners
+        if (window.electronAPI.onTopBarExpanded) {
+          window.electronAPI.onTopBarExpanded((expanded) => {
+            if (expanded && !isExpanded) {
+              document.body.classList.remove('collapsed');
+              document.body.classList.add('expanded');
+              isExpanded = true;
+            } else if (!expanded && isExpanded) {
+              document.body.classList.remove('expanded');
+              document.body.classList.add('collapsed');
+              isExpanded = false;
+            }
+          });
+        }
+
+        // Listen for manual positioning events
+        if (window.electronAPI.onTopBarManuallyPositioned) {
+          window.electronAPI.onTopBarManuallyPositioned((manual) => {
+            handleManualPositioning(manual);
+          });
+        }
+
+        // Setup Slack event listeners
+        if (window.electronAPI.onSlackMention) {
+          window.electronAPI.onSlackMention(onSlackMention);
+          window.electronAPI.onSlackMessage(onSlackMessage);
+          
+          window.electronAPI.onSlackConnected(() => {
+            console.log('🔗 Slack connected');
+            slackConnected = true;
+            updateStatusIndicator('slack', 'online', 'Connected');
+            updateActivitySummary();
+            startSlackUpdates();
+            loadSlackMessages();
+          });
+          
+          window.electronAPI.onSlackDisconnected(() => {
+            console.log('🔌 Slack disconnected');
+            slackConnected = false;
+            updateStatusIndicator('slack', 'offline', 'Disconnected');
+            updateActivitySummary();
+            stopSlackUpdates();
+          });
+          
+          window.electronAPI.onSlackError((error) => {
+            console.error('❌ Slack error:', error);
+            updateStatusIndicator('slack', 'offline', 'Error');
+            updateActivitySummary();
+          });
+        }
+      }
+      
+      // Services will auto-initialize
+      console.log('🎯 HeyJarvis ready - services will auto-initialize');
+    });
+
+    // Handle window clicks to restore from minimized state
+    document.addEventListener('click', function(e) {
+      if (isMinimized && !e.target.closest('.control-btn')) {
+        minimizeWindow();
+      }
+    });
+    
+    // Auto-initialize services after a short delay as fallback
+    setTimeout(() => {
+      if (!servicesInitialized) {
+        console.log('🔄 Fallback initialization triggered');
+        initializeServices();
+      }
+    }, 2000);
+  </script>
+</body>
+</html>

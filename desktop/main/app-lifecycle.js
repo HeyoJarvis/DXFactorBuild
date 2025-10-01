@@ -266,10 +266,10 @@ class AppLifecycle {
         this.showMainWindow();
       }
       
-      // Open DevTools in development
-      if (this.isDevelopment) {
-        this.mainWindow.webContents.openDevTools();
-      }
+      // DevTools disabled for cleaner experience
+      // if (this.isDevelopment) {
+      //   this.mainWindow.webContents.openDevTools();
+      // }
     });
     
     this.mainWindow.on('close', (event) => {

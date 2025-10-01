@@ -178,6 +178,40 @@
       margin-top: 8px;
     }
 
+    .response-type-indicator {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      display: inline-block;
+      opacity: 0.9;
+    }
+
+    .response-type-indicator.task {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .response-type-indicator.tool {
+      background: rgba(40, 167, 69, 0.2);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .response-type-indicator.workflow {
+      background: rgba(108, 117, 125, 0.2);
+      color: #6c757d;
+      border: 1px solid rgba(108, 117, 125, 0.3);
+    }
+
+    .response-type-indicator.business {
+      background: rgba(0, 212, 255, 0.2);
+      color: #00d4ff;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
     .input-container {
       padding: 20px 30px;
       border-top: 1px solid rgba(0, 212, 255, 0.1);
@@ -356,7 +390,14 @@
       <div class="messages-container" id="messagesContainer">
         <div class="empty-state" id="emptyState">
           <h2>Welcome to HeyJarvis!</h2>
-          <p>I'm your AI assistant for competitive intelligence and business analysis. Ask me anything about market trends, competitor insights, or strategic analysis.</p>
+          <p>I'm your enhanced business intelligence assistant. I can help with:</p>
+          <div style="text-align: left; max-width: 500px; margin: 20px auto;">
+            <div style="margin: 8px 0;">🎯 <strong>Task Management:</strong> Assign and track work</div>
+            <div style="margin: 8px 0;">🔧 <strong>Tool Comparisons:</strong> Find the best solutions</div>
+            <div style="margin: 8px 0;">⚙️ <strong>Workflow Analysis:</strong> Optimize your processes</div>
+            <div style="margin: 8px 0;">💼 <strong>Business Intelligence:</strong> Strategic insights</div>
+            <div style="margin: 8px 0;">📊 <strong>CRM Integration:</strong> Data-driven decisions</div>
+          </div>
         </div>
       </div>
 
@@ -365,7 +406,7 @@
           <textarea 
             class="message-input" 
             id="messageInput" 
-            placeholder="Ask me anything about competitive intelligence..."
+            placeholder="Ask about tasks, tools, workflows, or business intelligence..."
             rows="1"
             onkeydown="handleInputKeydown(event)"
             oninput="adjustTextareaHeight(this)"
@@ -635,14 +676,39 @@
       messageElements.forEach(el => el.remove());
       
       // Add new messages
-      const messagesHTML = currentConversation.messages.map(message => `
-        <div class="message ${message.role}">
-          <div>${message.content.replace(/\n/g, '<br>')}</div>
-          <div class="message-time">
-            ${new Date(message.created_at).toLocaleString()}
+      const messagesHTML = currentConversation.messages.map(message => {
+        let messageClass = message.role;
+        let responseTypeIndicator = '';
+        
+        // Add visual indicators for different BI response types
+        if (message.role === 'assistant' && message.metadata?.bi_metadata?.response_type) {
+          const responseType = message.metadata.bi_metadata.response_type;
+          switch (responseType) {
+            case 'task_assignment':
+              responseTypeIndicator = '<div class="response-type-indicator task">🎯 Task Assignment</div>';
+              break;
+            case 'tool_comparison':
+              responseTypeIndicator = '<div class="response-type-indicator tool">🔧 Tool Analysis</div>';
+              break;
+            case 'workflow_analysis':
+              responseTypeIndicator = '<div class="response-type-indicator workflow">⚙️ Workflow Analysis</div>';
+              break;
+            case 'general_business_query':
+              responseTypeIndicator = '<div class="response-type-indicator business">💼 Business Intelligence</div>';
+              break;
+          }
+        }
+        
+        return `
+          <div class="message ${messageClass}">
+            ${responseTypeIndicator}
+            <div>${message.content.replace(/\n/g, '<br>')}</div>
+            <div class="message-time">
+              ${new Date(message.created_at).toLocaleString()}
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
       
       // Insert messages after empty state
       emptyState.insertAdjacentHTML('afterend', messagesHTML);

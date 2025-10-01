@@ -14,6 +14,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   closeWindow: () => ipcRenderer.invoke('copilot:close'),
   toggleAlwaysOnTop: () => ipcRenderer.invoke('copilot:toggleAlwaysOnTop'),
   
+  // Top bar controls
+  toggleTopBar: () => ipcRenderer.invoke('topbar:toggle'),
+  expandTopBar: () => ipcRenderer.invoke('topbar:expand'),
+  collapseTopBar: () => ipcRenderer.invoke('topbar:collapse'),
+  repositionTopBar: () => ipcRenderer.invoke('topbar:reposition'),
+  resetPosition: () => ipcRenderer.invoke('topbar:resetPosition'),
+  getPosition: () => ipcRenderer.invoke('topbar:getPosition'),
+  setOpacity: (opacity) => ipcRenderer.invoke('overlay:opacity', opacity),
+  
   // Drag handling
   startDrag: () => ipcRenderer.invoke('copilot:startDrag'),
   endDrag: () => ipcRenderer.invoke('copilot:endDrag'),
@@ -63,6 +72,27 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('crm:dataUpdate', (event, data) => callback(data));
   },
 
+  // CRM loading event listeners
+  onCRMLoadingStarted: (callback) => {
+    ipcRenderer.on('crm:loading:started', (event, data) => callback(data));
+  },
+
+  onCRMLoadingProgress: (callback) => {
+    ipcRenderer.on('crm:loading:progress', (event, data) => callback(data));
+  },
+
+  onCRMLoadingCompleted: (callback) => {
+    ipcRenderer.on('crm:loading:completed', (event, data) => callback(data));
+  },
+
+  onCRMLoadingError: (callback) => {
+    ipcRenderer.on('crm:loading:error', (event, data) => callback(data));
+  },
+
+  onCRMDataUpdated: (callback) => {
+    ipcRenderer.on('crm:data:updated', (event, data) => callback(data));
+  },
+
   // Slack event listeners
   onSlackMention: (callback) => {
     ipcRenderer.on('slack:mention', (event, message) => callback(message));
@@ -82,23 +112,37 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   onSlackError: (callback) => {
     ipcRenderer.on('slack:error', (event, error) => callback(error));
+  },
+
+  // Top bar event listeners
+  onTopBarExpanded: (callback) => {
+    ipcRenderer.on('topbar:expanded', (event, isExpanded) => callback(isExpanded));
+  },
+
+  onTopBarManuallyPositioned: (callback) => {
+    ipcRenderer.on('topbar:manually-positioned', (event, isManual) => callback(isManual));
   }
 });
 
-// Add drag functionality to window
+// Add drag functionality to window - only on drag handle
 window.addEventListener('DOMContentLoaded', () => {
   let isDragging = false;
   let dragOffset = { x: 0, y: 0 };
   
-  // Make header draggable
-  const header = document.querySelector('.copilot-header');
-  if (header && window.electronAPI) {
-    header.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      dragOffset.x = e.clientX;
-      dragOffset.y = e.clientY;
-      if (window.electronAPI.startDrag) {
-        window.electronAPI.startDrag();
+  // Make only the title area draggable
+  const dragHandle = document.getElementById('dragHandle');
+  if (dragHandle) {
+    dragHandle.addEventListener('mousedown', (e) => {
+      // Only start drag if clicking on the title area, not input elements
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+        isDragging = true;
+        dragOffset.x = e.clientX;
+        dragOffset.y = e.clientY;
+        
+        // Add visual feedback
+        document.body.classList.add('dragging');
+        
+        console.log('🎯 Started dragging from title area');
       }
     });
     
@@ -107,8 +151,12 @@ window.addEventListener('DOMContentLoaded', () => {
         const deltaX = e.clientX - dragOffset.x;
         const deltaY = e.clientY - dragOffset.y;
         
-        // Move window
-        if (window.electronAPI.moveWindow) {
+        // Update drag offset for next calculation
+        dragOffset.x = e.clientX;
+        dragOffset.y = e.clientY;
+        
+        // Move window by delta
+        if (window.electronAPI && window.electronAPI.moveWindow) {
           window.electronAPI.moveWindow({ deltaX, deltaY });
         }
       }
@@ -117,9 +165,11 @@ window.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mouseup', () => {
       if (isDragging) {
         isDragging = false;
-        if (window.electronAPI.endDrag) {
-          window.electronAPI.endDrag();
-        }
+        
+        // Remove visual feedback
+        document.body.classList.remove('dragging');
+        
+        console.log('🎯 Finished dragging');
       }
     });
   }

@@ -29,6 +29,7 @@ class SlackService extends EventEmitter {
     this.isConnected = false;
     this.recentMessages = [];
     this.app = null;
+    this.autoStartEnabled = true; // Enable auto-start by default
     
     this.initialize();
   }

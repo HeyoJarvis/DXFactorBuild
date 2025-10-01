@@ -52,16 +52,10 @@ module.exports = async (req, res) => {
     switch (method) {
       case 'GET':
         return await handleGet(req, res, supabase, userId, query);
-      
+
       case 'POST':
         return await handlePost(req, res, supabase, userId);
-      
-      case 'PUT':
-        return await handlePut(req, res, supabase, userId);
-      
-      case 'DELETE':
-        return await handleDelete(req, res, supabase, userId);
-      
+
       default:
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -79,43 +73,47 @@ module.exports = async (req, res) => {
  * Handle GET requests - fetch conversations and messages
  */
 async function handleGet(req, res, supabase, userId, query) {
-  const { action, conversation_id, limit } = query;
+  const { action, conversation_id: getConversationId, limit = 20 } = query;
 
-  switch (action) {
-    case 'conversations':
-      // Get user's conversations
-      const conversations = await supabase.getUserConversations(userId, { 
-        limit: parseInt(limit) || 20 
-      });
-      return res.json({ conversations });
+  try {
+    switch (action) {
+      case 'conversations':
+        const conversations = await supabase.getUserConversations(userId, limit);
+        return res.json({
+          conversations: conversations || [],
+          user_id: userId
+        });
 
-    case 'conversation':
-      // Get specific conversation with messages
-      if (!conversation_id) {
-        return res.status(400).json({ error: 'conversation_id is required' });
-      }
-      
-      const conversation = await supabase.getConversationWithMessages(conversation_id, userId);
-      return res.json({ conversation });
-
-    case 'messages':
-      // Get messages for a conversation
-      if (!conversation_id) {
-        return res.status(400).json({ error: 'conversation_id is required' });
-      }
-      
-      const conversationData = await supabase.getConversationWithMessages(conversation_id, userId);
-      return res.json({ 
-        messages: conversationData.messages,
-        conversation: {
-          id: conversationData.id,
-          title: conversationData.title,
-          created_at: conversationData.created_at
+      case 'conversation':
+      case 'messages':
+        if (!getConversationId) {
+          return res.status(400).json({ error: 'conversation_id is required' });
         }
-      });
 
-    default:
-      return res.status(400).json({ error: 'Invalid action parameter' });
+        const conversation = await supabase.getConversationWithMessages(getConversationId, userId);
+        if (!conversation) {
+          return res.status(404).json({ error: 'Conversation not found' });
+        }
+
+        return res.json({
+          conversation,
+          messages: conversation.messages || []
+        });
+
+      default:
+        const user = await supabase.getUser(userId);
+        return res.json({
+          user: {
+            id: user?.id || userId,
+            name: user?.name || 'User',
+            email: user?.email || 'user@example.com'
+          }
+        });
+    }
+
+  } catch (error) {
+    console.error('GET error:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
   }
 }
 
@@ -123,278 +121,78 @@ async function handleGet(req, res, supabase, userId, query) {
  * Handle POST requests - create conversations and send messages
  */
 async function handlePost(req, res, supabase, userId) {
-  const { action, conversation_id, message, title, model_name } = req.body;
+  const { action, conversation_id: postConversationId, message, title } = req.body;
 
-  switch (action) {
-    case 'create_conversation':
-      // Create new conversation
-      const conversation = await supabase.createConversation(userId, title);
-      return res.json({ conversation });
-
-    case 'send_message':
-      // Send message to conversation
-      if (!conversation_id || !message) {
-        return res.status(400).json({ 
-          error: 'conversation_id and message are required' 
-        });
-      }
-
-      // Verify user owns the conversation
-      const existingConv = await supabase.getConversationWithMessages(conversation_id, userId);
-      if (!existingConv) {
-        return res.status(404).json({ error: 'Conversation not found' });
-      }
-
-      const startTime = Date.now();
-      
-      // Add user message
-      const userMessage = await supabase.addMessage(
-        conversation_id, 
-        userId, 
-        'user', 
-        message,
-        { model_name }
-      );
-
-      // Generate AI response with user context for workflow analysis
-      const userContext = {
-        userId,
-        userName: req.user?.name || req.user?.real_name,
-        userRole: req.user?.is_admin ? 'admin' : 'member',
-        slackUserId: req.user?.slack_user_id
-      };
-      
-      const aiResponse = await generateAIResponse(message, existingConv.messages, userContext);
-      const processingTime = Date.now() - startTime;
-
-      // Add AI message
-      const aiMessage = await supabase.addMessage(
-        conversation_id,
-        userId,
-        'assistant',
-        aiResponse.content,
-        {
-          model_name: aiResponse.model || 'claude-3-sonnet',
-          tokens_used: aiResponse.tokens || 0,
-          processing_time_ms: processingTime
-        }
-      );
-
-      // Auto-generate title for first message
-      if (existingConv.messages.length === 0 && !existingConv.title) {
-        const autoTitle = generateConversationTitle(message);
-        await supabase.updateConversationTitle(conversation_id, userId, autoTitle);
-      }
-
-      return res.json({
-        user_message: userMessage,
-        ai_message: aiMessage,
-        processing_time_ms: processingTime
-      });
-
-    default:
-      return res.status(400).json({ error: 'Invalid action' });
-  }
-}
-
-/**
- * Handle PUT requests - update conversations
- */
-async function handlePut(req, res, supabase, userId) {
-  const { action, conversation_id, title } = req.body;
-
-  switch (action) {
-    case 'update_title':
-      if (!conversation_id || !title) {
-        return res.status(400).json({ 
-          error: 'conversation_id and title are required' 
-        });
-      }
-
-      const updatedConversation = await supabase.updateConversationTitle(
-        conversation_id, 
-        userId, 
-        title
-      );
-      
-      return res.json({ conversation: updatedConversation });
-
-    default:
-      return res.status(400).json({ error: 'Invalid action' });
-  }
-}
-
-/**
- * Handle DELETE requests - archive conversations
- */
-async function handleDelete(req, res, supabase, userId) {
-  const { conversation_id } = req.body;
-
-  if (!conversation_id) {
-    return res.status(400).json({ error: 'conversation_id is required' });
-  }
-
-  const archivedConversation = await supabase.archiveConversation(conversation_id, userId);
-  
-  return res.json({ 
-    success: true,
-    conversation: archivedConversation 
-  });
-}
-
-/**
- * Generate AI workflow analysis response using Claude
- */
-async function generateAIResponse(userMessage, conversationHistory, userContext = {}) {
   try {
-    // Import AI analyzer and workflow intelligence
-    const AIAnalyzer = require('../../core/signals/enrichment/ai-analyzer');
-    const WorkflowIntelligence = require('../../core/intelligence/workflow-analyzer');
-    
-    const aiAnalyzer = new AIAnalyzer();
-    const workflowIntelligence = new WorkflowIntelligence();
+    switch (action) {
+      case 'create_conversation':
+        const newConversation = await supabase.createConversation(userId, title || 'New Conversation');
+        return res.json({ conversation: newConversation });
 
-    // Determine if this is a workflow analysis request
-    const isWorkflowRequest = await detectWorkflowAnalysisRequest(userMessage);
-    
-    if (isWorkflowRequest) {
-      return await generateWorkflowAnalysis(userMessage, conversationHistory, aiAnalyzer, workflowIntelligence, userContext);
-    } else {
-      return await generateGeneralResponse(userMessage, conversationHistory, aiAnalyzer);
+      case 'send_message':
+        if (!postConversationId || !message) {
+          return res.status(400).json({ error: 'conversation_id and message are required' });
+        }
+
+        // Verify conversation exists and belongs to user
+        const conversation = await supabase.getConversation(postConversationId, userId);
+        if (!conversation) {
+          return res.status(404).json({ error: 'Conversation not found' });
+        }
+
+        // Add user message
+        const userMessage = await supabase.addMessage(postConversationId, userId, 'user', message);
+
+        // Generate AI response
+        const aiResponse = await generateAIResponse(message, conversation, req.user);
+
+        // Add AI message
+        const aiMessage = await supabase.addMessage(
+          postConversationId, 
+          userId, 
+          'assistant', 
+          aiResponse.content,
+          {
+            model_name: aiResponse.model,
+            tokens_used: aiResponse.tokens,
+            processing_time_ms: aiResponse.processing_time
+          }
+        );
+
+        return res.json({
+          user_message: userMessage,
+          ai_message: aiMessage,
+          processing_time_ms: aiResponse.processing_time
+        });
+
+      default:
+        return res.status(400).json({ error: 'Invalid action' });
     }
 
   } catch (error) {
-    console.error('AI response generation error:', error);
-    return {
-      content: "I apologize, but I'm having trouble generating a response right now. Please try again later.",
-      model: 'error-fallback',
-      tokens: 0
-    };
+    console.error('POST error:', error);
+    res.status(500).json({ error: 'Failed to process request' });
   }
 }
 
 /**
- * Detect if user message is requesting workflow analysis
- */
-async function detectWorkflowAnalysisRequest(message) {
-  const workflowKeywords = [
-    'workflow', 'process', 'efficiency', 'productivity', 'task', 'request',
-    'outbound', 'communication', 'team', 'member', 'ceo', 'admin',
-    'analyze', 'analysis', 'pattern', 'improvement', 'optimization'
-  ];
-  
-  const lowerMessage = message.toLowerCase();
-  return workflowKeywords.some(keyword => lowerMessage.includes(keyword));
-}
-
-/**
- * Generate workflow-specific AI analysis
- */
-async function generateWorkflowAnalysis(userMessage, conversationHistory, aiAnalyzer, workflowIntelligence, userContext) {
-  const systemPrompt = `You are HeyJarvis, an AI-powered workflow analysis assistant specializing in CEO-to-team member communication patterns and productivity optimization.
-
-Your expertise includes:
-- Analyzing outbound requests from leadership to team members
-- Identifying communication patterns and bottlenecks
-- Measuring response times and engagement
-- Suggesting workflow improvements
-- Tracking task completion and follow-ups
-
-Context: You're analyzing workflows between Sundeep (CEO/Admin) and Avi (Team Member).
-
-Respond with actionable insights, patterns you notice, and specific recommendations for improving communication efficiency.`;
-
-  // Create conversation context
-  const messages = conversationHistory.map(msg => ({
-    role: msg.role === 'assistant' ? 'assistant' : 'user',
-    content: msg.content
-  }));
-  
-  messages.push({ role: 'user', content: userMessage });
-
-  // Use AI analyzer for workflow-specific analysis
-  const mockSignal = {
-    id: 'workflow_analysis',
-    title: `Workflow Analysis: ${userMessage.substring(0, 50)}...`,
-    content: userMessage,
-    url: 'internal://workflow-chat',
-    metadata: {
-      user_context: userContext,
-      conversation_length: conversationHistory.length,
-      analysis_type: 'workflow_communication'
-    }
-  };
-
-  const analysis = await aiAnalyzer.analyzeSignal(mockSignal, {
-    systemPrompt,
-    analysisType: 'workflow_analysis',
-    maxTokens: 1000
-  });
-
-  return {
-    content: analysis.analysis || analysis.summary || "I've analyzed your workflow request and here are my insights...",
-    model: 'claude-3-5-sonnet-workflow',
-    tokens: analysis.tokens || 500,
-    analysis_type: 'workflow'
-  };
-}
-
-/**
- * Generate general AI response
- */
-async function generateGeneralResponse(userMessage, conversationHistory, aiAnalyzer) {
-  const systemPrompt = `You are HeyJarvis, an AI assistant for business intelligence and productivity. You help users with:
-- Competitive analysis and market insights
-- Workflow optimization
-- Team communication improvement
-- Strategic planning and decision making
-
-Be helpful, concise, and actionable in your responses.`;
-
-  const mockSignal = {
-    id: 'general_chat',
-    title: userMessage.substring(0, 50),
-    content: userMessage,
-    url: 'internal://general-chat'
-  };
-
-  const analysis = await aiAnalyzer.analyzeSignal(mockSignal, {
-    systemPrompt,
-    analysisType: 'general_assistance',
-    maxTokens: 800
-  });
-
-  return {
-    content: analysis.analysis || analysis.summary || "I understand your question. Let me help you with that...",
-    model: 'claude-3-5-sonnet-general',
-    tokens: analysis.tokens || 400,
-    analysis_type: 'general'
-  };
-}
-
-/**
- * Handle fallback mode (no database) - memory-based chat
+ * Handle fallback mode (when database is unavailable)
  */
 async function handleFallbackMode(req, res, method, query) {
-  const userId = req.userId;
   const user = req.user;
-
-  // In-memory conversation storage (this would reset on server restart)
+  
+  // In-memory storage for fallback mode
   if (!global.fallbackConversations) {
     global.fallbackConversations = new Map();
   }
   
-  if (!global.fallbackConversations.has(userId)) {
-    global.fallbackConversations.set(userId, []);
-  }
-
-  const userConversations = global.fallbackConversations.get(userId);
+  const userConversations = global.fallbackConversations.get(user.id) || [];
 
   switch (method) {
     case 'GET':
-      const { action: getAction, conversation_id: getConversationId } = query;
+      const { action, conversation_id: getConversationId } = query;
       
-      switch (getAction) {
+      switch (action) {
         case 'conversations':
           return res.json({
             conversations: userConversations,
@@ -438,6 +236,7 @@ async function handleFallbackMode(req, res, method, query) {
           };
           
           userConversations.unshift(newConversation);
+          global.fallbackConversations.set(user.id, userConversations);
           return res.json({ conversation: newConversation, fallback: true });
 
         case 'send_message':
@@ -462,8 +261,8 @@ async function handleFallbackMode(req, res, method, query) {
 
           targetConversation.messages.push(userMessage);
 
-          // Generate AI response for sales tools
-          const aiResponse = await generateSalesToolsResponse(message, targetConversation.messages, user);
+          // Generate AI response
+          const aiResponse = await generateAIResponse(message, targetConversation, user);
 
           // Add AI message
           const aiMessage = {
@@ -487,6 +286,8 @@ async function handleFallbackMode(req, res, method, query) {
             targetConversation.title = generateConversationTitle(message);
           }
 
+          global.fallbackConversations.set(user.id, userConversations);
+
           return res.json({
             user_message: userMessage,
             ai_message: aiMessage,
@@ -504,159 +305,246 @@ async function handleFallbackMode(req, res, method, query) {
 }
 
 /**
- * Generate AI response for sales tools and context-aware assistance
+ * Generate AI response using Enhanced Business Intelligence
  */
-async function generateSalesToolsResponse(userMessage, conversationHistory, userContext) {
+async function generateAIResponse(userMessage, conversation, userContext) {
   const startTime = Date.now();
   
   try {
-    // Import AI analyzer
-    const AIAnalyzer = require('../../core/signals/enrichment/ai-analyzer');
-    const aiAnalyzer = new AIAnalyzer();
+    // Import Enhanced Business Intelligence System
+    const EnhancedBusinessIntelligenceSystem = require('../../enhanced-business-intelligence-system');
+    const biSystem = new EnhancedBusinessIntelligenceSystem();
 
-    // Detect if this is a sales tools question or has Slack context
-    const hasSlackContext = userMessage.toLowerCase().includes('slack') || 
-                           userMessage.toLowerCase().includes('outbound') ||
-                           userMessage.toLowerCase().includes('context');
+    // Process message through business intelligence system
+    const biResponse = await biSystem.processMessage(userMessage, {
+      userId: userContext.id,
+      userName: userContext.name,
+      organizationId: userContext.organization_id || 'default_org'
+    });
 
-    const systemPrompt = hasSlackContext ? 
-      getSalesToolsContextPrompt(userContext) : 
-      getSalesToolsGeneralPrompt();
+    // Format response based on type
+    let formattedResponse = '';
+    
+    switch (biResponse.type) {
+      case 'task_assignment':
+        formattedResponse = formatTaskAssignmentResponse(biResponse);
+        break;
+      case 'tool_comparison':
+        formattedResponse = formatToolComparisonResponse(biResponse);
+        break;
+      case 'workflow_analysis':
+        formattedResponse = formatWorkflowAnalysisResponse(biResponse);
+        break;
+      case 'general_business_query':
+        formattedResponse = formatGeneralBusinessResponse(biResponse);
+        break;
+      default:
+        formattedResponse = biResponse.response || 'I can help you with business intelligence, task management, and tool recommendations. What would you like to explore?';
+    }
 
-    // Create conversation context for AI
-    const messages = conversationHistory.map(msg => ({
-      role: msg.role === 'assistant' ? 'assistant' : 'user',
-      content: msg.content
-    }));
-
-    // Use AI analyzer for sales tools response
-    const mockSignal = {
-      id: 'sales_tools_chat',
-      title: `Sales Tools Query: ${userMessage.substring(0, 50)}...`,
-      content: userMessage,
-      url: 'internal://sales-chat',
-      metadata: {
-        user_context: userContext,
-        conversation_length: conversationHistory.length,
-        has_slack_context: hasSlackContext
+    return {
+      content: formattedResponse,
+      model: 'enhanced-bi-system',
+      tokens: 0,
+      processing_time: Date.now() - startTime,
+      bi_metadata: {
+        response_type: biResponse.type,
+        confidence: biResponse.confidence,
+        classification: biResponse.classification
       }
     };
 
-    const analysis = await aiAnalyzer.analyzeSignal(mockSignal, {
-      systemPrompt,
-      analysisType: 'sales_tools_assistance',
-      maxTokens: 1000
-    });
-
-    return {
-      content: analysis.analysis || analysis.summary || generateFallbackSalesResponse(userMessage),
-      model: 'claude-3-5-sonnet-sales',
-      tokens: analysis.tokens || 500,
-      processing_time: Date.now() - startTime
-    };
-
   } catch (error) {
-    console.error('Sales tools AI response error:', error);
-    return {
-      content: generateFallbackSalesResponse(userMessage),
-      model: 'fallback-sales',
-      tokens: 0,
-      processing_time: Date.now() - startTime
-    };
+    console.error('Enhanced BI response generation error:', error);
+    
+    // Fallback to basic AI analyzer
+    try {
+      const AIAnalyzer = require('../../core/signals/enrichment/ai-analyzer');
+      const aiAnalyzer = new AIAnalyzer();
+
+      const systemPrompt = getGeneralAssistantPrompt();
+
+      // Create conversation context for AI
+      const messages = (conversation.messages || []).slice(-10).map(msg => ({
+        role: msg.role === 'assistant' ? 'assistant' : 'user',
+        content: msg.content
+      }));
+
+      // Add current message
+      messages.push({
+        role: 'user',
+        content: userMessage
+      });
+
+      // Use AI analyzer for response
+      const mockSignal = {
+        id: 'chat_' + Date.now(),
+        title: `Chat: ${userMessage.substring(0, 50)}...`,
+        content: userMessage,
+        url: 'internal://chat',
+        metadata: {
+          user_context: userContext,
+          conversation_history: messages.slice(0, -1)
+        }
+      };
+
+      const analysis = await aiAnalyzer.analyzeSignal(mockSignal, {
+        systemPrompt,
+        messages,
+        maxTokens: 1000,
+        temperature: 0.7
+      });
+
+      return {
+        content: analysis.summary || 'I apologize, but I encountered an issue generating a response. Please try again.',
+        model: 'claude-3-sonnet',
+        tokens: analysis.metadata?.tokens_used || 0,
+        processing_time: Date.now() - startTime
+      };
+
+    } catch (fallbackError) {
+      console.error('Fallback AI response generation error:', fallbackError);
+      
+      return {
+        content: 'I apologize, but I encountered an issue processing your request. Please try again.',
+        model: 'fallback',
+        tokens: 0,
+        processing_time: Date.now() - startTime
+      };
+    }
   }
 }
 
 /**
- * Get system prompt for general sales tools questions
+ * Get general assistant prompt
  */
-function getSalesToolsGeneralPrompt() {
-  return `You are HeyJarvis, an AI sales assistant specialized in sales tools, CRM systems, and sales automation.
+function getGeneralAssistantPrompt() {
+  return `You are HeyJarvis, a helpful AI assistant focused on productivity and tooling. You help with:
 
-Your expertise includes:
-- CRM platforms (Salesforce, HubSpot, Pipedrive, etc.)
-- Sales automation tools (Outreach, SalesLoft, Apollo, etc.)
-- Lead generation tools (ZoomInfo, LinkedIn Sales Navigator, etc.)
-- Email marketing platforms (Mailchimp, Constant Contact, etc.)
-- Sales analytics and reporting tools
-- Integration and workflow optimization
-- Best practices for sales processes
+- Code and development tasks
+- Project management and organization  
+- Workflow optimization
+- Tool recommendations
+- General problem-solving
+- Task automation ideas
+- File organization and management
+- Process improvement
 
-You can answer questions about:
-- Tool recommendations and comparisons
-- Setup and configuration guidance
-- Integration possibilities
-- Pricing and feature analysis
-- Sales process optimization
-- Workflow automation
-
-Be helpful, specific, and actionable in your responses. If you don't know something, be honest about it.`;
+Be concise, practical, and actionable. Focus on helping the user be more productive. When possible, provide specific steps or code examples.`;
 }
 
 /**
- * Get system prompt for context-aware sales assistance
+ * Format task assignment response
  */
-function getSalesToolsContextPrompt(userContext) {
-  return `You are HeyJarvis, an AI sales assistant with access to Slack conversation context and sales intelligence.
-
-Your capabilities include:
-- Analyzing outbound sales conversations from Slack
-- Providing context-aware sales tool recommendations
-- Identifying sales opportunities and next steps
-- Suggesting follow-up actions based on conversation context
-- Recommending tools and processes for specific situations
-
-Context: You're assisting ${userContext.userName || 'a sales professional'} who may have Slack conversations or sales context to analyze.
-
-When provided with conversation context:
-- Analyze the sales situation
-- Identify key insights and opportunities
-- Suggest specific tools and actions
-- Provide strategic recommendations
-
-Be proactive and context-aware in your responses.`;
+function formatTaskAssignmentResponse(biResponse) {
+  let response = '🎯 **Task Assignment Detected**\n\n';
+  
+  if (biResponse.task_context) {
+    const task = biResponse.task_context;
+    if (task.assignee) response += `👤 **Assignee:** ${task.assignee}\n`;
+    if (task.deadline) response += `📅 **Deadline:** ${task.deadline}\n`;
+    if (task.priority) response += `⚡ **Priority:** ${task.priority}\n`;
+  }
+  
+  if (biResponse.actionable_items?.length > 0) {
+    response += '\n✅ **Action Items:**\n';
+    biResponse.actionable_items.forEach((item, index) => {
+      response += `${index + 1}. ${item}\n`;
+    });
+  }
+  
+  if (biResponse.recommendations?.tools?.length > 0) {
+    response += '\n🛠️ **Recommended Tools:**\n';
+    biResponse.recommendations.tools.forEach(tool => {
+      response += `• ${tool}\n`;
+    });
+  }
+  
+  return response;
 }
 
 /**
- * Generate fallback response for sales tools questions
+ * Format tool comparison response
  */
-function generateFallbackSalesResponse(message) {
-  const lowerMessage = message.toLowerCase();
+function formatToolComparisonResponse(biResponse) {
+  let response = '🔧 **Tool Analysis & Recommendations**\n\n';
   
-  if (lowerMessage.includes('crm')) {
-    return "I can help you with CRM selection! Popular options include Salesforce (enterprise), HubSpot (all-in-one), and Pipedrive (simple). What's your team size and main requirements?";
+  response += biResponse.analysis + '\n\n';
+  
+  if (biResponse.comparison_factors?.length > 0) {
+    response += '📊 **Key Comparison Factors:**\n';
+    biResponse.comparison_factors.forEach(factor => {
+      response += `• ${factor}\n`;
+    });
+    response += '\n';
   }
   
-  if (lowerMessage.includes('email') || lowerMessage.includes('outreach')) {
-    return "For email outreach, I recommend tools like Outreach.io, SalesLoft, or Apollo.io. They offer automation, personalization, and tracking. What type of outreach are you planning?";
+  if (biResponse.next_steps?.length > 0) {
+    response += '🚀 **Next Steps:**\n';
+    biResponse.next_steps.forEach((step, index) => {
+      response += `${index + 1}. ${step}\n`;
+    });
   }
   
-  if (lowerMessage.includes('lead') || lowerMessage.includes('prospect')) {
-    return "For lead generation, consider ZoomInfo, LinkedIn Sales Navigator, or Apollo for data. What industry and company size are you targeting?";
-  }
-  
-  return `I'm here to help with sales tools and processes! I can assist with:
+  return response;
+}
 
-• CRM recommendations and setup
-• Sales automation tools
-• Lead generation platforms  
-• Email marketing solutions
-• Integration guidance
-• Process optimization
+/**
+ * Format workflow analysis response
+ */
+function formatWorkflowAnalysisResponse(biResponse) {
+  let response = '⚙️ **Workflow Analysis & Optimization**\n\n';
+  
+  response += biResponse.analysis + '\n\n';
+  
+  if (biResponse.optimization_areas?.length > 0) {
+    response += '🎯 **Optimization Opportunities:**\n';
+    biResponse.optimization_areas.forEach(area => {
+      response += `• ${area}\n`;
+    });
+    response += '\n';
+  }
+  
+  if (biResponse.recommended_actions?.length > 0) {
+    response += '💡 **Recommended Actions:**\n';
+    biResponse.recommended_actions.forEach((action, index) => {
+      response += `${index + 1}. ${action}\n`;
+    });
+  }
+  
+  return response;
+}
 
-What specific sales challenge can I help you solve?`;
+/**
+ * Format general business response
+ */
+function formatGeneralBusinessResponse(biResponse) {
+  let response = '💼 **Business Intelligence Insights**\n\n';
+  
+  response += biResponse.response + '\n\n';
+  
+  if (biResponse.related_topics?.length > 0) {
+    response += '🔗 **Related Topics:**\n';
+    biResponse.related_topics.forEach(topic => {
+      response += `• ${topic}\n`;
+    });
+    response += '\n';
+  }
+  
+  if (biResponse.data_sources?.length > 0) {
+    response += '📊 **Relevant Data Sources:**\n';
+    biResponse.data_sources.forEach(source => {
+      response += `• ${source}\n`;
+    });
+  }
+  
+  return response;
 }
 
 /**
  * Generate conversation title from first message
  */
 function generateConversationTitle(message) {
-  // Simple title generation - first few words or key phrases
-  const words = message.trim().split(/\s+/);
-  
-  if (words.length <= 6) {
-    return message.trim();
-  }
-  
-  // Take first 6 words and add ellipsis
-  return words.slice(0, 6).join(' ') + '...';
+  const words = message.split(' ').slice(0, 8).join(' ');
+  return words.length < message.length ? words + '...' : words;
 }

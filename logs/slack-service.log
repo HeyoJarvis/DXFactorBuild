@@ -1,0 +1,182 @@
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-09-30T21:42:40.635Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-09-30T21:42:40.639Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-09-30T21:42:50.300Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-09-30T21:42:50.753Z"}
+{"level":"info","message":"Stopping Slack service...","service":"slack-service","timestamp":"2025-09-30T21:43:39.093Z"}
+{"level":"info","message":"Slack service stopped","service":"slack-service","timestamp":"2025-09-30T21:43:39.093Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-09-30T21:43:39.784Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-09-30T21:43:40.222Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-09-30T21:45:41.154Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-09-30T21:45:41.157Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-09-30T21:45:51.106Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-09-30T21:45:51.895Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-09-30T21:47:42.457Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-09-30T21:47:42.460Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-09-30T21:49:54.492Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-09-30T21:49:54.495Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:17:20.818Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:17:20.822Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T05:17:35.906Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T05:17:36.396Z"}
+{"level":"info","message":"Stopping Slack service...","service":"slack-service","timestamp":"2025-10-01T05:19:10.896Z"}
+{"level":"info","message":"Slack service stopped","service":"slack-service","timestamp":"2025-10-01T05:19:10.897Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T05:19:11.939Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T05:19:12.471Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:36:04.867Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:36:04.872Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T05:38:15.977Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T05:38:16.470Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:39:53.085Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:39:53.088Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T05:39:58.210Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T05:39:58.668Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:45:40.081Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:45:40.084Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:47:42.227Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:47:42.230Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T05:49:41.001Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T05:49:41.495Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:50:41.324Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:50:41.328Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:54:25.356Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:54:25.359Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:54:50.178Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:54:50.181Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:57:50.402Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:57:50.407Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T05:58:11.857Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T05:58:11.861Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:03:39.068Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:03:39.072Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:04:04.881Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:04:05.352Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:05:41.704Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:05:41.708Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:07:40.759Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:07:40.762Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:07:57.481Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:07:57.484Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:08:48.171Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:08:48.174Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:09:59.858Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:09:59.861Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:11:09.640Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:11:10.095Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:12:19.271Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:12:19.275Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:13:35.741Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:13:35.744Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:13:50.405Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:13:50.408Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:14:02.774Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:14:02.777Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:15:32.569Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:15:32.573Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:16:35.516Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:16:35.519Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:17:43.583Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:17:43.586Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:18:54.431Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:18:54.436Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:19:29.305Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:19:29.309Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:20:30.243Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:20:30.246Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:21:24.561Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:21:24.564Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:22:19.565Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:22:19.568Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:26:46.457Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:26:46.461Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:27:17.438Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:27:17.441Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:27:17.668Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:27:18.125Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:27:30.891Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:27:30.895Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:27:31.051Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:27:31.571Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:28:36.277Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:28:36.280Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:28:36.576Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:28:37.200Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:29:35.914Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:29:35.917Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:29:36.177Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:29:36.650Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:32:35.809Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:32:35.813Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:32:36.320Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:32:36.786Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:34:14.537Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:34:14.540Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:34:14.795Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:34:15.252Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:39:04.008Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:39:04.013Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:39:04.305Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:39:04.778Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:42:20.060Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:42:20.063Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:42:20.310Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:42:20.866Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:42:45.672Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:42:45.675Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:42:45.892Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:42:46.347Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:45:46.992Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:45:46.996Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:45:47.247Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:45:47.719Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:49:25.485Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:49:25.489Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:49:25.718Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:49:26.252Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:49:43.993Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:49:43.996Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:49:44.211Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:49:44.676Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:52:03.758Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:52:03.761Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:52:03.982Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:52:04.441Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:52:16.468Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:52:16.471Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:52:16.672Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:52:17.116Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:53:43.895Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:53:43.898Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:53:44.159Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:53:44.625Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:53:55.386Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:53:55.389Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:53:55.607Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:53:56.056Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:54:12.253Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:54:12.257Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:54:12.460Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:54:12.891Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:54:22.901Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:54:22.904Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:54:23.101Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:54:23.588Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:54:35.377Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:54:35.381Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:54:35.566Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:54:35.995Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:54:48.797Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:54:48.800Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:54:49.038Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:54:49.644Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:55:33.834Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:55:33.837Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:55:34.026Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:55:34.486Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:55:52.626Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:55:52.629Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:55:52.832Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:55:53.279Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-01T06:56:05.057Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-01T06:56:05.061Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-01T06:56:05.251Z"}
+{"level":"info","message":"Slack service started successfully","service":"slack-service","timestamp":"2025-10-01T06:56:05.730Z"}

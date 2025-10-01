@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: https: http://localhost:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:* https:;">
   <title>HeyJarvis Copilot Enhanced</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&display=swap');
     
     * {
       margin: 0;
@@ -15,419 +15,291 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, 
-        rgba(10, 10, 15, 0.98) 0%, 
-        rgba(20, 25, 35, 0.95) 50%, 
-        rgba(15, 20, 30, 0.98) 100%);
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: rgba(28, 28, 30, 0.95); /* Apple's dark mode background */
       color: #ffffff;
       height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
-      border-radius: 16px;
       overflow: hidden;
-      backdrop-filter: blur(40px) saturate(150%);
-      border: 1px solid rgba(0, 212, 255, 0.2);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(0, 212, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       position: relative;
+      border-radius: 16px; /* More Apple-like radius */
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* Arc Reactor glow effect */
+    /* Top bar collapsed state */
+    body.collapsed {
+      height: 60px; /* Apple-like height */
+      background: rgba(28, 28, 30, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+    }
+
+    /* Top bar expanded state */
+    body.expanded {
+      height: 680px;
+      background: rgba(28, 28, 30, 0.95);
+      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(40px) saturate(200%);
+    }
+
+    /* Subtle Apple-inspired ambient glow */
     body::before {
       content: '';
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
+      top: -20%;
+      left: -20%;
+      width: 140%;
+      height: 140%;
       background: radial-gradient(circle at center, 
-        rgba(0, 212, 255, 0.03) 0%, 
-        rgba(0, 150, 200, 0.01) 30%, 
+        rgba(0, 122, 255, 0.02) 0%, 
+        rgba(88, 86, 214, 0.01) 40%, 
         transparent 70%);
-      animation: pulse 4s ease-in-out infinite;
+      animation: breathe 6s ease-in-out infinite;
       pointer-events: none;
       z-index: -1;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(1.05); }
+    /* Collapsed state - show header chat, hide main content and bottom input */
+    body.collapsed .copilot-content {
+      display: none !important;
     }
 
-    /* Header */
+    body.collapsed .header-chat-container {
+      display: flex !important;
+    }
+
+    /* Expanded state - hide header chat, show main content and bottom input */
+    body.expanded .copilot-content {
+      display: flex !important;
+    }
+
+    body.expanded .header-chat-container {
+      display: none !important;
+    }
+
+    /* Content area styling */
+    .copilot-content {
+      flex: 1;
+      display: none; /* Hidden by default, shown when expanded */
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0; /* Important for flex children */
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.02); }
+    }
+
+    /* Top Bar Header */
     .copilot-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 20px 12px;
-      background: rgba(0, 0, 0, 0.2);
-      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
-      backdrop-filter: blur(20px);
+      padding: 16px 32px;
+      height: 60px;
+      background: transparent;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border-radius: 16px;
+      gap: 20px;
+      position: relative;
+      flex-shrink: 0; /* Prevent header from shrinking */
+    }
+
+    /* Header Chat Container - Only visible when collapsed */
+    .header-chat-container {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      max-width: 300px;
+      gap: 8px;
+      -webkit-app-region: no-drag; /* Prevent dragging on chat area */
+    }
+
+    .header-chat-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 10px 18px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      min-width: 0;
+      -webkit-app-region: no-drag;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .header-chat-input:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(0, 122, 255, 0.6);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      transform: scale(1.02);
+    }
+
+    .header-send-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      -webkit-app-region: no-drag;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    }
+
+    .header-send-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+    }
+
+    .header-send-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Dragging state */
+    body.dragging {
+      cursor: move !important;
+      box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3) !important;
+    }
+
+    body.dragging .copilot-header {
+      background: rgba(0, 212, 255, 0.1) !important;
+    }
+
+    /* Manual positioning indicator */
+    .position-indicator {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 6px;
+      height: 6px;
+      background: rgba(0, 212, 255, 0.6);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    body.manually-positioned .position-indicator {
+      opacity: 1;
+    }
+
+    /* Hide header content when collapsed except for the main title */
+    body.collapsed .copilot-header .copilot-controls {
+      display: none;
+    }
+
+    body.collapsed .copilot-title {
+      font-size: 15px; /* Slightly larger for taller bar */
+      font-weight: 500;
     }
 
     .copilot-title {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
       font-weight: 600;
-      font-size: 16px;
+      font-size: 17px;
       color: #ffffff;
+      cursor: move;
+      padding: 10px 16px;
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      user-select: none;
+      -webkit-app-region: drag;
+      letter-spacing: -0.02em;
+    }
+
+    .copilot-title:hover {
+      background: rgba(255, 255, 255, 0.08);
     }
 
     .copilot-icon {
-      font-size: 20px;
-      filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .copilot-icon:hover {
+      filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.6));
+      transform: scale(1.05);
     }
 
     .copilot-controls {
       display: flex;
       gap: 8px;
+      -webkit-app-region: no-drag; /* Prevent dragging on controls */
     }
 
     .control-btn {
       width: 28px;
       height: 28px;
       border: none;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.6);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 14px;
       font-weight: 500;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      -webkit-app-region: no-drag;
+      backdrop-filter: blur(10px);
     }
 
     .control-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.05);
-    }
-
-    .control-btn.close:hover {
-      background: rgba(255, 59, 48, 0.8);
-    }
-
-    /* Tab Navigation */
-    .tab-navigation {
-      display: flex;
-      background: rgba(0, 0, 0, 0.1);
-      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
-      padding: 0 8px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 12px 16px;
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      border-radius: 8px 8px 0 0;
-      margin: 0 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .tab-btn:hover {
-      color: rgba(255, 255, 255, 0.8);
-      background: rgba(0, 212, 255, 0.05);
-    }
-
-    .tab-btn.active {
-      color: #ffffff;
-      background: rgba(0, 212, 255, 0.1);
-      border-bottom: 2px solid #00d4ff;
-    }
-
-    /* Content Area */
-    .copilot-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .tab-content {
-      flex: 1;
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      height: 100%;
-      position: relative;
-    }
-
-    .tab-content.active {
-      display: flex;
-    }
-
-    /* Chat Tab Styles */
-    .chat-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .welcome-message {
-      text-align: center;
-      padding: 20px;
-      background: rgba(0, 212, 255, 0.05);
-      border-radius: 12px;
-      border: 1px solid rgba(0, 212, 255, 0.1);
-    }
-
-    .welcome-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
-      filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.8));
-    }
-
-    .welcome-text {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .welcome-subtitle {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 20px;
-    }
-
-    .quick-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .quick-action {
-      padding: 10px 16px;
-      background: rgba(0, 212, 255, 0.1);
-      border: 1px solid rgba(0, 212, 255, 0.2);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      transition: all 0.2s ease;
-      text-align: center;
-    }
-
-    .quick-action:hover {
-      background: rgba(0, 212, 255, 0.2);
-      transform: translateY(-1px);
-    }
-
-    /* CRM AI Assistant Styles */
-    .crm-assistant {
-      padding: 12px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      flex: 1;
-      box-sizing: border-box;
-      min-height: 0;
-    }
-
-    .assistant-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .assistant-title {
-      font-size: 16px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #00d4ff;
-    }
-
-    .refresh-btn {
-      padding: 8px 12px;
-      background: rgba(0, 212, 255, 0.1);
-      border: 1px solid rgba(0, 212, 255, 0.3);
-      border-radius: 6px;
-      color: #ffffff;
-      cursor: pointer;
-      font-size: 12px;
-      transition: all 0.2s ease;
-    }
-
-    .refresh-btn:hover {
-      background: rgba(0, 212, 255, 0.2);
-      transform: translateY(-1px);
-    }
-
-    .insights-container {
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(0, 212, 255, 0.1);
-      border-radius: 8px;
-      padding: 12px;
-      min-height: 60px;
-      margin-bottom: 12px;
-      flex-shrink: 0;
-    }
-
-    .critical-insight {
-      background: rgba(255, 59, 48, 0.1);
-      border: 1px solid rgba(255, 59, 48, 0.3);
-      border-radius: 6px;
-      padding: 12px;
-      margin-bottom: 8px;
-    }
-
-    .warning-insight {
-      background: rgba(255, 149, 0, 0.1);
-      border: 1px solid rgba(255, 149, 0, 0.3);
-      border-radius: 6px;
-      padding: 12px;
-      margin-bottom: 8px;
-    }
-
-    .positive-insight {
-      background: rgba(52, 199, 89, 0.1);
-      border: 1px solid rgba(52, 199, 89, 0.3);
-      border-radius: 6px;
-      padding: 12px;
-      margin-bottom: 8px;
-    }
-
-    .insight-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .insight-text {
-      font-size: 12px;
-      line-height: 1.4;
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.1);
       color: rgba(255, 255, 255, 0.9);
     }
 
-    .recommendations-section, .next-steps-section {
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(0, 212, 255, 0.1);
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 12px;
-      flex-shrink: 0;
+    .control-btn.close:hover {
+      background: rgba(255, 69, 58, 0.8);
+      color: #ffffff;
     }
 
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #00d4ff;
-    }
-
-    .recommendation-item, .next-step-item {
-      background: rgba(0, 212, 255, 0.05);
-      border: 1px solid rgba(0, 212, 255, 0.1);
-      border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .recommendation-item:hover, .next-step-item:hover {
-      background: rgba(0, 212, 255, 0.1);
-      transform: translateY(-1px);
-    }
-
-    .recommendation-title, .step-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .recommendation-description, .step-description {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.8);
-      line-height: 1.3;
-    }
-
-    .roi-badge {
-      display: inline-block;
-      background: rgba(52, 199, 89, 0.2);
-      color: #34c759;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 600;
-      margin-left: 6px;
-    }
-
-    .urgency-badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 600;
-      margin-left: 6px;
-    }
-
-    .urgency-high {
-      background: rgba(255, 59, 48, 0.2);
-      color: #ff3b30;
-    }
-
-    .urgency-medium {
-      background: rgba(255, 149, 0, 0.2);
-      color: #ff9500;
-    }
-
-    .urgency-low {
-      background: rgba(52, 199, 89, 0.2);
-      color: #34c759;
-    }
-
-    /* Slack Tab Styles */
-    .slack-container {
-      padding: 12px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      flex: 1;
-      box-sizing: border-box;
-      min-height: 0;
-    }
-
-    .slack-header {
+    /* Status Bar */
+    .status-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-shrink: 0;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+      padding: 12px 24px;
+      background: rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+      flex-shrink: 0; /* Prevent status bar from shrinking */
     }
 
-    .slack-status {
+    .status-indicators {
+      display: flex;
+      gap: 20px;
+    }
+
+    .status-item {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -439,253 +311,183 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #ff3b30;
-      box-shadow: 0 0 6px rgba(255, 59, 48, 0.6);
+      background: rgba(142, 142, 147, 0.8);
+      transition: all 0.3s ease;
     }
 
     .status-dot.online {
-      background: #34c759;
-      box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+      background: #34C759;
+      box-shadow: 0 0 8px rgba(52, 199, 89, 0.4);
     }
 
-    .status-dot.offline {
-      background: #8e8e93;
-      box-shadow: 0 0 6px rgba(142, 142, 147, 0.6);
+    .status-dot.loading {
+      background: #FF9F0A;
+      animation: pulse-status 2s ease-in-out infinite;
     }
 
-    .slack-toggle {
-      padding: 6px 12px;
-      background: rgba(0, 212, 255, 0.1);
-      border: 1px solid rgba(0, 212, 255, 0.3);
-      border-radius: 6px;
-      color: #ffffff;
-      cursor: pointer;
-      font-size: 11px;
-      transition: all 0.2s ease;
-    }
-
-    .slack-toggle:hover {
-      background: rgba(0, 212, 255, 0.2);
-      transform: translateY(-1px);
-    }
-
-    .slack-toggle.stop {
-      background: rgba(255, 59, 48, 0.1);
-      border-color: rgba(255, 59, 48, 0.3);
-    }
-
-    .slack-toggle.stop:hover {
-      background: rgba(255, 59, 48, 0.2);
-    }
-
-    .slack-stats {
-      display: flex;
-      gap: 16px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
-    }
-
-    .stat-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    .status-label {
+      color: rgba(255, 255, 255, 0.7);
       font-size: 12px;
     }
 
-    .stat-label {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .stat-value {
-      color: #00d4ff;
-      font-weight: 600;
-    }
-
-    .slack-messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .no-messages {
-      text-align: center;
-      padding: 40px 20px;
+    .activity-summary {
+      font-size: 12px;
       color: rgba(255, 255, 255, 0.6);
     }
 
-    .no-messages-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
-      opacity: 0.7;
+    @keyframes pulse-status {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
-    .no-messages-text {
+    /* Chat Interface - Main container */
+    .chat-interface {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0; /* Important for flex children */
+    }
+    
+    /* Ensure input container is always visible */
+    body.expanded .input-container {
+      display: block !important;
+      position: relative;
+      z-index: 100;
+    }
+
+    /* Enhanced Chat Styles */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth;
+      min-height: 0; /* Allow shrinking */
+      max-height: calc(100% - 180px); /* Leave space for input container */
+    }
+
+    .welcome-message {
+      text-align: center;
+      padding: 32px 24px;
+      background: rgba(0, 122, 255, 0.04);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+    }
+
+    .welcome-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 2px 8px rgba(0, 122, 255, 0.3));
+    }
+
+    .welcome-text {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .welcome-subtitle {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .quick-action {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      cursor: pointer;
       font-size: 14px;
       font-weight: 500;
-      margin-bottom: 4px;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      text-align: left;
+      backdrop-filter: blur(10px);
     }
 
-    .no-messages-subtitle {
-      font-size: 12px;
+    .quick-action:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(0, 122, 255, 0.3);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-icon {
+      font-size: 18px;
       opacity: 0.8;
     }
 
-    .slack-message {
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(0, 212, 255, 0.1);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 6px;
-    }
-
-    .slack-message.mention {
-      border-color: rgba(255, 149, 0, 0.4);
-      background: rgba(255, 149, 0, 0.05);
-    }
-
-    .slack-message.urgent {
-      border-color: rgba(255, 59, 48, 0.4);
-      background: rgba(255, 59, 48, 0.05);
-    }
-
-    .message-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-      font-size: 11px;
-    }
-
-    .message-user {
-      color: #00d4ff;
-      font-weight: 600;
-    }
-
-    .message-time {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .message-type {
-      background: rgba(0, 212, 255, 0.2);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
+    .action-text {
+      flex: 1;
       font-weight: 500;
     }
 
-    .message-type.mention {
-      background: rgba(255, 149, 0, 0.2);
-      color: #ff9500;
-    }
-
-    .message-text {
-      font-size: 12px;
-      line-height: 1.4;
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .message-channel {
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 4px;
-    }
-
-    /* Input Container */
-    .input-container {
-      padding: 16px 20px;
-      background: rgba(0, 0, 0, 0.2);
-      border-top: 1px solid rgba(0, 212, 255, 0.1);
-    }
-
-    .input-wrapper {
-      display: flex;
-      gap: 12px;
-      align-items: flex-end;
-    }
-
-    .message-input {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(0, 212, 255, 0.2);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: #ffffff;
-      font-size: 14px;
-      resize: none;
-      min-height: 44px;
-      max-height: 120px;
-      font-family: inherit;
-      transition: all 0.2s ease;
-    }
-
-    .message-input:focus {
-      outline: none;
-      border-color: rgba(0, 212, 255, 0.5);
-      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
-    }
-
-    .message-input::placeholder {
-      color: rgba(255, 255, 255, 0.4);
-    }
-
-    .send-btn {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, #00d4ff, #0099cc);
-      border: none;
-      border-radius: 12px;
-      color: #ffffff;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
-    }
-
-    .send-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(0, 212, 255, 0.4);
-    }
-
-    .send-btn:active {
-      transform: translateY(0);
-    }
-
-    /* Typing Indicator */
+    /* Enhanced Typing Indicator */
     .typing-indicator {
       display: none;
-      padding: 16px 20px;
+      padding: 20px 24px;
+      align-items: center;
+      gap: 16px;
+      background: rgba(0, 122, 255, 0.04);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      flex-shrink: 0; /* Prevent typing indicator from shrinking */
+    }
+
+    .typing-avatar {
+      font-size: 20px;
+      opacity: 0.8;
+    }
+
+    .typing-content {
+      display: flex;
       align-items: center;
       gap: 12px;
-      background: rgba(0, 212, 255, 0.05);
-      border-top: 1px solid rgba(0, 212, 255, 0.1);
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .typing-text {
+      font-weight: 500;
     }
 
     .typing-dots {
       display: flex;
-      gap: 4px;
+      gap: 6px;
     }
 
     .typing-dot {
-      width: 6px;
-      height: 6px;
-      background: #00d4ff;
+      width: 8px;
+      height: 8px;
+      background: #007AFF;
       border-radius: 50%;
-      animation: typing 1.4s infinite ease-in-out;
+      animation: typing 1.6s infinite ease-in-out;
     }
 
     .typing-dot:nth-child(1) { animation-delay: -0.32s; }
     .typing-dot:nth-child(2) { animation-delay: -0.16s; }
 
     @keyframes typing {
-      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-      40% { transform: scale(1.2); opacity: 1; }
+      0%, 80%, 100% { transform: scale(0.9); opacity: 0.4; }
+      40% { transform: scale(1.1); opacity: 1; }
     }
 
     /* Message Styles */
@@ -747,6 +549,77 @@
       margin-top: 4px;
     }
 
+    .message-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 16px 20px;
+      color: #ffffff;
+      font-size: 15px;
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      resize: none;
+      min-height: 50px;
+      max-height: 140px;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      backdrop-filter: blur(10px);
+    }
+
+    .message-input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(0, 122, 255, 0.6);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      transform: scale(1.01);
+    }
+
+    .message-input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Bottom Input Container - Fixed positioning */
+    .input-container {
+      padding: 20px 24px;
+      background: rgba(0, 0, 0, 0.3); /* More visible background */
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      flex-shrink: 0; /* Prevent input from shrinking */
+      min-height: 80px; /* Ensure minimum height */
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .send-btn {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      border: none;
+      border-radius: 50%;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+      flex-shrink: 0; /* Prevent button from shrinking */
+    }
+
+    .send-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+    }
+
+    .send-btn:active {
+      transform: translateY(0);
+    }
+
     /* Minimized state */
     body.minimized {
       width: 60px !important;
@@ -764,8 +637,7 @@
 
     body.minimized .copilot-header,
     body.minimized .tab-navigation,
-    body.minimized .copilot-content,
-    body.minimized .input-container {
+    body.minimized .copilot-content {
       display: none !important;
     }
 
@@ -777,16 +649,6 @@
       padding: 20px;
       color: rgba(255, 255, 255, 0.6);
       font-size: 13px;
-    }
-
-    .error-state {
-      background: rgba(255, 59, 48, 0.1);
-      border: 1px solid rgba(255, 59, 48, 0.3);
-      border-radius: 8px;
-      padding: 16px;
-      margin: 16px;
-      text-align: center;
-      color: #ff3b30;
     }
 
     /* Scrollbar */
@@ -810,142 +672,103 @@
 </head>
 <body>
   <div class="copilot-header">
-    <div class="copilot-title">
-      <div class="copilot-icon">🤖</div>
-      HeyJarvis Copilot
+    <div class="copilot-title" id="dragHandle">
+      <img src="/Users/jarvis/Code/HeyJarvis/Jarvis.png" alt="Jarvis" class="copilot-icon">
+      HeyJarvis
     </div>
+    
+    <!-- Header Chat Container - Only visible when collapsed -->
+    <div class="header-chat-container">
+      <input type="text" 
+             class="header-chat-input" 
+             id="headerChatInput"
+             placeholder="Ask me anything..." 
+             autocomplete="off"
+             spellcheck="false">
+      <button class="header-send-btn" id="headerSendBtn" onclick="sendHeaderMessage()">
+        <span>→</span>
+      </button>
+    </div>
+    
     <div class="copilot-controls">
-      <button class="control-btn minimize" onclick="minimizeWindow(event)" title="Minimize">−</button>
-      <button class="control-btn close" onclick="closeWindow()" title="Close">×</button>
+      <button class="control-btn minimize" onclick="collapseTopBar()" title="Collapse to header chat">−</button>
+      <button class="control-btn close" onclick="closeWindow()" title="Hide">×</button>
     </div>
   </div>
-
-  <!-- Tab Navigation -->
-  <div class="tab-navigation">
-    <button class="tab-btn active" onclick="switchTab('chat')" data-tab="chat">
-      💬 Chat
-    </button>
-    <button class="tab-btn" onclick="switchTab('crm')" data-tab="crm">
-      📊 CRM
-    </button>
-    <button class="tab-btn" onclick="switchTab('slack')" data-tab="slack">
-      💬 Slack
-    </button>
-  </div>
+  
+  <!-- Position indicator -->
+  <div class="position-indicator" title="Manually positioned - double-click to reset"></div>
 
   <div class="copilot-content">
-    <!-- Chat Tab -->
-    <div class="tab-content active" id="chatTab">
+    <!-- Status Bar -->
+    <div class="status-bar" id="statusBar">
+      <div class="status-indicators">
+        <div class="status-item" id="slackStatus">
+          <div class="status-dot" id="slackStatusDot"></div>
+          <span class="status-label">Slack</span>
+        </div>
+        <div class="status-item" id="crmStatus">
+          <div class="status-dot" id="crmStatusDot"></div>
+          <span class="status-label">CRM</span>
+        </div>
+      </div>
+      <div class="activity-summary" id="activitySummary">
+        <span class="activity-text">All systems ready</span>
+      </div>
+    </div>
+    
+    <!-- Chat Interface -->
+    <div class="chat-interface">
       <div class="chat-container" id="chatContainer">
         <div class="welcome-message">
-          <div class="welcome-icon">🤖</div>
+          <div class="welcome-icon">✨</div>
           <div class="welcome-text">Hello! I'm your AI copilot.</div>
-          <div class="welcome-subtitle">Ask me about competitors, market trends, or strategic insights.</div>
+          <div class="welcome-subtitle">I can help with competitive intelligence, CRM insights, and Slack monitoring.</div>
           
           <div class="quick-actions">
             <div class="quick-action" onclick="sendQuickMessage('What are the latest competitor moves?')">
-              Latest competitor moves
+              <div class="action-icon">📊</div>
+              <div class="action-text">Latest competitor moves</div>
             </div>
-            <div class="quick-action" onclick="sendQuickMessage('Analyze market trends')">
-              Market trends
+            <div class="quick-action" onclick="sendQuickMessage('Analyze my CRM data')">
+              <div class="action-icon">🧠</div>
+              <div class="action-text">CRM insights</div>
             </div>
-            <div class="quick-action" onclick="sendQuickMessage('Show me recent signals')">
-              Recent signals
+            <div class="quick-action" onclick="sendQuickMessage('Show Slack activity')">
+              <div class="action-icon">💬</div>
+              <div class="action-text">Slack activity</div>
             </div>
           </div>
         </div>
       </div>
 
       <div class="typing-indicator" id="typingIndicator">
-        <span>HeyJarvis is thinking</span>
-        <div class="typing-dots">
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
+        <div class="typing-avatar">✨</div>
+        <div class="typing-content">
+          <span class="typing-text">HeyJarvis is thinking</span>
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
         </div>
       </div>
 
+      <!-- Bottom Input Container - Now properly positioned -->
       <div class="input-container">
         <div class="input-wrapper">
           <textarea 
             class="message-input" 
             id="messageInput" 
-            placeholder="Ask me anything about your competitive landscape..."
+            placeholder="Ask me anything about your business..."
             rows="1"
           ></textarea>
           <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-            →
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m22 2-7 20-4-9-9-4z"/>
+              <path d="M22 2 11 13"/>
+            </svg>
           </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- CRM Tab -->
-    <div class="tab-content" id="crmTab">
-      <div class="crm-assistant">
-        <div class="assistant-header">
-          <div class="assistant-title">
-            🧠 AI Workflow Assistant
-          </div>
-          <button class="refresh-btn" onclick="refreshCRMInsights()">
-            🔄 Analyze
-          </button>
-        </div>
-
-        <div class="insights-container" id="insightsContainer">
-          <div class="loading">Analyzing your CRM workflows...</div>
-        </div>
-
-        <div class="recommendations-section" id="recommendationsSection">
-          <div class="section-title">
-            💡 Smart Recommendations
-          </div>
-          <div id="recommendationsList">
-            <div class="loading">Generating AI recommendations...</div>
-          </div>
-        </div>
-
-        <div class="next-steps-section" id="nextStepsSection">
-          <div class="section-title">
-            🎯 Next Steps
-          </div>
-          <div id="nextStepsList">
-            <div class="loading">Preparing action items...</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Slack Tab -->
-    <div class="tab-content" id="slackTab">
-      <div class="slack-container">
-        <div class="slack-header">
-          <div class="slack-status" id="slackStatus">
-            <span class="status-dot offline" id="slackStatusDot"></span>
-            <span id="slackStatusText">Connecting...</span>
-          </div>
-          <button class="slack-toggle" id="slackToggle" onclick="toggleSlackMonitoring()">
-            Start Monitoring
-          </button>
-        </div>
-        
-        <div class="slack-stats" id="slackStats" style="display: none;">
-          <div class="stat-item">
-            <span class="stat-label">Messages:</span>
-            <span class="stat-value" id="messageCount">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Mentions:</span>
-            <span class="stat-value" id="mentionCount">0</span>
-          </div>
-        </div>
-        
-        <div class="slack-messages" id="slackMessages">
-          <div class="no-messages" id="noMessages">
-            <div class="no-messages-icon">📱</div>
-            <div class="no-messages-text">No Slack messages yet</div>
-            <div class="no-messages-subtitle">Start monitoring to see @hj2 mentions and messages</div>
-          </div>
         </div>
       </div>
     </div>
@@ -954,218 +777,111 @@
   <script>
     let isMinimized = false;
     let chatHistory = [];
-    let currentTab = 'chat';
     let crmData = null;
     let crmUpdateInterval = null;
     let slackConnected = false;
     let slackMessages = [];
     let slackUpdateInterval = null;
+    let servicesInitialized = false;
 
     // DOM elements
     const chatContainer = document.getElementById('chatContainer');
     const messageInput = document.getElementById('messageInput');
+    const headerChatInput = document.getElementById('headerChatInput');
     const sendBtn = document.getElementById('sendBtn');
+    const headerSendBtn = document.getElementById('headerSendBtn');
     const typingIndicator = document.getElementById('typingIndicator');
 
-    // Tab switching
-    function switchTab(tabName) {
-      // Update tab buttons
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-
-      // Update tab content
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      document.getElementById(`${tabName}Tab`).classList.add('active');
-
-      currentTab = tabName;
-
-      // Load CRM data when switching to CRM tab
-      if (tabName === 'crm') {
-        loadCRMData();
-        startCRMUpdates();
-      } else {
-        stopCRMUpdates();
+    // Auto-initialize services on app launch
+    async function initializeServices() {
+      if (servicesInitialized) return;
+      
+      console.log('🚀 Auto-initializing services...');
+      servicesInitialized = true;
+      
+      // Update status indicators
+      updateStatusIndicator('slack', 'loading', 'Connecting...');
+      updateStatusIndicator('crm', 'loading', 'Loading...');
+      
+      // Auto-start Slack monitoring
+      try {
+        const slackResult = await window.electronAPI.slack.startMonitoring();
+        if (slackResult.success) {
+          console.log('✅ Slack auto-initialized');
+          updateStatusIndicator('slack', 'online', 'Connected');
+          startSlackUpdates();
+        } else {
+          console.log('⚠️ Slack initialization failed:', slackResult.error);
+          updateStatusIndicator('slack', 'offline', 'Failed');
+        }
+      } catch (error) {
+        console.log('❌ Slack auto-init error:', error);
+        updateStatusIndicator('slack', 'offline', 'Error');
       }
+      
+      // Auto-load CRM data
+      try {
+        await loadCRMData();
+        console.log('✅ CRM auto-initialized');
+        updateStatusIndicator('crm', 'online', 'Ready');
+        startCRMUpdates();
+      } catch (error) {
+        console.log('❌ CRM auto-init error:', error);
+        updateStatusIndicator('crm', 'offline', 'Error');
+      }
+      
+      // Update activity summary
+      updateActivitySummary();
+    }
+    
+    function updateStatusIndicator(service, status, message) {
+      const statusDot = document.getElementById(`${service}StatusDot`);
+      if (statusDot) {
+        statusDot.className = `status-dot ${status}`;
+      }
+    }
+    
+    function updateActivitySummary() {
+      const summaryEl = document.getElementById('activitySummary');
+      if (!summaryEl) return;
+      
+      let summary = 'All systems ready';
+      if (!slackConnected && !crmData?.connected) {
+        summary = 'Services initializing...';
+      } else if (!slackConnected) {
+        summary = 'CRM ready • Slack offline';
+      } else if (!crmData?.connected) {
+        summary = 'Slack ready • CRM loading';
+      }
+      
+      summaryEl.textContent = summary;
     }
 
     // CRM AI Insights Management
     async function loadCRMData() {
       try {
-        showCRMLoading();
+        if (!window.electronAPI) {
+          throw new Error('Electron API not available');
+        }
         
-        // Get AI insights and recommendations from intelligent service
-        const insightsResponse = await fetch('http://localhost:3002/analysis/latest/default_org');
+        // Get CRM data from the startup service via Electron API
+        const response = await window.electronAPI.getCRMData();
         
-        if (insightsResponse.status === 404) {
-          // No analysis data yet - trigger a new analysis
-          showCRMMessage('No analysis data found. Triggering new analysis...');
-          await triggerNewAnalysis();
+        if (response.isLoading) {
+          // Show loading progress if still loading
           return;
         }
         
-        if (!insightsResponse.ok) {
-          throw new Error(`Insights fetch failed: ${insightsResponse.status}`);
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to load CRM data');
         }
         
-        const insightsData = await insightsResponse.json();
-        
-        // Check if we got an error response
-        if (insightsData.error) {
-          if (insightsData.error === 'No analysis found') {
-            showCRMMessage('No analysis data available. Triggering new analysis...');
-            await triggerNewAnalysis();
-            return;
-          }
-          throw new Error(insightsData.error);
-        }
-        
-        updateCRMInsights(insightsData);
+        // Store data for future use
+        crmData = response.data;
         
       } catch (error) {
-        showCRMError(`AI Analysis failed: ${error.message}`);
+        console.error('❌ Failed to load CRM data:', error);
       }
-    }
-
-    async function triggerNewAnalysis() {
-      try {
-        showCRMMessage('🧠 Starting intelligent analysis... This may take 2-3 minutes.');
-        
-        const response = await fetch('http://localhost:3002/analysis/trigger', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            website: 'https://dxfactor.com',
-            organization_id: 'default_org'
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Analysis trigger failed: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        showCRMMessage(`✅ Analysis started (ID: ${result.analysis_id}). Refreshing in 30 seconds...`);
-        
-        // Wait and then try to load data again
-        setTimeout(() => {
-          loadCRMData();
-        }, 30000);
-        
-      } catch (error) {
-        showCRMError(`Failed to trigger analysis: ${error.message}`);
-      }
-    }
-
-    function showCRMMessage(message) {
-      document.getElementById('insightsContainer').innerHTML = `
-        <div class="info-message" style="padding: 20px; text-align: center; color: #4A90E2;">
-          <div style="font-size: 16px; margin-bottom: 10px;">${message}</div>
-          <button onclick="loadCRMData()" style="padding: 8px 16px; background: #4A90E2; color: white; border: none; border-radius: 4px; cursor: pointer;">
-            🔄 Refresh
-          </button>
-        </div>
-      `;
-    }
-
-    function showCRMLoading() {
-      document.getElementById('insightsContainer').innerHTML = '<div class="loading">Analyzing your CRM workflows...</div>';
-      document.getElementById('recommendationsList').innerHTML = '<div class="loading">Generating AI recommendations...</div>';
-      document.getElementById('nextStepsList').innerHTML = '<div class="loading">Preparing action items...</div>';
-    }
-
-    function showCRMError(message) {
-      document.getElementById('insightsContainer').innerHTML = `<div class="error">❌ ${message}</div>`;
-      document.getElementById('recommendationsList').innerHTML = `<div class="error">❌ Unable to generate recommendations</div>`;
-      document.getElementById('nextStepsList').innerHTML = `<div class="error">❌ Unable to prepare action items</div>`;
-    }
-
-    function updateCRMInsights(insightsData) {
-      // Update insights
-      const insightsContainer = document.getElementById('insightsContainer');
-      if (insightsData.insights && insightsData.insights.length > 0) {
-        insightsContainer.innerHTML = insightsData.insights.map(insight => `
-          <div class="${insight.type}-insight">
-            <div class="insight-title">
-              ${getInsightIcon(insight.type)} ${insight.title}
-            </div>
-            <div class="insight-text">${insight.description}</div>
-          </div>
-        `).join('');
-      } else {
-        insightsContainer.innerHTML = '<div class="no-insights">No critical insights at this time</div>';
-      }
-      
-      // Update recommendations
-      const recommendationsList = document.getElementById('recommendationsList');
-      if (insightsData.recommendations && insightsData.recommendations.length > 0) {
-        recommendationsList.innerHTML = insightsData.recommendations.map(rec => `
-          <div class="recommendation-item" onclick="handleRecommendationClick('${rec.id}')">
-            <div class="recommendation-title">
-              🔧 ${rec.title}
-              ${rec.roi ? `<span class="roi-badge">ROI: ${rec.roi}</span>` : ''}
-            </div>
-            <div class="recommendation-description">${rec.description}</div>
-          </div>
-        `).join('');
-      } else {
-        recommendationsList.innerHTML = '<div class="no-recommendations">All workflows optimized!</div>';
-      }
-      
-      // Update next steps
-      const nextStepsList = document.getElementById('nextStepsList');
-      if (insightsData.nextSteps && insightsData.nextSteps.length > 0) {
-        nextStepsList.innerHTML = insightsData.nextSteps.map(step => `
-          <div class="next-step-item" onclick="handleStepClick('${step.id}')">
-            <div class="step-title">
-              ${getUrgencyIcon(step.urgency)} ${step.title}
-              <span class="urgency-badge urgency-${step.urgency}">${step.urgency.toUpperCase()}</span>
-            </div>
-            <div class="step-description">${step.description}</div>
-          </div>
-        `).join('');
-      } else {
-        nextStepsList.innerHTML = '<div class="no-steps">No immediate actions required</div>';
-      }
-
-      // Store data for future use
-      crmData = insightsData;
-    }
-
-    function getInsightIcon(type) {
-      switch(type) {
-        case 'critical': return '🚨';
-        case 'warning': return '⚠️';
-        case 'positive': return '✅';
-        default: return '💡';
-      }
-    }
-
-    function getUrgencyIcon(urgency) {
-      switch(urgency) {
-        case 'high': return '🔥';
-        case 'medium': return '⚡';
-        case 'low': return '📝';
-        default: return '📋';
-      }
-    }
-
-    function handleRecommendationClick(recId) {
-      // Handle recommendation click - could open details, start implementation, etc.
-      console.log('Recommendation clicked:', recId);
-    }
-
-    function handleStepClick(stepId) {
-      // Handle next step click - could mark as done, get more details, etc.
-      console.log('Next step clicked:', stepId);
-    }
-
-    function refreshCRMInsights() {
-      loadCRMData();
     }
 
     function startCRMUpdates() {
@@ -1180,47 +896,31 @@
       }
     }
 
-    // Slack Functions
+    // Slack Functions (now auto-initialized)
     async function toggleSlackMonitoring() {
-      const toggleBtn = document.getElementById('slackToggle');
-      const statusDot = document.getElementById('slackStatusDot');
-      const statusText = document.getElementById('slackStatusText');
-      
+      // This function is kept for compatibility but Slack auto-starts now
       try {
         if (slackConnected) {
-          // Stop monitoring
-          statusText.textContent = 'Stopping...';
           const result = await window.electronAPI.slack.stopMonitoring();
-          
           if (result.success) {
             slackConnected = false;
-            statusDot.className = 'status-dot offline';
-            statusText.textContent = 'Disconnected';
-            toggleBtn.textContent = 'Start Monitoring';
-            toggleBtn.classList.remove('stop');
+            updateStatusIndicator('slack', 'offline', 'Disconnected');
             stopSlackUpdates();
+            updateActivitySummary();
           }
         } else {
-          // Start monitoring
-          statusText.textContent = 'Connecting...';
           const result = await window.electronAPI.slack.startMonitoring();
-          
           if (result.success) {
             slackConnected = true;
-            statusDot.className = 'status-dot online';
-            statusText.textContent = 'Connected';
-            toggleBtn.textContent = 'Stop Monitoring';
-            toggleBtn.classList.add('stop');
+            updateStatusIndicator('slack', 'online', 'Connected');
             startSlackUpdates();
             loadSlackMessages();
-          } else {
-            statusText.textContent = 'Connection Failed';
-            console.error('Failed to start Slack monitoring:', result.error);
+            updateActivitySummary();
           }
         }
       } catch (error) {
         console.error('Error toggling Slack monitoring:', error);
-        statusText.textContent = 'Error';
+        updateStatusIndicator('slack', 'offline', 'Error');
       }
     }
 
@@ -1230,73 +930,9 @@
         const status = await window.electronAPI.slack.getStatus();
         
         slackMessages = messages;
-        updateSlackUI(messages, status);
       } catch (error) {
         console.error('Error loading Slack messages:', error);
       }
-    }
-
-    function updateSlackUI(messages, status) {
-      const messagesContainer = document.getElementById('slackMessages');
-      const noMessages = document.getElementById('noMessages');
-      const slackStats = document.getElementById('slackStats');
-      const messageCount = document.getElementById('messageCount');
-      const mentionCount = document.getElementById('mentionCount');
-      
-      // Update stats
-      if (status) {
-        messageCount.textContent = status.messageCount || 0;
-        mentionCount.textContent = status.mentionCount || 0;
-        slackStats.style.display = slackConnected ? 'flex' : 'none';
-      }
-      
-      if (messages.length === 0) {
-        noMessages.style.display = 'block';
-        return;
-      }
-      
-      noMessages.style.display = 'none';
-      
-      // Clear existing messages
-      messagesContainer.innerHTML = '';
-      
-      // Add messages
-      messages.forEach(message => {
-        const messageEl = createSlackMessageElement(message);
-        messagesContainer.appendChild(messageEl);
-      });
-    }
-
-    function createSlackMessageElement(message) {
-      const messageEl = document.createElement('div');
-      messageEl.className = `slack-message ${message.type}`;
-      
-      if (message.urgent) {
-        messageEl.classList.add('urgent');
-      }
-      
-      const time = new Date(message.timestamp).toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-      
-      messageEl.innerHTML = `
-        <div class="message-header">
-          <div class="message-user">@${message.user}</div>
-          <div class="message-time">${time}</div>
-          <div class="message-type ${message.type}">${message.type}</div>
-        </div>
-        <div class="message-text">${escapeHtml(message.text)}</div>
-        <div class="message-channel">Channel: ${message.channel}</div>
-      `;
-      
-      return messageEl;
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
     }
 
     function startSlackUpdates() {
@@ -1320,13 +956,8 @@
         slackMessages = slackMessages.slice(0, 50);
       }
       
-      // Update UI if on Slack tab
-      if (currentTab === 'slack') {
-        loadSlackMessages();
-      }
-      
-      // Show notification badge or alert
-      showSlackNotification(message);
+      // Update UI
+      loadSlackMessages();
     }
 
     function onSlackMessage(message) {
@@ -1337,35 +968,42 @@
         slackMessages = slackMessages.slice(0, 50);
       }
       
-      if (currentTab === 'slack') {
-        loadSlackMessages();
-      }
+      loadSlackMessages();
     }
 
-    function showSlackNotification(message) {
-      // Add visual indicator for new mentions
-      const slackTab = document.querySelector('[data-tab="slack"]');
-      if (slackTab && currentTab !== 'slack') {
-        slackTab.style.background = 'rgba(255, 149, 0, 0.2)';
-        setTimeout(() => {
-          slackTab.style.background = '';
-        }, 3000);
-      }
+    // Auto-resize textarea (for bottom input)
+    if (messageInput) {
+      messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      });
+
+      // Send message on Enter (but not Shift+Enter)
+      messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
     }
 
-    // Auto-resize textarea
-    messageInput.addEventListener('input', function() {
-      this.style.height = 'auto';
-      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-    });
+    // Header chat input event listeners
+    if (headerChatInput) {
+      headerChatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendHeaderMessage();
+        }
+      });
 
-    // Send message on Enter (but not Shift+Enter)
-    messageInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
+      // Auto-expand when user starts typing in header
+      headerChatInput.addEventListener('focus', () => {
+        if (!isExpanded) {
+          console.log('🔍 Auto-expanding due to header chat input focus');
+          expandTopBar();
+        }
+      });
+    }
 
     // Window controls
     function minimizeWindow(event) {
@@ -1374,24 +1012,8 @@
         event.preventDefault();
       }
       
-      console.log('🔄 Minimizing window...');
-      
-      // Toggle the minimized state directly
-      isMinimized = !isMinimized;
-      console.log('🔄 Toggling minimized state:', isMinimized);
-      document.body.classList.toggle('minimized', isMinimized);
-      
-      if (isMinimized) {
-        console.log('⚡ Arc Reactor mode activated!');
-        // Stop CRM updates when minimized
-        stopCRMUpdates();
-      } else {
-        console.log('🔄 Expanding back to full copilot...');
-        // Restart CRM updates if on CRM tab
-        if (currentTab === 'crm') {
-          startCRMUpdates();
-        }
-      }
+      console.log('📦 Collapsing top bar...');
+      collapseTopBar();
     }
 
     function closeWindow() {
@@ -1404,15 +1026,32 @@
       }
     }
 
-    // Chat functionality
+    // Chat functionality - works for both header and bottom inputs
     async function sendMessage() {
       const message = messageInput.value.trim();
       if (!message) return;
 
-      // Add user message to chat
-      addMessage(message, 'user');
+      await processChatMessage(message);
       messageInput.value = '';
       messageInput.style.height = 'auto';
+    }
+
+    async function sendHeaderMessage() {
+      const message = headerChatInput.value.trim();
+      if (!message) return;
+
+      // Expand to show full chat interface
+      if (!isExpanded) {
+        expandTopBar();
+      }
+
+      await processChatMessage(message);
+      headerChatInput.value = '';
+    }
+
+    async function processChatMessage(message) {
+      // Add user message to chat
+      addMessage(message, 'user');
 
       // Show typing indicator
       showTypingIndicator();
@@ -1443,8 +1082,14 @@
     }
 
     function sendQuickMessage(message) {
-      messageInput.value = message;
-      sendMessage();
+      // Use the appropriate input based on current state
+      if (isExpanded && messageInput) {
+        messageInput.value = message;
+        sendMessage();
+      } else if (headerChatInput) {
+        headerChatInput.value = message;
+        sendHeaderMessage();
+      }
     }
 
     function addMessage(content, sender) {
@@ -1483,66 +1128,143 @@
       typingIndicator.style.display = 'none';
     }
 
+    // Top bar management
+    let isExpanded = true; // Start expanded so chat is visible
+
+    function toggleTopBar() {
+      if (isExpanded) {
+        collapseTopBar();
+      } else {
+        expandTopBar();
+      }
+    }
+
+    function expandTopBar() {
+      if (!isExpanded) {
+        isExpanded = true;
+        document.body.classList.remove('collapsed');
+        document.body.classList.add('expanded');
+        console.log('📖 Expanded top bar - chat moved to bottom');
+        
+        if (window.electronAPI && window.electronAPI.expandTopBar) {
+          window.electronAPI.expandTopBar();
+        }
+      }
+    }
+
+    function collapseTopBar() {
+      if (isExpanded) {
+        isExpanded = false;
+        document.body.classList.remove('expanded');
+        document.body.classList.add('collapsed');
+        console.log('📦 Collapsed top bar - chat moved to header');
+        
+        if (window.electronAPI && window.electronAPI.collapseTopBar) {
+          window.electronAPI.collapseTopBar();
+        }
+      }
+    }
+
+    // Manual positioning management
+    let isManuallyPositioned = false;
+
+    function handleManualPositioning(manual) {
+      isManuallyPositioned = manual;
+      if (manual) {
+        document.body.classList.add('manually-positioned');
+        console.log('🎯 Bar is now manually positioned');
+      } else {
+        document.body.classList.remove('manually-positioned');
+        console.log('🔄 Bar returned to auto-positioning');
+      }
+    }
+
+    // Reset position to auto-center
+    async function resetPosition() {
+      if (window.electronAPI && window.electronAPI.resetPosition) {
+        const result = await window.electronAPI.resetPosition();
+        if (result.success) {
+          handleManualPositioning(false);
+          console.log('✅ Position reset to auto-center');
+        }
+      }
+    }
+
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('🚀 HeyJarvis Copilot Enhanced loaded');
+      console.log('🚀 HeyJarvis Top Bar loaded');
       
-      // Load initial data if on CRM tab
-      if (currentTab === 'crm') {
-        loadCRMData();
-      }
+      // Start in expanded mode so chat interface is visible
+      document.body.classList.add('expanded');
       
-      // Setup Slack event listeners
-      if (window.electronAPI && window.electronAPI.onSlackMention) {
-        window.electronAPI.onSlackMention(onSlackMention);
-        window.electronAPI.onSlackMessage(onSlackMessage);
-        
-        window.electronAPI.onSlackConnected(() => {
-          console.log('🔗 Slack connected');
-          slackConnected = true;
-          const statusDot = document.getElementById('slackStatusDot');
-          const statusText = document.getElementById('slackStatusText');
-          const toggleBtn = document.getElementById('slackToggle');
-          
-          if (statusDot) statusDot.className = 'status-dot online';
-          if (statusText) statusText.textContent = 'Connected';
-          if (toggleBtn) {
-            toggleBtn.textContent = 'Stop Monitoring';
-            toggleBtn.classList.add('stop');
-          }
-          
-          startSlackUpdates();
-          loadSlackMessages();
-        });
-        
-        window.electronAPI.onSlackDisconnected(() => {
-          console.log('🔌 Slack disconnected');
-          slackConnected = false;
-          const statusDot = document.getElementById('slackStatusDot');
-          const statusText = document.getElementById('slackStatusText');
-          const toggleBtn = document.getElementById('slackToggle');
-          
-          if (statusDot) statusDot.className = 'status-dot offline';
-          if (statusText) statusText.textContent = 'Disconnected';
-          if (toggleBtn) {
-            toggleBtn.textContent = 'Start Monitoring';
-            toggleBtn.classList.remove('stop');
-          }
-          
-          stopSlackUpdates();
-        });
-        
-        window.electronAPI.onSlackError((error) => {
-          console.error('❌ Slack error:', error);
-          const statusText = document.getElementById('slackStatusText');
-          if (statusText) statusText.textContent = 'Error: ' + error;
+      // Add double-click to reset position
+      const positionIndicator = document.querySelector('.position-indicator');
+      if (positionIndicator) {
+        positionIndicator.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
+          resetPosition();
         });
       }
       
-      // Load initial Slack status
-      if (window.electronAPI && window.electronAPI.slack) {
-        loadSlackMessages();
+      // Auto-initialize all services
+      initializeServices();
+      
+      // Setup event listeners
+      if (window.electronAPI) {
+        // Setup top bar event listeners
+        if (window.electronAPI.onTopBarExpanded) {
+          window.electronAPI.onTopBarExpanded((expanded) => {
+            if (expanded && !isExpanded) {
+              document.body.classList.remove('collapsed');
+              document.body.classList.add('expanded');
+              isExpanded = true;
+            } else if (!expanded && isExpanded) {
+              document.body.classList.remove('expanded');
+              document.body.classList.add('collapsed');
+              isExpanded = false;
+            }
+          });
+        }
+
+        // Listen for manual positioning events
+        if (window.electronAPI.onTopBarManuallyPositioned) {
+          window.electronAPI.onTopBarManuallyPositioned((manual) => {
+            handleManualPositioning(manual);
+          });
+        }
+
+        // Setup Slack event listeners
+        if (window.electronAPI.onSlackMention) {
+          window.electronAPI.onSlackMention(onSlackMention);
+          window.electronAPI.onSlackMessage(onSlackMessage);
+          
+          window.electronAPI.onSlackConnected(() => {
+            console.log('🔗 Slack connected');
+            slackConnected = true;
+            updateStatusIndicator('slack', 'online', 'Connected');
+            updateActivitySummary();
+            startSlackUpdates();
+            loadSlackMessages();
+          });
+          
+          window.electronAPI.onSlackDisconnected(() => {
+            console.log('🔌 Slack disconnected');
+            slackConnected = false;
+            updateStatusIndicator('slack', 'offline', 'Disconnected');
+            updateActivitySummary();
+            stopSlackUpdates();
+          });
+          
+          window.electronAPI.onSlackError((error) => {
+            console.error('❌ Slack error:', error);
+            updateStatusIndicator('slack', 'offline', 'Error');
+            updateActivitySummary();
+          });
+        }
       }
+      
+      // Services will auto-initialize
+      console.log('🎯 HeyJarvis ready - services will auto-initialize');
     });
 
     // Handle window clicks to restore from minimized state
@@ -1551,6 +1273,14 @@
         minimizeWindow();
       }
     });
+    
+    // Auto-initialize services after a short delay as fallback
+    setTimeout(() => {
+      if (!servicesInitialized) {
+        console.log('🔄 Fallback initialization triggered');
+        initializeServices();
+      }
+    }, 2000);
   </script>
 </body>
 </html>

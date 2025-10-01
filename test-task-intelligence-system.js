@@ -84,21 +84,28 @@ class TaskIntelligenceSystemTester {
       // Display analysis results
       this.displayTaskAnalysis(enrichedContext, analysisTime);
 
-      // Step 4: Generate recommendations if it's a task
+      // Step 4: Generate recommendations based on confidence and type
       let recommendations = null;
-      if (enrichedContext.is_task && enrichedContext.confidence_score >= 0.3) {
+      if (enrichedContext.confidence_score >= 0.2) {
         console.log('\n💡 STEP 2: AI Recommendation Generation');
         console.log('-'.repeat(50));
         
         const recStartTime = Date.now();
-        recommendations = await this.recommendationGenerator.generateTaskRecommendations(enrichedContext);
-        const recTime = Date.now() - recStartTime;
         
+        if (enrichedContext.is_task) {
+          // Generate task-specific recommendations
+          recommendations = await this.recommendationGenerator.generateTaskRecommendations(enrichedContext);
+        } else {
+          // Generate general business intelligence recommendations
+          recommendations = await this.generateGeneralRecommendations(messageText, enrichedContext);
+        }
+        
+        const recTime = Date.now() - recStartTime;
         this.displayRecommendations(recommendations, recTime);
       } else {
-        console.log('\n❌ STEP 2: Skipped (Not identified as a task)');
+        console.log('\n❌ STEP 2: Skipped (Confidence too low)');
         console.log('-'.repeat(50));
-        console.log(`Confidence too low: ${enrichedContext.confidence_score}`);
+        console.log(`Confidence: ${enrichedContext.confidence_score} (minimum: 0.2)`);
       }
 
       // Step 5: Simulate delivery
@@ -143,6 +150,61 @@ class TaskIntelligenceSystemTester {
       
       this.testResults.push(testResult);
       throw error;
+    }
+  }
+
+  /**
+   * Generate general business intelligence recommendations
+   */
+  async generateGeneralRecommendations(messageText, context) {
+    try {
+      const AIAnalyzer = require('./core/ai/anthropic-analyzer');
+      const aiAnalyzer = new AIAnalyzer();
+
+      const prompt = `
+You are a business intelligence assistant. Generate helpful recommendations for this query:
+
+MESSAGE: "${messageText}"
+CONTEXT: ${JSON.stringify(context, null, 2)}
+
+Provide recommendations in this JSON format:
+{
+  "type": "general_business_intelligence",
+  "recommendations": [
+    {
+      "title": "Recommendation Title",
+      "description": "Detailed description",
+      "priority": "high|medium|low",
+      "category": "analysis|tools|process|strategy"
+    }
+  ],
+  "insights": [
+    "Key insight 1",
+    "Key insight 2"
+  ],
+  "next_steps": [
+    "Actionable step 1",
+    "Actionable step 2"
+  ]
+}`;
+
+      const analysis = await aiAnalyzer.analyzeText(messageText, { prompt });
+      return typeof analysis === 'string' ? JSON.parse(analysis) : analysis;
+    } catch (error) {
+      this.logger.error('General recommendations generation failed', { error: error.message });
+      return {
+        type: 'general_business_intelligence',
+        recommendations: [
+          {
+            title: 'Business Analysis',
+            description: 'I can help analyze your business questions and provide insights.',
+            priority: 'medium',
+            category: 'analysis'
+          }
+        ],
+        insights: ['Consider providing more context for better analysis'],
+        next_steps: ['Clarify specific requirements', 'Gather relevant data']
+      };
     }
   }
 
