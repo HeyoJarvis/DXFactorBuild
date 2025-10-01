@@ -1727,15 +1727,16 @@ ipcMain.handle('highlights:find-heyjarvis', async () => {
     // First capture the screen
     const { desktopCapturer, screen } = require('electron');
     const primaryDisplay = screen.getPrimaryDisplay();
+    const scaleFactor = primaryDisplay.scaleFactor || 1;
     const { width: screenWidth, height: screenHeight } = primaryDisplay.bounds;
     
-    console.log(`📺 Screen dimensions: ${screenWidth}x${screenHeight}`);
+    console.log(`📺 Screen: ${screenWidth}x${screenHeight} (scale: ${scaleFactor}x)`);
     
     const sources = await desktopCapturer.getSources({
       types: ['screen'],
       thumbnailSize: {
-        width: screenWidth,
-        height: screenHeight
+        width: screenWidth * scaleFactor,
+        height: screenHeight * scaleFactor
       }
     });
     
@@ -1750,13 +1751,16 @@ ipcMain.handle('highlights:find-heyjarvis', async () => {
     const capturedWidth = sources[0].thumbnail.getSize().width;
     const capturedHeight = sources[0].thumbnail.getSize().height;
     
-    console.log(`📸 Captured image dimensions: ${capturedWidth}x${capturedHeight}`);
+    console.log(`📸 Captured: ${capturedWidth}x${capturedHeight}`);
     
-    // Calculate scaling factors for coordinate mapping
+    // CRITICAL: Calculate coordinate transformation
+    // On Retina displays, captured image is 2x the logical screen size
+    // Tesseract returns coordinates in captured image space
+    // We need to map to logical screen space
     const scaleX = screenWidth / capturedWidth;
     const scaleY = screenHeight / capturedHeight;
     
-    console.log(`📏 Coordinate scaling factors: X=${scaleX.toFixed(3)}, Y=${scaleY.toFixed(3)}`);
+    console.log(`🔧 Transform: scaleX=${scaleX.toFixed(3)}, scaleY=${scaleY.toFixed(3)}`);
     
     console.log('📸 Screen captured, running OCR...');
     
@@ -2028,51 +2032,52 @@ ipcMain.handle('highlights:find-heyjarvis', async () => {
       }
     }
     
-    // Create highlights for found words
+    // Create highlights with CORRECTED coordinates
     const highlights = [];
+    
+    // Debug logging before processing
+    console.log('🐛 DEBUG INFO:');
+    console.log(`  Screen dimensions: ${screenWidth}x${screenHeight}`);
+    console.log(`  Captured dimensions: ${capturedWidth}x${capturedHeight}`);
+    console.log(`  Scale factor: ${scaleFactor}x`);
+    console.log(`  Transform: X=${scaleX}, Y=${scaleY}`);
+    console.log(`  Number of jarvis words: ${jarvisWords.length}`);
+    
     jarvisWords.forEach((word, index) => {
-      // Handle different bbox structures
-      let ocrX, ocrY, ocrWidth, ocrHeight;
-      
       if (word.bbox) {
-        // Standard Tesseract bbox format (relative to captured image)
-        ocrX = word.bbox.x0 || word.bbox.left || 0;
-        ocrY = word.bbox.y0 || word.bbox.top || 0;
-        ocrWidth = Math.max((word.bbox.x1 || word.bbox.right || 100) - ocrX, 50);
-        ocrHeight = Math.max((word.bbox.y1 || word.bbox.bottom || 30) - ocrY, 20);
+        // Get OCR bbox (in captured image space)
+        const ocrX = word.bbox.x0;
+        const ocrY = word.bbox.y0;
+        const ocrWidth = word.bbox.x1 - word.bbox.x0;
+        const ocrHeight = word.bbox.y1 - word.bbox.y0;
         
-        // Scale coordinates to match actual screen dimensions
-        let screenX = Math.round(ocrX * scaleX);
-        let screenY = Math.round(ocrY * scaleY);
-        const screenWidth = Math.round(ocrWidth * scaleX);
-        const screenHeight = Math.round(ocrHeight * scaleY);
+        // Transform to screen space (logical pixels)
+        const screenX = Math.round(ocrX * scaleX);
+        const screenY = Math.round(ocrY * scaleY);
+        const screenW = Math.round(ocrWidth * scaleX);
+        const screenH = Math.round(ocrHeight * scaleY);
         
-        // Apply fine-tuning offsets based on common OCR positioning issues
-        // OCR sometimes has slight offsets due to different coordinate systems
-        const offsetX = 0; // Horizontal offset adjustment
-        const offsetY = 0; // Vertical offset adjustment
-        
-        screenX += offsetX;
-        screenY += offsetY;
+        console.log(`📍 "${word.text}": OCR(${ocrX},${ocrY},${ocrWidth}x${ocrHeight}) → Screen(${screenX},${screenY},${screenW}x${screenH})`);
         
         // Ensure coordinates are within screen bounds
-        screenX = Math.max(0, Math.min(screenX, screenWidth - screenWidth));
-        screenY = Math.max(0, Math.min(screenY, screenHeight - screenHeight));
+        const boundedX = Math.max(0, Math.min(screenX, screenWidth - screenW));
+        const boundedY = Math.max(0, Math.min(screenY, screenHeight - screenH));
         
         highlights.push({
           id: `ocr-jarvis-${index}`,
           text: word.text || 'Unknown',
           reason: `Found "${word.text}" via OCR (confidence: ${Math.round(word.confidence || 50)}%) - Scaled from (${ocrX}, ${ocrY})`,
           confidence: (word.confidence || 50) / 100,
-          x: screenX,
-          y: screenY,
-          width: Math.max(screenWidth, 50), // Minimum width for visibility
-          height: Math.max(screenHeight, 20) // Minimum height for visibility
+          x: boundedX,
+          y: boundedY,
+          width: Math.max(screenW, 50), // Minimum width for visibility
+          height: Math.max(screenH, 20) // Minimum height for visibility
         });
         
         console.log(`📍 Created highlight ${index}: "${word.text}"`);
         console.log(`   OCR coords: (${ocrX}, ${ocrY}) ${ocrWidth}x${ocrHeight}`);
-        console.log(`   Screen coords: (${screenX}, ${screenY}) ${screenWidth}x${screenHeight}`);
+        console.log(`   Screen coords: (${screenX}, ${screenY}) ${screenW}x${screenH}`);
+        console.log(`   Bounded coords: (${boundedX}, ${boundedY})`);
         console.log(`   Scale factors: X=${scaleX.toFixed(3)}, Y=${scaleY.toFixed(3)}`);
         
       } else {
@@ -2100,6 +2105,13 @@ ipcMain.handle('highlights:find-heyjarvis', async () => {
     
     if (highlights.length > 0) {
       console.log(`✅ Created ${highlights.length} OCR-based highlights`);
+      
+      // Final debug summary
+      console.log('🐛 FINAL HIGHLIGHT SUMMARY:');
+      highlights.forEach((h, i) => {
+        console.log(`  [${i}] "${h.text}" at (${h.x}, ${h.y}) size ${h.width}x${h.height}`);
+      });
+      
       showHighlights(highlights);
       return { success: true, found: highlights.length, method: 'ocr' };
     } else {
