@@ -121,6 +121,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   onTopBarManuallyPositioned: (callback) => {
     ipcRenderer.on('topbar:manually-positioned', (event, isManual) => callback(isManual));
+  },
+  
+  // Fact checking API
+  factCheck: {
+    captureScreen: () => ipcRenderer.invoke('fact-check:capture-screen'),
+    extractText: (imageBase64) => ipcRenderer.invoke('fact-check:extract-text', imageBase64)
+  },
+  
+  // AI analysis API
+  ai: {
+    simpleAnalyze: (prompt) => ipcRenderer.invoke('ai:simple-analyze', prompt)
   }
 });
 

@@ -738,6 +738,10 @@
               <div class="action-icon">💬</div>
               <div class="action-text">Slack activity</div>
             </div>
+            <div class="quick-action" onclick="startFactCheck()">
+              <div class="action-icon">🔍</div>
+              <div class="action-text">Fact Check Screen</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1281,6 +1285,180 @@
         initializeServices();
       }
     }, 2000);
+    
+    // ===== FACT CHECKING FUNCTIONALITY =====
+    
+    async function startFactCheck() {
+      try {
+        addMessage('assistant', '📸 Capturing screen content...');
+        showTypingIndicator();
+        
+        // Method 1: Try screen capture with OCR
+        let screenText = await captureAndExtractText();
+        
+        // Method 2: Fallback to clipboard
+        if (!screenText || screenText.length < 10) {
+          addMessage('assistant', '📋 Checking clipboard content...');
+          screenText = await getClipboardContent();
+        }
+        
+        if (!screenText || screenText.length < 10) {
+          addMessage('assistant', '❌ No readable text found. Try copying some text first, then click Fact Check.');
+          return;
+        }
+        
+        addMessage('assistant', `✅ Found ${screenText.length} characters. Analyzing for misinformation...`);
+        
+        // Analyze with AI
+        const analysis = await analyzeWithAI(screenText);
+        
+        // Show results
+        displayFactCheckResults(analysis, screenText);
+        
+      } catch (error) {
+        console.error('Fact check error:', error);
+        addMessage('assistant', '❌ Fact check failed. Please try again.');
+      } finally {
+        hideTypingIndicator();
+      }
+    }
+    
+    async function captureAndExtractText() {
+      try {
+        if (!window.electronAPI?.factCheck) {
+          console.log('Fact check API not available, using clipboard fallback');
+          return null;
+        }
+        
+        // Capture screen
+        const capture = await window.electronAPI.factCheck.captureScreen();
+        
+        if (!capture.success) {
+          console.error('Screen capture failed:', capture.error);
+          return null;
+        }
+        
+        // Extract text with OCR
+        const textResult = await window.electronAPI.factCheck.extractText(capture.image);
+        
+        if (!textResult.success) {
+          console.error('Text extraction failed:', textResult.error);
+          return null;
+        }
+        
+        return textResult.text;
+        
+      } catch (error) {
+        console.error('Screen capture and OCR failed:', error);
+        return null;
+      }
+    }
+    
+    async function getClipboardContent() {
+      try {
+        return await navigator.clipboard.readText();
+      } catch (error) {
+        console.error('Clipboard access failed:', error);
+        return null;
+      }
+    }
+    
+    async function analyzeWithAI(text) {
+      try {
+        const prompt = `Analyze this text for potential misinformation, exaggerations, or suspicious claims. Look for:
+        - Unverifiable statistics or numbers
+        - Exaggerated or superlative claims ("best ever", "never before seen")
+        - Missing sources for bold statements
+        - Logical inconsistencies
+        - Claims that seem too good to be true
+        
+        For each suspicious part you find, respond with a JSON array containing objects with:
+        - "text": the exact suspicious text (keep it short, under 100 chars)
+        - "reason": brief explanation why it's suspicious
+        - "confidence": number from 0-1 (how confident you are it's problematic)
+        
+        Text to analyze: "${text.substring(0, 2000)}"${text.length > 2000 ? '...' : ''}
+        
+        If no issues found, return empty array []. Only return valid JSON.`;
+        
+        if (!window.electronAPI?.ai) {
+          throw new Error('AI analysis not available');
+        }
+        
+        const response = await window.electronAPI.ai.simpleAnalyze(prompt);
+        
+        // Try to parse as JSON, fallback to simple analysis
+        try {
+          const parsed = JSON.parse(response);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (parseError) {
+          // Fallback: create simple analysis from text response
+          if (response.toLowerCase().includes('suspicious') || 
+              response.toLowerCase().includes('problematic') ||
+              response.toLowerCase().includes('unverifiable')) {
+            return [{
+              text: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+              reason: response,
+              confidence: 0.6
+            }];
+          }
+          return [];
+        }
+        
+      } catch (error) {
+        console.error('AI analysis failed:', error);
+        return [];
+      }
+    }
+    
+    function displayFactCheckResults(analysis, originalText) {
+      if (!analysis || analysis.length === 0) {
+        addMessage('assistant', '✅ No obvious misinformation detected in the analyzed text.');
+        return;
+      }
+      
+      addMessage('assistant', `⚠️ Found ${analysis.length} potentially suspicious claim${analysis.length > 1 ? 's' : ''}:`);
+      
+      analysis.forEach((item, index) => {
+        const confidence = Math.round((item.confidence || 0.5) * 100);
+        const color = confidence > 70 ? '#dc3545' : confidence > 40 ? '#ffc107' : '#28a745';
+        
+        const highlightHtml = `
+          <div class="fact-check-item" style="
+            background: rgba(255, 0, 0, 0.1); 
+            border-left: 3px solid ${color}; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border-radius: 4px;
+            cursor: pointer;
+          " onclick="showDetailedAnalysis('${encodeURIComponent(item.reason)}', '${encodeURIComponent(item.text)}')">
+            <strong>🚨 Suspicious Claim #${index + 1}</strong><br>
+            <em>"${item.text}"</em><br>
+            <small style="color: ${color};">Risk Level: ${confidence}% • Click for details</small>
+          </div>
+        `;
+        
+        addMessage('assistant', highlightHtml);
+      });
+    }
+    
+    function showDetailedAnalysis(encodedReason, encodedText) {
+      const reason = decodeURIComponent(encodedReason);
+      const suspiciousText = decodeURIComponent(encodedText);
+      
+      const detailHtml = `
+        <div style="background: rgba(0, 0, 0, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+          <strong>🔍 Detailed Analysis:</strong><br><br>
+          <strong>Suspicious Text:</strong><br>
+          <em>"${suspiciousText}"</em><br><br>
+          <strong>Why This Might Be Problematic:</strong><br>
+          ${reason}
+        </div>
+      `;
+      
+      addMessage('assistant', detailHtml);
+    }
+    
   </script>
 </body>
 </html>

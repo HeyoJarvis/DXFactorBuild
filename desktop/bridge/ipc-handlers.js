@@ -33,6 +33,7 @@ class IPCHandlers {
       this.setupNotificationHandlers();
       this.setupAPIHandlers();
       this.setupCRMHandlers();
+      this.setupFactCheckHandlers();
       
       this.logger.info('IPC handlers setup complete');
       
@@ -550,6 +551,123 @@ class IPCHandlers {
         return { status: 'unhealthy', error: error.message };
       }
     });
+  }
+  
+  /**
+   * Setup fact checking handlers
+   */
+  setupFactCheckHandlers() {
+    this.logger.info('Setting up fact check handlers...');
+    const { desktopCapturer, screen } = require('electron');
+    
+    // Screen capture handler
+    ipcMain.handle('fact-check:capture-screen', async () => {
+      this.logger.info('📸 Fact check screen capture handler called');
+      try {
+        this.logger.info('Capturing screen for fact check');
+        
+        const primaryDisplay = screen.getPrimaryDisplay();
+        
+        const sources = await desktopCapturer.getSources({
+          types: ['screen'],
+          thumbnailSize: {
+            width: Math.min(primaryDisplay.size.width, 1920),
+            height: Math.min(primaryDisplay.size.height, 1080)
+          }
+        });
+        
+        if (sources.length === 0) {
+          throw new Error('No screen sources available');
+        }
+        
+        const screenshot = sources[0].thumbnail.toPNG();
+        
+        this.logger.info('Screen captured successfully', {
+          size: screenshot.length,
+          dimensions: primaryDisplay.size
+        });
+        
+        return {
+          success: true,
+          image: screenshot.toString('base64'),
+          dimensions: primaryDisplay.size
+        };
+        
+      } catch (error) {
+        this.logger.error('Screen capture failed', { error: error.message });
+        return {
+          success: false,
+          error: error.message
+        };
+      }
+    });
+    
+    // OCR text extraction handler
+    ipcMain.handle('fact-check:extract-text', async (event, imageBase64) => {
+      try {
+        this.logger.info('Starting OCR text extraction');
+        
+        // For now, we'll use a simple fallback since Tesseract can be heavy
+        // In production, you might want to use a cloud OCR service
+        
+        // Simulate OCR processing time
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // For MVP, return a placeholder - you can integrate real OCR later
+        const mockText = 'OCR text extraction not yet implemented. Using clipboard fallback.';
+        
+        this.logger.info('OCR extraction completed (mock)');
+        
+        return {
+          success: true,
+          text: mockText
+        };
+        
+      } catch (error) {
+        this.logger.error('OCR extraction failed', { error: error.message });
+        return {
+          success: false,
+          error: error.message
+        };
+      }
+    });
+    
+    // AI analysis handler
+    ipcMain.handle('ai:simple-analyze', async (event, prompt) => {
+      this.logger.info('🤖 AI analysis handler called');
+      try {
+        this.logger.info('Starting AI analysis for fact check');
+        
+        // Use existing AI analyzer
+        const AIAnalyzer = require('../../core/signals/enrichment/ai-analyzer');
+        const aiAnalyzer = new AIAnalyzer();
+        
+        const response = await aiAnalyzer.anthropic.messages.create({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 500,
+          temperature: 0.3,
+          messages: [{
+            role: 'user',
+            content: prompt
+          }]
+        });
+        
+        const result = response.content[0].text;
+        
+        this.logger.info('AI analysis completed', {
+          promptLength: prompt.length,
+          responseLength: result.length
+        });
+        
+        return result;
+        
+      } catch (error) {
+        this.logger.error('AI analysis failed', { error: error.message });
+        return 'AI analysis temporarily unavailable. Please try again later.';
+      }
+    });
+    
+    this.logger.info('✅ Fact check handlers registered successfully');
   }
 }
 

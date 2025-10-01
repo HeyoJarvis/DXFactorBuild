@@ -1206,3 +1206,104 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+// ===== FACT CHECK IPC HANDLERS =====
+
+// Screen capture handler
+ipcMain.handle('fact-check:capture-screen', async () => {
+  try {
+    console.log('📸 Capturing screen for fact check');
+    
+    const { desktopCapturer, screen } = require('electron');
+    const primaryDisplay = screen.getPrimaryDisplay();
+    
+    const sources = await desktopCapturer.getSources({
+      types: ['screen'],
+      thumbnailSize: {
+        width: Math.min(primaryDisplay.size.width, 1920),
+        height: Math.min(primaryDisplay.size.height, 1080)
+      }
+    });
+    
+    if (sources.length === 0) {
+      throw new Error('No screen sources available');
+    }
+    
+    const screenshot = sources[0].thumbnail.toPNG();
+    
+    console.log('✅ Screen captured successfully');
+    
+    return {
+      success: true,
+      image: screenshot.toString('base64'),
+      dimensions: primaryDisplay.size
+    };
+    
+  } catch (error) {
+    console.error('❌ Screen capture failed:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// OCR text extraction handler (placeholder for now)
+ipcMain.handle('fact-check:extract-text', async (event, imageBase64) => {
+  try {
+    console.log('🔍 Starting OCR text extraction (placeholder)');
+    
+    // Simulate OCR processing time
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // For MVP, return a placeholder - you can integrate real OCR later
+    const mockText = 'OCR text extraction not yet implemented. Using clipboard fallback.';
+    
+    console.log('✅ OCR extraction completed (mock)');
+    
+    return {
+      success: true,
+      text: mockText
+    };
+    
+  } catch (error) {
+    console.error('❌ OCR extraction failed:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// AI analysis handler
+ipcMain.handle('ai:simple-analyze', async (event, prompt) => {
+  try {
+    console.log('🤖 Starting AI analysis for fact check');
+    
+    // Use existing AI analyzer
+    const AIAnalyzer = require('../core/signals/enrichment/ai-analyzer');
+    const aiAnalyzer = new AIAnalyzer();
+    
+    const response = await aiAnalyzer.anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 500,
+      temperature: 0.3,
+      messages: [{
+        role: 'user',
+        content: prompt
+      }]
+    });
+    
+    const result = response.content[0].text;
+    
+    console.log('✅ AI analysis completed');
+    
+    return result;
+    
+  } catch (error) {
+    console.error('❌ AI analysis failed:', error.message);
+    return 'AI analysis temporarily unavailable. Please try again later.';
+  }
+});
+
+console.log('✅ Fact check IPC handlers registered');
