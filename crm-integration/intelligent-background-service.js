@@ -8,17 +8,18 @@
  * 4. Runs intelligent monitoring and alerting
  */
 
-require('dotenv').config({ path: '../.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const express = require('express');
 const winston = require('winston');
 const cron = require('node-cron');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs').promises;
-const path = require('path');
 const { EventEmitter } = require('events');
 
 // Import intelligent components
 const IntelligentCRMAnalyzer = require('./intelligent-crm-analyzer');
+const CRMSupabaseAdapter = require('./supabase-adapter');
 
 class IntelligentBackgroundService extends EventEmitter {
   constructor(options = {}) {
@@ -41,9 +42,13 @@ class IntelligentBackgroundService extends EventEmitter {
       logLevel: this.options.logLevel
     });
     
-    // State management
-    this.analysisHistory = new Map(); // organizationId -> analysis history
-    this.alertHistory = new Map(); // organizationId -> alert history
+    // Initialize Supabase database adapter
+    this.dbAdapter = new CRMSupabaseAdapter({
+      logger: this.logger
+    });
+    this.logger.info('✅ Supabase adapter initialized for CRM integration');
+    
+    // State management - all data stored in Supabase
     this.companyIntelligence = null;
     this.lastAnalysisTime = null;
     
@@ -122,58 +127,69 @@ class IntelligentBackgroundService extends EventEmitter {
       }
     });
     
-    // Get latest analysis results
+    // Get latest analysis results from Supabase
     this.app.get('/analysis/latest/:organizationId', async (req, res) => {
       try {
         const { organizationId } = req.params;
-        const history = this.analysisHistory.get(organizationId) || [];
-        const latest = history[history.length - 1];
         
-        if (!latest) {
+        // Fetch from Supabase
+        const analyses = await this.dbAdapter.getAnalyses(organizationId, { limit: 1 });
+        
+        if (!analyses || analyses.length === 0) {
           return res.status(404).json({ error: 'No analysis found' });
         }
         
+        const latest = analyses[0];
         res.json(latest);
+        
       } catch (error) {
         this.logger.error('Failed to get analysis results', { error: error.message });
         res.status(500).json({ error: error.message });
       }
     });
     
-    // Get recommendations
+    // Get recommendations from Supabase
     this.app.get('/recommendations/:organizationId', async (req, res) => {
       try {
         const { organizationId } = req.params;
-        const history = this.analysisHistory.get(organizationId) || [];
-        const latest = history[history.length - 1];
         
-        if (!latest?.recommendations) {
+        // Fetch latest analysis from Supabase
+        const analyses = await this.dbAdapter.getAnalyses(organizationId, { limit: 1 });
+        
+        if (!analyses || analyses.length === 0) {
           return res.status(404).json({ error: 'No recommendations found' });
         }
         
+        const latest = analyses[0];
+        
         res.json({
-          recommendations: latest.recommendations,
+          recommendations: latest.recommendations || [],
           generated_at: latest.timestamp,
-          company: latest.company_name
+          company: latest.company_name || organizationId
         });
+        
       } catch (error) {
         this.logger.error('Failed to get recommendations', { error: error.message });
         res.status(500).json({ error: error.message });
       }
     });
     
-    // Company intelligence endpoint
+    // Company intelligence endpoint - fetch from Supabase
     this.app.get('/intelligence/:organizationId', async (req, res) => {
       try {
         const { organizationId } = req.params;
-        const history = this.analysisHistory.get(organizationId) || [];
-        const latest = history[history.length - 1];
         
-        if (!latest?.company_intelligence) {
+        // Fetch latest analysis from Supabase
+        const analyses = await this.dbAdapter.getAnalyses(organizationId, { limit: 1 });
+        
+        if (!analyses || analyses.length === 0) {
           return res.status(404).json({ error: 'No company intelligence found' });
         }
         
-        res.json(latest.company_intelligence);
+        const latest = analyses[0];
+        
+        res.json(latest.company_intelligence || {});
+        
       } catch (error) {
         this.logger.error('Failed to get company intelligence', { error: error.message });
         res.status(500).json({ error: error.message });
@@ -483,20 +499,32 @@ class IntelligentBackgroundService extends EventEmitter {
     }
   }
   
-  storeAnalysisResult(organizationId, result) {
-    if (!this.analysisHistory.has(organizationId)) {
-      this.analysisHistory.set(organizationId, []);
-    }
-    
-    const history = this.analysisHistory.get(organizationId);
-    history.push({
-      ...result,
-      stored_at: new Date().toISOString()
-    });
-    
-    // Keep only last 10 analyses
-    if (history.length > 10) {
-      history.shift();
+  async storeAnalysisResult(organizationId, result) {
+    try {
+      // Store in Supabase database
+      const signal = await this.dbAdapter.storeAnalysis(organizationId, result);
+      
+      this.logger.info('Analysis result stored in Supabase', {
+        organizationId,
+        signal_id: signal.id,
+        urgency: result.urgency || 'medium'
+      });
+      
+      // Emit event for real-time updates
+      this.emit('analysis_stored', {
+        organizationId,
+        signal_id: signal.id,
+        result
+      });
+      
+      return signal;
+      
+    } catch (error) {
+      this.logger.error('Failed to store analysis result', {
+        organizationId,
+        error: error.message
+      });
+      // Don't throw - logging failure shouldn't break analysis
     }
   }
   
@@ -590,25 +618,52 @@ class IntelligentBackgroundService extends EventEmitter {
       urgency: alert.urgency
     });
     
-    // Emit event for Slack integration or other alert handlers
-    this.emit('alert_generated', {
-      organizationId,
-      alert,
-      timestamp: new Date().toISOString()
-    });
-    
-    // Here you could integrate with Slack, email, or other notification systems
-    // For now, just log the alert
-    console.log(`\n🔔 INTELLIGENT ALERT for ${organizationId}:`);
-    console.log(`📋 ${alert.title}`);
-    console.log(`💬 ${alert.message}`);
-    if (alert.recommendations) {
-      console.log(`💡 Top Recommendations:`);
-      alert.recommendations.slice(0, 2).forEach((rec, i) => {
-        console.log(`   ${i + 1}. ${rec.tool_name}: ${rec.recommendation}`);
+    try {
+      // Store alert in database
+      const signal = await this.dbAdapter.storeAlert(organizationId, alert);
+      
+      this.logger.info('Alert stored in database', {
+        organizationId,
+        signal_id: signal.id,
+        alert_type: alert.type
+      });
+      
+      // Emit event for Slack integration or other alert handlers
+      this.emit('alert_generated', {
+        organizationId,
+        alert,
+        signal_id: signal.id,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Console log for visibility
+      console.log(`\n🔔 INTELLIGENT ALERT for ${organizationId}:`);
+      console.log(`📋 ${alert.title}`);
+      console.log(`💬 ${alert.message}`);
+      console.log(`🔗 Signal ID: ${signal.id}`);
+      if (alert.recommendations) {
+        console.log(`💡 Top Recommendations:`);
+        alert.recommendations.slice(0, 2).forEach((rec, i) => {
+          console.log(`   ${i + 1}. ${rec.tool_name || 'Recommendation'}: ${rec.recommendation || rec.description || ''}`);
+        });
+      }
+      console.log('');
+      
+      return signal;
+      
+    } catch (error) {
+      this.logger.error('Failed to store alert', {
+        organizationId,
+        error: error.message
+      });
+      // Still emit event even if storage fails
+      this.emit('alert_generated', {
+        organizationId,
+        alert,
+        timestamp: new Date().toISOString(),
+        storage_error: error.message
       });
     }
-    console.log('');
   }
   
   trackAlertHistory(organizationId, alerts) {

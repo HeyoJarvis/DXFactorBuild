@@ -9,6 +9,9 @@
  * 5. Real-time notifications
  */
 
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+
 const { App } = require('@slack/bolt');
 const winston = require('winston');
 const express = require('express');
@@ -20,6 +23,7 @@ const DigestCard = require('./blocks/digest');
 const FeedbackHandler = require('./blocks/feedback');
 const CommandHandlers = require('./commands');
 const WorkflowHandlers = require('./workflows');
+const SlackSupabaseAdapter = require('./supabase-adapter');
 
 class HeyJarvisSlackApp {
   constructor(options = {}) {
@@ -43,6 +47,12 @@ class HeyJarvisSlackApp {
       defaultMeta: { service: 'slack-app' }
     });
     
+    // Initialize Supabase database adapter
+    this.dbAdapter = new SlackSupabaseAdapter({
+      logger: this.logger
+    });
+    this.logger.info('✅ Supabase adapter initialized for Slack bot');
+    
     // Initialize Slack Bolt app
     this.slackApp = new App({
       token: process.env.SLACK_BOT_TOKEN,
@@ -54,7 +64,10 @@ class HeyJarvisSlackApp {
         debug: (...msgs) => this.logger.debug(msgs.join(' ')),
         info: (...msgs) => this.logger.info(msgs.join(' ')),
         warn: (...msgs) => this.logger.warn(msgs.join(' ')),
-        error: (...msgs) => this.logger.error(msgs.join(' '))
+        error: (...msgs) => this.logger.error(msgs.join(' ')),
+        setLevel: () => {},
+        getLevel: () => this.options.logLevel,
+        setName: () => {}
       }
     });
     
@@ -315,6 +328,24 @@ class HeyJarvisSlackApp {
           unfurl_media: false
         });
         
+        // Track delivery in database
+        await this.dbAdapter.trackDelivery({
+          signal_id: signal.id,
+          user_id: user.id,
+          channel: result.channel,
+          message_ts: result.ts,
+          urgency: signal.priority || 'medium',
+          metadata: {
+            delivery_type: options.delivery_type || 'real_time',
+            source: signal.source_id
+          }
+        }).catch(err => {
+          // Log but don't fail delivery
+          this.logger.warn('Failed to track delivery in database', { 
+            error: err.message 
+          });
+        });
+        
         results.success_count++;
         results.details.push({
           user_id: user.id,
@@ -354,16 +385,32 @@ class HeyJarvisSlackApp {
    * Deliver digest to user
    */
   async deliverDigest(userId, digestBlocks, options = {}) {
-    // In production, would look up user's Slack ID from database
+    // Get user preferences from database
+    const preferences = await this.dbAdapter.getUserPreferences(userId).catch(() => ({}));
+    
+    // Use Slack ID from database or fallback
     const slackUserId = options.slack_user_id || userId;
     
-    return await this.slackApp.client.chat.postMessage({
+    // Get signals for digest if not provided
+    const signals = options.signals || await this.dbAdapter.getSignalsForDigest(userId, options.hours || 24);
+    
+    // Create digest if blocks not provided
+    const blocks = digestBlocks || this.digestCard.createDigest(signals, { preferences });
+    
+    const result = await this.slackApp.client.chat.postMessage({
       channel: slackUserId,
-      text: '📊 Your HeyJarvis Daily Digest',
-      blocks: digestBlocks,
+      text: '📊 Your HeyJarvis Digest',
+      blocks: blocks,
       unfurl_links: false,
       unfurl_media: false
     });
+    
+    this.logger.info('Digest delivered', { 
+      user_id: userId, 
+      signal_count: signals.length 
+    });
+    
+    return result;
   }
   
   /**

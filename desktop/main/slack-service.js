@@ -8,13 +8,14 @@ const { EventEmitter } = require('events');
 const winston = require('winston');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const DesktopSupabaseAdapter = require('./supabase-adapter');
 
 class SlackService extends EventEmitter {
   constructor() {
     super();
     
     this.logger = winston.createLogger({
-      level: 'info',
+      level: 'debug', // Changed from 'info' to 'debug' to see message events
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
@@ -30,6 +31,9 @@ class SlackService extends EventEmitter {
     this.recentMessages = [];
     this.app = null;
     this.autoStartEnabled = true; // Enable auto-start by default
+    
+    // Initialize Supabase adapter
+    this.dbAdapter = new DesktopSupabaseAdapter({ logger: this.logger });
     
     this.initialize();
   }
@@ -65,6 +69,12 @@ class SlackService extends EventEmitter {
     // Handle @hj2 mentions
     this.app.event('app_mention', async ({ event }) => {
       try {
+        this.logger.info('🎯 BOT MENTIONED!', { 
+          user: event.user, 
+          channel: event.channel,
+          text: event.text.substring(0, 100) 
+        });
+        
         const message = {
           id: `mention_${Date.now()}`,
           type: 'mention',
@@ -79,13 +89,9 @@ class SlackService extends EventEmitter {
         this.addMessage(message);
         this.emit('mention', message);
         
-        this.logger.info('Bot mentioned', { 
-          user: event.user, 
-          channel: event.channel,
-          text: event.text.substring(0, 100) 
-        });
+        this.logger.info('✅ Mention processed and stored');
       } catch (error) {
-        this.logger.error('Error handling app mention', { error: error.message });
+        this.logger.error('Error handling app mention', { error: error.message, stack: error.stack });
       }
     });
     
@@ -94,8 +100,16 @@ class SlackService extends EventEmitter {
       try {
         // Skip bot messages
         if (message.subtype === 'bot_message' || message.bot_id) {
+          this.logger.debug('Skipping bot message');
           return;
         }
+        
+        this.logger.info('💬 MESSAGE RECEIVED!', { 
+          user: message.user, 
+          channel: message.channel,
+          channelType: context.channelType,
+          text: message.text?.substring(0, 50) 
+        });
         
         const msg = {
           id: `msg_${Date.now()}`,
@@ -111,13 +125,9 @@ class SlackService extends EventEmitter {
         this.addMessage(msg);
         this.emit('message', msg);
         
-        this.logger.debug('Message received', { 
-          user: message.user, 
-          channel: message.channel,
-          channelType: context.channelType 
-        });
+        this.logger.info('✅ Message processed and stored');
       } catch (error) {
-        this.logger.error('Error handling message', { error: error.message });
+        this.logger.error('Error handling message', { error: error.message, stack: error.stack });
       }
     });
     
@@ -135,6 +145,11 @@ class SlackService extends EventEmitter {
     if (this.recentMessages.length > 100) {
       this.recentMessages = this.recentMessages.slice(0, 100);
     }
+    
+    // Save to Supabase asynchronously (don't wait)
+    this.dbAdapter.saveSlackMessage(message).catch(error => {
+      this.logger.warn('Failed to save message to Supabase', { error: error.message });
+    });
   }
   
   async start() {
@@ -144,16 +159,25 @@ class SlackService extends EventEmitter {
       }
       
       this.logger.info('Starting Slack service...');
+      this.logger.info('Socket Mode enabled:', process.env.SLACK_SOCKET_MODE === 'true');
+      this.logger.info('Bot Token present:', !!process.env.SLACK_BOT_TOKEN);
+      this.logger.info('App Token present:', !!process.env.SLACK_APP_TOKEN);
+      
       await this.app.start();
       this.isConnected = true;
       
-      this.logger.info('Slack service started successfully');
+      this.logger.info('✅ Slack service started successfully and listening for events');
+      this.logger.info('Waiting for messages... Make sure:');
+      this.logger.info('  1. Bot is invited to channels (/invite @hj2)');
+      this.logger.info('  2. Event subscriptions are configured in Slack App settings');
+      this.logger.info('  3. Bot has proper OAuth scopes (channels:history, etc.)');
+      
       this.emit('connected');
       
       return { success: true, message: 'Slack monitoring started' };
       
     } catch (error) {
-      this.logger.error('Failed to start Slack service', { error: error.message });
+      this.logger.error('Failed to start Slack service', { error: error.message, stack: error.stack });
       this.emit('error', error);
       return { success: false, error: error.message };
     }
@@ -187,7 +211,7 @@ class SlackService extends EventEmitter {
       connected: this.isConnected,
       messageCount: this.recentMessages.length,
       mentionCount: this.recentMessages.filter(m => m.type === 'mention').length,
-      botName: 'hj2',
+      botName: 'Jarvis-Shail',
       lastMessage: this.recentMessages.length > 0 ? this.recentMessages[0].timestamp : null
     };
   }

@@ -113,6 +113,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onSlackError: (callback) => {
     ipcRenderer.on('slack:error', (event, error) => callback(error));
   },
+  
+  // Workflow detection event listeners
+  onWorkRequest: (callback) => {
+    ipcRenderer.on('slack:workRequest', (event, data) => callback(data));
+  },
 
   // Top bar event listeners
   onTopBarExpanded: (callback) => {
@@ -146,6 +151,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Listen for explanation requests
   onShowExplanation: (callback) => {
     ipcRenderer.on('show-explanation', (event, data) => callback(data));
+  },
+  
+  // Workflow detection API
+  workflow: {
+    analyzeMessage: (message) => ipcRenderer.invoke('workflow:analyzeMessage', message),
+    getRecentWorkRequests: (limit) => ipcRenderer.invoke('workflow:getRecentWorkRequests', limit),
+    getInsights: (userId) => ipcRenderer.invoke('workflow:getInsights', userId),
+    getStats: () => ipcRenderer.invoke('workflow:getStats')
+  },
+  
+  // Task management API
+  tasks: {
+    create: (taskData) => ipcRenderer.invoke('tasks:create', taskData),
+    getAll: () => ipcRenderer.invoke('tasks:getAll'),
+    update: (taskId, updates) => ipcRenderer.invoke('tasks:update', taskId, updates),
+    delete: (taskId) => ipcRenderer.invoke('tasks:delete', taskId),
+    toggle: (taskId, currentStatus) => ipcRenderer.invoke('tasks:toggle', taskId, currentStatus),
+    getStats: () => ipcRenderer.invoke('tasks:getStats')
   }
 });
 

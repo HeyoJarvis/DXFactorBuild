@@ -16,6 +16,7 @@ class SupabaseClient {
   constructor(options = {}) {
     this.options = {
       logLevel: 'info',
+      useServiceRole: false, // Set to true for background services
       ...options
     };
     
@@ -30,7 +31,10 @@ class SupabaseClient {
     
     // Initialize Supabase client
     const supabaseUrl = process.env.SUPABASE_URL || 'https://your-project.supabase.co';
-    const supabaseKey = process.env.SUPABASE_ANON_KEY || 'your-anon-key';
+    // Use service role key for admin operations, anon key for user operations
+    const supabaseKey = this.options.useServiceRole
+      ? (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY)
+      : (process.env.SUPABASE_ANON_KEY || 'your-anon-key');
     
     this.supabase = createClient(supabaseUrl, supabaseKey, {
       auth: {

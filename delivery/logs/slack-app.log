@@ -1,0 +1,5 @@
+{"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-10-02T01:52:21.539Z"}
+{"level":"info","message":"HeyJarvis Slack app started successfully","port":3000,"service":"slack-app","timestamp":"2025-10-02T01:52:21.782Z","webhook_port":3001}
+{"level":"info","message":"Webhook server started","port":3001,"service":"slack-app","timestamp":"2025-10-02T01:52:21.782Z"}
+{"level":"info","message":"Now connected to Slack","service":"slack-app","timestamp":"2025-10-02T01:52:22.060Z"}
+{"level":"info","message":"Disconnecting ...","service":"slack-app","timestamp":"2025-10-02T01:53:12.726Z"}

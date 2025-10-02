@@ -3,10 +3,16 @@
  * Loads the copilot-enhanced.html directly without webpack
  */
 
+// Load environment variables FIRST before anything else
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+
 const { app, BrowserWindow, ipcMain, Tray, Menu, screen, desktopCapturer } = require('electron');
 const path = require('path');
 const SlackService = require('./main/slack-service');
 const CRMStartupService = require('./main/crm-startup-service');
+const DesktopSupabaseAdapter = require('./main/supabase-adapter');
+const WorkRequestAlertSystem = require('../api/notifications/work-request-alerts');
+const WorkflowIntelligenceSystem = require('../core/intelligence/workflow-analyzer');
 
 // Global error handlers to prevent crashes
 process.on('uncaughtException', (error) => {
@@ -24,7 +30,11 @@ let highlightOverlay = null; // New overlay for fact-check highlights
 let tray;
 let slackService;
 let crmStartupService;
+let dbAdapter; // Supabase adapter for desktop app
+let workRequestSystem; // Workflow detection system
+let workflowIntelligence; // Workflow intelligence analyzer
 let conversationHistory = []; // Store conversation history
+let currentSessionId = null; // Track current conversation session
 let lastSlackContext = null; // Cache Slack context
 let isExpanded = false; // Track if top bar is expanded
 let isManuallyPositioned = false; // Track if user has manually moved the bar
@@ -72,8 +82,8 @@ function createWindow() {
     type: 'panel' // Panel type for better overlay behavior
   });
 
-  // Load the copilot HTML file directly
-  mainWindow.loadFile(path.join(__dirname, 'renderer/copilot-enhanced.html'));
+  // Load the copilot HTML file directly (with tasks tab)
+  mainWindow.loadFile(path.join(__dirname, 'renderer/copilot-with-tasks.html'));
 
   // Setup persistent overlay behavior
   setupPersistentOverlay();
@@ -534,8 +544,37 @@ function toggleTopBarExpansion() {
 
 // Initialize services with auto-startup
 function initializeServices() {
+  // Initialize Supabase adapter
+  dbAdapter = new DesktopSupabaseAdapter({
+    logger: {
+      info: (msg, meta) => console.log('🗄️', msg, meta),
+      debug: (msg, meta) => console.log('🔍', msg, meta),
+      warn: (msg, meta) => console.warn('⚠️', msg, meta),
+      error: (msg, meta) => console.error('❌', msg, meta)
+    }
+  });
+  
+  // Initialize Workflow Detection Systems
+  console.log('🧠 Initializing workflow detection systems...');
+  
+  workRequestSystem = new WorkRequestAlertSystem({
+    alertThreshold: 0.7,
+    adminUserId: process.env.ADMIN_USER_ID || 'U09GEFMKGE7' // Your user ID
+  });
+  
+  workflowIntelligence = new WorkflowIntelligenceSystem({
+    logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+    analysisWindow: 7, // days
+    minPatternOccurrences: 3
+  });
+  
+  console.log('✅ Workflow detection systems initialized');
+  
   // Initialize Slack service
   slackService = new SlackService();
+  
+  // Setup Slack workflow detection integration
+  setupWorkflowDetection();
   
   // Initialize CRM startup service
   crmStartupService = new CRMStartupService({
@@ -590,6 +629,157 @@ function initializeServices() {
 
   ipcMain.handle('slack:getChannelInfo', async (event, channelId) => {
     return await slackService.getChannelInfo(channelId);
+  });
+  
+  // Workflow detection IPC handlers
+  ipcMain.handle('workflow:analyzeMessage', async (event, message) => {
+    try {
+      return workRequestSystem.analyzeForWorkRequest(message, {});
+    } catch (error) {
+      console.error('Workflow analysis failed:', error);
+      return { isWorkRequest: false, error: error.message };
+    }
+  });
+  
+  ipcMain.handle('workflow:getRecentWorkRequests', async (event, limit = 20) => {
+    try {
+      // Get recent messages and filter for work requests
+      const recentMessages = slackService.getRecentMessages(50);
+      const workRequests = [];
+      
+      for (const message of recentMessages) {
+        const analysis = workRequestSystem.analyzeForWorkRequest(
+          { text: message.text, timestamp: message.timestamp },
+          { user: message.user, channel: message.channel }
+        );
+        
+        if (analysis.isWorkRequest) {
+          workRequests.push({
+            ...message,
+            analysis
+          });
+        }
+      }
+      
+      return workRequests.slice(0, limit);
+    } catch (error) {
+      console.error('Failed to get work requests:', error);
+      return [];
+    }
+  });
+  
+  ipcMain.handle('workflow:getInsights', async (event, userId) => {
+    try {
+      if (!workflowIntelligence) {
+        return { insights: [], patterns: [] };
+      }
+      
+      // Get workflow patterns and insights for user
+      const insights = await workflowIntelligence.generateInsights(userId);
+      return insights || { insights: [], patterns: [] };
+    } catch (error) {
+      console.error('Failed to get workflow insights:', error);
+      return { insights: [], patterns: [] };
+    }
+  });
+  
+  ipcMain.handle('workflow:getStats', () => {
+    try {
+      const recentMessages = slackService.getRecentMessages(100);
+      let workRequestCount = 0;
+      let urgentCount = 0;
+      let totalMessages = recentMessages.length;
+      
+      for (const message of recentMessages) {
+        const analysis = workRequestSystem.analyzeForWorkRequest(
+          { text: message.text, timestamp: message.timestamp },
+          { user: message.user, channel: message.channel }
+        );
+        
+        if (analysis.isWorkRequest) {
+          workRequestCount++;
+          if (analysis.urgency === 'high' || analysis.urgency === 'urgent') {
+            urgentCount++;
+          }
+        }
+      }
+      
+      return {
+        totalMessages,
+        workRequestCount,
+        urgentCount,
+        workRequestRate: totalMessages > 0 ? (workRequestCount / totalMessages) : 0
+      };
+    } catch (error) {
+      console.error('Failed to get workflow stats:', error);
+      return { totalMessages: 0, workRequestCount: 0, urgentCount: 0, workRequestRate: 0 };
+    }
+  });
+
+  // Task Management IPC handlers
+  ipcMain.handle('tasks:create', async (event, taskData) => {
+    try {
+      const userId = 'desktop-user'; // TODO: Get actual user ID
+      const result = await dbAdapter.createTask(userId, taskData);
+      return result;
+    } catch (error) {
+      console.error('Failed to create task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('tasks:getAll', async () => {
+    try {
+      const userId = 'desktop-user'; // TODO: Get actual user ID
+      console.log('📥 IPC: Getting all tasks for user:', userId);
+      const result = await dbAdapter.getUserTasks(userId, { includeCompleted: false });
+      console.log('📦 IPC: Task result:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to get tasks:', error);
+      return { success: false, error: error.message, tasks: [] };
+    }
+  });
+
+  ipcMain.handle('tasks:update', async (event, taskId, updates) => {
+    try {
+      const result = await dbAdapter.updateTask(taskId, updates);
+      return result;
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('tasks:delete', async (event, taskId) => {
+    try {
+      const result = await dbAdapter.deleteTask(taskId);
+      return result;
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('tasks:toggle', async (event, taskId, currentStatus) => {
+    try {
+      const result = await dbAdapter.toggleTaskCompletion(taskId, currentStatus);
+      return result;
+    } catch (error) {
+      console.error('Failed to toggle task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('tasks:getStats', async () => {
+    try {
+      const userId = 'desktop-user'; // TODO: Get actual user ID
+      const result = await dbAdapter.getTaskStats(userId);
+      return result;
+    } catch (error) {
+      console.error('Failed to get task stats:', error);
+      return { success: false, error: error.message, stats: {} };
+    }
   });
 
   // Copilot IPC handlers with persistent context and real data integration
@@ -721,6 +911,43 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
         content: aiResponse,
         timestamp: new Date().toISOString()
       });
+      
+      // Save both messages to Supabase session (asynchronously)
+      const userId = 'desktop-user'; // TODO: Get actual user ID when auth is implemented
+      
+      // Get or create active session
+      if (!currentSessionId) {
+        const sessionResult = await dbAdapter.getOrCreateActiveSession(userId, {
+          slack_connected: slackContext.connected,
+          crm_connected: crmContext.connected
+        });
+        
+        if (sessionResult.success) {
+          currentSessionId = sessionResult.session.id;
+          console.log('📂 Using conversation session:', currentSessionId);
+          
+          // Auto-generate title from first message if it's a new session
+          if (sessionResult.isNew !== false && message.length > 10) {
+            const title = message.substring(0, 50) + (message.length > 50 ? '...' : '');
+            dbAdapter.updateSessionTitle(currentSessionId, title).catch(err => 
+              console.warn('Failed to update session title:', err.message)
+            );
+          }
+        }
+      }
+      
+      // Save both messages to the session
+      if (currentSessionId) {
+        dbAdapter.saveMessageToSession(currentSessionId, message, 'user', {
+          slack_connected: slackContext.connected,
+          crm_connected: crmContext.connected
+        }).catch(err => console.warn('Failed to save user message:', err.message));
+        
+        dbAdapter.saveMessageToSession(currentSessionId, aiResponse, 'assistant', {
+          model: 'claude-3-5-sonnet-20241022',
+          context_used: true
+        }).catch(err => console.warn('Failed to save assistant message:', err.message));
+      }
       
       // Add contextual insights based on actual data
       let contextualInsights = '';
@@ -869,6 +1096,17 @@ What would you like to explore?`,
 
   ipcMain.handle('copilot:clearHistory', () => {
     conversationHistory = [];
+    
+    // Close current session and start a new one on next message
+    if (currentSessionId && dbAdapter) {
+      dbAdapter.closeSession(currentSessionId).then(() => {
+        console.log('🗑️ Conversation session closed');
+        currentSessionId = null;
+      }).catch(err => console.warn('Failed to close session:', err.message));
+    } else {
+      currentSessionId = null;
+    }
+    
     console.log('🗑️ Conversation history cleared');
     return { success: true, message: 'Conversation history cleared' };
   });
@@ -1137,6 +1375,101 @@ What would you like to explore?`,
       mainWindow.webContents.send('slack:error', error.message);
     }
   });
+}
+
+/**
+ * Setup Workflow Detection Integration
+ * Analyzes incoming Slack messages for work requests and patterns
+ */
+function setupWorkflowDetection() {
+  console.log('🔗 Setting up workflow detection integration...');
+  
+  // Listen for Slack messages and analyze them
+  slackService.on('message', async (message) => {
+    try {
+      // Analyze for work requests
+      const workRequestAnalysis = workRequestSystem.analyzeForWorkRequest(
+        { text: message.text, timestamp: message.timestamp },
+        { user: message.user, channel: message.channel }
+      );
+      
+      if (workRequestAnalysis.isWorkRequest) {
+        console.log('🚨 Work request detected!', {
+          confidence: workRequestAnalysis.confidence,
+          urgency: workRequestAnalysis.urgency,
+          workType: workRequestAnalysis.workType
+        });
+        
+        // Send enriched message to renderer with workflow analysis
+        if (mainWindow) {
+          mainWindow.webContents.send('slack:workRequest', {
+            ...message,
+            analysis: workRequestAnalysis
+          });
+        }
+      }
+      
+      // Capture in workflow intelligence system
+      if (workflowIntelligence) {
+        await workflowIntelligence.captureInboundRequest(
+          message.user,
+          message.channel,
+          message.text,
+          {
+            messageType: message.type,
+            timestamp: message.timestamp,
+            channelType: message.channelType
+          }
+        );
+      }
+      
+    } catch (error) {
+      console.error('❌ Workflow detection error:', error.message);
+    }
+  });
+  
+  // Listen for mentions and analyze them too
+  slackService.on('mention', async (message) => {
+    try {
+      // Mentions are often work requests, analyze with higher priority
+      const workRequestAnalysis = workRequestSystem.analyzeForWorkRequest(
+        { text: message.text, timestamp: message.timestamp },
+        { user: message.user, channel: message.channel }
+      );
+      
+      console.log('👋 Bot mentioned - analyzing...', {
+        isWorkRequest: workRequestAnalysis.isWorkRequest,
+        urgency: workRequestAnalysis.urgency
+      });
+      
+      // Capture mention in workflow intelligence
+      if (workflowIntelligence) {
+        await workflowIntelligence.captureInboundRequest(
+          message.user,
+          message.channel,
+          message.text,
+          {
+            messageType: 'mention',
+            timestamp: message.timestamp,
+            urgent: message.urgent || workRequestAnalysis.urgency === 'high'
+          }
+        );
+      }
+      
+      // Send to renderer with analysis
+      if (mainWindow && workRequestAnalysis.isWorkRequest) {
+        mainWindow.webContents.send('slack:workRequest', {
+          ...message,
+          analysis: workRequestAnalysis
+        });
+      }
+      
+    } catch (error) {
+      console.error('❌ Mention workflow analysis error:', error.message);
+    }
+  });
+  
+  console.log('✅ Workflow detection integration complete');
 }
 
 // Setup CRM startup event handlers

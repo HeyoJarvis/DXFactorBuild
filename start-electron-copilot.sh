@@ -14,8 +14,9 @@ else
     
     if [ -f "crm-integration/intelligent-background-service.js" ]; then
         cd crm-integration
-        export HUBSPOT_API_KEY="pat-na1-e5c61dcf-ac4b-4e68-8160-f515662e8234"
-        export ANTHROPIC_API_KEY="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"
+        # Load from .env file instead of hardcoding
+        # export HUBSPOT_API_KEY="..."
+        # export ANTHROPIC_API_KEY="..."
         export COMPANY_WEBSITE="https://dxfactor.com"
         node intelligent-background-service.js &
         

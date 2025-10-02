@@ -9,6 +9,9 @@
  * 5. Workflow optimization
  */
 
+// Load environment variables for API keys
+require('dotenv').config({ path: require('path').join(__dirname, '../../..', '.env') });
+
 const Anthropic = require('@anthropic-ai/sdk');
 const winston = require('winston');
 
@@ -40,8 +43,21 @@ class AIAnalyzer {
     });
     
     // Initialize Anthropic client
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    
+    if (!apiKey || apiKey === 'demo-key') {
+      this.logger.error('ANTHROPIC_API_KEY not found in environment variables!', {
+        available_keys: Object.keys(process.env).filter(k => k.includes('ANTHROPIC'))
+      });
+      throw new Error('ANTHROPIC_API_KEY is required but not found in environment');
+    }
+    
     this.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY || 'demo-key'
+      apiKey: apiKey
+    });
+    
+    this.logger.info('Anthropic client initialized with API key', {
+      key_prefix: apiKey.substring(0, 15) + '...'
     });
   }
   

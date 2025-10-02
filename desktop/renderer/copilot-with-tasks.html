@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: https: http://localhost:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:* https:;">
+  <title>HeyJarvis Copilot</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: rgba(28, 28, 30, 0.95);
+      color: #ffffff;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Header */
+    .copilot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 32px;
+      height: 60px;
+      background: transparent;
+      border-radius: 16px;
+      gap: 20px;
+      flex-shrink: 0;
+    }
+
+    .copilot-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #ffffff;
+      cursor: move;
+      padding: 10px 16px;
+      border-radius: 12px;
+      user-select: none;
+      -webkit-app-region: drag;
+    }
+
+    .copilot-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    .copilot-controls {
+      display: flex;
+      gap: 8px;
+      -webkit-app-region: no-drag;
+    }
+
+    .control-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.1);
+    }
+
+    .control-btn.close:hover {
+      background: rgba(255, 69, 58, 0.8);
+      color: #ffffff;
+    }
+
+    /* Tab Navigation */
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      padding: 0 24px 12px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    }
+
+    .tab-icon {
+      font-size: 16px;
+    }
+
+    /* Content Area */
+    .tab-content {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* To Do List Styles */
+    .tasks-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .tasks-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .tasks-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .task-stats {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .stat-dot.todo { background: #FF9F0A; }
+    .stat-dot.in-progress { background: #007AFF; }
+    .stat-dot.completed { background: #34C759; }
+
+    .task-input-section {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .task-input-wrapper {
+      display: flex;
+      gap: 12px;
+    }
+
+    .task-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .task-input:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(0, 122, 255, 0.6);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+    }
+
+    .task-input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .add-task-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    }
+
+    .add-task-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+    }
+
+    .add-task-btn:active {
+      transform: translateY(0);
+    }
+
+    .priority-selector {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .priority-btn {
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .priority-btn:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .priority-btn.active {
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(88, 86, 214, 0.3));
+      border-color: #007AFF;
+      color: #ffffff;
+    }
+
+    .tasks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .task-item {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .task-item:hover {
+      background: rgba(0, 0, 0, 0.3);
+      border-color: rgba(0, 122, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .task-item.completed {
+      opacity: 0.6;
+    }
+
+    .task-item.completed .task-title {
+      text-decoration: line-through;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .task-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .task-checkbox:hover {
+      border-color: #007AFF;
+    }
+
+    .task-checkbox.checked {
+      background: linear-gradient(135deg, #007AFF, #5856D6);
+      border-color: #007AFF;
+    }
+
+    .task-checkbox.checked::after {
+      content: '✓';
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .task-title {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 500;
+      color: #ffffff;
+    }
+
+    .task-priority {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .task-priority.urgent {
+      background: rgba(255, 59, 48, 0.2);
+      color: #FF3B30;
+      border: 1px solid rgba(255, 59, 48, 0.3);
+    }
+
+    .task-priority.high {
+      background: rgba(255, 159, 10, 0.2);
+      color: #FF9F0A;
+      border: 1px solid rgba(255, 159, 10, 0.3);
+    }
+
+    .task-priority.medium {
+      background: rgba(0, 122, 255, 0.2);
+      color: #007AFF;
+      border: 1px solid rgba(0, 122, 255, 0.3);
+    }
+
+    .task-priority.low {
+      background: rgba(142, 142, 147, 0.2);
+      color: #8E8E93;
+      border: 1px solid rgba(142, 142, 147, 0.3);
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .task-action-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-center;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .task-action-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .task-action-btn.delete:hover {
+      background: rgba(255, 59, 48, 0.3);
+      color: #FF3B30;
+    }
+
+    .task-description {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 212, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 212, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="copilot-header">
+    <div class="copilot-title" id="dragHandle">
+      <img src="/Users/jarvis/Code/HeyJarvis/Jarvis.png" alt="Jarvis" class="copilot-icon">
+      HeyJarvis
+    </div>
+    
+    <div class="copilot-controls">
+      <button class="control-btn close" onclick="closeWindow()" title="Hide">×</button>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('copilot')">
+      <span class="tab-icon">💬</span>
+      <span>Copilot</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('tasks')">
+      <span class="tab-icon">✓</span>
+      <span>To Do</span>
+      <span id="taskBadge" class="task-badge" style="
+        background: #FF9F0A;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-left: 4px;
+        display: none;
+      "></span>
+    </button>
+  </div>
+
+  <!-- Copilot Tab Content -->
+  <div id="copilotTab" class="tab-content active">
+    <div style="padding: 40px; text-align: center; color: rgba(255, 255, 255, 0.7);">
+      <div style="font-size: 48px; margin-bottom: 16px;">🤖</div>
+      <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Copilot Coming Soon</div>
+      <div style="font-size: 14px;">AI assistant features will be available here</div>
+    </div>
+  </div>
+
+  <!-- To Do List Tab Content -->
+  <div id="tasksTab" class="tab-content">
+    <div class="tasks-container">
+      <div class="tasks-header">
+        <div class="tasks-title">✓ My Tasks</div>
+        <div class="task-stats" id="taskStats">
+          <div class="stat-item">
+            <div class="stat-dot todo"></div>
+            <span id="todoCount">0</span> To Do
+          </div>
+          <div class="stat-item">
+            <div class="stat-dot in-progress"></div>
+            <span id="inProgressCount">0</span> In Progress
+          </div>
+          <div class="stat-item">
+            <div class="stat-dot completed"></div>
+            <span id="completedCount">0</span> Done
+          </div>
+        </div>
+      </div>
+
+      <div class="task-input-section">
+        <div class="task-input-wrapper">
+          <input 
+            type="text" 
+            id="taskInput" 
+            class="task-input" 
+            placeholder="What needs to be done?" 
+            onkeypress="if(event.key==='Enter') addTask()"
+          />
+          <button class="add-task-btn" onclick="addTask()">
+            + Add Task
+          </button>
+        </div>
+        <div class="priority-selector">
+          <button class="priority-btn" data-priority="low" onclick="selectPriority('low')">Low</button>
+          <button class="priority-btn active" data-priority="medium" onclick="selectPriority('medium')">Medium</button>
+          <button class="priority-btn" data-priority="high" onclick="selectPriority('high')">High</button>
+          <button class="priority-btn" data-priority="urgent" onclick="selectPriority('urgent')">Urgent</button>
+        </div>
+      </div>
+
+      <div class="tasks-list" id="tasksList">
+        <div class="empty-state">
+          <div class="empty-icon">📝</div>
+          <div class="empty-text">No tasks yet. Add one above to get started!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTab = 'copilot';
+    let currentPriority = 'medium';
+    let tasks = [];
+    const userId = 'desktop-user'; // TODO: Get actual user ID
+
+    // Tab switching
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.closest('.tab-btn').classList.add('active');
+      
+      // Update content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById(tab + 'Tab').classList.add('active');
+      
+      // Load tasks if switching to tasks tab
+      if (tab === 'tasks') {
+        loadTasks();
+      }
+    }
+
+    // Priority selection
+    function selectPriority(priority) {
+      currentPriority = priority;
+      document.querySelectorAll('.priority-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+
+    // Add task
+    async function addTask() {
+      const input = document.getElementById('taskInput');
+      const title = input.value.trim();
+      
+      if (!title) return;
+      
+      try {
+        const result = await window.electronAPI.tasks.create({
+          title,
+          priority: currentPriority
+        });
+        
+        if (result.success) {
+          input.value = '';
+          await loadTasks();
+        } else {
+          console.error('Failed to create task:', result.error);
+        }
+      } catch (error) {
+        console.error('Error creating task:', error);
+      }
+    }
+
+    // Load tasks
+    async function loadTasks() {
+      try {
+        console.log('📥 Loading tasks from Supabase...');
+        const result = await window.electronAPI.tasks.getAll();
+        
+        console.log('📦 Task result:', result);
+        
+        if (result.success) {
+          tasks = result.tasks;
+          console.log(`✅ Loaded ${tasks.length} tasks`);
+          renderTasks();
+          updateStats();
+        } else {
+          console.error('❌ Failed to load tasks:', result.error);
+          // Show error in UI
+          const tasksList = document.getElementById('tasksList');
+          tasksList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">⚠️</div>
+              <div class="empty-text">Failed to load tasks: ${result.error}</div>
+              <div class="empty-text">Check console for details</div>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('❌ Error loading tasks:', error);
+        // Show error in UI
+        const tasksList = document.getElementById('tasksList');
+        tasksList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-text">Error: ${error.message}</div>
+            <div class="empty-text">Check console for details</div>
+          </div>
+        `;
+      }
+    }
+
+    // Render tasks
+    function renderTasks() {
+      const tasksList = document.getElementById('tasksList');
+      
+      if (tasks.length === 0) {
+        tasksList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <div class="empty-text">No tasks yet. Add one above to get started!</div>
+          </div>
+        `;
+        return;
+      }
+      
+      tasksList.innerHTML = tasks.map(task => `
+        <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
+          <div class="task-header">
+            <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" 
+                 onclick="toggleTask('${task.id}', '${task.status}')"></div>
+            <div class="task-title">${escapeHtml(task.title)}</div>
+            <div class="task-priority ${task.priority}">${task.priority}</div>
+            <div class="task-actions">
+              <button class="task-action-btn delete" onclick="deleteTask('${task.id}')" title="Delete">
+                🗑️
+              </button>
+            </div>
+          </div>
+          ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
+          <div class="task-meta">
+            <span>Created ${formatDate(task.created_at)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Toggle task completion
+    async function toggleTask(taskId, currentStatus) {
+      try {
+        const result = await window.electronAPI.tasks.toggle(taskId, currentStatus);
+        
+        if (result.success) {
+          await loadTasks();
+        }
+      } catch (error) {
+        console.error('Error toggling task:', error);
+      }
+    }
+
+    // Delete task
+    async function deleteTask(taskId) {
+      if (!confirm('Delete this task?')) return;
+      
+      try {
+        const result = await window.electronAPI.tasks.delete(taskId);
+        
+        if (result.success) {
+          await loadTasks();
+        }
+      } catch (error) {
+        console.error('Error deleting task:', error);
+      }
+    }
+
+    // Update stats
+    function updateStats() {
+      const todoCount = tasks.filter(t => t.status === 'todo').length;
+      const inProgressCount = tasks.filter(t => t.status === 'in_progress').length;
+      const completedCount = tasks.filter(t => t.status === 'completed').length;
+      
+      document.getElementById('todoCount').textContent = todoCount;
+      document.getElementById('inProgressCount').textContent = inProgressCount;
+      document.getElementById('completedCount').textContent = completedCount;
+      
+      // Update badge
+      const badge = document.getElementById('taskBadge');
+      const activeCount = todoCount + inProgressCount;
+      if (activeCount > 0) {
+        badge.textContent = activeCount;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Helper functions
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      
+      if (minutes < 1) return 'just now';
+      if (minutes < 60) return `${minutes}m ago`;
+      if (hours < 24) return `${hours}h ago`;
+      if (days < 7) return `${days}d ago`;
+      
+      return date.toLocaleDateString();
+    }
+
+    function closeWindow() {
+      if (window.electronAPI) {
+        window.electronAPI.closeWindow();
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 HeyJarvis loaded with Tasks');
+      
+      // Check if electronAPI is available
+      if (!window.electronAPI || !window.electronAPI.tasks) {
+        console.error('❌ Task API not available!');
+        return;
+      }
+      
+      console.log('✅ Task API connected');
+      
+      await loadTasks();
+    });
+  </script>
+</body>
+</html>
+
