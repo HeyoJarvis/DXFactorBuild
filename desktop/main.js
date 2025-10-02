@@ -1425,6 +1425,7 @@ ipcMain.handle('fact-check:extract-text', async (event, imageBase64) => {
     console.log('🔍 Starting OCR text extraction from screen');
     
     let textBlocks = [];
+    let allText = null;
     
     // Method 1: Use Tesseract.js for OCR if we have a screenshot
     if (imageBase64) {
@@ -1444,10 +1445,40 @@ ipcMain.handle('fact-check:extract-text', async (event, imageBase64) => {
           }
         });
         
-        console.log(`📝 OCR found ${data.words.length} words`);
+        // Extract text and word positions safely
+        const extractedText = data.text || '';
+        console.log(`📝 OCR extracted ${extractedText.length} characters of text`);
+        
+        // Extract word positions from blocks structure
+        const words = [];
+        if (data.blocks && Array.isArray(data.blocks)) {
+          data.blocks.forEach(block => {
+            if (block.paragraphs) {
+              block.paragraphs.forEach(para => {
+                if (para.lines) {
+                  para.lines.forEach(line => {
+                    if (line.words) {
+                      line.words.forEach(word => {
+                        if (word.text && word.bbox) {
+                          words.push({
+                            text: word.text.trim(),
+                            bbox: word.bbox,
+                            confidence: word.confidence || 0
+                          });
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+        
+        console.log(`📚 Extracted ${words.length} words from OCR blocks`);
         
         // Filter for words containing "jarvis" (case insensitive)
-        const jarvisWords = data.words.filter(word => 
+        const jarvisWords = words.filter(word => 
           word.text.toLowerCase().includes('jarvis') || 
           word.text.toLowerCase().includes('heyjarvis')
         );
@@ -1481,19 +1512,21 @@ ipcMain.handle('fact-check:extract-text', async (event, imageBase64) => {
         const allTextBlocks = [];
         
         // Group words into lines/sentences for better analysis
-        const lines = data.lines;
-        lines.forEach((line, index) => {
-          if (line.text.trim().length > 10) {
-            allTextBlocks.push({
-              text: line.text.trim(),
-              x: line.bbox.x0,
-              y: line.bbox.y0,
-              width: line.bbox.x1 - line.bbox.x0,
-              height: line.bbox.y1 - line.bbox.y0,
-              confidence: line.confidence / 100
-            });
-          }
-        });
+        const lines = data.lines || [];
+        if (Array.isArray(lines)) {
+          lines.forEach((line, index) => {
+            if (line.text && line.text.trim().length > 10 && line.bbox) {
+              allTextBlocks.push({
+                text: line.text.trim(),
+                x: line.bbox.x0,
+                y: line.bbox.y0,
+                width: line.bbox.x1 - line.bbox.x0,
+                height: line.bbox.y1 - line.bbox.y0,
+                confidence: (line.confidence || 0) / 100
+              });
+            }
+          });
+        }
         
         if (allTextBlocks.length > 0) {
           return {
@@ -1719,12 +1752,11 @@ ipcMain.handle('highlights:forward-click', (event, x, y) => {
   return { success: true };
 });
 
-// Find and highlight "heyjarvis" text using OCR
-ipcMain.handle('highlights:find-heyjarvis', async () => {
-  console.log('🔍 Finding "heyjarvis" text using OCR...');
+// OCR-based fact checking - extract screen text and analyze for BS
+ipcMain.handle('fact-check:analyze-screen', async () => {
+  console.log('🔍 Starting fact-check analysis of screen content...');
   
   try {
-    // First capture the screen
     const { desktopCapturer, screen } = require('electron');
     const primaryDisplay = screen.getPrimaryDisplay();
     const scaleFactor = primaryDisplay.scaleFactor || 1;
@@ -1745,398 +1777,249 @@ ipcMain.handle('highlights:find-heyjarvis', async () => {
     }
     
     const screenshot = sources[0].thumbnail.toPNG();
-    const imageBase64 = screenshot.toString('base64');
-    
-    // Get the actual captured image dimensions
+    const imageBuffer = Buffer.from(screenshot.toString('base64'), 'base64');
     const capturedWidth = sources[0].thumbnail.getSize().width;
     const capturedHeight = sources[0].thumbnail.getSize().height;
     
-    console.log(`📸 Captured: ${capturedWidth}x${capturedHeight}`);
+    console.log('📸 Screen captured, extracting text...');
     
-    // CRITICAL: Calculate coordinate transformation
-    // On Retina displays, captured image is 2x the logical screen size
-    // Tesseract returns coordinates in captured image space
-    // We need to map to logical screen space
     const scaleX = screenWidth / capturedWidth;
     const scaleY = screenHeight / capturedHeight;
     
-    console.log(`🔧 Transform: scaleX=${scaleX.toFixed(3)}, scaleY=${scaleY.toFixed(3)}`);
+    const { createWorker } = require('tesseract.js');
     
-    console.log('📸 Screen captured, running OCR...');
-    
-    // Use Tesseract.js for OCR with optimized settings
-    const Tesseract = require('tesseract.js');
-    const imageBuffer = Buffer.from(imageBase64, 'base64');
-    
-    console.log('🔧 Starting OCR with optimized settings...');
-    
-    const { data } = await Tesseract.recognize(imageBuffer, 'eng', {
+    const worker = await createWorker('eng', 1, {
       logger: m => {
         if (m.status === 'recognizing text') {
           console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
         }
-      },
-      tessedit_pageseg_mode: Tesseract.PSM.AUTO,
-      tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-_',
+      }
     });
     
-    console.log('📝 OCR completed, analyzing result structure...');
-    console.log('OCR data keys:', Object.keys(data));
+    // Get both text AND word positions for highlighting suspicious content
+    const result = await worker.recognize(imageBuffer);
     
-    // Check what's available in the OCR result
-    let words = [];
-    if (data.words && Array.isArray(data.words)) {
-      words = data.words;
-      console.log(`📝 Found ${words.length} words via data.words`);
-    } else if (data.lines && Array.isArray(data.lines)) {
-      // Extract words from lines if words array is not available
-      words = [];
-      data.lines.forEach(line => {
-        if (line.words && Array.isArray(line.words)) {
-          words.push(...line.words);
-        }
-      });
-      console.log(`📝 Found ${words.length} words via data.lines`);
-    } else if (data.paragraphs && Array.isArray(data.paragraphs)) {
-      // Extract words from paragraphs if lines are not available
-      words = [];
-      data.paragraphs.forEach(paragraph => {
-        if (paragraph.lines && Array.isArray(paragraph.lines)) {
-          paragraph.lines.forEach(line => {
-            if (line.words && Array.isArray(line.words)) {
-              words.push(...line.words);
+    await worker.terminate();
+    
+    console.log('📋 OCR result structure:', {
+      hasResult: !!result,
+      hasData: !!result?.data,
+      dataKeys: result?.data ? Object.keys(result.data) : [],
+      hasBlocks: !!result?.data?.blocks,
+      blocksType: typeof result?.data?.blocks,
+      blocksLength: Array.isArray(result?.data?.blocks) ? result.data.blocks.length : 'not array'
+    });
+    
+    const data = result.data;
+    const extractedText = data.text || '';
+    
+    console.log(`📝 Extracted ${extractedText.length} characters of text`);
+    
+    if (!extractedText || extractedText.trim().length < 50) {
+      throw new Error(`Not enough text found on screen. Got ${extractedText.length} characters.`);
+    }
+    
+    console.log('Text preview:', extractedText.substring(0, 200));
+    
+    // Send to AI for fact-checking
+    console.log('🤖 Analyzing text for misinformation...');
+    
+    const AIAnalyzer = require('../core/signals/enrichment/ai-analyzer');
+    const aiAnalyzer = new AIAnalyzer();
+    
+    const factCheckPrompt = `Analyze this text for misinformation, clickbait, or suspicious claims. Identify specific phrases/sentences that are problematic and explain why.
+
+TEXT:
+${extractedText}
+
+Respond with:
+1. Overall assessment (legitimate/suspicious/misleading)
+2. List of specific suspicious phrases/claims (if any)
+3. Brief explanation of concerns
+
+Be specific about which exact phrases raised red flags. Format suspicious phrases in quotes.`;
+
+    const response = await aiAnalyzer.anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 800,
+      temperature: 0.3,
+      messages: [{ role: 'user', content: factCheckPrompt }]
+    });
+    
+    const analysis = response.content[0].text;
+    
+    console.log('✅ AI analysis completed');
+    console.log('Analysis preview:', analysis.substring(0, 200));
+    
+    // Extract suspicious phrases from AI response and create highlights
+    const highlights = [];
+    
+    // Parse AI response for quoted suspicious phrases
+    const quoteMatches = analysis.match(/"([^"]+)"/g);
+    
+    if (quoteMatches && data.blocks && Array.isArray(data.blocks)) {
+      console.log(`🎯 Found ${quoteMatches.length} suspicious phrases to highlight`);
+      
+      // Extract all words with positions from blocks structure
+      const words = [];
+      
+      // According to Tesseract.js docs, blocks contain paragraphs -> lines -> words
+      data.blocks.forEach((block, blockIndex) => {
+        console.log(`📦 Block ${blockIndex}:`, {
+          hasParagraphs: !!block.paragraphs,
+          paragraphsType: typeof block.paragraphs,
+          paragraphsLength: Array.isArray(block.paragraphs) ? block.paragraphs.length : 'not array'
+        });
+        
+        if (block.paragraphs && Array.isArray(block.paragraphs)) {
+          block.paragraphs.forEach((para, paraIndex) => {
+            console.log(`  📄 Paragraph ${paraIndex}:`, {
+              hasLines: !!para.lines,
+              linesType: typeof para.lines,
+              linesLength: Array.isArray(para.lines) ? para.lines.length : 'not array'
+            });
+            
+            if (para.lines && Array.isArray(para.lines)) {
+              para.lines.forEach((line, lineIndex) => {
+                console.log(`    📝 Line ${lineIndex}:`, {
+                  hasWords: !!line.words,
+                  wordsType: typeof line.words,
+                  wordsLength: Array.isArray(line.words) ? line.words.length : 'not array'
+                });
+                
+                if (line.words && Array.isArray(line.words)) {
+                  line.words.forEach((word, wordIndex) => {
+                    if (word.text && word.bbox) {
+                      words.push({
+                        text: word.text.trim().toLowerCase(),
+                        bbox: word.bbox,
+                        confidence: word.confidence || 0
+                      });
+                      
+                      if (wordIndex < 3) { // Log first few words for debugging
+                        console.log(`      🔤 Word ${wordIndex}: "${word.text}" at (${word.bbox.x0}, ${word.bbox.y0})`);
+                      }
+                    }
+                  });
+                }
+              });
             }
           });
         }
       });
-      console.log(`📝 Found ${words.length} words via data.paragraphs`);
-    } else {
-      console.log('⚠️ No words found in OCR result, checking text content...');
-      console.log('Available data:', JSON.stringify(data, null, 2).substring(0, 500));
       
-      // Try to extract text from the raw text if available
-      if (data.text && typeof data.text === 'string' && data.text.trim().length > 0) {
-        console.log('📄 Found raw text, creating mock word objects...');
-        const textLines = data.text.split('\n').filter(line => line.trim().length > 0);
+      console.log(`📚 Extracted ${words.length} total words from OCR`);
+      
+      // Fallback: If no words found from blocks, try parsing TSV data
+      if (words.length === 0 && data.tsv) {
+        console.log('⚠️ No words from blocks, trying TSV fallback...');
+        console.log('TSV data type:', typeof data.tsv, 'length:', data.tsv.length);
         
-        textLines.forEach((line, lineIndex) => {
-          const lineWords = line.split(/\s+/).filter(word => word.trim().length > 0);
-          lineWords.forEach((wordText, wordIndex) => {
-            // Create mock word objects with estimated positions (relative to captured image)
-            const estimatedX = 100 + (wordIndex * 80);
-            const estimatedY = 100 + (lineIndex * 30);
-            const estimatedWidth = wordText.length * 8;
-            const estimatedHeight = 25;
-            
-            words.push({
-              text: wordText,
-              confidence: 70, // Moderate confidence for raw text
-              bbox: {
-                x0: estimatedX,
-                y0: estimatedY,
-                x1: estimatedX + estimatedWidth,
-                y1: estimatedY + estimatedHeight
+        if (typeof data.tsv === 'string' && data.tsv.length > 0) {
+          const tsvLines = data.tsv.split('\n').filter(line => line.trim());
+          console.log(`📊 TSV has ${tsvLines.length} lines`);
+          
+          tsvLines.forEach((line, lineIndex) => {
+            const parts = line.split('\t');
+            if (parts.length >= 12 && parts[0] === '5') { // Level 5 = word level
+              const left = parseInt(parts[6]);
+              const top = parseInt(parts[7]);
+              const width = parseInt(parts[8]);
+              const height = parseInt(parts[9]);
+              const confidence = parseInt(parts[10]);
+              const text = parts[11];
+              
+              if (text && text.trim() && !isNaN(left) && !isNaN(top)) {
+                words.push({
+                  text: text.trim().toLowerCase(),
+                  bbox: {
+                    x0: left,
+                    y0: top,
+                    x1: left + width,
+                    y1: top + height
+                  },
+                  confidence: confidence
+                });
+                
+                if (lineIndex < 5) { // Log first few for debugging
+                  console.log(`      📊 TSV Word: "${text}" at (${left}, ${top})`);
+                }
               }
+            }
+          });
+          
+          console.log(`✅ TSV fallback extracted ${words.length} words`);
+        }
+      }
+      
+      // For each suspicious phrase, find matching words and create highlight
+      quoteMatches.forEach((quotedPhrase, index) => {
+        const phrase = quotedPhrase.replace(/"/g, '').toLowerCase();
+        const phraseWords = phrase.split(/\s+/).filter(w => w.length > 2); // Only significant words
+        
+        console.log(`🔍 Searching for phrase: "${phrase}" (${phraseWords.length} words)`);
+        
+        // Find words that match this phrase
+        phraseWords.forEach(searchWord => {
+          const matchingWords = words.filter(w => 
+            w.text.includes(searchWord) || searchWord.includes(w.text)
+          );
+          
+          matchingWords.forEach((word, wordIndex) => {
+            const screenX = Math.round(word.bbox.x0 * scaleX);
+            const screenY = Math.round(word.bbox.y0 * scaleY);
+            const screenW = Math.round((word.bbox.x1 - word.bbox.x0) * scaleX);
+            const screenH = Math.round((word.bbox.y1 - word.bbox.y0) * scaleY);
+            
+            highlights.push({
+              id: `suspicious-${index}-${wordIndex}`,
+              text: word.text,
+              reason: `Suspicious claim: "${phrase}"`,
+              confidence: word.confidence / 100,
+              x: screenX,
+              y: screenY,
+              width: Math.max(screenW, 50),
+              height: Math.max(screenH, 20)
             });
           });
         });
-        
-        console.log(`📝 Created ${words.length} mock word objects from raw text`);
-      }
-    }
-    
-    if (words.length === 0) {
-      console.log('❌ Still no words found, creating test highlights for visible "jarvis" text');
-      
-      // Create highlights for known locations where "jarvis" text appears
-      const knownJarvisLocations = [
-        { text: 'HeyJarvis', x: 50, y: 150, reason: 'File explorer folder name' },
-        { text: 'heyjarvis', x: 250, y: 620, reason: 'Terminal command/output' },
-        { text: 'jarvis', x: 400, y: 300, reason: 'Code content' },
-        { text: 'copilot-enhanced.html', x: 580, y: 52, reason: 'Tab name' }
-      ];
-      
-      const testHighlights = knownJarvisLocations.map((loc, index) => ({
-        id: `known-jarvis-${index}`,
-        text: loc.text,
-        reason: `Known location: ${loc.reason}`,
-        confidence: 0.8,
-        x: loc.x,
-        y: loc.y,
-        width: Math.max(loc.text.length * 8, 60),
-        height: 25
-      }));
-      
-      console.log(`🎯 Created ${testHighlights.length} highlights for known jarvis locations`);
-      showHighlights(testHighlights);
-      return { success: true, found: testHighlights.length, method: 'known-locations' };
-    }
-    
-    // Find all words containing "jarvis" (case insensitive)
-    const jarvisWords = words.filter(word => {
-      if (!word.text) return false;
-      const text = word.text.toLowerCase();
-      return text.includes('jarvis') || text.includes('heyjarvis') || text.includes('hey');
-    });
-    
-    console.log(`🎯 Found ${jarvisWords.length} words containing "jarvis" or "hey"`);
-    console.log('OCR detected jarvis words:', jarvisWords.map(w => ({ text: w.text, bbox: w.bbox })));
-    
-    // Try to use OCR coordinates but with validation and correction
-    if (jarvisWords.length > 0) {
-      console.log('🔍 Analyzing OCR coordinates for validation...');
-      
-      // Check if OCR coordinates seem reasonable (within screen bounds and not clustered)
-      let useOCRCoords = true;
-      const screenBounds = { width: screenWidth, height: screenHeight };
-      
-      for (const word of jarvisWords) {
-        if (word.bbox) {
-          const x = word.bbox.x0 || 0;
-          const y = word.bbox.y0 || 0;
-          
-          // Check if coordinates are way off (outside reasonable content area)
-          if (x < 50 || x > screenBounds.width - 50 || y < 50 || y > screenBounds.height - 50) {
-            console.log(`⚠️ OCR coordinate seems off: (${x}, ${y}) for "${word.text}"`);
-            useOCRCoords = false;
-            break;
-          }
-        }
-      }
-      
-      if (useOCRCoords) {
-        console.log('✅ OCR coordinates seem reasonable, using with scaling');
-        // Use the original OCR coordinate mapping approach
-      } else {
-        console.log('❌ OCR coordinates unreliable, using content-aware positioning');
-        
-        // Use a more intelligent approach: search for "HeyJarvis" in the raw OCR text
-        // and estimate positions based on text flow
-        const fullText = data.text || '';
-        const lines = fullText.split('\n');
-        const highlights = [];
-        
-        lines.forEach((line, lineIndex) => {
-          const lowerLine = line.toLowerCase();
-          let searchIndex = 0;
-          
-          while (true) {
-            const jarvisIndex = lowerLine.indexOf('jarvis', searchIndex);
-            if (jarvisIndex === -1) break;
-            
-            // Estimate position based on line position and character position
-            // Use more realistic ChatGPT content area coordinates
-            const contentStartX = 408; // ChatGPT content area starts around here
-            const contentStartY = 190; // Content starts below header
-            const charWidth = 7; // More accurate character width
-            const lineHeight = 24; // More accurate line height
-            
-            const estimatedX = contentStartX + (jarvisIndex * charWidth);
-            const estimatedY = contentStartY + (lineIndex * lineHeight);
-            
-            // Only add if within reasonable bounds
-            if (estimatedX < screenWidth - 100 && estimatedY < screenHeight - 50) {
-              const highlightText = line.substring(Math.max(0, jarvisIndex - 3), jarvisIndex + 10);
-              
-              highlights.push({
-                id: `text-flow-${highlights.length}`,
-                text: highlightText,
-                reason: `Found "${highlightText}" at line ${lineIndex}, char ${jarvisIndex} -> (${estimatedX}, ${estimatedY})`,
-                confidence: 0.8,
-                x: estimatedX,
-                y: estimatedY,
-                width: Math.max(highlightText.length * 8, 80),
-                height: 25
-              });
-              
-              try {
-          console.log(`📍 Text flow highlight: line ${lineIndex}, char ${jarvisIndex} -> (${estimatedX}, ${estimatedY})`);
-        } catch (logError) {
-          // Ignore console logging errors
-        }
-            }
-            
-            searchIndex = jarvisIndex + 1;
-            if (highlights.length >= 5) break; // Limit to 5 highlights
-          }
-          
-          if (highlights.length >= 5) return;
-        });
-        
-        if (highlights.length > 0) {
-          console.log(`✅ Created ${highlights.length} text-flow highlights`);
-          showHighlights(highlights);
-          return { success: true, found: highlights.length, method: 'text-flow-positioning' };
-        } else {
-          console.log('❌ Text flow positioning failed, using manual positions based on screenshot analysis');
-          
-          // Manual positioning based on actual ChatGPT layout analysis
-          const manualHighlights = [
-            {
-              id: 'manual-jarvis-1',
-              text: 'HeyJarvis',
-              reason: 'Manual positioning - Header area',
-              confidence: 0.9,
-              x: 573, y: 51, width: 80, height: 25
-            },
-            {
-              id: 'manual-jarvis-2', 
-              text: 'HeyJarvis',
-              reason: 'Manual positioning - First paragraph',
-              confidence: 0.9,
-              x: 1045, y: 223, width: 80, height: 25
-            },
-            {
-              id: 'manual-jarvis-3',
-              text: 'HeyJarvis', 
-              reason: 'Manual positioning - Content area',
-              confidence: 0.9,
-              x: 469, y: 285, width: 80, height: 25
-            },
-            {
-              id: 'manual-jarvis-4',
-              text: 'HeyJarvis',
-              reason: 'Manual positioning - Mid content',
-              confidence: 0.9, 
-              x: 557, y: 348, width: 80, height: 25
-            },
-            {
-              id: 'manual-jarvis-5',
-              text: 'HeyJarvis',
-              reason: 'Manual positioning - Lower content',
-              confidence: 0.9,
-              x: 754, y: 410, width: 80, height: 25
-            }
-          ];
-          
-          console.log(`✅ Created ${manualHighlights.length} manual highlights`);
-          showHighlights(manualHighlights);
-          return { success: true, found: manualHighlights.length, method: 'manual-positioning' };
-        }
-      }
-    }
-    
-    if (jarvisWords.length === 0) {
-      // Fallback: look for any text that might be related
-      const relatedWords = words.filter(word => {
-        if (!word.text) return false;
-        const text = word.text.toLowerCase();
-        return text.includes('hey') || text.includes('jar') || text.includes('vis') || 
-               text.includes('copilot') || text.includes('desktop') || text.includes('app');
       });
       
-      console.log(`📄 No "jarvis" found, but found ${relatedWords.length} related words`);
+      console.log(`✨ Created ${highlights.length} highlights for suspicious content`);
       
-      if (relatedWords.length > 0) {
-        jarvisWords.push(...relatedWords.slice(0, 5)); // Add first 5 related words
+      if (highlights.length > 0) {
+        showHighlights(highlights);
       }
     }
     
-    // Create highlights with CORRECTED coordinates
-    const highlights = [];
-    
-    // Debug logging before processing
-    console.log('🐛 DEBUG INFO:');
-    console.log(`  Screen dimensions: ${screenWidth}x${screenHeight}`);
-    console.log(`  Captured dimensions: ${capturedWidth}x${capturedHeight}`);
-    console.log(`  Scale factor: ${scaleFactor}x`);
-    console.log(`  Transform: X=${scaleX}, Y=${scaleY}`);
-    console.log(`  Number of jarvis words: ${jarvisWords.length}`);
-    
-    jarvisWords.forEach((word, index) => {
-      if (word.bbox) {
-        // Get OCR bbox (in captured image space)
-        const ocrX = word.bbox.x0;
-        const ocrY = word.bbox.y0;
-        const ocrWidth = word.bbox.x1 - word.bbox.x0;
-        const ocrHeight = word.bbox.y1 - word.bbox.y0;
-        
-        // Transform to screen space (logical pixels)
-        const screenX = Math.round(ocrX * scaleX);
-        const screenY = Math.round(ocrY * scaleY);
-        const screenW = Math.round(ocrWidth * scaleX);
-        const screenH = Math.round(ocrHeight * scaleY);
-        
-        console.log(`📍 "${word.text}": OCR(${ocrX},${ocrY},${ocrWidth}x${ocrHeight}) → Screen(${screenX},${screenY},${screenW}x${screenH})`);
-        
-        // Ensure coordinates are within screen bounds
-        const boundedX = Math.max(0, Math.min(screenX, screenWidth - screenW));
-        const boundedY = Math.max(0, Math.min(screenY, screenHeight - screenH));
-        
-        highlights.push({
-          id: `ocr-jarvis-${index}`,
-          text: word.text || 'Unknown',
-          reason: `Found "${word.text}" via OCR (confidence: ${Math.round(word.confidence || 50)}%) - Scaled from (${ocrX}, ${ocrY})`,
-          confidence: (word.confidence || 50) / 100,
-          x: boundedX,
-          y: boundedY,
-          width: Math.max(screenW, 50), // Minimum width for visibility
-          height: Math.max(screenH, 20) // Minimum height for visibility
-        });
-        
-        console.log(`📍 Created highlight ${index}: "${word.text}"`);
-        console.log(`   OCR coords: (${ocrX}, ${ocrY}) ${ocrWidth}x${ocrHeight}`);
-        console.log(`   Screen coords: (${screenX}, ${screenY}) ${screenW}x${screenH}`);
-        console.log(`   Bounded coords: (${boundedX}, ${boundedY})`);
-        console.log(`   Scale factors: X=${scaleX.toFixed(3)}, Y=${scaleY.toFixed(3)}`);
-        
-      } else {
-        // Fallback positioning if no bbox
-        console.log('⚠️ No bbox found for word:', word.text);
-        const fallbackX = 100 + (index * 150);
-        const fallbackY = 200 + (index * 40);
-        const fallbackWidth = Math.max(word.text.length * 8, 50);
-        const fallbackHeight = 30;
-        
-        highlights.push({
-          id: `ocr-jarvis-${index}`,
-          text: word.text || 'Unknown',
-          reason: `Found "${word.text}" via OCR (fallback positioning)`,
-          confidence: (word.confidence || 50) / 100,
-          x: fallbackX,
-          y: fallbackY,
-          width: fallbackWidth,
-          height: fallbackHeight
-        });
-        
-        console.log(`📍 Created fallback highlight ${index}: "${word.text}" at (${fallbackX}, ${fallbackY})`);
-      }
-    });
-    
-    if (highlights.length > 0) {
-      console.log(`✅ Created ${highlights.length} OCR-based highlights`);
-      
-      // Final debug summary
-      console.log('🐛 FINAL HIGHLIGHT SUMMARY:');
-      highlights.forEach((h, i) => {
-        console.log(`  [${i}] "${h.text}" at (${h.x}, ${h.y}) size ${h.width}x${h.height}`);
-      });
-      
-      showHighlights(highlights);
-      return { success: true, found: highlights.length, method: 'ocr' };
-    } else {
-      throw new Error('No "jarvis" text found via OCR');
-    }
+    return {
+      success: true,
+      extractedText: extractedText.substring(0, 500) + (extractedText.length > 500 ? '...' : ''),
+      analysis: analysis,
+      highlightsCreated: highlights.length,
+      textLength: extractedText.length
+    };
     
   } catch (error) {
-    console.error('❌ OCR text detection failed:', error);
-    
-    // Fallback to debug highlights if OCR fails
-    console.log('🔄 Falling back to debug highlights...');
-    const fallbackHighlight = [{
-      id: 'ocr-fallback',
-      text: 'OCR FAILED - FALLBACK',
-      reason: `OCR failed: ${error.message}. This is a fallback highlight.`,
-      confidence: 0.3,
-      x: 200,
-      y: 200,
-      width: 300,
-      height: 60
-    }];
-    
-    showHighlights(fallbackHighlight);
-    return { success: false, error: error.message, found: 1 };
+    console.error('❌ Fact-check failed:', error);
+    return {
+      success: false,
+      error: error.message,
+      analysis: `Error analyzing screen: ${error.message}`
+    };
   }
+});
+
+// Legacy handler for backwards compatibility
+ipcMain.handle('highlights:find-heyjarvis', async () => {
+  console.log('⚠️ Legacy handler called - redirecting to new fact-check system');
+  // Just return a simple success for now to prevent errors
+  return { 
+    success: true, 
+    found: 0, 
+    method: 'legacy-redirect',
+    message: 'Please use the new fact-check system'
+  };
 });
 
 // Calibration mode - creates a grid to help fine-tune OCR coordinate mapping

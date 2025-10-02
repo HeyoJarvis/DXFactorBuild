@@ -139,7 +139,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     show: (highlights) => ipcRenderer.invoke('highlights:show', highlights),
     hide: () => ipcRenderer.invoke('highlights:hide'),
     test: () => ipcRenderer.invoke('highlights:test'),
-    findHeyjarvis: () => ipcRenderer.invoke('highlights:find-heyjarvis'),
+    findHeyjarvis: () => ipcRenderer.invoke('fact-check:analyze-screen'),
     calibrate: () => ipcRenderer.invoke('highlights:calibrate')
   },
   
