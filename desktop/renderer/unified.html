@@ -763,6 +763,294 @@
       color: rgba(255, 255, 255, 0.5);
     }
 
+    /* Task Chat Button */
+    .task-action-btn.chat {
+      background: rgba(0, 122, 255, 0.15);
+      color: #007AFF;
+      font-size: 14px;
+    }
+    
+    .task-action-btn.chat:hover {
+      background: rgba(0, 122, 255, 0.25);
+      transform: scale(1.1);
+    }
+    
+    /* Task Chat Modal */
+    .task-chat-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .task-chat-container {
+      width: 90%;
+      max-width: 700px;
+      height: 80vh;
+      max-height: 600px;
+      background: rgba(28, 28, 30, 0.98);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .task-chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+    }
+    
+    .task-chat-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .task-chat-icon {
+      font-size: 24px;
+    }
+    
+    .task-chat-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .task-chat-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+    
+    .task-chat-subtitle {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .task-chat-close {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .task-chat-close:hover {
+      background: rgba(255, 59, 48, 0.2);
+      color: #FF3B30;
+    }
+    
+    .task-chat-context {
+      padding: 16px 24px;
+      background: rgba(0, 122, 255, 0.08);
+      border-bottom: 1px solid rgba(0, 122, 255, 0.2);
+      flex-shrink: 0;
+    }
+    
+    .task-context-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    
+    .task-context-content {
+      font-size: 14px;
+      color: #ffffff;
+      line-height: 1.5;
+    }
+    
+    .task-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .task-chat-welcome {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .task-chat-welcome .welcome-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .task-chat-welcome .welcome-text {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .task-chat-welcome .welcome-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .task-message {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: messageSlideIn 0.3s ease;
+    }
+    
+    @keyframes messageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .task-message.user {
+      align-items: flex-end;
+    }
+    
+    .task-message.assistant {
+      align-items: flex-start;
+    }
+    
+    .task-message-bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    
+    .task-message.user .task-message-bubble {
+      background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .task-message.assistant .task-message-bubble {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .task-message-time {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      padding: 0 8px;
+    }
+    
+    .task-chat-typing {
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .task-chat-input {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+    
+    .task-chat-textarea {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      min-height: 44px;
+      max-height: 120px;
+      transition: all 0.2s ease;
+    }
+    
+    .task-chat-textarea:focus {
+      outline: none;
+      border-color: #007AFF;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    
+    .task-chat-textarea::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .task-chat-send {
+      background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+      border: none;
+      color: #ffffff;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .task-chat-send:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    }
+    
+    .task-chat-send:active {
+      transform: scale(0.95);
+    }
+
     /* Empty State */
     .empty-state {
       text-align: center;
@@ -936,6 +1224,57 @@
     </div>
   </div>
 
+  <!-- Task Chat Modal -->
+  <div id="taskChatModal" class="task-chat-modal" style="display: none;">
+    <div class="task-chat-container">
+      <div class="task-chat-header">
+        <div class="task-chat-title">
+          <span class="task-chat-icon">💬</span>
+          <div class="task-chat-info">
+            <div class="task-chat-name" id="taskChatName">Task Discussion</div>
+            <div class="task-chat-subtitle">AI-powered task assistant</div>
+          </div>
+        </div>
+        <button class="task-chat-close" onclick="closeTaskChat()">×</button>
+      </div>
+      
+      <div class="task-chat-context">
+        <div class="task-context-label">Task Context:</div>
+        <div class="task-context-content" id="taskChatContext"></div>
+      </div>
+      
+      <div class="task-chat-messages" id="taskChatMessages">
+        <div class="task-chat-welcome">
+          <div class="welcome-icon">🎯</div>
+          <div class="welcome-text">Let's work on this task together!</div>
+          <div class="welcome-subtitle">I can help you brainstorm, plan, and complete this task.</div>
+        </div>
+      </div>
+      
+      <div class="task-chat-typing" id="taskChatTyping" style="display: none;">
+        <div>✨</div>
+        <div>
+          <span>Thinking about your task...</span>
+        </div>
+      </div>
+      
+      <div class="task-chat-input">
+        <textarea 
+          id="taskChatInput" 
+          class="task-chat-textarea" 
+          placeholder="Ask about this task, brainstorm ideas, get help..." 
+          rows="1"
+        ></textarea>
+        <button class="task-chat-send" onclick="sendTaskChatMessage()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m22 2-7 20-4-9-9-4z"/>
+            <path d="M22 2 11 13"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let currentTab = 'copilot';
     let currentPriority = 'medium';
@@ -945,6 +1284,8 @@
     let crmData = null;
     let slackConnected = false;
     let servicesInitialized = false;
+    let currentTaskChat = null;
+    let taskChatHistories = {}; // Store chat history for each task
 
     const chatContainer = document.getElementById('chatContainer');
     const messageInput = document.getElementById('messageInput');
@@ -1061,6 +1402,7 @@
             <div class="task-title">${escapeHtml(task.title)}</div>
             <div class="task-priority ${task.priority}">${task.priority}</div>
             <div class="task-actions">
+              <button class="task-action-btn chat" onclick="openTaskChat('${task.id}')" title="AI Chat">💬</button>
               <button class="task-action-btn delete" onclick="deleteTask('${task.id}')">🗑️</button>
             </div>
           </div>
@@ -1306,6 +1648,143 @@
       return date.toLocaleDateString();
     }
 
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    }
+
+    // ===== TASK CHAT FUNCTIONS =====
+    
+    function openTaskChat(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+      
+      currentTaskChat = task;
+      
+      // Update modal title and context
+      document.getElementById('taskChatName').textContent = task.title;
+      document.getElementById('taskChatContext').innerHTML = `
+        <strong>${escapeHtml(task.title)}</strong>
+        ${task.description ? `<br>${escapeHtml(task.description)}` : ''}
+        <br><span style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">
+          Priority: ${task.priority} • Status: ${task.status}
+        </span>
+      `;
+      
+      // Load existing chat history for this task
+      renderTaskChatHistory(taskId);
+      
+      // Show modal
+      document.getElementById('taskChatModal').style.display = 'flex';
+      
+      // Focus input after a brief delay to allow animation
+      setTimeout(() => {
+        document.getElementById('taskChatInput').focus();
+      }, 100);
+    }
+    
+    function closeTaskChat() {
+      document.getElementById('taskChatModal').style.display = 'none';
+      currentTaskChat = null;
+    }
+    
+    function renderTaskChatHistory(taskId) {
+      const messagesContainer = document.getElementById('taskChatMessages');
+      const history = taskChatHistories[taskId] || [];
+      
+      if (history.length === 0) {
+        messagesContainer.innerHTML = `
+          <div class="task-chat-welcome">
+            <div class="welcome-icon">🎯</div>
+            <div class="welcome-text">Let's work on this task together!</div>
+            <div class="welcome-subtitle">I can help you brainstorm, plan, and complete this task.</div>
+          </div>
+        `;
+      } else {
+        messagesContainer.innerHTML = history.map(msg => `
+          <div class="task-message ${msg.role}">
+            <div class="task-message-bubble">${escapeHtml(msg.content)}</div>
+            <div class="task-message-time">${formatTime(msg.timestamp)}</div>
+          </div>
+        `).join('');
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }
+    
+    async function sendTaskChatMessage() {
+      if (!currentTaskChat) return;
+      
+      const input = document.getElementById('taskChatInput');
+      const message = input.value.trim();
+      if (!message) return;
+      
+      const taskId = currentTaskChat.id;
+      
+      // Initialize chat history for this task if needed
+      if (!taskChatHistories[taskId]) {
+        taskChatHistories[taskId] = [];
+      }
+      
+      // Add user message to history
+      const userMessage = {
+        role: 'user',
+        content: message,
+        timestamp: new Date().toISOString()
+      };
+      taskChatHistories[taskId].push(userMessage);
+      
+      // Clear input and update UI
+      input.value = '';
+      input.style.height = 'auto';
+      renderTaskChatHistory(taskId);
+      
+      // Show typing indicator
+      document.getElementById('taskChatTyping').style.display = 'flex';
+      
+      try {
+        // Call backend API with task context
+        if (!window.electronAPI || !window.electronAPI.copilot) {
+          throw new Error('Electron API not available');
+        }
+        
+        const response = await window.electronAPI.copilot.sendTaskMessage(taskId, message, {
+          task: currentTaskChat
+        });
+        
+        // Add AI response to history
+        const assistantMessage = {
+          role: 'assistant',
+          content: response.content || response,
+          timestamp: new Date().toISOString()
+        };
+        taskChatHistories[taskId].push(assistantMessage);
+        
+        // Update UI
+        renderTaskChatHistory(taskId);
+        
+      } catch (error) {
+        console.error('Task chat error:', error);
+        
+        // Add error message
+        const errorMessage = {
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.',
+          timestamp: new Date().toISOString()
+        };
+        taskChatHistories[taskId].push(errorMessage);
+        renderTaskChatHistory(taskId);
+      } finally {
+        // Hide typing indicator
+        document.getElementById('taskChatTyping').style.display = 'none';
+      }
+    }
+
     // Auto-resize textarea
     if (messageInput) {
       messageInput.addEventListener('input', function() {
@@ -1338,6 +1817,29 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('🚀 HeyJarvis loaded');
       initializeServices();
+      
+      // Setup task chat input handlers
+      const taskChatInput = document.getElementById('taskChatInput');
+      if (taskChatInput) {
+        taskChatInput.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        
+        taskChatInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendTaskChatMessage();
+          }
+        });
+      }
+      
+      // Close task chat modal on escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && currentTaskChat) {
+          closeTaskChat();
+        }
+      });
     });
   </script>
 </body>

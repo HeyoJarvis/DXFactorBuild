@@ -169,6 +169,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     delete: (taskId) => ipcRenderer.invoke('tasks:delete', taskId),
     toggle: (taskId, currentStatus) => ipcRenderer.invoke('tasks:toggle', taskId, currentStatus),
     getStats: () => ipcRenderer.invoke('tasks:getStats')
+  },
+  
+  // Copilot API
+  copilot: {
+    sendMessage: (message) => ipcRenderer.invoke('copilot:sendMessage', message),
+    sendTaskMessage: (taskId, message, context) => ipcRenderer.invoke('copilot:sendTaskMessage', taskId, message, context),
+    minimize: () => ipcRenderer.invoke('copilot:minimize'),
+    close: () => ipcRenderer.invoke('copilot:close'),
+    clearHistory: () => ipcRenderer.invoke('copilot:clearHistory'),
+    getHistory: () => ipcRenderer.invoke('copilot:getHistory')
   }
 });
 

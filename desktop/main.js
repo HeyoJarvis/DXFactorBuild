@@ -35,6 +35,7 @@ let workRequestSystem; // Workflow detection system
 let workflowIntelligence; // Workflow intelligence analyzer
 let conversationHistory = []; // Store conversation history
 let currentSessionId = null; // Track current conversation session
+let taskSessionIds = {}; // Track task-specific session IDs: { taskId: sessionId }
 let lastSlackContext = null; // Cache Slack context
 let isExpanded = false; // Track if top bar is expanded
 let isManuallyPositioned = false; // Track if user has manually moved the bar
@@ -1117,6 +1118,131 @@ What would you like to explore?`,
       history: conversationHistory,
       length: conversationHistory.length
     };
+  });
+
+  // Task-specific chat handler
+  ipcMain.handle('copilot:sendTaskMessage', async (event, taskId, message, context) => {
+    try {
+      console.log('💬 Processing task chat message:', { taskId, message: message.substring(0, 50) + '...' });
+      
+      const task = context.task;
+      const userId = 'desktop-user'; // TODO: Get actual user ID
+      
+      // Get or create task-specific session
+      if (!taskSessionIds[taskId]) {
+        console.log('📂 Creating new session for task:', taskId);
+        const sessionResult = await dbAdapter.getOrCreateActiveSession(userId, {
+          workflow_type: 'task_chat',
+          workflow_id: `task_${taskId}`,
+          task_id: taskId,
+          task_title: task.title,
+          task_priority: task.priority,
+          task_status: task.status
+        });
+        
+        if (sessionResult.success) {
+          taskSessionIds[taskId] = sessionResult.session.id;
+          console.log('✅ Task session created:', { taskId, sessionId: taskSessionIds[taskId] });
+          
+          // Set session title to task title
+          await dbAdapter.updateSessionTitle(taskSessionIds[taskId], `Task: ${task.title}`).catch(err => 
+            console.warn('Failed to update task session title:', err.message)
+          );
+        } else {
+          console.error('❌ Failed to create task session:', sessionResult.error);
+        }
+      }
+      
+      const taskSessionId = taskSessionIds[taskId];
+      
+      // Build task-specific context for AI
+      const AIAnalyzer = require('../core/signals/enrichment/ai-analyzer');
+      const aiAnalyzer = new AIAnalyzer();
+      
+      const systemPrompt = `You are HeyJarvis, an AI assistant helping with a specific task.
+
+TASK DETAILS:
+- Title: ${task.title}
+- Description: ${task.description || 'No description provided'}
+- Priority: ${task.priority}
+- Status: ${task.status}
+- Created: ${task.created_at}
+${task.assignor ? `- Assigned by: ${task.assignor.name || task.assignor.id}` : ''}
+${task.assignee ? `- Assigned to: ${task.assignee.name || task.assignee.id}` : ''}
+
+Your role is to help the user complete this task by:
+- Providing actionable advice and suggestions
+- Breaking down the task into manageable steps
+- Answering questions about the task
+- Brainstorming solutions and approaches
+- Offering relevant insights and best practices
+
+Be concise, practical, and focused on helping complete this specific task.`;
+
+      // Get AI response with task context
+      const response = await aiAnalyzer.anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 800,
+        temperature: 0.7,
+        messages: [
+          {
+            role: 'user',
+            content: `${systemPrompt}\n\nUser: ${message}`
+          }
+        ]
+      });
+      
+      const aiResponse = response.content[0].text;
+      
+      // Save to task-specific session in Supabase
+      if (dbAdapter && taskSessionId) {
+        console.log('💾 Saving messages to task session:', taskSessionId);
+        
+        // Save user message
+        await dbAdapter.saveMessageToSession(taskSessionId, message, 'user', {
+          task_id: taskId,
+          task_title: task.title,
+          task_priority: task.priority,
+          task_status: task.status,
+          message_type: 'task_chat'
+        }).catch(err => console.warn('Failed to save task message:', err.message));
+        
+        // Save AI response
+        await dbAdapter.saveMessageToSession(taskSessionId, aiResponse, 'assistant', {
+          task_id: taskId,
+          task_title: task.title,
+          model: 'claude-3-5-sonnet-20241022',
+          message_type: 'task_chat'
+        }).catch(err => console.warn('Failed to save task response:', err.message));
+        
+        console.log('✅ Task messages saved to Supabase');
+      } else {
+        console.warn('⚠️ No task session ID available, messages not saved');
+      }
+      
+      console.log('✅ Task chat response generated');
+      
+      return {
+        type: 'message',
+        content: aiResponse,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          task_id: taskId,
+          task_title: task.title,
+          session_id: taskSessionId
+        }
+      };
+      
+    } catch (error) {
+      console.error('❌ Task chat processing failed:', error);
+      
+      return {
+        type: 'message',
+        content: `I'm having trouble right now, but I'm here to help! Here are some general tips for your task:\n\n1. Break it down into smaller steps\n2. Start with the highest priority items\n3. Set realistic deadlines\n4. Ask for help when needed\n\nWhat specific aspect would you like to focus on?`,
+        timestamp: new Date().toISOString(),
+        error: true
+      };
+    }
   });
 
   // CRM IPC handlers - Connected to real CRM integration service
