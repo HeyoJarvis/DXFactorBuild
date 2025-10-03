@@ -1108,3 +1108,136 @@
 {"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-02T21:06:03.038Z"}
 {"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-02T21:06:03.213Z"}
 {"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-02T21:06:03.213Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-02T23:36:44.038Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-02T23:36:44.038Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-02T23:36:44.050Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-02T23:36:44.131Z","uptime":0.786938803}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-02T23:36:44.131Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:36:44.922Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-02T23:36:44.923Z"}
+{"error":"Analysis trigger failed: 500","level":"warn","message":"Failed to trigger initial analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:37:07.438Z"}
+{"insights_count":0,"level":"info","load_time_ms":23400,"message":"✅ CRM startup service initialized successfully","recommendations_count":0,"service":"crm-startup-service","timestamp":"2025-10-02T23:37:07.438Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-02T23:40:55.589Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-02T23:40:55.590Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-02T23:40:55.597Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-02T23:40:55.646Z","uptime":0.735391805}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-02T23:40:55.646Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:40:56.222Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-02T23:40:56.223Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-02T23:41:38.329Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-02T23:41:38.329Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-02T23:41:38.341Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-02T23:41:38.418Z","uptime":0.785030364}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-02T23:41:38.419Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:41:38.683Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-02T23:41:38.683Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-02T23:50:01.594Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-02T23:50:01.594Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-02T23:50:01.602Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-02T23:50:01.662Z","uptime":0.769571566}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-02T23:50:01.662Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:50:01.909Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-02T23:50:01.909Z"}
+{"error":"Analysis trigger failed: 500","level":"warn","message":"Failed to trigger initial analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:50:22.513Z"}
+{"insights_count":0,"level":"info","load_time_ms":20919,"message":"✅ CRM startup service initialized successfully","recommendations_count":0,"service":"crm-startup-service","timestamp":"2025-10-02T23:50:22.513Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-02T23:53:24.447Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-02T23:53:24.448Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-02T23:53:24.460Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-02T23:53:24.539Z","uptime":0.808157769}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-02T23:53:24.540Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:53:24.807Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-02T23:53:24.807Z"}
+{"error":"Analysis trigger failed: 500","level":"warn","message":"Failed to trigger initial analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:53:45.552Z"}
+{"insights_count":0,"level":"info","load_time_ms":21105,"message":"✅ CRM startup service initialized successfully","recommendations_count":0,"service":"crm-startup-service","timestamp":"2025-10-02T23:53:45.553Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-02T23:57:27.231Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-02T23:57:27.231Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-02T23:57:27.244Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-02T23:57:27.310Z","uptime":0.788049783}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-02T23:57:27.310Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:57:27.572Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-02T23:57:27.572Z"}
+{"error":"Analysis trigger failed: 500","level":"warn","message":"Failed to trigger initial analysis","service":"crm-startup-service","timestamp":"2025-10-02T23:57:48.551Z"}
+{"insights_count":0,"level":"info","load_time_ms":21321,"message":"✅ CRM startup service initialized successfully","recommendations_count":0,"service":"crm-startup-service","timestamp":"2025-10-02T23:57:48.552Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:01:28.842Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:01:28.843Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:01:28.854Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:01:28.910Z","uptime":0.759716402}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:01:28.910Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:01:29.126Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:01:29.126Z"}
+{"error":"Analysis trigger failed: 500","level":"warn","message":"Failed to trigger initial analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:01:50.317Z"}
+{"insights_count":0,"level":"info","load_time_ms":21476,"message":"✅ CRM startup service initialized successfully","recommendations_count":0,"service":"crm-startup-service","timestamp":"2025-10-03T00:01:50.318Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:05:33.816Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:05:33.817Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:05:33.823Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:05:33.871Z","uptime":0.752946981}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:05:33.872Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:05:34.699Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:05:34.700Z"}
+{"error":"Analysis trigger failed: 500","level":"warn","message":"Failed to trigger initial analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:05:54.849Z"}
+{"insights_count":0,"level":"info","load_time_ms":21034,"message":"✅ CRM startup service initialized successfully","recommendations_count":0,"service":"crm-startup-service","timestamp":"2025-10-03T00:05:54.850Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:09:35.164Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:09:35.164Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:09:35.176Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:09:35.255Z","uptime":0.798523311}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:09:35.255Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:09:35.561Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:09:35.561Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:11:38.945Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:11:38.945Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:11:38.952Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:11:39.001Z","uptime":0.73461}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:11:39.001Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:11:39.410Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:11:39.410Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:15:33.935Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:15:33.935Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:15:33.948Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:15:34.019Z","uptime":0.793293154}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:15:34.019Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:15:34.340Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:15:34.340Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:18:02.042Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:18:02.042Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:18:02.054Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:18:02.124Z","uptime":0.737861732}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:18:02.124Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:18:02.402Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:18:02.402Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:18:44.447Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:18:44.447Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:18:44.455Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:18:44.511Z","uptime":0.785555818}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:18:44.511Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:18:44.815Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:18:44.815Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:29:06.201Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:29:06.202Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:29:06.214Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:29:06.293Z","uptime":0.786584897}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:29:06.293Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:29:06.893Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:29:06.894Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:29:22.109Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:29:22.110Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:29:22.121Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:29:22.201Z","uptime":0.79198262}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:29:22.201Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:29:22.398Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:29:22.398Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:39:51.478Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:39:51.478Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:39:51.485Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:39:51.559Z","uptime":0.789142219}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:39:51.559Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:39:51.962Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:39:51.963Z"}
+{"error":"Analysis trigger failed: 500","level":"warn","message":"Failed to trigger initial analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:40:12.365Z"}
+{"insights_count":0,"level":"info","load_time_ms":20888,"message":"✅ CRM startup service initialized successfully","recommendations_count":0,"service":"crm-startup-service","timestamp":"2025-10-03T00:40:12.366Z"}
+{"level":"info","message":"🚀 Initializing CRM startup service...","service":"crm-startup-service","timestamp":"2025-10-03T00:51:17.609Z"}
+{"level":"info","message":"🔧 Starting CRM background service...","service":"crm-startup-service","timestamp":"2025-10-03T00:51:17.610Z"}
+{"level":"info","message":"✅ CRM background service started","service":"crm-startup-service","timestamp":"2025-10-03T00:51:17.622Z"}
+{"level":"info","message":"✅ CRM service is ready","service":"crm-startup-service","timestamp":"2025-10-03T00:51:17.701Z","uptime":0.792167475}
+{"level":"info","message":"📊 Loading initial CRM data...","service":"crm-startup-service","timestamp":"2025-10-03T00:51:17.701Z"}
+{"level":"info","message":"No existing analysis found - will trigger new analysis","service":"crm-startup-service","timestamp":"2025-10-03T00:51:18.518Z"}
+{"level":"info","message":"🧠 Triggering initial CRM analysis...","service":"crm-startup-service","timestamp":"2025-10-03T00:51:18.519Z"}

@@ -555,7 +555,10 @@ class DesktopSupabaseAdapter {
             description: taskData.description || null,
             tags: taskData.tags || [],
             due_date: taskData.dueDate || null,
-            parent_session_id: taskData.parentSessionId || null // Link to chat that spawned this task
+            parent_session_id: taskData.parentSessionId || null, // Link to chat that spawned this task
+            assignor: taskData.assignor || null, // Who assigned/created the task
+            assignee: taskData.assignee || null, // Who the task is assigned to
+            mentioned_users: taskData.mentionedUsers || [] // All mentioned users
           },
           is_active: true,
           is_completed: false
@@ -615,6 +618,9 @@ class DesktopSupabaseAdapter {
         tags: session.workflow_metadata?.tags || [],
         due_date: session.workflow_metadata?.due_date || null,
         parent_session_id: session.workflow_metadata?.parent_session_id || null,
+        assignor: session.workflow_metadata?.assignor || null,
+        assignee: session.workflow_metadata?.assignee || null,
+        mentioned_users: session.workflow_metadata?.mentioned_users || [],
         created_at: session.started_at,
         updated_at: session.last_activity_at,
         completed_at: session.completed_at
@@ -647,7 +653,7 @@ class DesktopSupabaseAdapter {
       }
 
       // Update metadata fields
-      if (updates.priority || updates.description || updates.tags || updates.dueDate) {
+      if (updates.priority || updates.description || updates.tags || updates.dueDate || updates.assignor || updates.assignee) {
         // Get current metadata first
         const { data: current, error: fetchError } = await this.supabase
           .from('conversation_sessions')
@@ -663,6 +669,8 @@ class DesktopSupabaseAdapter {
         if (updates.description !== undefined) metadata.description = updates.description;
         if (updates.tags) metadata.tags = updates.tags;
         if (updates.dueDate !== undefined) metadata.due_date = updates.dueDate;
+        if (updates.assignor !== undefined) metadata.assignor = updates.assignor;
+        if (updates.assignee !== undefined) metadata.assignee = updates.assignee;
         
         sessionUpdate.workflow_metadata = metadata;
       }

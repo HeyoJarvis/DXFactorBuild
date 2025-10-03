@@ -66,6 +66,18 @@ class SlackService extends EventEmitter {
   }
   
   setupEventHandlers() {
+    this.logger.info('🔧 Setting up Slack event handlers...');
+    
+    // Log ALL events for debugging
+    this.app.event(/.*/,async ({ event, body }) => {
+      this.logger.debug('📡 Slack event received', { 
+        type: event.type,
+        subtype: event.subtype,
+        user: event.user,
+        channel: event.channel 
+      });
+    });
+    
     // Handle @hj2 mentions
     this.app.event('app_mention', async ({ event }) => {
       try {
@@ -108,7 +120,10 @@ class SlackService extends EventEmitter {
           user: message.user, 
           channel: message.channel,
           channelType: context.channelType,
-          text: message.text?.substring(0, 50) 
+          text: message.text?.substring(0, 50),
+          subtype: message.subtype,
+          bot_id: message.bot_id,
+          ts: message.ts
         });
         
         const msg = {
@@ -163,10 +178,16 @@ class SlackService extends EventEmitter {
       this.logger.info('Bot Token present:', !!process.env.SLACK_BOT_TOKEN);
       this.logger.info('App Token present:', !!process.env.SLACK_APP_TOKEN);
       
+      this.logger.info('🚀 Calling app.start()...');
       await this.app.start();
       this.isConnected = true;
       
       this.logger.info('✅ Slack service started successfully and listening for events');
+      this.logger.info('📋 Event handlers registered:', {
+        mention_handler: true,
+        message_handler: true,
+        error_handler: true
+      });
       this.logger.info('Waiting for messages... Make sure:');
       this.logger.info('  1. Bot is invited to channels (/invite @hj2)');
       this.logger.info('  2. Event subscriptions are configured in Slack App settings');

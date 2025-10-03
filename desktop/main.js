@@ -83,7 +83,7 @@ function createWindow() {
   });
 
   // Load the copilot HTML file directly (with tasks tab)
-  mainWindow.loadFile(path.join(__dirname, 'renderer/copilot-with-tasks.html'));
+  mainWindow.loadFile(path.join(__dirname, 'renderer/unified.html'));
 
   // Setup persistent overlay behavior
   setupPersistentOverlay();
@@ -558,7 +558,7 @@ function initializeServices() {
   console.log('🧠 Initializing workflow detection systems...');
   
   workRequestSystem = new WorkRequestAlertSystem({
-    alertThreshold: 0.7,
+    alertThreshold: 0.5, // Lowered from 0.7 to detect more work requests
     adminUserId: process.env.ADMIN_USER_ID || 'U09GEFMKGE7' // Your user ID
   });
   
@@ -1381,6 +1381,42 @@ What would you like to explore?`,
  * Setup Workflow Detection Integration
  * Analyzes incoming Slack messages for work requests and patterns
  */
+
+// ===== TASK AUTO-CREATION HELPERS =====
+
+/**
+ * Extract task title from Slack message
+ */
+function extractTaskTitle(text) {
+  // Remove Slack mentions (<@U123|user> format)
+  const cleanText = text.replace(/<@[UW][A-Z0-9]+(|[^>]+)?>/g, '').trim();
+  
+  // Remove common prefixes
+  const withoutPrefixes = cleanText
+    .replace(/^(hey|hi|hello|yo),?\s+/i, '')
+    .replace(/^(can you|could you|please)\s+/i, '')
+    .trim();
+  
+  // Take first sentence or first 100 chars
+  const firstSentence = withoutPrefixes.split(/[.!?]/)[0].trim();
+  return firstSentence.length > 100 
+    ? firstSentence.substring(0, 97) + '...' 
+    : firstSentence || 'Task from Slack';
+}
+
+/**
+ * Convert urgency to priority
+ */
+function urgencyToPriority(urgency) {
+  const mapping = {
+    'critical': 'urgent',
+    'high': 'high',
+    'medium': 'medium',
+    'low': 'low'
+  };
+  return mapping[urgency] || 'medium';
+}
+
 function setupWorkflowDetection() {
   console.log('🔗 Setting up workflow detection integration...');
   
@@ -1409,18 +1445,62 @@ function setupWorkflowDetection() {
         }
       }
       
-      // Capture in workflow intelligence system
+      // Capture in workflow intelligence system with assignment tracking
       if (workflowIntelligence) {
-        await workflowIntelligence.captureInboundRequest(
+        const workflowData = await workflowIntelligence.captureInboundRequest(
           message.user,
           message.channel,
           message.text,
           {
             messageType: message.type,
             timestamp: message.timestamp,
-            channelType: message.channelType
+            channelType: message.channelType,
+            user_name: message.user,
+            slack_user_id: message.user
           }
         );
+        
+        // ✨ AUTO-CREATE TASK if it's a work request with assignment
+        if (workRequestAnalysis.isWorkRequest && 
+            workRequestAnalysis.confidence > 0.4 &&
+            (workflowData.context.assignee || workflowData.context.is_assignment)) {
+          
+          try {
+            const taskData = {
+              title: extractTaskTitle(message.text),
+              priority: urgencyToPriority(workRequestAnalysis.urgency),
+              description: message.text,
+              tags: [workRequestAnalysis.workType, 'slack-auto'],
+              assignor: workflowData.context.assignor,
+              assignee: workflowData.context.assignee,
+              mentionedUsers: workflowData.context.mentioned_users,
+              parentSessionId: workflowData.id
+            };
+
+            const result = await dbAdapter.createTask('desktop-user', taskData);
+            
+            if (result.success) {
+              console.log('✅ Auto-created task from Slack:', {
+                task_id: result.task.id,
+                title: taskData.title,
+                assignee: taskData.assignee?.name || taskData.assignee?.id || 'unassigned'
+              });
+              
+              // Notify UI
+              if (mainWindow) {
+                mainWindow.webContents.send('task:created', result.task);
+                mainWindow.webContents.send('notification', {
+                  type: 'task_created',
+                  message: `New task created: ${taskData.title}`
+                });
+              }
+            } else {
+              console.error('❌ Failed to create task:', result.error);
+            }
+          } catch (taskError) {
+            console.error('❌ Task creation error:', taskError.message);
+          }
+        }
       }
       
     } catch (error) {
@@ -1442,18 +1522,53 @@ function setupWorkflowDetection() {
         urgency: workRequestAnalysis.urgency
       });
       
-      // Capture mention in workflow intelligence
+      // Capture mention in workflow intelligence with assignment tracking
       if (workflowIntelligence) {
-        await workflowIntelligence.captureInboundRequest(
+        const workflowData = await workflowIntelligence.captureInboundRequest(
           message.user,
           message.channel,
           message.text,
           {
             messageType: 'mention',
             timestamp: message.timestamp,
-            urgent: message.urgent || workRequestAnalysis.urgency === 'high'
+            urgent: message.urgent || workRequestAnalysis.urgency === 'high',
+            user_name: message.user,
+            slack_user_id: message.user
           }
         );
+        
+        // ✨ AUTO-CREATE TASK from mention if it's a work request with assignment
+        if (workRequestAnalysis.isWorkRequest &&
+            (workflowData.context.assignee || workflowData.context.is_assignment)) {
+          
+          try {
+            const taskData = {
+              title: extractTaskTitle(message.text),
+              priority: urgencyToPriority(workRequestAnalysis.urgency || 'medium'),
+              description: message.text,
+              tags: ['mention', workRequestAnalysis.workType || 'task', 'slack-auto'],
+              assignor: workflowData.context.assignor,
+              assignee: workflowData.context.assignee,
+              mentionedUsers: workflowData.context.mentioned_users,
+              parentSessionId: workflowData.id
+            };
+
+            const result = await dbAdapter.createTask('desktop-user', taskData);
+            
+            if (result.success) {
+              console.log('✅ Auto-created task from mention:', {
+                task_id: result.task.id,
+                title: taskData.title
+              });
+              
+              if (mainWindow) {
+                mainWindow.webContents.send('task:created', result.task);
+              }
+            }
+          } catch (taskError) {
+            console.error('❌ Task creation from mention error:', taskError.message);
+          }
+        }
       }
       
       // Send to renderer with analysis
