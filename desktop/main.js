@@ -823,6 +823,18 @@ function initializeServices() {
     }
   });
 
+  ipcMain.handle('tasks:getChatHistory', async (event, taskId) => {
+    try {
+      console.log('📜 IPC: Getting chat history for task:', taskId);
+      const result = await dbAdapter.getTaskChatHistory(taskId);
+      console.log('📦 IPC: Chat history result:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to get task chat history:', error);
+      return { success: false, error: error.message, messages: [] };
+    }
+  });
+
   // Copilot IPC handlers with persistent context and real data integration
   ipcMain.handle('copilot:sendMessage', async (event, message) => {
     try {
@@ -1260,17 +1272,42 @@ Your role is to help the user complete this task by:
 
 Be concise, practical, and focused on helping complete this specific task.`;
 
-      // Get AI response with task context
+      // Build conversation history for Claude
+      const conversationHistory = context.conversationHistory || [];
+      const messages = [];
+      
+      // Add system prompt as first user message
+      messages.push({
+        role: 'user',
+        content: systemPrompt
+      });
+      
+      // Add conversation history (last 10 messages for context)
+      const recentHistory = conversationHistory.slice(-10);
+      for (const msg of recentHistory) {
+        // Skip the user message we just added to history (it's in the current message)
+        if (msg.content !== message) {
+          messages.push({
+            role: msg.role,
+            content: msg.content
+          });
+        }
+      }
+      
+      // Add current user message
+      messages.push({
+        role: 'user',
+        content: message
+      });
+      
+      console.log('💬 Sending', messages.length, 'messages to Claude (including history)');
+      
+      // Get AI response with full conversation context
       const response = await aiAnalyzer.anthropic.messages.create({
         model: 'claude-3-5-sonnet-20241022',
         max_tokens: 800,
         temperature: 0.7,
-        messages: [
-          {
-            role: 'user',
-            content: `${systemPrompt}\n\nUser: ${message}`
-          }
-        ]
+        messages: messages
       });
       
       const aiResponse = response.content[0].text;

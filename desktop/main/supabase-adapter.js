@@ -714,6 +714,43 @@ class DesktopSupabaseAdapter {
   }
 
   /**
+   * Get chat history for a specific task
+   */
+  async getTaskChatHistory(taskId) {
+    try {
+      this.logger.info('Fetching task chat history', { task_id: taskId });
+
+      const { data, error } = await this.supabase
+        .from('conversation_messages')
+        .select('*')
+        .eq('metadata->>task_id', taskId)
+        .eq('metadata->>message_type', 'task_chat')
+        .order('timestamp', { ascending: true });
+
+      if (error) throw error;
+
+      const messages = (data || []).map(msg => ({
+        role: msg.role,
+        content: msg.message_text,
+        timestamp: msg.timestamp
+      }));
+
+      this.logger.info('Task chat history loaded', { 
+        task_id: taskId,
+        message_count: messages.length 
+      });
+
+      return { success: true, messages };
+    } catch (error) {
+      this.logger.error('Failed to get task chat history', { 
+        task_id: taskId,
+        error: error.message 
+      });
+      return { success: false, error: error.message, messages: [] };
+    }
+  }
+
+  /**
    * Get task statistics
    */
   async getTaskStats(userId) {
@@ -782,4 +819,3 @@ class DesktopSupabaseAdapter {
 }
 
 module.exports = DesktopSupabaseAdapter;
-

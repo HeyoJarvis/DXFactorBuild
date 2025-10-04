@@ -174,7 +174,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     update: (taskId, updates) => ipcRenderer.invoke('tasks:update', taskId, updates),
     delete: (taskId) => ipcRenderer.invoke('tasks:delete', taskId),
     toggle: (taskId, currentStatus) => ipcRenderer.invoke('tasks:toggle', taskId, currentStatus),
-    getStats: () => ipcRenderer.invoke('tasks:getStats')
+    getStats: () => ipcRenderer.invoke('tasks:getStats'),
+    getChatHistory: (taskId) => ipcRenderer.invoke('tasks:getChatHistory', taskId)
   },
   
   // Copilot API
