@@ -1,0 +1,25 @@
+.copilot-page {
+  display: flex;
+  flex-direction: column;
+  height: 1020%;
+  background: var(--color-bg);
+}
+
+.copilot-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.welcome-actions {
+  position: absolute;
+  bottom: var(--spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - var(--spacing-xl) * 2);
+  max-width: 600px;
+  z-index: var(--z-overlay);
+}
+

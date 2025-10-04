@@ -1,0 +1,70 @@
+.tasks-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--color-bg);
+}
+
+.tasks-page.loading {
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+.tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.tasks-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: 20px;
+  font-weight: 600;
+  font-family: 'SF Pro Display', sans-serif;
+}
+
+.tasks-icon {
+  font-size: 24px;
+}
+
+.task-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.stat-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.stat-dot.todo {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.stat-dot.in-progress {
+  background: var(--color-primary);
+}
+
+.stat-dot.completed {
+  background: var(--color-success);
+}
+

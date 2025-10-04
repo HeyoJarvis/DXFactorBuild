@@ -1,0 +1,236 @@
+.jarvis-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1c1c1e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Minimized header mode - slim header at top */
+.jarvis-header.minimized {
+  height: 100vh !important;
+  background: #1c1c1e !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+  width: 100vw;
+  z-index: var(--z-modal);
+  animation: none; /* Disable the fadeIn animation for minimized mode */
+}
+
+.jarvis-header.minimized .header-content {
+  background: transparent;
+  border-radius: 0;
+  height: 70px;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0 20px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  width: 100%;
+  height: 70px;
+  -webkit-app-region: drag; /* Make header draggable */
+}
+
+.header-content > * {
+  -webkit-app-region: no-drag; /* Make interactive elements not draggable */
+}
+
+/* Logo Section */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.header-logo:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.logo-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 0 8px rgba(0, 122, 255, 0.5));
+}
+
+.logo-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* Chat Bar Section */
+.header-chat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 20px;
+  padding: 4px;
+  transition: all 0.2s ease;
+}
+
+.header-chat:focus-within {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 14px;
+  padding: 8px 12px;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.chat-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.chat-submit {
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 4px;
+}
+
+.chat-submit:hover:not(:disabled) {
+  color: #007AFF;
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.chat-submit:disabled {
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Action Icons Section */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.action-button {
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.action-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* Notification Badge */
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #FF3B30;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(255, 59, 48, 0.3);
+}
+
+/* Fact Check Active State */
+.fact-check-btn.active {
+  background: rgba(255, 59, 48, 0.2);
+  border-color: #FF3B30;
+  color: #FF3B30;
+}
+
+.fact-check-btn.active:hover {
+  background: rgba(255, 59, 48, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-content {
+    min-width: auto;
+    width: 90%;
+    gap: 16px;
+    padding: 12px 20px;
+  }
+  
+  .logo-text {
+    display: none;
+  }
+  
+  .chat-input {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    gap: 12px;
+    padding: 10px 16px;
+  }
+  
+  .action-button {
+    width: 40px;
+    height: 40px;
+  }
+}

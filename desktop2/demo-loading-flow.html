@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis Loading Flow Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1c1c1e;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* Typing Animation Styles */
+        .typing-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(28, 28, 30, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(30px);
+        }
+
+        .typing-text {
+            font-size: 32px;
+            font-weight: 300;
+            color: #ffffff;
+            line-height: 1.4;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .typing-cursor {
+            color: #007AFF;
+            font-weight: 400;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Header Styles */
+        .jarvis-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #1c1c1e;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 0 32px;
+            width: 100%;
+            max-width: 1200px;
+            height: 70px;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .header-logo:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .logo-icon {
+            font-size: 24px;
+            filter: drop-shadow(0 0 8px rgba(0, 122, 255, 0.5));
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .header-chat {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 20px;
+            padding: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .header-chat:focus-within {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-size: 16px;
+            padding: 12px 16px;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .chat-submit {
+            background: transparent;
+            border: none;
+            border-radius: 16px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 4px;
+        }
+
+        .chat-submit:hover {
+            color: #007AFF;
+            background: rgba(0, 122, 255, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-button {
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #FF3B30;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fact-check-btn.active {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: #FF3B30;
+            color: #FF3B30;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .demo-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1000;
+        }
+
+        .demo-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Typing Animation Stage -->
+    <div id="typingStage" class="typing-animation" style="display: none;">
+        <div class="typing-text">
+            <span id="typedText"></span><span class="typing-cursor">|</span>
+        </div>
+    </div>
+
+    <!-- Header Stage -->
+    <div id="headerStage" class="jarvis-header" style="display: flex;">
+        <div class="header-content">
+            <div class="header-logo" onclick="enterMainSystem()">
+                <div class="logo-icon">🤖</div>
+                <span class="logo-text">J.A.R.V.I.S</span>
+            </div>
+
+            <div class="header-chat">
+                <input type="text" class="chat-input" placeholder="Chat with me..." onkeypress="handleChatKeypress(event)">
+                <button class="chat-submit" onclick="enterMainSystem()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="header-actions">
+                <button class="action-button notification-btn" onclick="enterMainSystem()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 8A6 6 0 0 0 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M13.73 21A2 2 0 0 1 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="notification-badge">3</span>
+                </button>
+
+                <button class="action-button fact-check-btn" onclick="toggleFactCheck(this)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12L11 14L15 10M21 12A9 9 0 1 1 3 12A9 9 0 0 1 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <button class="demo-button" onclick="restartDemo()">Restart Demo</button>
+        <button class="demo-button" onclick="skipToHeader()">Skip to Header</button>
+    </div>
+
+    <script>
+        const fullText = 'Welcome ... J.A.R.V.I.S is Loading';
+        let currentIndex = 0;
+        let typingInterval;
+
+        function startTypingAnimation() {
+            const typedTextElement = document.getElementById('typedText');
+            currentIndex = 0;
+            typedTextElement.textContent = '';
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < fullText.length) {
+                    typedTextElement.textContent = fullText.slice(0, currentIndex + 1);
+                    currentIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                    setTimeout(showHeader, 1500);
+                }
+            }, 100);
+        }
+
+        function showHeader() {
+            document.getElementById('typingStage').style.display = 'none';
+            document.getElementById('headerStage').style.display = 'flex';
+        }
+
+        function enterMainSystem() {
+            alert('Entering main system! 🚀\n\nThis would transition to the full HeyJarvis interface.');
+        }
+
+        function toggleFactCheck(button) {
+            button.classList.toggle('active');
+            const isActive = button.classList.contains('active');
+            console.log('Fact check mode:', isActive ? 'ON' : 'OFF');
+        }
+
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                enterMainSystem();
+            }
+        }
+
+        function restartDemo() {
+            document.getElementById('typingStage').style.display = 'flex';
+            document.getElementById('headerStage').style.display = 'none';
+            clearInterval(typingInterval);
+            setTimeout(startTypingAnimation, 100);
+        }
+
+        function skipToHeader() {
+            clearInterval(typingInterval);
+            showHeader();
+        }
+
+        // Start with header displayed (no typing animation)
+        // startTypingAnimation();
+    </script>
+</body>
+</html>
