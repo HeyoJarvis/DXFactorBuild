@@ -6,13 +6,16 @@
 // Load environment variables FIRST before anything else
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 
-const { app, BrowserWindow, ipcMain, Tray, Menu, screen, desktopCapturer } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, screen, desktopCapturer, protocol } = require('electron');
 const path = require('path');
 const SlackService = require('./main/slack-service');
 const CRMStartupService = require('./main/crm-startup-service');
 const DesktopSupabaseAdapter = require('./main/supabase-adapter');
 const WorkRequestAlertSystem = require('../api/notifications/work-request-alerts');
+const AIWorkRequestDetector = require('../api/notifications/ai-work-request-detector');
 const WorkflowIntelligenceSystem = require('../core/intelligence/workflow-analyzer');
+const AuthService = require('./services/auth-service');
+const FactCheckerService = require('./main/fact-checker-service');
 
 // Global error handlers to prevent crashes
 process.on('uncaughtException', (error) => {
@@ -26,6 +29,7 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 let mainWindow;
+let loginWindow;
 let highlightOverlay = null; // New overlay for fact-check highlights
 let tray;
 let slackService;
@@ -33,6 +37,9 @@ let crmStartupService;
 let dbAdapter; // Supabase adapter for desktop app
 let workRequestSystem; // Workflow detection system
 let workflowIntelligence; // Workflow intelligence analyzer
+let authService; // Authentication service
+let factCheckerService; // Fact-checker service
+let currentUser = null; // Currently authenticated user
 let conversationHistory = []; // Store conversation history
 let currentSessionId = null; // Track current conversation session
 let taskSessionIds = {}; // Track task-specific session IDs: { taskId: sessionId }
@@ -40,6 +47,9 @@ let lastSlackContext = null; // Cache Slack context
 let isExpanded = false; // Track if top bar is expanded
 let isManuallyPositioned = false; // Track if user has manually moved the bar
 let activeHighlights = []; // Store active highlight data
+let userDefinedSize = null; // Track user's custom window size
+let isUserResizing = false; // Track if user is actively resizing
+let expandedSize = { width: 451, height: 397 }; // Remember expanded dimensions
 
 function createWindow() {
   // Create the browser window as a top bar overlay
@@ -47,9 +57,9 @@ function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth } = primaryDisplay.bounds;
   
-  // Make bar slightly bigger for better presence
-  const barWidth = Math.min(480, screenWidth * 0.35); // Max 480px or 35% of screen width (bigger)
-  const barHeight = 400; // Much taller to accommodate full chat interface
+  // Start in collapsed state - clean header bar
+  const barWidth = Math.min(800, screenWidth * 0.6); // Responsive width for header
+  const barHeight = 48; // Collapsed header height
   const xPosition = Math.floor((screenWidth - barWidth) / 2); // Center horizontally
   
   mainWindow = new BrowserWindow({
@@ -85,6 +95,28 @@ function createWindow() {
 
   // Load the copilot HTML file directly (with tasks tab)
   mainWindow.loadFile(path.join(__dirname, 'renderer/unified.html'));
+
+  // Track user resizing
+  mainWindow.on('will-resize', (event, newBounds) => {
+    isUserResizing = true;
+  });
+
+  mainWindow.on('resize', () => {
+    if (isUserResizing && isExpanded) {
+      // User is manually resizing - save their preference
+      const bounds = mainWindow.getBounds();
+      userDefinedSize = {
+        width: bounds.width,
+        height: bounds.height
+      };
+      console.log('💾 User resized window to:', userDefinedSize);
+    }
+    
+    // Reset resizing flag after a short delay
+    setTimeout(() => {
+      isUserResizing = false;
+    }, 100);
+  });
 
   // Setup persistent overlay behavior
   setupPersistentOverlay();
@@ -272,16 +304,19 @@ function setupDragDetection() {
 function positionOverlayOnCurrentScreen() {
   // Don't auto-reposition if user has manually moved the bar
   if (isManuallyPositioned) {
-    // Only update size, keep user's position
-    const currentBounds = mainWindow.getBounds();
-    const barHeight = isExpanded ? 600 : 55;
-    
-    if (currentBounds.height !== barHeight) {
-      mainWindow.setBounds({
-        ...currentBounds,
-        height: barHeight
-      });
+    // Only update size if user hasn't defined custom size
+    if (!userDefinedSize) {
+      const currentBounds = mainWindow.getBounds();
+      const barHeight = isExpanded ? 600 : 55;
+      
+      if (currentBounds.height !== barHeight) {
+        mainWindow.setBounds({
+          ...currentBounds,
+          height: barHeight
+        });
+      }
     }
+    // If user has defined size, don't change anything
     return;
   }
   
@@ -292,8 +327,9 @@ function positionOverlayOnCurrentScreen() {
   const { x: screenX, y: screenY } = currentDisplay.bounds;
   
   // Calculate bar dimensions and position
-  const barWidth = Math.min(480, screenWidth * 0.35); // Max 480px or 35% of screen width (bigger)
-  const barHeight = isExpanded ? 600 : 55; // Expanded or collapsed height (slightly taller)
+  // Use user-defined size if available, otherwise use optimized defaults
+  const barWidth = userDefinedSize?.width || (isExpanded ? expandedSize.width : Math.min(800, screenWidth * 0.5));
+  const barHeight = userDefinedSize?.height || (isExpanded ? expandedSize.height : 48);
   const xPosition = screenX + Math.floor((screenWidth - barWidth) / 2); // Center horizontally
   const yPosition = screenY + 10; // Small margin from top
   
@@ -392,57 +428,44 @@ function setupScreenMonitoring() {
   const { screen } = require('electron');
   let lastScreenId = null;
   
-  // Check screen changes every 10 seconds (reduced frequency)
-  const screenMonitorInterval = setInterval(() => {
-    if (!mainWindow || mainWindow.isDestroyed()) {
-      clearInterval(screenMonitorInterval);
-      return;
-    }
-    
-    try {
-      const cursor = screen.getCursorScreenPoint();
-      const currentDisplay = screen.getDisplayNearestPoint(cursor);
-      
-      // If user moved to a different screen, follow them
-      if (lastScreenId !== null && lastScreenId !== currentDisplay.id) {
-        console.log(`🏃‍♂️ Following user to screen: ${currentDisplay.id}`);
-        positionOverlayOnCurrentScreen();
-      }
-      
-      lastScreenId = currentDisplay.id;
-      
-      // Detect if any fullscreen app is running and adjust accordingly
-      detectFullscreenApps();
-      
-    } catch (error) {
-      console.log('⚠️ Screen monitoring error:', error.message);
-    }
-    }, 10000); // Reduced from 3 seconds to 10 seconds
+  // DISABLED: Automatic screen monitoring that repositions window
+  // Users should manually position the window themselves
+  // Only keep display change listeners for when monitors are added/removed
   
   // Listen for display changes
   screen.on('display-added', () => {
     console.log('🖥️ New display detected');
-    setTimeout(positionOverlayOnCurrentScreen, 1000);
+    // Only reposition if window is off-screen
+    setTimeout(() => {
+      if (!isManuallyPositioned) {
+        positionOverlayOnCurrentScreen();
+      }
+    }, 1000);
   });
   
   screen.on('display-removed', () => {
     console.log('🖥️ Display removed');
-    setTimeout(positionOverlayOnCurrentScreen, 1000);
+    // Only reposition if window is off-screen
+    setTimeout(() => {
+      if (!isManuallyPositioned) {
+        positionOverlayOnCurrentScreen();
+      }
+    }, 1000);
   });
   
   screen.on('display-metrics-changed', () => {
     try {
       console.log('🖥️ Display metrics changed');
-      setTimeout(positionOverlayOnCurrentScreen, 500);
+      // Only reposition if user hasn't manually positioned the window
+      if (!isManuallyPositioned) {
+        setTimeout(positionOverlayOnCurrentScreen, 500);
+      }
     } catch (error) {
       console.error('Error handling display metrics change:', error);
     }
   });
   
-  // Clean up on window close
-  mainWindow.on('closed', () => {
-    clearInterval(screenMonitorInterval);
-  });
+  // No interval to clean up since we disabled automatic monitoring
 }
 
 // Detect fullscreen applications and adjust overlay behavior
@@ -505,26 +528,30 @@ function expandTopBar() {
     const { width: screenWidth } = currentDisplay.bounds;
     const { x: screenX, y: screenY } = currentDisplay.bounds;
     
-    // Expand to show full interface - wider when expanded
-    const expandedWidth = Math.min(800, screenWidth * 0.6); // Wider when expanded
+    // Use user-defined size if available, otherwise use stored expanded size
+    const expandedWidth = userDefinedSize?.width || expandedSize.width;
+    const expandedHeight = userDefinedSize?.height || expandedSize.height;
     const xPosition = screenX + Math.floor((screenWidth - expandedWidth) / 2);
     
     mainWindow.setBounds({
       x: xPosition,
       y: screenY + 10,
       width: expandedWidth,
-      height: 600 // Expanded height
+      height: expandedHeight
     });
     
     // Send message to renderer to switch to expanded mode
     mainWindow.webContents.send('topbar:expanded', true);
-    console.log('📖 Expanded top bar');
+    console.log('📖 Expanded top bar to:', { width: expandedWidth, height: expandedHeight });
   }
 }
 
 function collapseTopBar() {
   if (mainWindow && isExpanded) {
     isExpanded = false;
+    
+    // Clear user-defined size when collapsing
+    userDefinedSize = null;
     
     // Get current screen and reposition to collapsed state
     positionOverlayOnCurrentScreen();
@@ -558,10 +585,20 @@ function initializeServices() {
   // Initialize Workflow Detection Systems
   console.log('🧠 Initializing workflow detection systems...');
   
-  workRequestSystem = new WorkRequestAlertSystem({
-    alertThreshold: 0.5, // Lowered from 0.7 to detect more work requests
-    adminUserId: process.env.ADMIN_USER_ID || 'U09GEFMKGE7' // Your user ID
+  // Use AI-powered detection for better accuracy
+  workRequestSystem = new AIWorkRequestDetector({
+    model: 'claude-sonnet-4-20250514', // Claude Sonnet 4.5 (latest)
+    temperature: 0.1 // Consistent detection
   });
+  
+  console.log('✨ Using AI-powered work request detection (Claude Sonnet 4.5)');
+  
+  // Initialize Fact-Checker Service
+  factCheckerService = new FactCheckerService({
+    model: 'claude-sonnet-4-20250514', // Same model for consistency
+    logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+  });
+  console.log('✅ Fact-checker service initialized');
   
   workflowIntelligence = new WorkflowIntelligenceSystem({
     logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
@@ -720,7 +757,9 @@ function initializeServices() {
   // Task Management IPC handlers
   ipcMain.handle('tasks:create', async (event, taskData) => {
     try {
-      const userId = 'desktop-user'; // TODO: Get actual user ID
+      // Use authenticated user ID
+      const userId = currentUser?.id || 'desktop-user';
+      console.log('📝 Creating task for user:', userId);
       const result = await dbAdapter.createTask(userId, taskData);
       return result;
     } catch (error) {
@@ -731,7 +770,8 @@ function initializeServices() {
 
   ipcMain.handle('tasks:getAll', async () => {
     try {
-      const userId = 'desktop-user'; // TODO: Get actual user ID
+      // Use authenticated user ID
+      const userId = currentUser?.id || 'desktop-user';
       console.log('📥 IPC: Getting all tasks for user:', userId);
       const result = await dbAdapter.getUserTasks(userId, { includeCompleted: false });
       console.log('📦 IPC: Task result:', result);
@@ -786,13 +826,52 @@ function initializeServices() {
   // Copilot IPC handlers with persistent context and real data integration
   ipcMain.handle('copilot:sendMessage', async (event, message) => {
     try {
-      console.log('💬 Processing copilot message with context:', message.substring(0, 50) + '...');
+      const userId = currentUser?.id || 'desktop-user';
+      console.log('💬 Processing copilot message for user:', userId, '- Message:', message.substring(0, 50) + '...');
+      
+      // ✨ Check for fact-check command
+      if (message.toLowerCase().startsWith('check') || 
+          message.toLowerCase().startsWith('fact check') ||
+          message.toLowerCase().startsWith('jarvis check')) {
+        console.log('🔍 Fact-check command detected!');
+        
+        try {
+          // Capture screen and analyze
+          const result = await factCheckerService.captureAndCheck();
+          
+          if (!result.hasSuspiciousContent) {
+            // Return simple chat message
+            return {
+              type: 'fact_check_result',
+              content: '✅ **All Clear!**\n\nNo suspicious claims detected on your screen. The content appears legitimate.',
+              timestamp: new Date().toISOString()
+            };
+          } else {
+            // Show overlay with highlights + brief chat message
+            await factCheckerService.showOverlayWithHighlights(result);
+            
+            return {
+              type: 'fact_check_result',
+              content: `🚨 **Fact-check complete!**\n\nFound ${result.claims.length} suspicious claim${result.claims.length > 1 ? 's' : ''} on your screen.\n\n💡 **Soft red highlights** are now visible. Click any highlight to see details.\n\n_Highlights will auto-fade after 15 seconds_`,
+              timestamp: new Date().toISOString()
+            };
+          }
+        } catch (error) {
+          console.error('❌ Fact-check failed:', error);
+          return {
+            type: 'error',
+            content: `❌ Fact-check failed: ${error.message}\n\nTry again or check the console for details.`,
+            timestamp: new Date().toISOString()
+          };
+        }
+      }
       
       // Add user message to conversation history
       conversationHistory.push({
         role: 'user',
         content: message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        user_id: userId
       });
       
       // Keep only last 10 messages for context
@@ -910,11 +989,12 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
       conversationHistory.push({
         role: 'assistant',
         content: aiResponse,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        user_id: userId
       });
       
       // Save both messages to Supabase session (asynchronously)
-      const userId = 'desktop-user'; // TODO: Get actual user ID when auth is implemented
+      // userId already defined above from currentUser
       
       // Get or create active session
       if (!currentSessionId) {
@@ -1007,6 +1087,7 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
         role: 'assistant',
         content: 'I encountered an error processing your request. Let me try to help you anyway.',
         timestamp: new Date().toISOString(),
+        user_id: userId,
         error: true
       });
       
@@ -1511,6 +1592,39 @@ Be concise, practical, and focused on helping complete this specific task.`;
 // ===== TASK AUTO-CREATION HELPERS =====
 
 /**
+ * Look up Supabase user by Slack user ID
+ */
+async function getSupabaseUserBySlackId(slackUserId) {
+  try {
+    const { data, error } = await dbAdapter.supabase
+      .from('users')
+      .select('*')
+      .eq('slack_user_id', slackUserId)
+      .single();
+    
+    if (error) {
+      console.log('⚠️ User not found for Slack ID:', slackUserId, error.message);
+      return null;
+    }
+    
+    console.log('✅ Found Supabase user for Slack ID:', slackUserId, '→', data.id);
+    return data;
+  } catch (error) {
+    console.error('❌ Error looking up user by Slack ID:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Extract mentioned Slack user IDs from message
+ */
+function extractMentionedSlackUsers(text) {
+  const mentionPattern = /<@([UW][A-Z0-9]+)>/g;
+  const mentions = [...text.matchAll(mentionPattern)];
+  return mentions.map(m => m[1]);
+}
+
+/**
  * Extract task title from Slack message
  */
 function extractTaskTitle(text) {
@@ -1549,8 +1663,8 @@ function setupWorkflowDetection() {
   // Listen for Slack messages and analyze them
   slackService.on('message', async (message) => {
     try {
-      // Analyze for work requests
-      const workRequestAnalysis = workRequestSystem.analyzeForWorkRequest(
+      // Analyze for work requests using AI
+      const workRequestAnalysis = await workRequestSystem.analyzeForWorkRequest(
         { text: message.text, timestamp: message.timestamp },
         { user: message.user, channel: message.channel }
       );
@@ -1586,42 +1700,98 @@ function setupWorkflowDetection() {
           }
         );
         
-        // ✨ AUTO-CREATE TASK if it's a work request with assignment
+        // ✨ AUTO-CREATE TASK from work requests
+        // Strategy: If mentioned users exist, create for them. Otherwise, create for current user.
         if (workRequestAnalysis.isWorkRequest && 
-            workRequestAnalysis.confidence > 0.4 &&
-            (workflowData.context.assignee || workflowData.context.is_assignment)) {
+            workRequestAnalysis.confidence > 0.4) {
           
           try {
-            const taskData = {
-              title: extractTaskTitle(message.text),
-              priority: urgencyToPriority(workRequestAnalysis.urgency),
-              description: message.text,
-              tags: [workRequestAnalysis.workType, 'slack-auto'],
-              assignor: workflowData.context.assignor,
-              assignee: workflowData.context.assignee,
-              mentionedUsers: workflowData.context.mentioned_users,
-              parentSessionId: workflowData.id
-            };
-
-            const result = await dbAdapter.createTask('desktop-user', taskData);
+            // Extract Slack user mentions from message
+            const mentionedSlackIds = extractMentionedSlackUsers(message.text);
+            console.log('🔍 Task creation check:', {
+              isWorkRequest: true,
+              mentionedUsers: mentionedSlackIds.length,
+              hasAssignment: workflowData.context.is_assignment
+            });
             
-            if (result.success) {
-              console.log('✅ Auto-created task from Slack:', {
-                task_id: result.task.id,
-                title: taskData.title,
-                assignee: taskData.assignee?.name || taskData.assignee?.id || 'unassigned'
-              });
+            // Strategy 1: Create tasks for explicitly mentioned users
+            if (mentionedSlackIds.length > 0) {
+              console.log('📌 Creating tasks for', mentionedSlackIds.length, 'mentioned user(s)');
               
-              // Notify UI
-              if (mainWindow) {
-                mainWindow.webContents.send('task:created', result.task);
-                mainWindow.webContents.send('notification', {
-                  type: 'task_created',
-                  message: `New task created: ${taskData.title}`
-                });
+              for (const slackUserId of mentionedSlackIds) {
+                const targetUser = await getSupabaseUserBySlackId(slackUserId);
+                
+                if (targetUser) {
+                  const taskData = {
+                    title: extractTaskTitle(message.text),
+                    priority: urgencyToPriority(workRequestAnalysis.urgency),
+                    description: message.text,
+                    tags: [workRequestAnalysis.workType, 'slack-auto', 'assigned'],
+                    assignor: message.user,
+                    assignee: slackUserId,
+                    mentionedUsers: mentionedSlackIds,
+                    parentSessionId: workflowData.id
+                  };
+
+                  const result = await dbAdapter.createTask(targetUser.id, taskData);
+                  
+                  if (result.success) {
+                    console.log('✅ Auto-created task for @mentioned user:', {
+                      task_id: result.task.id,
+                      title: taskData.title,
+                      assigned_to: targetUser.email
+                    });
+                    
+                    // Notify UI if task is for current logged-in user
+                    if (mainWindow && currentUser && targetUser.id === currentUser.id) {
+                      mainWindow.webContents.send('task:created', result.task);
+                      mainWindow.webContents.send('notification', {
+                        type: 'task_created',
+                        message: `Task assigned: ${taskData.title}`
+                      });
+                    }
+                  }
+                } else {
+                  console.log('⚠️ Mentioned user not in database:', slackUserId);
+                }
               }
-            } else {
-              console.error('❌ Failed to create task:', result.error);
+            } 
+            // Strategy 2: No mentions - create for current logged-in user
+            else {
+              console.log('📝 No explicit mentions - creating task for current user');
+              
+              const userId = currentUser?.id || 'desktop-user';
+              const taskData = {
+                title: extractTaskTitle(message.text),
+                priority: urgencyToPriority(workRequestAnalysis.urgency),
+                description: message.text,
+                tags: [workRequestAnalysis.workType, 'slack-auto', 'general'],
+                assignor: message.user,
+                assignee: null,
+                mentionedUsers: [],
+                parentSessionId: workflowData.id
+              };
+
+              const result = await dbAdapter.createTask(userId, taskData);
+              
+              if (result.success) {
+                console.log('✅ Auto-created task from work request:', {
+                  task_id: result.task.id,
+                  title: taskData.title,
+                  created_for: currentUser?.email || userId
+                });
+                
+                // Notify UI
+                if (mainWindow) {
+                  mainWindow.webContents.send('task:created', result.task);
+                  mainWindow.webContents.send('notification', {
+                    type: 'task_created',
+                    message: `New task: ${taskData.title}`
+                  });
+                }
+              } else {
+                console.error('❌ Failed to create task:', result.error);
+              }
             }
           } catch (taskError) {
             console.error('❌ Task creation error:', taskError.message);
@@ -1637,15 +1807,16 @@ function setupWorkflowDetection() {
   // Listen for mentions and analyze them too
   slackService.on('mention', async (message) => {
     try {
-      // Mentions are often work requests, analyze with higher priority
-      const workRequestAnalysis = workRequestSystem.analyzeForWorkRequest(
+      // Mentions are often work requests, analyze with AI
+      const workRequestAnalysis = await workRequestSystem.analyzeForWorkRequest(
         { text: message.text, timestamp: message.timestamp },
         { user: message.user, channel: message.channel }
       );
       
       console.log('👋 Bot mentioned - analyzing...', {
         isWorkRequest: workRequestAnalysis.isWorkRequest,
-        urgency: workRequestAnalysis.urgency
+        urgency: workRequestAnalysis.urgency,
+        message: message.text.substring(0, 100)
       });
       
       // Capture mention in workflow intelligence with assignment tracking
@@ -1663,32 +1834,56 @@ function setupWorkflowDetection() {
           }
         );
         
-        // ✨ AUTO-CREATE TASK from mention if it's a work request with assignment
-        if (workRequestAnalysis.isWorkRequest &&
-            (workflowData.context.assignee || workflowData.context.is_assignment)) {
+        // ✨ AUTO-CREATE TASK from mention - Create for ALL mentioned users
+        // When someone says "@Avi can you fix the payment API?"
+        // We create a task for Avi (the mentioned user), not the sender
+        if (workRequestAnalysis.isWorkRequest) {
           
           try {
-            const taskData = {
-              title: extractTaskTitle(message.text),
-              priority: urgencyToPriority(workRequestAnalysis.urgency || 'medium'),
-              description: message.text,
-              tags: ['mention', workRequestAnalysis.workType || 'task', 'slack-auto'],
-              assignor: workflowData.context.assignor,
-              assignee: workflowData.context.assignee,
-              mentionedUsers: workflowData.context.mentioned_users,
-              parentSessionId: workflowData.id
-            };
-
-            const result = await dbAdapter.createTask('desktop-user', taskData);
+            // Extract all mentioned Slack user IDs from the message
+            const mentionedSlackIds = extractMentionedSlackUsers(message.text);
+            console.log('📌 Mentioned Slack users:', mentionedSlackIds);
             
-            if (result.success) {
-              console.log('✅ Auto-created task from mention:', {
-                task_id: result.task.id,
-                title: taskData.title
-              });
+            // Create task for each mentioned user who has authenticated
+            for (const slackUserId of mentionedSlackIds) {
+              // Look up Supabase user by their Slack ID
+              const targetUser = await getSupabaseUserBySlackId(slackUserId);
               
-              if (mainWindow) {
-                mainWindow.webContents.send('task:created', result.task);
+              if (targetUser) {
+                const taskData = {
+                  title: extractTaskTitle(message.text),
+                  priority: urgencyToPriority(workRequestAnalysis.urgency || 'medium'),
+                  description: message.text,
+                  tags: ['mention', workRequestAnalysis.workType || 'task', 'slack-auto'],
+                  assignor: message.user,  // Who sent the message (the assigner)
+                  assignee: slackUserId,    // Who was mentioned (the assignee)
+                  mentionedUsers: mentionedSlackIds,
+                  parentSessionId: workflowData.id
+                };
+
+                // Create task for the MENTIONED user (not current user)
+                const result = await dbAdapter.createTask(targetUser.id, taskData);
+                
+                if (result.success) {
+                  console.log('✅ Auto-created task from mention:', {
+                    task_id: result.task.id,
+                    title: taskData.title,
+                    created_for_user: targetUser.email,
+                    slack_user_id: slackUserId
+                  });
+                  
+                  // Notify UI if this task is for the current logged-in user
+                  if (mainWindow && currentUser && targetUser.id === currentUser.id) {
+                    mainWindow.webContents.send('task:created', result.task);
+                    mainWindow.webContents.send('notification', {
+                      title: '✨ New Task Assigned',
+                      body: taskData.title,
+                      urgency: taskData.priority
+                    });
+                  }
+                }
+              } else {
+                console.log('⚠️ Mentioned user not found in database (they need to authenticate):', slackUserId);
               }
             }
           } catch (taskError) {
@@ -1762,11 +1957,70 @@ async function startCRMLoading() {
   }
 }
 
+// Create login window
+function createLoginWindow() {
+  loginWindow = new BrowserWindow({
+    width: 500,
+    height: 700,
+    show: true,
+    center: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'bridge', 'preload.js')
+    },
+    titleBarStyle: 'hiddenInset',
+    frame: true
+  });
+
+  loginWindow.loadFile(path.join(__dirname, 'renderer', 'login.html'));
+  
+  loginWindow.on('closed', () => {
+    loginWindow = null;
+  });
+  
+  console.log('🔐 Login window created');
+}
+
+// Check authentication and show appropriate window
+async function initializeApp() {
+  try {
+    // Initialize auth service
+    authService = new AuthService();
+    
+    // Try to load existing session
+    const session = await authService.loadSession();
+    
+    if (session && session.user) {
+      // User is authenticated
+      currentUser = session.user;
+      console.log('✅ User authenticated:', currentUser.email);
+      
+      // Show main app
+      createWindow();
+      initializeServices();
+    } else {
+      // No valid session, show login
+      console.log('🔐 No valid session, showing login');
+      createLoginWindow();
+    }
+  } catch (error) {
+    console.error('❌ App initialization failed:', error);
+    // Show login on error
+    createLoginWindow();
+  }
+}
+
 // This method will be called when Electron has finished initialization
 if (app && typeof app.whenReady === 'function') {
   app.whenReady().then(() => {
-    createWindow();
-    initializeServices();
+    // Register custom protocol for OAuth callback
+    protocol.registerFileProtocol('heyjarvis', (request, callback) => {
+      console.log('🔗 Custom protocol handler called:', request.url);
+    });
+    
+    initializeApp();
   });
 } else {
   console.error('Electron app object is not available:', typeof app);
@@ -1951,6 +2205,89 @@ function showHighlightExplanation(highlightId) {
     });
   }
 }
+
+// ===== AUTHENTICATION IPC HANDLERS =====
+
+// Sign in with Slack
+ipcMain.handle('auth:sign-in-slack', async () => {
+  try {
+    console.log('🔐 Starting Slack sign in...');
+    
+    if (!authService) {
+      authService = new AuthService();
+    }
+    
+    const result = await authService.signInWithSlack();
+    
+    if (result.success) {
+      currentUser = result.user;
+      
+      // Close login window
+      if (loginWindow) {
+        loginWindow.close();
+        loginWindow = null;
+      }
+      
+      // Create main window
+      createWindow();
+      initializeServices();
+      
+      return {
+        success: true,
+        user: currentUser
+      };
+    }
+    
+    return {
+      success: false,
+      error: 'Authentication failed'
+    };
+    
+  } catch (error) {
+    console.error('❌ Sign in failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// Sign out
+ipcMain.handle('auth:sign-out', async () => {
+  try {
+    console.log('🔐 Signing out...');
+    
+    if (authService) {
+      await authService.signOut();
+    }
+    
+    currentUser = null;
+    conversationHistory = [];
+    
+    // Close main window
+    if (mainWindow) {
+      mainWindow.close();
+      mainWindow = null;
+    }
+    
+    // Show login window
+    createLoginWindow();
+    
+    return { success: true };
+    
+  } catch (error) {
+    console.error('❌ Sign out failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// Get current user
+ipcMain.handle('auth:get-user', async () => {
+  return currentUser;
+});
 
 // ===== FACT CHECK IPC HANDLERS =====
 

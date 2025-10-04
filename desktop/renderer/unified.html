@@ -15,9 +15,9 @@
     }
 
     body {
-      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: rgba(28, 28, 30, 0.95);
-      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Text', sans-serif;
+      background: #fafafa;
+      color: #171717;
       height: 100vh;
       width: 100vw;
       margin: 0;
@@ -25,22 +25,26 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      backdrop-filter: blur(20px) saturate(180%);
+      backdrop-filter: blur(40px) saturate(180%);
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
-      border: 0.5px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 
+        0 0 0 0.5px rgba(0, 0, 0, 0.04),
+        0 20px 50px -12px rgba(0, 0, 0, 0.12),
+        0 8px 16px -8px rgba(0, 0, 0, 0.08);
     }
 
     body.collapsed {
-      height: 60px;
-      background: rgba(28, 28, 30, 0.85);
+      height: 48px;
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    body.collapsed .copilot-content {
+      display: none !important;
     }
 
     body.expanded {
-      height: 680px;
-      background: rgba(28, 28, 30, 0.95);
-      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
+      height: 100vh;
+      background: #fafafa;
     }
 
     body::before {
@@ -64,45 +68,225 @@
       50% { opacity: 0.4; transform: scale(1.02); }
     }
 
-    /* Header */
+    /* Header - Compact Premium Design */
     .copilot-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 16px 32px;
-      height: 60px;
-      background: transparent;
-      border-radius: 16px;
-      gap: 20px;
+      padding: 8px 20px;
+      height: 48px;
+      background: white;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      gap: 16px;
       flex-shrink: 0;
+    }
+
+    body.collapsed .copilot-header {
+      height: 48px;
     }
 
     .copilot-title {
       display: flex;
       align-items: center;
-      gap: 14px;
-      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      gap: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       font-weight: 600;
-      font-size: 17px;
-      color: #ffffff;
+      font-size: 14px;
+      color: #171717;
+      letter-spacing: -0.02em;
       cursor: move;
-      padding: 10px 16px;
-      border-radius: 12px;
+      padding: 6px 10px;
+      border-radius: 6px;
       user-select: none;
       -webkit-app-region: drag;
-      transition: all 0.3s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .copilot-title:hover {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.03);
     }
 
     .copilot-icon {
-      width: 36px;
-      height: 36px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
       transition: all 0.3s ease;
+    }
+
+    .header-input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      max-width: 500px;
+      margin: 0 16px;
+      -webkit-app-region: no-drag;
+      position: relative;
+    }
+
+    body.expanded .header-input-wrapper {
+      display: none;
+    }
+
+    .header-input {
+      width: 100%;
+      height: 32px;
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 0 16px;
+      padding-right: 40px;
+      font-size: 13px;
+      color: #171717;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .header-input::placeholder {
+      color: #a3a3a3;
+    }
+
+    .header-input:hover {
+      background: rgba(0, 0, 0, 0.06);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .header-input-send-btn {
+      position: absolute;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 122, 255, 0.1);
+      border: none;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .header-input-wrapper:hover .header-input-send-btn,
+    .header-input:focus ~ .header-input-send-btn,
+    .header-input-send-btn.has-text {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .header-input-send-btn:hover {
+      background: rgba(0, 122, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .header-input-send-btn:active {
+      transform: scale(0.95);
+    }
+
+    .header-input-send-btn svg {
+      width: 14px;
+      height: 14px;
+      color: #007AFF;
+    }
+
+    .header-input:focus {
+      background: white;
+      border-color: #171717;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      -webkit-app-region: no-drag;
+    }
+
+    .header-nav-btn {
+      height: 32px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #737373;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      letter-spacing: -0.01em;
+    }
+
+    .header-nav-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: #171717;
+    }
+
+    .header-nav-btn.active {
+      background: #171717;
+      color: white;
+    }
+
+    .header-nav-btn.active:hover {
+      background: #0a0a0a;
+    }
+
+    .nav-badge {
+      width: 6px;
+      height: 6px;
+      background: #FF3B30;
+      border-radius: 50%;
+      margin-left: 2px;
+    }
+
+    .header-nav-btn.active .nav-badge {
+      background: white;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.1);
+      margin: 0 6px;
+    }
+
+    .header-action-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #737373;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .header-action-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: #171717;
+    }
+
+    .header-action-btn:active {
+      transform: scale(0.95);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 8px;
+      height: 8px;
+      background: #FF3B30;
+      border-radius: 50%;
+      border: 2px solid white;
     }
 
     .header-chat-container {
@@ -120,19 +304,25 @@
 
     .header-chat-input {
       flex: 1;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 22px;
       padding: 10px 18px;
-      color: #ffffff;
+      color: #1d1d1f;
       font-size: 14px;
       outline: none;
       transition: all 0.3s ease;
       min-width: 0;
     }
 
+    .header-chat-input:focus {
+      background: rgba(0, 0, 0, 0.06);
+      border-color: rgba(0, 122, 255, 0.4);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.08);
+    }
+
     .header-chat-input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(0, 0, 0, 0.4);
     }
 
     .header-send-btn {
@@ -148,7 +338,12 @@
       justify-content: center;
       font-size: 16px;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+    }
+
+    .header-send-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
     }
 
     .copilot-controls {
@@ -162,78 +357,32 @@
     }
 
     .control-btn {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border: none;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.06);
-      color: rgba(255, 255, 255, 0.6);
+      background: rgba(0, 0, 0, 0.05);
+      color: rgba(0, 0, 0, 0.5);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 500;
       transition: all 0.3s ease;
     }
 
     .control-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.1);
+      color: rgba(0, 0, 0, 0.75);
       transform: scale(1.1);
     }
 
     .control-btn.close:hover {
-      background: rgba(255, 69, 58, 0.8);
+      background: #FF3B30;
       color: #ffffff;
     }
 
-    /* Tab Navigation */
-    .tab-nav {
-      display: flex;
-      gap: 8px;
-      padding: 0 24px 12px 24px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      flex-shrink: 0;
-    }
-
-    body.collapsed .tab-nav {
-      display: none;
-    }
-
-    .tab-btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tab-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-    }
-
-    .task-badge {
-      background: #FF9F0A;
-      color: white;
-      padding: 2px 6px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-left: 4px;
-    }
 
     /* Content Area */
     .copilot-content {
@@ -260,14 +409,14 @@
       display: flex;
     }
 
-    /* Status Bar */
+    /* Status Bar - Light Theme */
     .status-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 12px 24px;
-      background: rgba(0, 0, 0, 0.1);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.02);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
       flex-shrink: 0;
     }
 
@@ -302,71 +451,69 @@
       flex-direction: column;
       overflow: hidden;
       min-height: 0;
+      background: #fafafa;
     }
 
     .chat-container {
       flex: 1;
       overflow-y: auto;
-      padding: 24px;
+      padding: 16px 12px 12px 12px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 12px;
       scroll-behavior: smooth;
       min-height: 0;
     }
-
-    .welcome-message {
-      text-align: center;
-      padding: 32px 24px;
-      background: rgba(0, 122, 255, 0.04);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    
+    .chat-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .chat-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .chat-container::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    
+    .chat-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.15);
     }
 
-    .welcome-icon {
-      font-size: 40px;
-      margin-bottom: 16px;
+    .welcome-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+      min-height: 150px;
+      gap: 16px;
+    }
+
+    .welcome-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .welcome-text {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-
-    .welcome-subtitle {
-      font-size: 15px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 28px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #171717;
+      letter-spacing: -0.01em;
+      text-align: center;
       line-height: 1.4;
     }
 
-    .quick-actions {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
-    .quick-action {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 20px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      text-align: left;
-    }
-
-    .quick-action:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(0, 122, 255, 0.3);
-      transform: translateY(-2px);
+    .welcome-subtitle {
+      font-size: 12px;
+      font-weight: 400;
+      color: #a3a3a3;
+      letter-spacing: -0.005em;
     }
 
     .message {
@@ -406,116 +553,158 @@
 
     .message-content {
       flex: 1;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 12px;
-      padding: 12px 16px;
+      padding: 14px 16px;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
       max-width: 80%;
+      color: #171717;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
     .message.user .message-content {
-      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 204, 0.1));
-      border-color: rgba(0, 212, 255, 0.3);
+      background: #171717;
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
     .typing-indicator {
       display: none;
-      padding: 20px 24px;
+      padding: 16px 24px;
       align-items: center;
-      gap: 16px;
-      background: rgba(0, 122, 255, 0.04);
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 14px;
+      gap: 10px;
+      background: white;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 13px;
+      color: #737373;
       flex-shrink: 0;
     }
 
     .input-container {
-      padding: 20px 24px;
-      background: rgba(0, 0, 0, 0.3);
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px 12px 16px 12px;
+      background: white;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
       flex-shrink: 0;
     }
 
     .input-wrapper {
       display: flex;
-      gap: 16px;
+      gap: 8px;
       align-items: flex-end;
-      max-width: 800px;
+      max-width: 100%;
       margin: 0 auto;
+      background: #fafafa;
+      border: 1.5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      padding: 8px 8px 8px 12px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-wrapper:focus-within {
+      background: white;
+      border-color: #171717;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
     }
 
     .message-input {
       flex: 1;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
-      padding: 16px 20px;
-      color: #ffffff;
-      font-size: 15px;
+      background: transparent;
+      border: none;
+      padding: 4px 0;
+      color: #171717;
+      font-size: 13px;
+      line-height: 1.4;
       resize: none;
-      min-height: 50px;
-      max-height: 140px;
-      transition: all 0.3s ease;
+      min-height: 20px;
+      max-height: 80px;
+      font-family: inherit;
     }
 
     .message-input:focus {
       outline: none;
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(0, 122, 255, 0.6);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
     }
 
     .message-input::placeholder {
-      color: rgba(255, 255, 255, 0.4);
+      color: #a3a3a3;
     }
 
     .send-btn {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      width: 28px;
+      height: 28px;
+      background: #171717;
       border: none;
-      border-radius: 50%;
-      color: #ffffff;
+      border-radius: 8px;
+      color: white;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
+      font-size: 14px;
     }
 
-    .send-btn:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+    .send-btn:hover:not(:disabled) {
+      background: #0a0a0a;
+      transform: scale(1.05);
     }
 
-    /* Tasks Styles */
+    .send-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Tasks Styles - Compact Light Theme */
     .tasks-container {
       flex: 1;
       overflow-y: auto;
-      padding: 20px 24px;
+      padding: 12px;
+      background: #fafafa;
+    }
+    
+    .tasks-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .tasks-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .tasks-container::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    
+    .tasks-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.15);
     }
 
     .tasks-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
 
     .tasks-title {
-      font-size: 20px;
+      font-size: 15px;
       font-weight: 600;
+      color: #171717;
+      letter-spacing: -0.02em;
     }
 
     .task-stats {
       display: flex;
-      gap: 16px;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.7);
+      gap: 8px;
+      font-size: 11px;
+      color: #737373;
     }
 
     .stat-item {
@@ -529,142 +718,167 @@
     .stat-dot.completed { background: #34C759; }
 
     .task-input-section {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
     .task-input-wrapper {
       display: flex;
-      gap: 12px;
+      gap: 8px;
     }
 
     .task-input {
       flex: 1;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-      padding: 12px 16px;
-      color: #ffffff;
-      font-size: 14px;
+      background: #fafafa;
+      border: 1.5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #171717;
+      font-size: 13px;
       outline: none;
-      transition: all 0.3s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .task-input::placeholder {
+      color: #a3a3a3;
     }
 
     .task-input:focus {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(0, 122, 255, 0.6);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      background: white;
+      border-color: #171717;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
     }
 
     .add-task-btn {
-      padding: 12px 24px;
+      padding: 8px 16px;
       border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-      color: #ffffff;
-      font-size: 14px;
+      border-radius: 8px;
+      background: #171717;
+      color: white;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .add-task-btn:hover {
+      background: #0a0a0a;
+      transform: scale(1.02);
+    }
+
+    .add-task-btn:active {
+      transform: scale(0.98);
     }
 
     .priority-selector {
       display: flex;
-      gap: 8px;
-      margin-top: 12px;
+      gap: 6px;
+      margin-top: 8px;
     }
 
     .priority-btn {
-      padding: 6px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 12px;
+      padding: 4px 8px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 6px;
+      background: white;
+      color: #737373;
+      font-size: 11px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .priority-btn:hover {
+      background: #fafafa;
+      border-color: #171717;
     }
 
     .priority-btn.active {
-      background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(88, 86, 214, 0.3));
-      border-color: #007AFF;
+      background: #171717;
+      border-color: #171717;
       color: #ffffff;
     }
 
     .tasks-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 6px;
     }
 
     .task-item {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
     .task-item:hover {
-      background: rgba(0, 0, 0, 0.3);
-      border-color: rgba(0, 122, 255, 0.3);
-      transform: translateY(-2px);
+      border-color: rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
     }
 
     .task-item.completed {
-      opacity: 0.6;
+      opacity: 0.5;
+      background: #fafafa;
     }
 
     .task-item.completed .task-title {
       text-decoration: line-through;
-      color: rgba(255, 255, 255, 0.5);
+      color: #a3a3a3;
     }
 
     .task-header {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
 
     .task-checkbox {
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 6px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
     }
 
+    .task-checkbox:hover {
+      border-color: #171717;
+    }
+
     .task-checkbox.checked {
-      background: linear-gradient(135deg, #007AFF, #5856D6);
-      border-color: #007AFF;
+      background: #171717;
+      border-color: #171717;
     }
 
     .task-checkbox.checked::after {
       content: '✓';
       color: white;
-      font-size: 14px;
+      font-size: 11px;
       font-weight: bold;
     }
 
     .task-title {
       flex: 1;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 500;
+      color: #171717;
     }
 
     .task-priority {
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
     }
@@ -699,41 +913,46 @@
     }
 
     .task-action-btn {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       border: none;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.6);
+      border-radius: 5px;
+      background: #fafafa;
+      color: #737373;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
-      font-size: 14px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 12px;
+    }
+
+    .task-action-btn:hover {
+      background: #f0f0f0;
+      color: #171717;
     }
 
     .task-action-btn.delete:hover {
-      background: rgba(255, 59, 48, 0.3);
+      background: rgba(255, 59, 48, 0.1);
       color: #FF3B30;
     }
 
     .task-description {
-      margin-top: 8px;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.7);
+      margin-top: 6px;
+      font-size: 12px;
+      color: #737373;
       line-height: 1.4;
-      padding-left: 32px;
+      padding-left: 24px;
     }
 
     .task-meta {
-      margin-top: 12px;
-      padding-left: 32px;
+      margin-top: 8px;
+      padding-left: 24px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
       align-items: center;
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .task-assignor,
@@ -748,41 +967,42 @@
     }
 
     .task-assignor {
-      background: rgba(59, 130, 246, 0.15);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
     .task-assignee {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-      border: 1px solid rgba(34, 197, 94, 0.3);
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.2);
     }
 
     .task-date {
-      color: rgba(255, 255, 255, 0.5);
+      color: #a3a3a3;
     }
 
     /* Task Chat Button */
     .task-action-btn.chat {
-      background: rgba(0, 122, 255, 0.15);
-      color: #007AFF;
+      background: #fafafa;
+      color: #737373;
       font-size: 14px;
     }
     
     .task-action-btn.chat:hover {
-      background: rgba(0, 122, 255, 0.25);
-      transform: scale(1.1);
+      background: #f0f0f0;
+      color: #171717;
+      transform: scale(1.05);
     }
     
-    /* Task Chat Modal */
+    /* Task Chat Modal - Light Theme */
     .task-chat-modal {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(10px);
       z-index: 10000;
       display: flex;
@@ -801,10 +1021,10 @@
       max-width: 700px;
       height: 80vh;
       max-height: 600px;
-      background: rgba(28, 28, 30, 0.98);
+      background: white;
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
       animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -826,8 +1046,9 @@
       justify-content: space-between;
       align-items: center;
       padding: 20px 24px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
       flex-shrink: 0;
+      background: white;
     }
     
     .task-chat-title {
@@ -837,7 +1058,9 @@
     }
     
     .task-chat-icon {
-      font-size: 24px;
+      width: 20px;
+      height: 20px;
+      color: #737373;
     }
     
     .task-chat-info {
@@ -849,22 +1072,22 @@
     .task-chat-name {
       font-size: 16px;
       font-weight: 600;
-      color: #ffffff;
+      color: #171717;
     }
     
     .task-chat-subtitle {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.6);
+      color: #737373;
     }
     
     .task-chat-close {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.05);
       border: none;
-      color: #ffffff;
+      color: #737373;
       width: 32px;
       height: 32px;
       border-radius: 8px;
-      font-size: 24px;
+      font-size: 20px;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
@@ -873,14 +1096,14 @@
     }
     
     .task-chat-close:hover {
-      background: rgba(255, 59, 48, 0.2);
+      background: rgba(255, 59, 48, 0.1);
       color: #FF3B30;
     }
     
     .task-chat-context {
       padding: 16px 24px;
-      background: rgba(0, 122, 255, 0.08);
-      border-bottom: 1px solid rgba(0, 122, 255, 0.2);
+      background: rgba(0, 0, 0, 0.02);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
       flex-shrink: 0;
     }
     
@@ -888,14 +1111,14 @@
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.6);
+      color: #737373;
       margin-bottom: 6px;
       letter-spacing: 0.5px;
     }
     
     .task-context-content {
       font-size: 14px;
-      color: #ffffff;
+      color: #171717;
       line-height: 1.5;
     }
     
@@ -906,12 +1129,13 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      background: #fafafa;
     }
     
     .task-chat-welcome {
       text-align: center;
       padding: 40px 20px;
-      color: rgba(255, 255, 255, 0.8);
+      color: #737373;
     }
     
     .task-chat-welcome .welcome-icon {
@@ -923,11 +1147,12 @@
       font-size: 18px;
       font-weight: 600;
       margin-bottom: 8px;
+      color: #171717;
     }
     
     .task-chat-welcome .welcome-subtitle {
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.6);
+      color: #a3a3a3;
     }
     
     .task-message {
@@ -966,20 +1191,21 @@
     }
     
     .task-message.user .task-message-bubble {
-      background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-      color: #ffffff;
+      background: #171717;
+      color: white;
       border-bottom-right-radius: 4px;
     }
     
     .task-message.assistant .task-message-bubble {
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
+      background: white;
+      color: #171717;
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-bottom-left-radius: 4px;
     }
     
     .task-message-time {
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.5);
+      color: #a3a3a3;
       padding: 0 8px;
     }
     
@@ -989,13 +1215,15 @@
       align-items: center;
       gap: 12px;
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      color: #737373;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      background: white;
     }
     
     .task-chat-input {
       padding: 16px 24px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      background: white;
       display: flex;
       gap: 12px;
       align-items: flex-end;
@@ -1004,11 +1232,11 @@
     
     .task-chat-textarea {
       flex: 1;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #fafafa;
+      border: 1.5px solid rgba(0, 0, 0, 0.1);
       border-radius: 12px;
       padding: 12px 16px;
-      color: #ffffff;
+      color: #171717;
       font-size: 14px;
       font-family: inherit;
       resize: none;
@@ -1019,18 +1247,19 @@
     
     .task-chat-textarea:focus {
       outline: none;
-      border-color: #007AFF;
-      background: rgba(255, 255, 255, 0.12);
+      border-color: #171717;
+      background: white;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
     }
     
     .task-chat-textarea::placeholder {
-      color: rgba(255, 255, 255, 0.4);
+      color: #a3a3a3;
     }
     
     .task-chat-send {
-      background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+      background: #171717;
       border: none;
-      color: #ffffff;
+      color: white;
       width: 44px;
       height: 44px;
       border-radius: 12px;
@@ -1043,8 +1272,8 @@
     }
     
     .task-chat-send:hover {
+      background: #0a0a0a;
       transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
     }
     
     .task-chat-send:active {
@@ -1079,16 +1308,51 @@
     }
   </style>
 </head>
-<body class="expanded">
+<body class="collapsed">
   <div class="copilot-header">
     <div class="copilot-title" id="dragHandle">
       <img src="/Users/jarvis/Code/HeyJarvis/Jarvis.png" alt="Jarvis" class="copilot-icon">
-      HeyJarvis
+      <span id="appTitle">HeyJarvis</span>
     </div>
     
-    <div class="header-chat-container">
-      <input type="text" class="header-chat-input" id="headerChatInput" placeholder="Ask me anything..." autocomplete="off">
-      <button class="header-send-btn" onclick="sendHeaderMessage()">→</button>
+    <div class="header-input-wrapper">
+      <input 
+        type="text" 
+        class="header-input" 
+        id="headerInput" 
+        placeholder="Ask me anything..." 
+        autocomplete="off"
+      >
+      <button class="header-input-send-btn" id="headerSendBtn" onclick="sendHeaderMessage()" title="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="header-actions">
+      <button class="header-nav-btn" onclick="switchTab('chat')" id="chatNavBtn" title="Chat">
+        Chat
+      </button>
+      <button class="header-nav-btn" onclick="switchTab('tasks')" id="tasksNavBtn" title="Tasks">
+        Tasks
+        <span class="nav-badge" id="tasksBadge" style="display: none;"></span>
+      </button>
+      <div class="header-divider"></div>
+      <button class="header-action-btn" onclick="switchTab('tasks')" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
+      </button>
+      <button class="header-action-btn" onclick="startFactCheck()" title="Fact Check">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+      </button>
     </div>
     
     <div class="copilot-controls">
@@ -1097,59 +1361,17 @@
     </div>
   </div>
 
-  <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('copilot')">
-      <span>💬</span>
-      <span>Copilot</span>
-    </button>
-    <button class="tab-btn" onclick="switchTab('tasks')">
-      <span>✓</span>
-      <span>To Do</span>
-      <span id="taskBadge" class="task-badge" style="display: none;"></span>
-    </button>
-  </div>
 
   <div class="copilot-content">
     <!-- Copilot Tab -->
     <div id="copilotTab" class="tab-content active">
-      <div class="status-bar">
-        <div class="status-indicators">
-          <div class="status-item">
-            <div class="status-dot" id="slackStatusDot"></div>
-            <span>Slack</span>
-          </div>
-          <div class="status-item">
-            <div class="status-dot" id="crmStatusDot"></div>
-            <span>CRM</span>
-          </div>
-        </div>
-        <div id="activitySummary">All systems ready</div>
-      </div>
-
       <div class="chat-interface">
         <div class="chat-container" id="chatContainer">
           <div class="welcome-message">
-            <div class="welcome-icon">✨</div>
-            <div class="welcome-text">Hello! I'm your AI copilot.</div>
-            <div class="welcome-subtitle">I can help with competitive intelligence, CRM insights, and Slack monitoring.</div>
-            
-            <div class="quick-actions">
-              <div class="quick-action" onclick="sendQuickMessage('What are the latest competitor moves?')">
-                <div>📊</div>
-                <div>Latest competitor moves</div>
-              </div>
-              <div class="quick-action" onclick="sendQuickMessage('Analyze my CRM data')">
-                <div>🧠</div>
-                <div>CRM insights</div>
-              </div>
-              <div class="quick-action" onclick="sendQuickMessage('Show Slack activity')">
-                <div>💬</div>
-                <div>Slack activity</div>
-              </div>
-              <div class="quick-action" onclick="startFactCheck()">
-                <div>🔍</div>
-                <div>Fact Check Screen</div>
-              </div>
+            <img src="../../Jarvis.png" alt="HeyJarvis" class="welcome-logo">
+            <div class="welcome-text">
+              We are your Mission Control.
+              <div class="welcome-subtitle">How can we help you today?</div>
             </div>
           </div>
         </div>
@@ -1170,9 +1392,8 @@
           <div class="input-wrapper">
             <textarea class="message-input" id="messageInput" placeholder="Ask me anything..." rows="1"></textarea>
             <button class="send-btn" onclick="sendMessage()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m22 2-7 20-4-9-9-4z"/>
-                <path d="M22 2 11 13"/>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 3 18 9-18 9V3z"/>
               </svg>
             </button>
           </div>
@@ -1229,7 +1450,9 @@
     <div class="task-chat-container">
       <div class="task-chat-header">
         <div class="task-chat-title">
-          <span class="task-chat-icon">💬</span>
+          <svg class="task-chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
           <div class="task-chat-info">
             <div class="task-chat-name" id="taskChatName">Task Discussion</div>
             <div class="task-chat-subtitle">AI-powered task assistant</div>
@@ -1279,7 +1502,7 @@
     let currentTab = 'copilot';
     let currentPriority = 'medium';
     let tasks = [];
-    let isExpanded = true;
+    let isExpanded = false;
     let chatHistory = [];
     let crmData = null;
     let slackConnected = false;
@@ -1289,18 +1512,27 @@
 
     const chatContainer = document.getElementById('chatContainer');
     const messageInput = document.getElementById('messageInput');
-    const headerChatInput = document.getElementById('headerChatInput');
+    const headerInput = document.getElementById('headerInput');
     const typingIndicator = document.getElementById('typingIndicator');
 
     // Tab switching
     function switchTab(tab) {
       currentTab = tab;
       
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.closest('.tab-btn').classList.add('active');
+      // Expand interface when switching tabs
+      if (!isExpanded) expandTopBar();
       
+      // Update navigation buttons
+      document.querySelectorAll('.header-nav-btn').forEach(btn => btn.classList.remove('active'));
+      const navMap = { 'chat': 'chatNavBtn', 'copilot': 'chatNavBtn', 'tasks': 'tasksNavBtn' };
+      const targetBtn = document.getElementById(navMap[tab]);
+      if (targetBtn) targetBtn.classList.add('active');
+      
+      // Update content
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      document.getElementById(tab + 'Tab').classList.add('active');
+      const contentMap = { 'chat': 'copilotTab', 'copilot': 'copilotTab', 'tasks': 'tasksTab' };
+      const targetContent = document.getElementById(contentMap[tab]);
+      if (targetContent) targetContent.classList.add('active');
       
       if (tab === 'tasks') {
         loadTasks();
@@ -1374,7 +1606,10 @@
       if (tasks.length === 0) {
         tasksList.innerHTML = `
           <div class="empty-state">
-            <div class="empty-icon">📋</div>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #a3a3a3; margin-bottom: 16px;">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+              <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+            </svg>
             <div>No tasks yet. Add one above to get started!</div>
           </div>
         `;
@@ -1476,13 +1711,37 @@
     }
 
     async function sendHeaderMessage() {
-      const message = headerChatInput.value.trim();
-      if (!message) return;
+      const inputElement = document.getElementById('headerInput');
+      if (!inputElement) {
+        console.error('❌ Header input element not found');
+        return;
+      }
+      
+      const message = inputElement.value.trim();
+      if (!message) {
+        console.log('📭 No message to send');
+        return;
+      }
 
-      if (!isExpanded) expandTopBar();
+      console.log('📤 Sending message:', message);
+      
+      // Expand when user sends a message
+      if (!isExpanded) {
+        console.log('🔍 Expanding top bar...');
+        expandTopBar();
+      }
+      
+      // Switch to chat tab
+      switchTab('chat');
 
       await processChatMessage(message);
-      headerChatInput.value = '';
+      inputElement.value = '';
+      
+      // Remove has-text class from send button
+      const sendBtn = document.getElementById('headerSendBtn');
+      if (sendBtn) {
+        sendBtn.classList.remove('has-text');
+      }
     }
 
     async function processChatMessage(message) {
@@ -1563,12 +1822,17 @@
     }
 
     function expandTopBar() {
+      console.log('🔍 expandTopBar() called, isExpanded:', isExpanded);
       isExpanded = true;
       document.body.classList.remove('collapsed');
       document.body.classList.add('expanded');
+      console.log('✅ Body classes updated:', document.body.classList.toString());
       
       if (window.electronAPI?.expandTopBar) {
+        console.log('📡 Calling electron expandTopBar API...');
         window.electronAPI.expandTopBar();
+      } else {
+        console.warn('⚠️ electron expandTopBar API not available');
       }
     }
 
@@ -1577,6 +1841,16 @@
         window.electronAPI.closeWindow();
       } else {
         window.close();
+      }
+    }
+
+
+    function startFactCheck() {
+      if (window.electronAPI?.startFactCheck) {
+        window.electronAPI.startFactCheck();
+      } else {
+        console.log('Fact check initiated - screen capture will start');
+        // Placeholder for fact check functionality
       }
     }
 
@@ -1800,23 +2074,80 @@
       });
     }
 
-    if (headerChatInput) {
-      headerChatInput.addEventListener('keydown', function(e) {
+    if (headerInput) {
+      const headerSendBtn = document.getElementById('headerSendBtn');
+      
+      // Show/hide send button based on input content
+      headerInput.addEventListener('input', function() {
+        if (this.value.trim() && headerSendBtn) {
+          headerSendBtn.classList.add('has-text');
+        } else if (headerSendBtn) {
+          headerSendBtn.classList.remove('has-text');
+        }
+      });
+      
+      headerInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
           e.preventDefault();
           sendHeaderMessage();
         }
       });
+    }
 
-      headerChatInput.addEventListener('focus', () => {
-        if (!isExpanded) expandTopBar();
-      });
+    // Load user info and update UI
+    async function loadUserInfo() {
+      try {
+        console.log('🔍 Checking for user info...');
+        
+        if (window.electronAPI && window.electronAPI.auth) {
+          const user = await window.electronAPI.auth.getUser();
+          console.log('👤 User data received:', user);
+          
+          if (user) {
+            // Update the title to show "Hey [Name]"
+            const appTitle = document.getElementById('appTitle');
+            if (appTitle) {
+              // Try different name sources
+              let displayName = user.name || user.email?.split('@')[0] || 'Jarvis';
+              
+              // If it's an email, extract the part before @
+              if (displayName.includes('@')) {
+                displayName = displayName.split('@')[0];
+              }
+              
+              // Get first name only if it has spaces
+              const firstName = displayName.split(' ')[0];
+              
+              // Capitalize first letter
+              const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+              
+              appTitle.textContent = `Hey ${capitalizedName}`;
+              console.log('✅ Title updated to: Hey', capitalizedName);
+            }
+          } else {
+            console.warn('⚠️ No user data found');
+          }
+        } else {
+          console.warn('⚠️ electronAPI.auth not available');
+        }
+      } catch (error) {
+        console.error('❌ Failed to load user info:', error);
+        // Keep default "HeyJarvis" title on error
+      }
     }
 
     // Initialize on load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       console.log('🚀 HeyJarvis loaded');
+      
+      // Load user info and update title
+      await loadUserInfo();
+      
       initializeServices();
+      
+      // Set initial active nav button
+      const chatNavBtn = document.getElementById('chatNavBtn');
+      if (chatNavBtn) chatNavBtn.classList.add('active');
       
       // Setup task chat input handlers
       const taskChatInput = document.getElementById('taskChatInput');

@@ -6,6 +6,13 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 // Expose secure API to renderer
 contextBridge.exposeInMainWorld('electronAPI', {
+  // Authentication
+  auth: {
+    signInWithSlack: () => ipcRenderer.invoke('auth:sign-in-slack'),
+    signOut: () => ipcRenderer.invoke('auth:sign-out'),
+    getUser: () => ipcRenderer.invoke('auth:get-user')
+  },
+  
   // Signal management
   signals: {
     getRecent: (limit) => ipcRenderer.invoke('signals:getRecent', limit),

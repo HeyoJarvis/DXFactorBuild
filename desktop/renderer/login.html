@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+  <title>Sign in to HeyJarvis</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 48px 40px;
+      width: 420px;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+      animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #171717;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #737373;
+      font-weight: 400;
+    }
+
+    .sign-in-section {
+      margin-top: 40px;
+    }
+
+    .slack-button {
+      width: 100%;
+      height: 52px;
+      background: #4A154B;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(74, 21, 75, 0.3);
+    }
+
+    .slack-button:hover {
+      background: #611f69;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(74, 21, 75, 0.4);
+    }
+
+    .slack-button:active {
+      transform: translateY(0);
+    }
+
+    .slack-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .slack-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .slack-button.loading .loading-spinner {
+      display: block;
+    }
+
+    .slack-button.loading .slack-icon {
+      display: none;
+    }
+
+    .features {
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: #525252;
+    }
+
+    .feature:last-child {
+      margin-bottom: 0;
+    }
+
+    .feature-icon {
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .feature-icon svg {
+      width: 12px;
+      height: 12px;
+      color: white;
+    }
+
+    .error-message {
+      background: #fee;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #c00;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #a3a3a3;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo-container">
+      <img src="/Users/jarvis/Code/HeyJarvis/Jarvis.png" alt="HeyJarvis" class="logo">
+      <h1>Welcome to HeyJarvis</h1>
+      <p class="subtitle">Your AI-powered business intelligence copilot</p>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+
+    <div class="sign-in-section">
+      <button class="slack-button" id="slackSignInBtn">
+        <svg class="slack-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+        </svg>
+        <div class="loading-spinner"></div>
+        <span>Continue with Slack</span>
+      </button>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <span>Real-time Slack monitoring and insights</span>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <span>AI-powered task management</span>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <span>Personalized business intelligence</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      Secure authentication powered by Supabase
+    </div>
+  </div>
+
+  <script>
+    const slackSignInBtn = document.getElementById('slackSignInBtn');
+    const errorMessage = document.getElementById('errorMessage');
+
+    slackSignInBtn.addEventListener('click', async () => {
+      try {
+        // Show loading state
+        slackSignInBtn.classList.add('loading');
+        slackSignInBtn.disabled = true;
+        errorMessage.classList.remove('show');
+
+        // Call Electron IPC to start OAuth
+        const result = await window.electronAPI.auth.signInWithSlack();
+
+        if (result.success) {
+          console.log('✅ Sign in successful:', result.user);
+          // IPC will handle navigation to main app
+        } else {
+          throw new Error('Authentication failed');
+        }
+
+      } catch (error) {
+        console.error('❌ Sign in error:', error);
+        
+        // Show error message
+        errorMessage.textContent = error.message || 'Failed to sign in. Please try again.';
+        errorMessage.classList.add('show');
+        
+        // Reset button
+        slackSignInBtn.classList.remove('loading');
+        slackSignInBtn.disabled = false;
+      }
+    });
+
+    // Listen for auth errors from main process
+    if (window.electronAPI && window.electronAPI.onAuthError) {
+      window.electronAPI.onAuthError((error) => {
+        errorMessage.textContent = error.message || 'Authentication error occurred';
+        errorMessage.classList.add('show');
+        slackSignInBtn.classList.remove('loading');
+        slackSignInBtn.disabled = false;
+      });
+    }
+
+    // Log ready state
+    console.log('🔐 Login page loaded and ready');
+  </script>
+</body>
+</html>
+

@@ -6,6 +6,12 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 // Expose secure API to renderer
 contextBridge.exposeInMainWorld('electronAPI', {
+  // Authentication
+  auth: {
+    getUser: () => ipcRenderer.invoke('auth:get-user'),
+    signOut: () => ipcRenderer.invoke('auth:sign-out')
+  },
+  
   // Message handling
   sendMessage: (message) => ipcRenderer.invoke('copilot:sendMessage', message),
   
