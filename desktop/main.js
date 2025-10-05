@@ -50,6 +50,7 @@ let activeHighlights = []; // Store active highlight data
 let userDefinedSize = null; // Track user's custom window size
 let isUserResizing = false; // Track if user is actively resizing
 let expandedSize = { width: 451, height: 397 }; // Remember expanded dimensions
+let isQuittingApp = false; // Track real quit vs window hide
 
 function createWindow() {
   // Create the browser window as a top bar overlay
@@ -123,6 +124,26 @@ function createWindow() {
   
   // Setup system tray
   setupSystemTray();
+  
+  // Register global keyboard shortcut to show window (Ctrl+Shift+J or Cmd+Shift+J)
+  const { globalShortcut } = require('electron');
+  const shortcutRegistered = globalShortcut.register('CommandOrControl+Shift+J', () => {
+    if (mainWindow) {
+      if (mainWindow.isVisible()) {
+        mainWindow.focus();
+      } else {
+        mainWindow.show();
+        mainWindow.focus();
+        console.log('⌨️ Window shown via keyboard shortcut (Ctrl+Shift+J)');
+      }
+    }
+  });
+  
+  if (shortcutRegistered) {
+    console.log('⌨️ Global shortcut registered: Ctrl+Shift+J (or Cmd+Shift+J on Mac) to show window');
+  } else {
+    console.warn('⚠️ Failed to register global shortcut');
+  }
 
   // DevTools disabled for cleaner experience
   // if (process.env.NODE_ENV === 'development') {
@@ -132,16 +153,40 @@ function createWindow() {
 
 // Setup system tray for persistent overlay control
 function setupSystemTray() {
-  // Create tray icon (you may need to add an icon file)
-  const iconPath = path.join(__dirname, 'assets', 'tray-icon.png');
+  // Create tray icon using Jarvis logo
+  const { nativeImage } = require('electron');
+  const iconPath = path.join(__dirname, '..', 'Jarvis.png');
   
-  // Fallback to a simple icon if file doesn't exist
+  let trayIcon;
   try {
-    tray = new Tray(iconPath);
+    // Load and resize the Jarvis icon for tray (16x16 or 32x32)
+    trayIcon = nativeImage.createFromPath(iconPath);
+    if (!trayIcon.isEmpty()) {
+      trayIcon = trayIcon.resize({ width: 16, height: 16 });
+    }
   } catch (error) {
-    // Create a simple tray without icon for now
-    tray = new Tray(require('electron').nativeImage.createEmpty());
+    console.warn('⚠️ Could not load tray icon, creating placeholder');
   }
+  
+  // Create tray with icon or fallback
+  if (trayIcon && !trayIcon.isEmpty()) {
+    tray = new Tray(trayIcon);
+    console.log('✅ Tray icon created with Jarvis logo');
+  } else {
+    console.warn('⚠️ Could not load Jarvis.png, using fallback');
+    // Create a simple visible icon for Linux/Windows
+    const { nativeImage } = require('electron');
+    const fallbackIcon = nativeImage.createFromDataURL(
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAE3SURBVDiNpZO/S8NAGMXfu0uTNhKkFQcHBwcHBwcHFx0cXJyc/Buc/BMcXBwcHBz8Axz8Axz8Axz8Axz8Axz8AxwcHBwcHBwcHBwcHBwcHBwcXHTwK7Q1adL03uC9+917H3cHhBBERLTWWmuutdZaa6211lprrbXWWmuutdZaa6211lprrbXWWmuutdZaa6211lprrbXWWmut/wcAAIAQghACAIAQghBCEEIQQgBCCEIIQggAQAgBCCEAAEIIIAQAgBACCCEAAAghgBACAAAIIQAAgBACAAAgBACAAAghgBACAAAIIQAAgBACAEAIAQAghABACAEAAEIIAAQAQggABACAEAIAAQAQAgABABACAEAIAAQAQAgABABACAEAIQAQAgABABACAEAIQAgBABACAEAIAQghABAC'
+    );
+    tray = new Tray(fallbackIcon);
+    console.log('✅ Tray created with fallback icon');
+  }
+  
+  // Prevent tray from being garbage collected
+  tray.setIgnoreDoubleClickEvents(false);
+  
+  console.log('🎯 Tray created successfully! Look for the icon in your system tray.');
   
   // Create context menu
   const contextMenu = Menu.buildFromTemplate([
@@ -209,6 +254,7 @@ function setupSystemTray() {
     {
       label: 'Quit HeyJarvis',
       click: () => {
+        isQuittingApp = true;
         app.quit();
       }
     }
@@ -217,9 +263,24 @@ function setupSystemTray() {
   tray.setContextMenu(contextMenu);
   tray.setToolTip('HeyJarvis - AI Copilot');
   
-  // Double-click to show/hide
+  // Single-click to show window (most intuitive on all platforms)
+  tray.on('click', () => {
+    if (mainWindow) {
+      if (mainWindow.isVisible()) {
+        mainWindow.focus();
+      } else {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }
+  });
+  
+  // Double-click also shows window
   tray.on('double-click', () => {
-    toggleOverlayVisibility();
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.focus();
+    }
   });
 }
 
@@ -243,10 +304,15 @@ function setupPersistentOverlay() {
     console.log('🚀 HeyJarvis overlay ready and visible');
   });
 
-  // Prevent window from being closed
+  // Prevent window from being closed - just hide it instead
   mainWindow.on('close', (event) => {
-    event.preventDefault();
-    toggleOverlayVisibility();
+    if (!isQuittingApp) {
+      event.preventDefault();
+      mainWindow.hide();
+      console.log('🚪 Window close event intercepted - hiding instead');
+    } else {
+      console.log('🛑 Window close event - allowing (app is quitting)');
+    }
   });
 
   // Enhanced always-on-top behavior
@@ -1123,8 +1189,13 @@ What would you like to explore?`,
     collapseTopBar();
   });
 
+  // X button - hide window, keep app running
   ipcMain.handle('copilot:close', () => {
-    toggleOverlayVisibility();
+    if (mainWindow) {
+      mainWindow.hide();
+      console.log('✖️ Window hidden via X button, app running in background');
+      console.log(`🎯 Tray status: ${tray ? (tray.isDestroyed() ? 'destroyed' : 'alive') : 'not created'}`);
+    }
   });
 
   ipcMain.handle('copilot:toggleAlwaysOnTop', () => {
@@ -2079,26 +2150,70 @@ if (app && typeof app.whenReady === 'function') {
 
 // Prevent app from quitting when window is closed (persistent overlay)
 app.on('window-all-closed', () => {
-  // Don't quit the app on macOS - keep it running as persistent overlay
-  if (process.platform !== 'darwin') {
-    // On Windows/Linux, keep running but hide in tray
-    console.log('🔄 Window closed but app remains running in system tray');
-  }
+  // Don't quit - keep running in tray on all platforms
+  console.log('🔄 All windows closed, app continues in tray');
+  console.log(`🎯 Tray status: ${tray ? (tray.isDestroyed() ? 'destroyed ❌' : 'still alive ✅') : 'not created ⚠️'}`);
 });
 
 // Handle app quit
-app.on('before-quit', async () => {
+app.on('before-quit', async (event) => {
+  if (!isQuittingApp) {
+    // Not a real quit, just closing windows - prevent quit
+    event.preventDefault();
+    return;
+  }
+  
   console.log('🛑 HeyJarvis shutting down...');
   
-  // Stop CRM service
-  if (crmStartupService) {
-    await crmStartupService.stop();
+  try {
+    // Stop Slack service
+    if (slackService && typeof slackService.stop === 'function') {
+      console.log('⏹️ Stopping Slack service...');
+      await slackService.stop();
+    }
+    
+    // Stop CRM service
+    if (crmStartupService && typeof crmStartupService.stop === 'function') {
+      console.log('⏹️ Stopping CRM service...');
+      await crmStartupService.stop();
+    }
+    
+    // Close fact-checker overlays
+    if (factCheckerService && typeof factCheckerService.closeOverlay === 'function') {
+      console.log('⏹️ Closing fact-checker overlays...');
+      factCheckerService.closeOverlay();
+    }
+    
+    // Close highlight overlay
+    if (highlightOverlay && !highlightOverlay.isDestroyed()) {
+      console.log('⏹️ Closing highlight overlay...');
+      highlightOverlay.destroy();
+    }
+    
+    // Close all windows
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.destroy();
+    }
+    if (loginWindow && !loginWindow.isDestroyed()) {
+      loginWindow.destroy();
+    }
+    
+    // Clean up tray
+    if (tray && !tray.isDestroyed()) {
+      console.log('⏹️ Destroying tray...');
+      tray.destroy();
+    }
+    
+    console.log('✅ Cleanup completed');
+    
+  } catch (error) {
+    console.error('❌ Error during cleanup:', error);
   }
-  
-  // Clean up tray
-  if (tray) {
-    tray.destroy();
-  }
+});
+
+// Final quit confirmation
+app.on('will-quit', () => {
+  console.log('💀 App will quit now');
 });
 
 app.on('activate', () => {
