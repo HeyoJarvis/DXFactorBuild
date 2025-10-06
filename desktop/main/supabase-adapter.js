@@ -581,6 +581,15 @@ class DesktopSupabaseAdapter {
    */
   async getUserTasks(userId, filters = {}) {
     try {
+      // Get user's Slack ID for filtering
+      const { data: userData } = await this.supabase
+        .from('users')
+        .select('slack_user_id')
+        .eq('id', userId)
+        .single();
+      
+      const userSlackId = userData?.slack_user_id;
+      
       let query = this.supabase
         .from('conversation_sessions')
         .select('*')
@@ -608,7 +617,7 @@ class DesktopSupabaseAdapter {
       if (error) throw error;
 
       // Transform to task format for UI compatibility
-      const tasks = (data || []).map(session => ({
+      let tasks = (data || []).map(session => ({
         id: session.id,
         user_id: session.user_id,
         title: session.session_title,
@@ -625,6 +634,84 @@ class DesktopSupabaseAdapter {
         updated_at: session.last_activity_at,
         completed_at: session.completed_at
       }));
+
+      // Apply assignment view filtering
+      const assignmentView = filters.assignmentView || 'assigned_to_me';
+      
+      if (userSlackId && assignmentView !== 'all') {
+        this.logger.info('Applying assignment filter', { 
+          assignmentView, 
+          userSlackId,
+          totalTasks: tasks.length
+        });
+
+        if (assignmentView === 'assigned_by_me') {
+          // Show tasks where user is assignor but NOT assignee (delegated to others)
+          tasks = tasks.filter(task => {
+            const isAssignor = task.assignor === userSlackId;
+            const isAssignee = task.assignee === userSlackId;
+            
+            // Check if title starts with someone else's name (e.g., "John, can you...")
+            const startsWithName = /^([A-Z][a-z]+),?\s+(can|could|please|would you|will you)/i.test(task.title);
+            
+            // Include if:
+            // - Has a different assignee, OR
+            // - Starts with someone else's name (intended delegation even if assignee not found)
+            const hasDifferentAssignee = task.assignee && !isAssignee;
+            const isIntendedDelegation = isAssignor && startsWithName && !isAssignee;
+            const matches = isAssignor && (hasDifferentAssignee || isIntendedDelegation);
+            
+            this.logger.debug('Filter assigned_by_me', {
+              title: task.title,
+              assignor: task.assignor,
+              assignee: task.assignee,
+              userSlackId,
+              isAssignor,
+              isAssignee,
+              startsWithName,
+              hasDifferentAssignee,
+              isIntendedDelegation,
+              matches
+            });
+            
+            return matches;
+          });
+        } else if (assignmentView === 'assigned_to_me') {
+          // Show tasks where user is assignee OR self-created without someone else's name
+          tasks = tasks.filter(task => {
+            // Check if title starts with someone else's name (e.g., "John, can you...")
+            const startsWithName = /^([A-Z][a-z]+),?\s+(can|could|please|would you|will you)/i.test(task.title);
+            
+            // Include if:
+            // - Explicitly assigned to this user
+            // - Self-assigned (assignor == assignee == this user)
+            // - Created by user with no assignee and doesn't start with someone else's name
+            const isAssignee = task.assignee === userSlackId;
+            const isSelfAssigned = task.assignor === userSlackId && task.assignee === userSlackId;
+            const isSelfCreatedNoDelegate = task.assignor === userSlackId && !task.assignee && !startsWithName;
+            const matches = isAssignee || isSelfAssigned || isSelfCreatedNoDelegate;
+            
+            this.logger.debug('Filter assigned_to_me', {
+              title: task.title,
+              assignor: task.assignor,
+              assignee: task.assignee,
+              userSlackId,
+              startsWithName,
+              isAssignee,
+              isSelfAssigned,
+              isSelfCreatedNoDelegate,
+              matches
+            });
+            
+            return matches;
+          });
+        }
+
+        this.logger.info('Filtered tasks result', { 
+          assignmentView, 
+          filteredCount: tasks.length 
+        });
+      }
 
       return { success: true, tasks };
     } catch (error) {

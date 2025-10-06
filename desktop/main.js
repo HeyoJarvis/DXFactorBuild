@@ -834,12 +834,15 @@ function initializeServices() {
     }
   });
 
-  ipcMain.handle('tasks:getAll', async () => {
+  ipcMain.handle('tasks:getAll', async (event, filters = {}) => {
     try {
       // Use authenticated user ID
       const userId = currentUser?.id || 'desktop-user';
-      console.log('📥 IPC: Getting all tasks for user:', userId);
-      const result = await dbAdapter.getUserTasks(userId, { includeCompleted: false });
+      console.log('📥 IPC: Getting all tasks for user:', userId, 'with filters:', filters);
+      const result = await dbAdapter.getUserTasks(userId, { 
+        includeCompleted: false,
+        ...filters
+      });
       console.log('📦 IPC: Task result:', result);
       return result;
     } catch (error) {
@@ -886,6 +889,68 @@ function initializeServices() {
     } catch (error) {
       console.error('Failed to get task stats:', error);
       return { success: false, error: error.message, stats: {} };
+    }
+  });
+
+  ipcMain.handle('tasks:getSlackUserInfo', async (event, slackUserId) => {
+    try {
+      console.log('🔍 Fetching Slack user info for:', slackUserId);
+      
+      if (!slackUserId) {
+        console.log('⚠️ No Slack user ID provided');
+        return { success: false, name: 'Unknown' };
+      }
+
+      if (!slackService) {
+        console.log('⚠️ Slack service not initialized');
+        return { success: false, name: slackUserId };
+      }
+
+      // FIX: The property is 'app', not 'slackApp'
+      if (!slackService.app || !slackService.app.client) {
+        console.log('⚠️ Slack client not available');
+        return { success: false, name: slackUserId };
+      }
+
+      // Try to get user info from Slack
+      try {
+        console.log('📞 Calling Slack API for user:', slackUserId);
+        const userInfo = await slackService.app.client.users.info({
+          user: slackUserId
+        });
+        
+        console.log('✅ Slack user info fetched:', {
+          id: slackUserId,
+          name: userInfo.user?.real_name,
+          display_name: userInfo.user?.name,
+          ok: userInfo.ok
+        });
+        
+        if (userInfo.ok && userInfo.user) {
+          const resolvedName = userInfo.user.real_name || userInfo.user.name || slackUserId;
+          console.log('✅ Resolved name:', resolvedName);
+          return {
+            success: true,
+            id: slackUserId,
+            name: resolvedName,
+            display_name: userInfo.user.profile?.display_name || userInfo.user.name,
+            avatar: userInfo.user.profile?.image_48
+          };
+        } else {
+          console.log('⚠️ Slack API returned not OK:', userInfo);
+        }
+      } catch (slackError) {
+        console.error('❌ Slack API error for user', slackUserId, ':', slackError.message);
+        console.error('Stack:', slackError.stack);
+      }
+
+      // Fallback to just returning the ID
+      console.log('⚠️ Falling back to user ID:', slackUserId);
+      return { success: false, name: slackUserId };
+    } catch (error) {
+      console.error('❌ Failed to get Slack user info:', error.message);
+      console.error('Stack:', error.stack);
+      return { success: false, name: slackUserId };
     }
   });
 
@@ -1724,6 +1789,36 @@ async function getSupabaseUserBySlackId(slackUserId) {
 }
 
 /**
+ * Update current user's Slack ID if not set
+ */
+async function updateCurrentUserSlackId(slackUserId) {
+  if (!currentUser || !slackUserId) return;
+  
+  try {
+    // Check if user already has a Slack ID
+    if (currentUser.slack_user_id) {
+      return; // Already set
+    }
+    
+    // Update the user's Slack ID
+    const { error } = await dbAdapter.supabase
+      .from('users')
+      .update({ slack_user_id: slackUserId })
+      .eq('id', currentUser.id);
+    
+    if (error) {
+      console.error('❌ Failed to update user Slack ID:', error.message);
+      return;
+    }
+    
+    console.log('✅ Updated current user Slack ID:', slackUserId);
+    currentUser.slack_user_id = slackUserId;
+  } catch (error) {
+    console.error('❌ Error updating user Slack ID:', error.message);
+  }
+}
+
+/**
  * Extract mentioned Slack user IDs from message
  */
 function extractMentionedSlackUsers(text) {
@@ -1771,6 +1866,10 @@ function setupWorkflowDetection() {
   // Listen for Slack messages and analyze them
   slackService.on('message', async (message) => {
     try {
+      // Update current user's Slack ID if this is their message and they don't have one set
+      if (currentUser && message.user) {
+        await updateCurrentUserSlackId(message.user);
+      }
       // Analyze for work requests using AI
       const workRequestAnalysis = await workRequestSystem.analyzeForWorkRequest(
         { text: message.text, timestamp: message.timestamp },
@@ -1826,6 +1925,7 @@ function setupWorkflowDetection() {
             if (mentionedSlackIds.length > 0) {
               console.log('📌 Creating tasks for', mentionedSlackIds.length, 'mentioned user(s)');
               
+              let taskCreated = false;
               for (const slackUserId of mentionedSlackIds) {
                 const targetUser = await getSupabaseUserBySlackId(slackUserId);
                 
@@ -1844,6 +1944,7 @@ function setupWorkflowDetection() {
                   const result = await dbAdapter.createTask(targetUser.id, taskData);
                   
                   if (result.success) {
+                    taskCreated = true;
                     console.log('✅ Auto-created task for @mentioned user:', {
                       task_id: result.task.id,
                       title: taskData.title,
@@ -1863,42 +1964,116 @@ function setupWorkflowDetection() {
                   console.log('⚠️ Mentioned user not in database:', slackUserId);
                 }
               }
-            } 
-            // Strategy 2: No mentions - create for current logged-in user
-            else {
-              console.log('📝 No explicit mentions - creating task for current user');
               
-              const userId = currentUser?.id || 'desktop-user';
-              const taskData = {
-                title: extractTaskTitle(message.text),
-                priority: urgencyToPriority(workRequestAnalysis.urgency),
-                description: message.text,
-                tags: [workRequestAnalysis.workType, 'slack-auto', 'general'],
-                assignor: message.user,
-                assignee: null,
-                mentionedUsers: [],
-                parentSessionId: workflowData.id
-              };
-
-              const result = await dbAdapter.createTask(userId, taskData);
-              
-              if (result.success) {
-                console.log('✅ Auto-created task from work request:', {
-                  task_id: result.task.id,
-                  title: taskData.title,
-                  created_for: currentUser?.email || userId
-                });
+              // Fallback: If no tasks were created (all mentioned users not in DB),
+              // create a task for the message sender with assignee info
+              if (!taskCreated) {
+                console.log('📝 Mentioned users not found - creating task for sender with delegation info');
+                const senderUser = await getSupabaseUserBySlackId(message.user);
                 
-                // Notify UI
-                if (mainWindow) {
-                  mainWindow.webContents.send('task:created', result.task);
-                  mainWindow.webContents.send('notification', {
-                    type: 'task_created',
-                    message: `New task: ${taskData.title}`
+                if (senderUser) {
+                  const taskData = {
+                    title: extractTaskTitle(message.text),
+                    priority: urgencyToPriority(workRequestAnalysis.urgency),
+                    description: message.text,
+                    tags: [workRequestAnalysis.workType, 'slack-auto', 'delegated'],
+                    assignor: message.user,
+                    assignee: mentionedSlackIds[0], // Keep first mentioned user as assignee
+                    mentionedUsers: mentionedSlackIds,
+                    parentSessionId: workflowData.id
+                  };
+
+                  const result = await dbAdapter.createTask(senderUser.id, taskData);
+                  
+                  if (result.success) {
+                    console.log('✅ Auto-created delegation task for sender:', {
+                      task_id: result.task.id,
+                      title: taskData.title,
+                      delegated_to: mentionedSlackIds[0]
+                    });
+                    
+                    // Notify UI if this is the current logged-in user
+                    if (mainWindow && currentUser && senderUser.id === currentUser.id) {
+                      mainWindow.webContents.send('task:created', result.task);
+                      mainWindow.webContents.send('notification', {
+                        type: 'task_created',
+                        message: `Task tracked: ${taskData.title}`
+                      });
+                    }
+                  }
+                } else {
+                  console.log('⚠️ Message sender not in database:', message.user);
+                }
+              }
+            } 
+            // Strategy 2: No mentions - check if it's delegation or self-assigned
+            else {
+              console.log('📝 No explicit mentions - analyzing task type');
+              
+              // Get the Slack user who sent the message
+              const senderUser = await getSupabaseUserBySlackId(message.user);
+              
+              if (senderUser) {
+                const title = extractTaskTitle(message.text);
+                
+                // Check if title starts with a name pattern (delegation to someone not in system)
+                const isDelegation = /^([A-Z][a-z]+),?\s+(can|could|please|would you|will you)/i.test(title);
+                
+                let taskData;
+                
+                if (isDelegation) {
+                  // Delegation to someone outside the system
+                  console.log('📤 Detected delegation to external person:', title);
+                  taskData = {
+                    title: title,
+                    priority: urgencyToPriority(workRequestAnalysis.urgency),
+                    description: message.text,
+                    tags: [workRequestAnalysis.workType, 'slack-auto', 'delegated'],
+                    assignor: message.user,
+                    assignee: null, // Delegated to someone not in system
+                    mentionedUsers: [],
+                    parentSessionId: workflowData.id
+                  };
+                } else {
+                  // True self-assigned task
+                  console.log('📝 Creating self-assigned task');
+                  taskData = {
+                    title: title,
+                    priority: urgencyToPriority(workRequestAnalysis.urgency),
+                    description: message.text,
+                    tags: [workRequestAnalysis.workType, 'slack-auto', 'self-assigned'],
+                    assignor: message.user,
+                    assignee: message.user, // Self-assigned
+                    mentionedUsers: [],
+                    parentSessionId: workflowData.id
+                  };
+                }
+
+                const result = await dbAdapter.createTask(senderUser.id, taskData);
+                
+                if (result.success) {
+                  console.log(`✅ Auto-created ${isDelegation ? 'delegation' : 'self-assigned'} task:`, {
+                    task_id: result.task.id,
+                    title: taskData.title,
+                    created_for: senderUser.email,
+                    assignor: message.user,
+                    assignee: taskData.assignee,
+                    isDelegation: isDelegation
                   });
+                  
+                  // Notify UI if task is for current logged-in user
+                  if (mainWindow && currentUser && senderUser.id === currentUser.id) {
+                    mainWindow.webContents.send('task:created', result.task);
+                    mainWindow.webContents.send('notification', {
+                      type: 'task_created',
+                      message: `${isDelegation ? 'Delegation tracked' : 'New task'}: ${taskData.title}`
+                    });
+                  }
+                } else {
+                  console.error('❌ Failed to create task:', result.error);
                 }
               } else {
-                console.error('❌ Failed to create task:', result.error);
+                console.log('⚠️ Message sender not in database:', message.user);
               }
             }
           } catch (taskError) {

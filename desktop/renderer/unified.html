@@ -717,6 +717,37 @@
     .stat-dot.in-progress { background: #007AFF; }
     .stat-dot.completed { background: #34C759; }
 
+    .task-filter-section {
+      margin-bottom: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .assignment-filter {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      background: white;
+      color: #171717;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .assignment-filter:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      background: rgba(0, 212, 255, 0.02);
+    }
+
+    .assignment-filter:focus {
+      border-color: rgba(0, 212, 255, 0.5);
+      box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+    }
+
     .task-input-section {
       background: white;
       border-radius: 10px;
@@ -1421,6 +1452,14 @@
             </div>
           </div>
         </div>
+        
+        <div class="task-filter-section">
+          <select id="assignmentFilter" class="assignment-filter" onchange="changeAssignmentView()">
+            <option value="assigned_to_me">📥 Assigned to Me</option>
+            <option value="assigned_by_me">📤 Assigned by Me</option>
+            <option value="all">📋 All Tasks</option>
+          </select>
+        </div>
 
         <div class="task-input-section">
           <div class="task-input-wrapper">
@@ -1576,6 +1615,15 @@
       }
     }
 
+    let currentAssignmentView = 'assigned_to_me';
+
+    async function changeAssignmentView() {
+      const filterSelect = document.getElementById('assignmentFilter');
+      currentAssignmentView = filterSelect.value;
+      console.log('🔄 Changing assignment view to:', currentAssignmentView);
+      await loadTasks();
+    }
+
     async function loadTasks() {
       try {
         if (!window.electronAPI || !window.electronAPI.tasks) {
@@ -1584,23 +1632,96 @@
           return;
         }
         
-        const result = await window.electronAPI.tasks.getAll();
+        const result = await window.electronAPI.tasks.getAll({
+          assignmentView: currentAssignmentView
+        });
         
         if (result.success) {
           tasks = result.tasks;
-          renderTasks();
+          console.log(`📋 Loaded ${tasks.length} tasks for view: ${currentAssignmentView}`);
+          await renderTasks();
           updateStats();
         } else {
           console.error('Failed to load tasks:', result.error);
-          renderTasks();
+          await renderTasks();
         }
       } catch (error) {
         console.error('Error loading tasks:', error);
-        renderTasks();
+        await renderTasks();
       }
     }
 
-    function renderTasks() {
+    // Cache for Slack user names
+    const slackUserCache = new Map();
+
+    async function getSlackUserName(slackUserId) {
+      console.log('🔍 getSlackUserName called with:', slackUserId);
+      
+      if (!slackUserId) {
+        console.log('⚠️ No Slack user ID provided to getSlackUserName');
+        return 'Unknown';
+      }
+      
+      // Check cache first
+      if (slackUserCache.has(slackUserId)) {
+        console.log('✅ Using cached name for:', slackUserId, '→', slackUserCache.get(slackUserId));
+        return slackUserCache.get(slackUserId);
+      }
+
+      console.log('🔍 Fetching name for Slack user:', slackUserId);
+
+      // Fetch from Slack
+      try {
+        if (window.electronAPI && window.electronAPI.tasks && window.electronAPI.tasks.getSlackUserInfo) {
+          console.log('✅ electronAPI.tasks.getSlackUserInfo is available');
+          const userInfo = await window.electronAPI.tasks.getSlackUserInfo(slackUserId);
+          console.log('📦 Received user info:', userInfo);
+          const name = userInfo.success ? userInfo.name : slackUserId;
+          slackUserCache.set(slackUserId, name);
+          console.log('✅ Resolved', slackUserId, '→', name);
+          return name;
+        } else {
+          console.error('⚠️ electronAPI.tasks.getSlackUserInfo not available!', {
+            hasElectronAPI: !!window.electronAPI,
+            hasTasks: !!(window.electronAPI && window.electronAPI.tasks),
+            hasGetSlackUserInfo: !!(window.electronAPI && window.electronAPI.tasks && window.electronAPI.tasks.getSlackUserInfo)
+          });
+        }
+      } catch (error) {
+        console.error('❌ Error fetching Slack user info:', error);
+      }
+
+      console.log('⚠️ Falling back to ID:', slackUserId);
+      return slackUserId; // Fallback to ID
+    }
+
+    // Helper function to resolve Slack mentions in text
+    async function resolveSlackMentions(text) {
+      if (!text) return text;
+      
+      // Find all Slack mentions in the format <@U12345678>
+      const mentionPattern = /<@([A-Z0-9]+)>/g;
+      const mentions = [...text.matchAll(mentionPattern)];
+      
+      if (mentions.length === 0) return text;
+      
+      console.log('🔍 Found', mentions.length, 'mentions in text:', text);
+      
+      // Resolve all mentions
+      let resolvedText = text;
+      for (const match of mentions) {
+        const userId = match[1];
+        const userName = await getSlackUserName(userId);
+        // Replace <@U12345678> with @Name
+        resolvedText = resolvedText.replace(match[0], `@${userName}`);
+      }
+      
+      console.log('✅ Resolved mentions:', resolvedText);
+      return resolvedText;
+    }
+
+    async function renderTasks() {
+      console.log('📋 renderTasks called with', tasks.length, 'tasks');
       const tasksList = document.getElementById('tasksList');
       
       if (tasks.length === 0) {
@@ -1616,20 +1737,41 @@
         return;
       }
       
-    //   tasksList.innerHTML = tasks.map(task => `
-    //     <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
-    //       <div class="task-header">
-    //         <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" 
-    //              onclick="toggleTask('${task.id}', '${task.status}')"></div>
-    //         <div class="task-title">${escapeHtml(task.title)}</div>
-    //         <div class="task-priority ${task.priority}">${task.priority}</div>
-    //         <div class="task-actions">
-    //           <button class="task-action-btn delete" onclick="deleteTask('${task.id}')">🗑️</button>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   `).join('');
-    tasksList.innerHTML = tasks.map(task => `
+      console.log('🔄 Resolving user names and mentions for tasks...');
+      // Resolve all user names and mentions first
+      const tasksWithNames = await Promise.all(tasks.map(async (task, index) => {
+        console.log(`📝 Task ${index + 1}:`, {
+          title: task.title,
+          assignor: task.assignor,
+          assignee: task.assignee
+        });
+        
+        const assignorName = task.assignor ? await getSlackUserName(task.assignor) : null;
+        const assigneeName = task.assignee ? await getSlackUserName(task.assignee) : null;
+        
+        // Resolve mentions in title and description
+        const resolvedTitle = await resolveSlackMentions(task.title);
+        const resolvedDescription = await resolveSlackMentions(task.description);
+        
+        console.log(`✅ Task ${index + 1} names resolved:`, {
+          assignorName,
+          assigneeName,
+          resolvedTitle,
+          resolvedDescription: resolvedDescription?.substring(0, 50) + '...'
+        });
+        
+        return {
+          ...task,
+          title: resolvedTitle,
+          description: resolvedDescription,
+          assignorName,
+          assigneeName
+        };
+      }));
+      
+      console.log('✅ All names resolved, rendering', tasksWithNames.length, 'tasks');
+      
+      tasksList.innerHTML = tasksWithNames.map(task => `
         <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
           <div class="task-header">
             <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" 
@@ -1643,8 +1785,8 @@
           </div>
           ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
           <div class="task-meta">
-            ${task.assignor ? `<span class="task-assignor">👤 From: ${escapeHtml(task.assignor.name || task.assignor.id)}</span>` : ''}
-            ${task.assignee ? `<span class="task-assignee">👉 To: ${escapeHtml(task.assignee.name || task.assignee.id)}</span>` : ''}
+            ${task.assignorName ? `<span class="task-assignor">👤 From: ${escapeHtml(task.assignorName)}</span>` : ''}
+            ${task.assigneeName ? `<span class="task-assignee">👉 To: ${escapeHtml(task.assigneeName)}</span>` : ''}
             <span class="task-date">Created ${formatDate(task.created_at)}</span>
           </div>
         </div>

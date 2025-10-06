@@ -170,12 +170,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Task management API
   tasks: {
     create: (taskData) => ipcRenderer.invoke('tasks:create', taskData),
-    getAll: () => ipcRenderer.invoke('tasks:getAll'),
+    getAll: (filters) => ipcRenderer.invoke('tasks:getAll', filters),
     update: (taskId, updates) => ipcRenderer.invoke('tasks:update', taskId, updates),
     delete: (taskId) => ipcRenderer.invoke('tasks:delete', taskId),
     toggle: (taskId, currentStatus) => ipcRenderer.invoke('tasks:toggle', taskId, currentStatus),
     getStats: () => ipcRenderer.invoke('tasks:getStats'),
-    getChatHistory: (taskId) => ipcRenderer.invoke('tasks:getChatHistory', taskId)
+    getChatHistory: (taskId) => ipcRenderer.invoke('tasks:getChatHistory', taskId),
+    getSlackUserInfo: (slackUserId) => ipcRenderer.invoke('tasks:getSlackUserInfo', slackUserId)
   },
   
   // Copilot API

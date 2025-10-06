@@ -3007,3 +3007,271 @@
 {"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T00:26:55.265Z"}
 {"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T00:26:55.265Z"}
 {"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T00:26:55.265Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T19:40:29.575Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T19:40:29.575Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T19:40:29.581Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T19:40:29.581Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T19:40:29.782Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T19:40:29.782Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T19:40:29.782Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T19:40:29.782Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T19:40:29.782Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T19:40:30.236Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T19:40:30.236Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T19:40:30.237Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T19:40:30.237Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T19:40:30.237Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T19:40:30.237Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T19:42:59.764Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T19:42:59.765Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T19:42:59.770Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T19:42:59.770Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T19:43:00.029Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T19:43:00.029Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T19:43:00.030Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T19:43:00.030Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T19:43:00.030Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T19:43:00.566Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T19:43:00.567Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T19:43:00.567Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T19:43:00.567Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T19:43:00.567Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T19:43:00.567Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T19:47:20.847Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T19:47:20.847Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T19:47:20.850Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T19:47:20.850Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T19:47:21.036Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T19:47:21.036Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T19:47:21.036Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T19:47:21.036Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T19:47:21.036Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T19:47:21.488Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T19:47:21.489Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T19:47:21.489Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T19:47:21.489Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T19:47:21.489Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T19:47:21.489Z"}
+{"channel":"C09G4ELBRL7","level":"debug","message":"📡 Slack event received","service":"slack-service","timestamp":"2025-10-05T19:47:35.240Z","type":"message","user":"U09GEFMKGE7"}
+{"channel":"C09G4ELBRL7","level":"info","message":"💬 MESSAGE RECEIVED!","service":"slack-service","text":"Rajan, can you do a competitor setup analysis?","timestamp":"2025-10-05T19:47:35.241Z","ts":"1759693654.111469","user":"U09GEFMKGE7"}
+{"level":"info","message":"✅ Message processed and stored","service":"slack-service","timestamp":"2025-10-05T19:47:35.241Z"}
+{"level":"debug","message":"Slack message saved to Supabase","message_id":"msg_1759693655241","service":"slack-service","timestamp":"2025-10-05T19:47:35.430Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T19:49:49.660Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T19:49:49.660Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T19:49:49.664Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T19:49:49.664Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T19:49:49.847Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T19:49:49.847Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T19:49:49.847Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T19:49:49.847Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T19:49:49.847Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T19:49:50.331Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T19:49:50.331Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T19:49:50.331Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T19:49:50.331Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T19:49:50.331Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T19:49:50.331Z"}
+{"channel":"C09G4ELBRL7","level":"debug","message":"📡 Slack event received","service":"slack-service","timestamp":"2025-10-05T19:50:37.334Z","type":"message","user":"U09GEFMKGE7"}
+{"channel":"C09G4ELBRL7","level":"info","message":"💬 MESSAGE RECEIVED!","service":"slack-service","text":"<@U09G4EL2CHM> can you create summary from meeting","timestamp":"2025-10-05T19:50:37.334Z","ts":"1759693835.818199","user":"U09GEFMKGE7"}
+{"level":"info","message":"✅ Message processed and stored","service":"slack-service","timestamp":"2025-10-05T19:50:37.336Z"}
+{"level":"debug","message":"Slack message saved to Supabase","message_id":"msg_1759693837334","service":"slack-service","timestamp":"2025-10-05T19:50:37.511Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T19:52:57.388Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T19:52:57.388Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T19:52:57.391Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T19:52:57.391Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T19:52:57.597Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T19:52:57.597Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T19:52:57.597Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T19:52:57.597Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T19:52:57.597Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T19:52:58.061Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T19:52:58.061Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T19:52:58.061Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T19:52:58.061Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T19:52:58.062Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T19:52:58.062Z"}
+{"channel":"C09G4ELBRL7","level":"debug","message":"📡 Slack event received","service":"slack-service","timestamp":"2025-10-05T19:53:29.731Z","type":"message","user":"U09GEFMKGE7"}
+{"channel":"C09G4ELBRL7","level":"info","message":"💬 MESSAGE RECEIVED!","service":"slack-service","text":"<@U09G4EL2CHM> can you create summary from meeting","timestamp":"2025-10-05T19:53:29.731Z","ts":"1759694008.932769","user":"U09GEFMKGE7"}
+{"level":"info","message":"✅ Message processed and stored","service":"slack-service","timestamp":"2025-10-05T19:53:29.733Z"}
+{"level":"debug","message":"Slack message saved to Supabase","message_id":"msg_1759694009731","service":"slack-service","timestamp":"2025-10-05T19:53:29.939Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T19:55:42.630Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T19:55:42.630Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T19:55:42.634Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T19:55:42.634Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T19:55:42.801Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T19:55:42.801Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T19:55:42.801Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T19:55:42.801Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T19:55:42.801Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T19:55:43.255Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T19:55:43.256Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T19:55:43.256Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T19:55:43.256Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T19:55:43.256Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T19:55:43.256Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T19:58:11.420Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T19:58:11.421Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T19:58:11.424Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T19:58:11.424Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T19:58:11.623Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T19:58:11.623Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T19:58:11.623Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T19:58:11.623Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T19:58:11.623Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T19:58:12.084Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T19:58:12.084Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T19:58:12.084Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T19:58:12.084Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T19:58:12.084Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T19:58:12.084Z"}
+{"channel":"C09G4ELBRL7","level":"debug","message":"📡 Slack event received","service":"slack-service","timestamp":"2025-10-05T19:58:30.299Z","type":"message","user":"U09GEFMKGE7"}
+{"channel":"C09G4ELBRL7","level":"info","message":"💬 MESSAGE RECEIVED!","service":"slack-service","text":"<@U09G4EL2CHM> can you create summary from meeting","timestamp":"2025-10-05T19:58:30.299Z","ts":"1759694309.621149","user":"U09GEFMKGE7"}
+{"level":"info","message":"✅ Message processed and stored","service":"slack-service","timestamp":"2025-10-05T19:58:30.300Z"}
+{"level":"debug","message":"Slack message saved to Supabase","message_id":"msg_1759694310299","service":"slack-service","timestamp":"2025-10-05T19:58:30.492Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:01:45.863Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:01:45.863Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:01:45.869Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:01:45.869Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:01:46.091Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:01:46.091Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:01:46.091Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:01:46.091Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:01:46.092Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:01:47.612Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:01:47.613Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:01:47.613Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:01:47.613Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:01:47.613Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:01:47.613Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:03:38.958Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:03:38.958Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:03:38.961Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:03:38.961Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:03:39.133Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:03:39.133Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:03:39.133Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:03:39.134Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:03:39.134Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:03:39.604Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:03:39.604Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:03:39.604Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:03:39.604Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:03:39.604Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:03:39.604Z"}
+{"channel":"C09G4ELBRL7","level":"debug","message":"📡 Slack event received","service":"slack-service","timestamp":"2025-10-05T20:03:59.328Z","type":"message","user":"U09GEFMKGE7"}
+{"channel":"C09G4ELBRL7","level":"info","message":"💬 MESSAGE RECEIVED!","service":"slack-service","text":"<@U09G4EL2CHM> can you create summary from meeting","timestamp":"2025-10-05T20:03:59.329Z","ts":"1759694638.247179","user":"U09GEFMKGE7"}
+{"level":"info","message":"✅ Message processed and stored","service":"slack-service","timestamp":"2025-10-05T20:03:59.329Z"}
+{"level":"debug","message":"Slack message saved to Supabase","message_id":"msg_1759694639329","service":"slack-service","timestamp":"2025-10-05T20:03:59.485Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:05:50.164Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:05:50.165Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:05:50.168Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:05:50.168Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:05:50.363Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:05:50.363Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:05:50.363Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:05:50.363Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:05:50.363Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:05:50.862Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:05:50.863Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:05:50.863Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:05:50.863Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:05:50.863Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:05:50.863Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:07:59.819Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:07:59.819Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:07:59.823Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:07:59.823Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:07:59.999Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:07:59.999Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:07:59.999Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:07:59.999Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:07:59.999Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:08:00.447Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:08:00.448Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:08:00.448Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:08:00.448Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:08:00.448Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:08:00.448Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:11:52.367Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:11:52.367Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:11:52.371Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:11:52.371Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:11:52.578Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:11:52.578Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:11:52.578Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:11:52.578Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:11:52.578Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:11:53.030Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:11:53.030Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:11:53.031Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:11:53.031Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:11:53.031Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:11:53.031Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:14:34.228Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:14:34.229Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:14:34.234Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:14:34.235Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:14:34.457Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:14:34.458Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:14:34.458Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:14:34.458Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:14:34.458Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:14:34.943Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:14:34.943Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:14:34.943Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:14:34.943Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:14:34.943Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:14:34.943Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:15:11.506Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:15:11.506Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:15:11.510Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:15:11.510Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:15:11.692Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:15:11.692Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:15:11.692Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:15:11.692Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:15:11.692Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:15:12.162Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:15:12.162Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:15:12.162Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:15:12.162Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:15:12.162Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:15:12.162Z"}
+{"channel":"C09G4ELBRL7","level":"debug","message":"📡 Slack event received","service":"slack-service","timestamp":"2025-10-05T20:15:28.170Z","type":"message","user":"U09GEFMKGE7"}
+{"channel":"C09G4ELBRL7","level":"info","message":"💬 MESSAGE RECEIVED!","service":"slack-service","text":"Rajan, can you do a competitor setup analysis for ","timestamp":"2025-10-05T20:15:28.171Z","ts":"1759695327.390509","user":"U09GEFMKGE7"}
+{"level":"info","message":"✅ Message processed and stored","service":"slack-service","timestamp":"2025-10-05T20:15:28.172Z"}
+{"level":"debug","message":"Slack message saved to Supabase","message_id":"msg_1759695328171","service":"slack-service","timestamp":"2025-10-05T20:15:28.524Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:17:44.639Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:17:44.640Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:17:44.643Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:17:44.643Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:17:44.864Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:17:44.864Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:17:44.864Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:17:44.864Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:17:44.864Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:17:45.449Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:17:45.450Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:17:45.450Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:17:45.450Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:17:45.450Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:17:45.450Z"}
+{"channel":"C09G4ELBRL7","level":"debug","message":"📡 Slack event received","service":"slack-service","timestamp":"2025-10-05T20:18:13.932Z","type":"message","user":"U09GEFMKGE7"}
+{"channel":"C09G4ELBRL7","level":"info","message":"💬 MESSAGE RECEIVED!","service":"slack-service","text":"Fil, can you do a competitor setup analysis for xy","timestamp":"2025-10-05T20:18:13.932Z","ts":"1759695492.562879","user":"U09GEFMKGE7"}
+{"level":"info","message":"✅ Message processed and stored","service":"slack-service","timestamp":"2025-10-05T20:18:13.932Z"}
+{"level":"debug","message":"Slack message saved to Supabase","message_id":"msg_1759695493932","service":"slack-service","timestamp":"2025-10-05T20:18:14.068Z"}
+{"level":"info","message":"Desktop Supabase adapter initialized","service":"slack-service","timestamp":"2025-10-05T20:27:58.224Z"}
+{"level":"info","message":"Initializing Slack service with hj2 bot","service":"slack-service","timestamp":"2025-10-05T20:27:58.225Z"}
+{"level":"info","message":"🔧 Setting up Slack event handlers...","service":"slack-service","timestamp":"2025-10-05T20:27:58.228Z"}
+{"level":"info","message":"Slack service initialized successfully","service":"slack-service","timestamp":"2025-10-05T20:27:58.228Z"}
+{"level":"info","message":"Starting Slack service...","service":"slack-service","timestamp":"2025-10-05T20:27:58.434Z"}
+{"level":"info","message":"Socket Mode enabled:","service":"slack-service","timestamp":"2025-10-05T20:27:58.435Z"}
+{"level":"info","message":"Bot Token present:","service":"slack-service","timestamp":"2025-10-05T20:27:58.435Z"}
+{"level":"info","message":"App Token present:","service":"slack-service","timestamp":"2025-10-05T20:27:58.435Z"}
+{"level":"info","message":"🚀 Calling app.start()...","service":"slack-service","timestamp":"2025-10-05T20:27:58.435Z"}
+{"level":"info","message":"✅ Slack service started successfully and listening for events","service":"slack-service","timestamp":"2025-10-05T20:27:58.891Z"}
+{"error_handler":true,"level":"info","mention_handler":true,"message":"📋 Event handlers registered:","message_handler":true,"service":"slack-service","timestamp":"2025-10-05T20:27:58.891Z"}
+{"level":"info","message":"Waiting for messages... Make sure:","service":"slack-service","timestamp":"2025-10-05T20:27:58.891Z"}
+{"level":"info","message":"  1. Bot is invited to channels (/invite @hj2)","service":"slack-service","timestamp":"2025-10-05T20:27:58.891Z"}
+{"level":"info","message":"  2. Event subscriptions are configured in Slack App settings","service":"slack-service","timestamp":"2025-10-05T20:27:58.891Z"}
+{"level":"info","message":"  3. Bot has proper OAuth scopes (channels:history, etc.)","service":"slack-service","timestamp":"2025-10-05T20:27:58.891Z"}
