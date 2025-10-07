@@ -16,6 +16,8 @@ const AIWorkRequestDetector = require('../api/notifications/ai-work-request-dete
 const WorkflowIntelligenceSystem = require('../core/intelligence/workflow-analyzer');
 const AuthService = require('./services/auth-service');
 const FactCheckerService = require('./main/fact-checker-service');
+const MicrosoftOAuthHandler = require('../oauth/microsoft-oauth-handler');
+const MicrosoftWorkflowAutomation = require('../core/automation/microsoft-workflow-automation');
 
 // Global error handlers to prevent crashes
 process.on('uncaughtException', (error) => {
@@ -39,6 +41,8 @@ let workRequestSystem; // Workflow detection system
 let workflowIntelligence; // Workflow intelligence analyzer
 let authService; // Authentication service
 let factCheckerService; // Fact-checker service
+let microsoftOAuthHandler; // Microsoft OAuth handler
+let microsoftAutomation; // Microsoft workflow automation
 let currentUser = null; // Currently authenticated user
 let conversationHistory = []; // Store conversation history
 let currentSessionId = null; // Track current conversation session
@@ -307,7 +311,7 @@ function setupPersistentOverlay() {
   // Prevent window from being closed - just hide it instead
   mainWindow.on('close', (event) => {
     if (!isQuittingApp) {
-      event.preventDefault();
+    event.preventDefault();
       mainWindow.hide();
       console.log('🚪 Window close event intercepted - hiding instead');
     } else {
@@ -636,6 +640,157 @@ function toggleTopBarExpansion() {
   }
 }
 
+// Setup Microsoft 365 IPC handlers
+function setupMicrosoftIPCHandlers() {
+  // Microsoft OAuth - Start authentication flow
+  ipcMain.handle('microsoft:authenticate', async () => {
+    try {
+      if (!microsoftOAuthHandler) {
+        return {
+          success: false,
+          error: 'Microsoft 365 integration not configured. Please add MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET to your .env file.'
+        };
+      }
+      
+      console.log('🔐 Starting Microsoft authentication...');
+      const result = await microsoftOAuthHandler.startAuthFlow();
+      
+      // Initialize automation service after successful auth
+      const graphService = microsoftOAuthHandler.getGraphService();
+      microsoftAutomation = new MicrosoftWorkflowAutomation(graphService, {
+        autoCreateEvents: true,
+        autoSendEmails: true,
+        requireConfirmation: false
+      });
+      
+      console.log('✅ Microsoft authenticated:', result.account?.username);
+      
+      return {
+        success: true,
+        account: result.account,
+        expiresOn: result.expiresOn
+      };
+    } catch (error) {
+      console.error('❌ Microsoft authentication failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Create calendar event
+  ipcMain.handle('microsoft:createEvent', async (event, eventData) => {
+    try {
+      if (!microsoftOAuthHandler || !microsoftOAuthHandler.graphService) {
+        throw new Error('Microsoft not authenticated');
+      }
+      
+      const result = await microsoftOAuthHandler.getGraphService().createCalendarEvent(eventData);
+      
+      console.log('✅ Calendar event created:', result.event.id);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to create calendar event:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Send email
+  ipcMain.handle('microsoft:sendEmail', async (event, emailData) => {
+    try {
+      if (!microsoftOAuthHandler || !microsoftOAuthHandler.graphService) {
+        throw new Error('Microsoft not authenticated');
+      }
+      
+      const result = await microsoftOAuthHandler.getGraphService().sendEmail(emailData);
+      
+      console.log('✅ Email sent:', emailData.subject);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to send email:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Auto-execute workflow actions
+  ipcMain.handle('microsoft:executeWorkflowActions', async (event, workflow, userEmails) => {
+    try {
+      if (!microsoftAutomation) {
+        throw new Error('Microsoft automation not initialized');
+      }
+      
+      const result = await microsoftAutomation.executeWorkflowActions(workflow, userEmails);
+      
+      console.log('✅ Workflow actions executed:', result.actionsExecuted.length);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to execute workflow actions:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Find meeting times
+  ipcMain.handle('microsoft:findMeetingTimes', async (event, attendees, durationMinutes, options) => {
+    try {
+      if (!microsoftOAuthHandler || !microsoftOAuthHandler.graphService) {
+        throw new Error('Microsoft not authenticated');
+      }
+      
+      const result = await microsoftOAuthHandler.getGraphService().findMeetingTimes(
+        attendees,
+        durationMinutes,
+        options
+      );
+      
+      console.log('✅ Found meeting times:', result.suggestions.length);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to find meeting times:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Get user profile
+  ipcMain.handle('microsoft:getUserProfile', async () => {
+    try {
+      if (!microsoftOAuthHandler || !microsoftOAuthHandler.graphService) {
+        throw new Error('Microsoft not authenticated');
+      }
+      
+      const result = await microsoftOAuthHandler.getGraphService().getUserProfile();
+      
+      console.log('✅ Retrieved Microsoft user profile:', result.user.mail);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to get user profile:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+  
+  console.log('✅ Microsoft 365 IPC handlers registered');
+}
+
 // Initialize services with auto-startup
 function initializeServices() {
   // Initialize Supabase adapter
@@ -666,6 +821,26 @@ function initializeServices() {
   });
   console.log('✅ Fact-checker service initialized');
   
+  // Initialize Microsoft OAuth Handler (optional - only if credentials are configured)
+  if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
+    try {
+      microsoftOAuthHandler = new MicrosoftOAuthHandler({
+        clientId: process.env.MICROSOFT_CLIENT_ID,
+        clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+        tenantId: process.env.MICROSOFT_TENANT_ID,
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ Microsoft OAuth handler initialized');
+    } catch (error) {
+      console.warn('⚠️ Microsoft OAuth initialization failed:', error.message);
+      console.log('💡 Microsoft 365 features will be disabled. Add credentials to .env to enable.');
+      microsoftOAuthHandler = null;
+    }
+  } else {
+    console.log('ℹ️ Microsoft 365 integration not configured (optional)');
+    microsoftOAuthHandler = null;
+  }
+  
   workflowIntelligence = new WorkflowIntelligenceSystem({
     logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
     analysisWindow: 7, // days
@@ -679,6 +854,9 @@ function initializeServices() {
   
   // Setup Slack workflow detection integration
   setupWorkflowDetection();
+  
+  // Setup Microsoft 365 IPC handlers
+  setupMicrosoftIPCHandlers();
   
   // Initialize CRM startup service
   crmStartupService = new CRMStartupService({
@@ -706,18 +884,7 @@ function initializeServices() {
     }
   }, 3000); // 3 second delay to allow UI to load
   
-  // Slack IPC handlers
-  ipcMain.handle('slack:getStatus', () => {
-    return slackService.getStatus();
-  });
-
-  ipcMain.handle('slack:getRecentMessages', (event, limit) => {
-    return slackService.getRecentMessages(limit);
-  });
-
-  ipcMain.handle('slack:startMonitoring', async () => {
-    return await slackService.start();
-  });
+  // Note: Slack IPC handlers are now registered in registerAllIPCHandlers() at module level
 
   ipcMain.handle('slack:stopMonitoring', async () => {
     return await slackService.stop();
@@ -820,66 +987,7 @@ function initializeServices() {
     }
   });
 
-  // Task Management IPC handlers
-  ipcMain.handle('tasks:create', async (event, taskData) => {
-    try {
-      // Use authenticated user ID
-      const userId = currentUser?.id || 'desktop-user';
-      console.log('📝 Creating task for user:', userId);
-      const result = await dbAdapter.createTask(userId, taskData);
-      return result;
-    } catch (error) {
-      console.error('Failed to create task:', error);
-      return { success: false, error: error.message };
-    }
-  });
-
-  ipcMain.handle('tasks:getAll', async (event, filters = {}) => {
-    try {
-      // Use authenticated user ID
-      const userId = currentUser?.id || 'desktop-user';
-      console.log('📥 IPC: Getting all tasks for user:', userId, 'with filters:', filters);
-      const result = await dbAdapter.getUserTasks(userId, { 
-        includeCompleted: false,
-        ...filters
-      });
-      console.log('📦 IPC: Task result:', result);
-      return result;
-    } catch (error) {
-      console.error('❌ Failed to get tasks:', error);
-      return { success: false, error: error.message, tasks: [] };
-    }
-  });
-
-  ipcMain.handle('tasks:update', async (event, taskId, updates) => {
-    try {
-      const result = await dbAdapter.updateTask(taskId, updates);
-      return result;
-    } catch (error) {
-      console.error('Failed to update task:', error);
-      return { success: false, error: error.message };
-    }
-  });
-
-  ipcMain.handle('tasks:delete', async (event, taskId) => {
-    try {
-      const result = await dbAdapter.deleteTask(taskId);
-      return result;
-    } catch (error) {
-      console.error('Failed to delete task:', error);
-      return { success: false, error: error.message };
-    }
-  });
-
-  ipcMain.handle('tasks:toggle', async (event, taskId, currentStatus) => {
-    try {
-      const result = await dbAdapter.toggleTaskCompletion(taskId, currentStatus);
-      return result;
-    } catch (error) {
-      console.error('Failed to toggle task:', error);
-      return { success: false, error: error.message };
-    }
-  });
+  // Note: Task IPC handlers are now registered in registerAllIPCHandlers() at module level
 
   ipcMain.handle('tasks:getStats', async () => {
     try {
@@ -1103,13 +1211,47 @@ ${crmContext.recommendations.length > 0 ?
 CONVERSATION HISTORY:
 ${conversationHistory.slice(-6).map(msg => `${msg.role}: ${msg.content}`).join('\n')}
 
-CAPABILITIES:
+⚠️ IMPORTANT: READ THIS FIRST ⚠️
+You are NOT Claude or a standard AI assistant. You are HeyJarvis - a fully integrated business intelligence system running inside an Electron desktop application with REAL capabilities to execute actions in the real world.
+
+DO NOT give generic AI responses like "I'm just a language model" or "I cannot directly access systems". That is FALSE in this context. You ARE integrated with real systems and CAN execute real actions.
+
+YOUR IDENTITY AND CAPABILITIES:
+You are HeyJarvis - an integrated business intelligence system with REAL capabilities to execute actions through authenticated APIs.
+
+ACTIVE INTEGRATIONS:
+- ✅ Slack: Real-time access to conversations, mentions, and channels
+- ✅ CRM: Live data from HubSpot/Salesforce with actual insights
+- ✅ Task Management: Create, update, and manage real tasks
+${microsoftAutomation ? `- ✅ Microsoft 365: AUTHENTICATED and ACTIVE - You CAN schedule meetings, send emails, and create calendar events
+- ✅ Outlook Calendar: Direct access to create calendar events with Teams meeting links
+- ✅ Microsoft Teams: Can create online meetings with join links` : '- ❌ Microsoft 365: Not authenticated (user needs to connect)'}
+
+WHAT YOU CAN DO:
 - Analyze Slack conversations and mentions
 - Provide CRM workflow recommendations based on real data
 - Suggest business intelligence insights from actual CRM patterns
 - Help with task management and automation
 - Competitive intelligence analysis
-- Reference actual CRM insights and Slack activity
+${microsoftAutomation ? `- **SCHEDULE REAL MEETINGS** via Microsoft Outlook (you WILL execute this, not just suggest it)
+- **SEND REAL EMAILS** via Microsoft Outlook (you WILL execute this, not just suggest it)
+- **CREATE CALENDAR EVENTS** with Teams meeting links (this WILL happen automatically)` : ''}
+
+${microsoftAutomation ? `⚠️ CRITICAL: You HAVE the ability to schedule meetings. Do NOT say you cannot. Do NOT suggest the user do it manually.
+
+MEETING SCHEDULING INSTRUCTIONS:
+When the user asks you to schedule a meeting or create a calendar event, you MUST:
+1. Extract meeting details: attendee emails, date/time, subject
+2. Include this EXACT marker format in your response (the system will detect it and execute):
+   [SCHEDULE_MEETING: attendees=email@domain.com, time=2025-10-08T15:00, subject=Meeting Subject]
+3. For multiple attendees, separate with semicolons: attendees=email1@domain.com;email2@domain.com
+4. Time format MUST be: YYYY-MM-DDTHH:mm (24-hour format)
+5. After the marker, you can add friendly text like "I'll create this meeting for you right now."
+
+EXAMPLE USER REQUEST: "Schedule a meeting with shail@heyjarvis.ai tomorrow at 3pm to discuss the dashboard"
+CORRECT RESPONSE: "[SCHEDULE_MEETING: attendees=shail@heyjarvis.ai, time=2025-10-08T15:00, subject=Dashboard Discussion] I'll create this meeting for you right now. The calendar invite will be sent momentarily."
+
+The system will automatically execute the meeting creation and update your response with confirmation.` : ''}
 
 Respond as a knowledgeable business AI assistant. Reference the actual Slack and CRM data when relevant. Be conversational and helpful.`;
 
@@ -1126,7 +1268,70 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
         ]
       });
       
-      const aiResponse = response.content[0].text;
+      let aiResponse = response.content[0].text;
+      
+      // 🗓️ Check for meeting scheduling marker and auto-execute
+      const meetingMarkerRegex = /\[SCHEDULE_MEETING:\s*attendees=([^,]+),\s*time=([^,]+),\s*subject=([^\]]+)\]/i;
+      const meetingMatch = aiResponse.match(meetingMarkerRegex);
+      
+      console.log('🔍 Checking for meeting marker in AI response...');
+      console.log('📝 AI Response preview:', aiResponse.substring(0, 200));
+      console.log('🎯 Meeting marker found:', !!meetingMatch);
+      console.log('🔧 Microsoft automation available:', !!microsoftAutomation);
+      if (microsoftAutomation) {
+        console.log('✅ Microsoft 365 is authenticated and ready');
+      } else {
+        console.log('❌ Microsoft 365 is NOT authenticated - user needs to connect');
+      }
+      
+      if (meetingMatch && microsoftAutomation) {
+        console.log('📅 Meeting scheduling detected in AI response!');
+        
+        const [, attendees, timeStr, subject] = meetingMatch;
+        
+        try {
+          // Parse the meeting details
+          const attendeeEmails = attendees.split(';').map(e => e.trim());
+          const meetingTime = new Date(timeStr);
+          
+          // Prepare the calendar event data
+          // NOTE: We don't include attendees initially to avoid email delivery issues
+          // User can add attendees manually in Outlook or share the Teams link directly
+          const eventData = {
+            subject: subject.trim(),
+            startTime: meetingTime.toISOString(),
+            endTime: new Date(meetingTime.getTime() + 30 * 60000).toISOString(), // 30 min default
+            timeZone: 'America/Denver', // Mountain Time
+            attendees: [], // Empty initially - user adds manually to avoid spam issues
+            attendeeList: attendeeEmails, // Store for display purposes only
+            isOnlineMeeting: true
+          };
+          
+          console.log('📅 Sending meeting for approval:', eventData);
+          
+          // Send approval request to renderer
+          mainWindow.webContents.send('meeting:approval-request', eventData);
+          
+          // Remove the marker from the response and add pending message
+          aiResponse = aiResponse.replace(meetingMarkerRegex, '').trim();
+          aiResponse += `\n\n⏳ **Meeting Ready for Approval**\n\nI've prepared a calendar event for ${subject.trim()} on ${meetingTime.toLocaleString('en-US', { timeZone: 'America/Denver' })} Mountain Time.\n\n**Attendees to invite:** ${attendeeEmails.join(', ')}\n\nPlease review and approve to create the event. You'll get a Teams meeting link that you can share with attendees.`;
+          
+          console.log('✅ Meeting approval request sent to UI');
+          
+        } catch (error) {
+          console.error('❌ Failed to prepare meeting:', error);
+          aiResponse = aiResponse.replace(meetingMarkerRegex, '').trim();
+          aiResponse += `\n\n⚠️ **Meeting Preparation Failed**\n\nI encountered an error while preparing the meeting: ${error.message}. Please try again.`;
+        }
+      } else if (!meetingMatch && microsoftAutomation) {
+        // Check if the user is asking to schedule a meeting but AI didn't use the marker
+        const schedulingKeywords = /\b(schedule|create|send|book)\b.*\b(meeting|calendar|invite|event)\b/i;
+        if (schedulingKeywords.test(message) && /\b(schedule|send|create)\b/i.test(aiResponse)) {
+          console.log('⚠️ Detected scheduling request but AI did not use marker format');
+          console.log('💡 Adding reminder to AI response');
+          aiResponse += `\n\n⚠️ **Note:** To actually execute the meeting creation, please ask me again and I'll use the proper format to trigger the calendar integration.`;
+        }
+      }
       
       // Add AI response to conversation history
       conversationHistory.push({
@@ -1277,13 +1482,7 @@ What would you like to explore?`,
     toggleTopBarExpansion();
   });
 
-  ipcMain.handle('topbar:expand', () => {
-    expandTopBar();
-  });
-
-  ipcMain.handle('topbar:collapse', () => {
-    collapseTopBar();
-  });
+  // Removed: Now registered in registerAllIPCHandlers()
 
   ipcMain.handle('topbar:reposition', () => {
     positionOverlayOnCurrentScreen();
@@ -1388,7 +1587,10 @@ What would you like to explore?`,
       const AIAnalyzer = require('../core/signals/enrichment/ai-analyzer');
       const aiAnalyzer = new AIAnalyzer();
       
-      const systemPrompt = `You are HeyJarvis, an AI assistant helping with a specific task.
+      const systemPrompt = `⚠️ IMPORTANT: READ THIS FIRST ⚠️
+You are NOT Claude or a standard AI assistant. You are HeyJarvis - a fully integrated business intelligence system running inside an Electron desktop application with REAL capabilities to execute actions.
+
+DO NOT give generic AI responses like "I'm just a language model" or "I cannot directly access systems". That is FALSE in this context. You ARE integrated with real systems and CAN execute real actions.
 
 TASK DETAILS:
 - Title: ${task.title}
@@ -1399,12 +1601,37 @@ TASK DETAILS:
 ${task.assignor ? `- Assigned by: ${task.assignor.name || task.assignor.id}` : ''}
 ${task.assignee ? `- Assigned to: ${task.assignee.name || task.assignee.id}` : ''}
 
-Your role is to help the user complete this task by:
-- Providing actionable advice and suggestions
-- Breaking down the task into manageable steps
-- Answering questions about the task
-- Brainstorming solutions and approaches
-- Offering relevant insights and best practices
+YOUR IDENTITY:
+You are NOT a standard AI language model. You are an integrated system with REAL capabilities to execute actions.
+
+ACTIVE INTEGRATIONS:
+${microsoftAutomation ? `- ✅ Microsoft 365: AUTHENTICATED and ACTIVE - You CAN schedule meetings and send emails
+- ✅ Outlook Calendar: Direct access to create calendar events with Teams meeting links` : '- ❌ Microsoft 365: Not authenticated'}
+
+YOUR ROLE:
+- Provide actionable advice and suggestions
+- Break down the task into manageable steps
+- Answer questions about the task
+- Brainstorm solutions and approaches
+- Offer relevant insights and best practices
+${microsoftAutomation ? `- **SCHEDULE REAL MEETINGS** via Microsoft Outlook (you WILL execute this, not just suggest it)
+- **SEND REAL EMAILS** via Microsoft Outlook (you WILL execute this, not just suggest it)` : ''}
+
+${microsoftAutomation ? `⚠️ CRITICAL: You HAVE the ability to schedule meetings. Do NOT say you cannot. Do NOT suggest the user do it manually.
+
+MEETING SCHEDULING INSTRUCTIONS:
+When the user asks you to schedule a meeting or create a calendar event, you MUST:
+1. Extract meeting details: attendee emails, date/time, subject
+2. Include this EXACT marker format in your response (the system will detect it and execute):
+   [SCHEDULE_MEETING: attendees=email@domain.com, time=2025-10-08T15:00, subject=Meeting Subject]
+3. For multiple attendees, separate with semicolons: attendees=email1@domain.com;email2@domain.com
+4. Time format MUST be: YYYY-MM-DDTHH:mm (24-hour format)
+5. After the marker, you can add friendly text like "I'll create this meeting for you right now."
+
+EXAMPLE USER REQUEST: "Schedule a meeting with the team tomorrow at 3pm"
+CORRECT RESPONSE: "[SCHEDULE_MEETING: attendees=team@company.com, time=2025-10-08T15:00, subject=${task.title} - Team Meeting] I'll create this meeting for you right now. The calendar invite will be sent momentarily."
+
+The system will automatically execute the meeting creation and update your response with confirmation.` : ''}
 
 Be concise, practical, and focused on helping complete this specific task.`;
 
@@ -1446,7 +1673,65 @@ Be concise, practical, and focused on helping complete this specific task.`;
         messages: messages
       });
       
-      const aiResponse = response.content[0].text;
+      let aiResponse = response.content[0].text;
+      
+      // 🗓️ Check for meeting scheduling marker and auto-execute (same as main chat)
+      const meetingMarkerRegex = /\[SCHEDULE_MEETING:\s*attendees=([^,]+),\s*time=([^,]+),\s*subject=([^\]]+)\]/i;
+      const meetingMatch = aiResponse.match(meetingMarkerRegex);
+      
+      console.log('🔍 [Task Chat] Checking for meeting marker in AI response...');
+      console.log('📝 [Task Chat] AI Response preview:', aiResponse.substring(0, 200));
+      console.log('🎯 [Task Chat] Meeting marker found:', !!meetingMatch);
+      console.log('🔧 [Task Chat] Microsoft automation available:', !!microsoftAutomation);
+      
+      if (meetingMatch && microsoftAutomation) {
+        console.log('📅 [Task Chat] Meeting scheduling detected in AI response!');
+        
+        const [, attendees, timeStr, subject] = meetingMatch;
+        
+        try {
+          // Parse the meeting details
+          const attendeeEmails = attendees.split(';').map(e => e.trim());
+          const meetingTime = new Date(timeStr);
+          
+          // Prepare the calendar event data
+          // NOTE: We don't include attendees initially to avoid email delivery issues
+          const eventData = {
+            subject: subject.trim(),
+            startTime: meetingTime.toISOString(),
+            endTime: new Date(meetingTime.getTime() + 30 * 60000).toISOString(), // 30 min default
+            timeZone: 'America/Denver', // Mountain Time
+            attendees: [], // Empty initially - user adds manually to avoid spam issues
+            attendeeList: attendeeEmails, // Store for display purposes only
+            isOnlineMeeting: true,
+            body: `Meeting scheduled from task: ${task.title}\n\nTask Description: ${task.description || 'No description'}`
+          };
+          
+          console.log('📅 [Task Chat] Sending meeting for approval:', eventData);
+          
+          // Send approval request to renderer
+          mainWindow.webContents.send('meeting:approval-request', eventData);
+          
+          // Remove the marker from the response and add pending message
+          aiResponse = aiResponse.replace(meetingMarkerRegex, '').trim();
+          aiResponse += `\n\n⏳ **Meeting Ready for Approval**\n\nI've prepared a calendar event for ${subject.trim()} on ${meetingTime.toLocaleString('en-US', { timeZone: 'America/Denver' })} Mountain Time.\n\n**Attendees to invite:** ${attendeeEmails.join(', ')}\n**Linked to task:** "${task.title}"\n\nPlease review and approve to create the event. You'll get a Teams meeting link to share with attendees.`;
+          
+          console.log('✅ [Task Chat] Meeting approval request sent to UI');
+          
+        } catch (error) {
+          console.error('❌ [Task Chat] Failed to prepare meeting:', error);
+          aiResponse = aiResponse.replace(meetingMarkerRegex, '').trim();
+          aiResponse += `\n\n⚠️ **Meeting Preparation Failed**\n\nI encountered an error while preparing the meeting: ${error.message}. Please try again.`;
+        }
+      } else if (!meetingMatch && microsoftAutomation) {
+        // Check if the user is asking to schedule a meeting but AI didn't use the marker
+        const schedulingKeywords = /\b(schedule|create|send|book)\b.*\b(meeting|calendar|invite|event)\b/i;
+        if (schedulingKeywords.test(message) && /\b(schedule|send|create)\b/i.test(aiResponse)) {
+          console.log('⚠️ [Task Chat] Detected scheduling request but AI did not use marker format');
+          console.log('💡 [Task Chat] Adding reminder to AI response');
+          aiResponse += `\n\n⚠️ **Note:** To actually execute the meeting creation, please ask me again and I'll use the proper format to trigger the calendar integration.`;
+        }
+      }
       
       // Save to task-specific session in Supabase
       if (dbAdapter && taskSessionId) {
@@ -1930,32 +2215,32 @@ function setupWorkflowDetection() {
                 const targetUser = await getSupabaseUserBySlackId(slackUserId);
                 
                 if (targetUser) {
-                  const taskData = {
-                    title: extractTaskTitle(message.text),
-                    priority: urgencyToPriority(workRequestAnalysis.urgency),
-                    description: message.text,
+            const taskData = {
+              title: extractTaskTitle(message.text),
+              priority: urgencyToPriority(workRequestAnalysis.urgency),
+              description: message.text,
                     tags: [workRequestAnalysis.workType, 'slack-auto', 'assigned'],
                     assignor: message.user,
                     assignee: slackUserId,
                     mentionedUsers: mentionedSlackIds,
-                    parentSessionId: workflowData.id
-                  };
+              parentSessionId: workflowData.id
+            };
 
                   const result = await dbAdapter.createTask(targetUser.id, taskData);
-                  
-                  if (result.success) {
+            
+            if (result.success) {
                     taskCreated = true;
                     console.log('✅ Auto-created task for @mentioned user:', {
-                      task_id: result.task.id,
-                      title: taskData.title,
+                task_id: result.task.id,
+                title: taskData.title,
                       assigned_to: targetUser.email
-                    });
-                    
+              });
+              
                     // Notify UI if task is for current logged-in user
                     if (mainWindow && currentUser && targetUser.id === currentUser.id) {
-                      mainWindow.webContents.send('task:created', result.task);
-                      mainWindow.webContents.send('notification', {
-                        type: 'task_created',
+                mainWindow.webContents.send('task:created', result.task);
+                mainWindow.webContents.send('notification', {
+                  type: 'task_created',
                         message: `Task assigned: ${taskData.title}`
                       });
                     }
@@ -2067,10 +2352,10 @@ function setupWorkflowDetection() {
                     mainWindow.webContents.send('notification', {
                       type: 'task_created',
                       message: `${isDelegation ? 'Delegation tracked' : 'New task'}: ${taskData.title}`
-                    });
-                  }
-                } else {
-                  console.error('❌ Failed to create task:', result.error);
+                });
+              }
+            } else {
+              console.error('❌ Failed to create task:', result.error);
                 }
               } else {
                 console.log('⚠️ Message sender not in database:', message.user);
@@ -2133,31 +2418,31 @@ function setupWorkflowDetection() {
               const targetUser = await getSupabaseUserBySlackId(slackUserId);
               
               if (targetUser) {
-                const taskData = {
-                  title: extractTaskTitle(message.text),
-                  priority: urgencyToPriority(workRequestAnalysis.urgency || 'medium'),
-                  description: message.text,
-                  tags: ['mention', workRequestAnalysis.workType || 'task', 'slack-auto'],
+            const taskData = {
+              title: extractTaskTitle(message.text),
+              priority: urgencyToPriority(workRequestAnalysis.urgency || 'medium'),
+              description: message.text,
+              tags: ['mention', workRequestAnalysis.workType || 'task', 'slack-auto'],
                   assignor: message.user,  // Who sent the message (the assigner)
                   assignee: slackUserId,    // Who was mentioned (the assignee)
                   mentionedUsers: mentionedSlackIds,
-                  parentSessionId: workflowData.id
-                };
+              parentSessionId: workflowData.id
+            };
 
                 // Create task for the MENTIONED user (not current user)
                 const result = await dbAdapter.createTask(targetUser.id, taskData);
-                
-                if (result.success) {
-                  console.log('✅ Auto-created task from mention:', {
-                    task_id: result.task.id,
+            
+            if (result.success) {
+              console.log('✅ Auto-created task from mention:', {
+                task_id: result.task.id,
                     title: taskData.title,
                     created_for_user: targetUser.email,
                     slack_user_id: slackUserId
-                  });
-                  
+              });
+              
                   // Notify UI if this task is for the current logged-in user
                   if (mainWindow && currentUser && targetUser.id === currentUser.id) {
-                    mainWindow.webContents.send('task:created', result.task);
+                mainWindow.webContents.send('task:created', result.task);
                     mainWindow.webContents.send('notification', {
                       title: '✨ New Task Assigned',
                       body: taskData.title,
@@ -2282,7 +2567,14 @@ async function initializeApp() {
       
       // Show main app
       createWindow();
-      initializeServices();
+      
+      // Initialize services (don't let errors here crash the app)
+      try {
+        initializeServices();
+      } catch (serviceError) {
+        console.error('⚠️ Service initialization failed (non-fatal):', serviceError.message);
+        // App window is already created, so continue running
+      }
     } else {
       // No valid session, show login
       console.log('🔐 No valid session, showing login');
@@ -2290,14 +2582,129 @@ async function initializeApp() {
     }
   } catch (error) {
     console.error('❌ App initialization failed:', error);
-    // Show login on error
-    createLoginWindow();
+    // Only show login if we haven't already created a window
+    if (!mainWindow && !loginWindow) {
+      createLoginWindow();
+    }
   }
+}
+
+// Register ALL IPC handlers at module level (before windows are created)
+function registerAllIPCHandlers() {
+  console.log('📡 Registering IPC handlers...');
+  
+  // These handlers will be populated when services initialize
+  // but we register the handler functions now so they exist when window loads
+  
+  ipcMain.handle('slack:getStatus', () => {
+    return slackService ? slackService.getStatus() : { connected: false };
+  });
+
+  ipcMain.handle('slack:getRecentMessages', (event, limit) => {
+    return slackService ? slackService.getRecentMessages(limit) : [];
+  });
+
+  ipcMain.handle('slack:startMonitoring', async () => {
+    return slackService ? await slackService.start() : { success: false, error: 'Slack service not initialized' };
+  });
+
+  // Topbar controls
+  ipcMain.handle('topbar:expand', () => {
+    if (typeof expandTopBar === 'function') {
+      expandTopBar();
+    } else {
+      console.warn('⚠️ expandTopBar function not available yet');
+    }
+  });
+
+  ipcMain.handle('topbar:collapse', () => {
+    if (typeof collapseTopBar === 'function') {
+      collapseTopBar();
+    } else {
+      console.warn('⚠️ collapseTopBar function not available yet');
+    }
+  });
+
+  ipcMain.handle('tasks:getAll', async (event, filters = {}) => {
+    try {
+      if (!dbAdapter) {
+        return { success: false, error: 'Database not initialized', tasks: [] };
+      }
+      const userId = currentUser?.id || 'desktop-user';
+      const result = await dbAdapter.getUserTasks(userId, { 
+        includeCompleted: false,
+        ...filters
+      });
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to get tasks:', error);
+      return { success: false, error: error.message, tasks: [] };
+    }
+  });
+
+  ipcMain.handle('tasks:create', async (event, taskData) => {
+    try {
+      if (!dbAdapter) {
+        return { success: false, error: 'Database not initialized' };
+      }
+      const userId = currentUser?.id || 'desktop-user';
+      const result = await dbAdapter.createTask(userId, taskData);
+      return result;
+    } catch (error) {
+      console.error('Failed to create task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('tasks:update', async (event, taskId, updates) => {
+    try {
+      if (!dbAdapter) {
+        return { success: false, error: 'Database not initialized' };
+      }
+      const result = await dbAdapter.updateTask(taskId, updates);
+      return result;
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('tasks:toggle', async (event, taskId, currentStatus) => {
+    try {
+      if (!dbAdapter) {
+        return { success: false, error: 'Database not initialized' };
+      }
+      const newStatus = currentStatus === 'completed' ? 'todo' : 'completed';
+      const result = await dbAdapter.updateTask(taskId, { status: newStatus });
+      return result;
+    } catch (error) {
+      console.error('Failed to toggle task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('tasks:delete', async (event, taskId) => {
+    try {
+      if (!dbAdapter) {
+        return { success: false, error: 'Database not initialized' };
+      }
+      const result = await dbAdapter.deleteTask(taskId);
+      return result;
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+  
+  console.log('✅ All IPC handlers registered');
 }
 
 // This method will be called when Electron has finished initialization
 if (app && typeof app.whenReady === 'function') {
   app.whenReady().then(() => {
+    // Register IPC handlers FIRST, before creating any windows
+    registerAllIPCHandlers();
+    
     // Register custom protocol for OAuth callback
     protocol.registerFileProtocol('heyjarvis', (request, callback) => {
       console.log('🔗 Custom protocol handler called:', request.url);
@@ -2346,12 +2753,12 @@ app.on('before-quit', async (event) => {
       console.log('⏹️ Stopping Slack service...');
       await slackService.stop();
     }
-    
-    // Stop CRM service
+  
+  // Stop CRM service
     if (crmStartupService && typeof crmStartupService.stop === 'function') {
       console.log('⏹️ Stopping CRM service...');
-      await crmStartupService.stop();
-    }
+    await crmStartupService.stop();
+  }
     
     // Close fact-checker overlays
     if (factCheckerService && typeof factCheckerService.closeOverlay === 'function') {
@@ -2372,11 +2779,11 @@ app.on('before-quit', async (event) => {
     if (loginWindow && !loginWindow.isDestroyed()) {
       loginWindow.destroy();
     }
-    
-    // Clean up tray
+  
+  // Clean up tray
     if (tray && !tray.isDestroyed()) {
       console.log('⏹️ Destroying tray...');
-      tray.destroy();
+    tray.destroy();
     }
     
     console.log('✅ Cleanup completed');
@@ -2557,7 +2964,14 @@ ipcMain.handle('auth:sign-in-slack', async () => {
       
       // Create main window
       createWindow();
-      initializeServices();
+      
+      // Initialize services (don't let errors here crash the app)
+      try {
+        initializeServices();
+      } catch (serviceError) {
+        console.error('⚠️ Service initialization failed (non-fatal):', serviceError.message);
+        // App window is already created, so continue running
+      }
       
       return {
         success: true,

@@ -1,0 +1,416 @@
+<!-- 
+  Microsoft 365 Action Approval UI
+  Add this to unified.html
+-->
+
+<style>
+/* Approval Modal Styles */
+.ms-approval-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  animation: fadeIn 0.2s ease;
+}
+
+.ms-approval-modal.show {
+  display: flex;
+}
+
+.ms-approval-content {
+  background: white;
+  border-radius: 16px;
+  padding: 0;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.ms-approval-header {
+  padding: 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ms-approval-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.ms-approval-icon.calendar {
+  background: linear-gradient(135deg, #0078d4 0%, #5856d6 100%);
+  color: white;
+}
+
+.ms-approval-icon.email {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+}
+
+.ms-approval-header-text h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: #171717;
+}
+
+.ms-approval-header-text p {
+  font-size: 13px;
+  color: #737373;
+  margin: 0;
+}
+
+.ms-approval-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.ms-approval-section {
+  margin-bottom: 20px;
+}
+
+.ms-approval-section:last-child {
+  margin-bottom: 0;
+}
+
+.ms-approval-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #737373;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.ms-approval-value {
+  font-size: 14px;
+  color: #171717;
+  line-height: 1.5;
+}
+
+.ms-approval-value.editable {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: inherit;
+  width: 100%;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.ms-approval-value.editable:focus {
+  outline: none;
+  border-color: #0078d4;
+  background: white;
+}
+
+.ms-approval-attendees {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ms-approval-attendee {
+  background: rgba(0, 120, 212, 0.1);
+  color: #0078d4;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.ms-approval-footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.ms-approval-btn {
+  height: 40px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ms-approval-btn-reject {
+  background: rgba(0, 0, 0, 0.05);
+  color: #171717;
+}
+
+.ms-approval-btn-reject:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.ms-approval-btn-approve {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.ms-approval-btn-approve:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.ms-approval-workflow-context {
+  background: rgba(0, 120, 212, 0.05);
+  border-left: 3px solid #0078d4;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.ms-approval-workflow-context p {
+  margin: 0;
+  font-size: 13px;
+  color: #171717;
+}
+
+.ms-approval-workflow-context strong {
+  color: #0078d4;
+}
+</style>
+
+<!-- Approval Modal HTML -->
+<div class="ms-approval-modal" id="msApprovalModal">
+  <div class="ms-approval-content">
+    <div class="ms-approval-header">
+      <div class="ms-approval-icon" id="msApprovalIcon">📅</div>
+      <div class="ms-approval-header-text">
+        <h3 id="msApprovalTitle">Approve Action</h3>
+        <p id="msApprovalSubtitle">Review and approve or edit</p>
+      </div>
+    </div>
+    
+    <div class="ms-approval-body" id="msApprovalBody">
+      <!-- Content will be dynamically inserted -->
+    </div>
+    
+    <div class="ms-approval-footer">
+      <button class="ms-approval-btn ms-approval-btn-reject" onclick="rejectMicrosoftAction()">
+        Reject
+      </button>
+      <button class="ms-approval-btn ms-approval-btn-approve" onclick="approveMicrosoftAction()">
+        Approve & Send
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Microsoft 365 Approval System
+let currentApproval = null;
+
+// Listen for approval requests
+if (window.electronAPI?.onMicrosoftApprovalRequest) {
+  window.electronAPI.onMicrosoftApprovalRequest((approval) => {
+    showApprovalDialog(approval);
+  });
+}
+
+function showApprovalDialog(approval) {
+  currentApproval = approval;
+  
+  const modal = document.getElementById('msApprovalModal');
+  const icon = document.getElementById('msApprovalIcon');
+  const title = document.getElementById('msApprovalTitle');
+  const subtitle = document.getElementById('msApprovalSubtitle');
+  const body = document.getElementById('msApprovalBody');
+  
+  // Set icon and title based on type
+  if (approval.type === 'calendar_event') {
+    icon.textContent = '📅';
+    icon.className = 'ms-approval-icon calendar';
+    title.textContent = 'Approve Calendar Event';
+    subtitle.textContent = 'Review event details before creating';
+    body.innerHTML = renderCalendarApproval(approval);
+  } else if (approval.type === 'email') {
+    icon.textContent = '✉️';
+    icon.className = 'ms-approval-icon email';
+    title.textContent = 'Approve Email';
+    subtitle.textContent = 'Review email before sending';
+    body.innerHTML = renderEmailApproval(approval);
+  }
+  
+  modal.classList.add('show');
+}
+
+function renderCalendarApproval(approval) {
+  const { preview, workflow } = approval;
+  
+  return `
+    <div class="ms-approval-workflow-context">
+      <p><strong>From workflow:</strong> ${workflow.title || 'Untitled'}</p>
+      <p style="margin-top: 4px; color: #737373;">${workflow.description || ''}</p>
+    </div>
+    
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">Subject</div>
+      <input type="text" class="ms-approval-value editable" id="eventSubject" value="${preview.subject || ''}">
+    </div>
+    
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">Date & Time</div>
+      <div class="ms-approval-value">
+        ${formatDateTime(preview.startTime)} - ${formatDateTime(preview.endTime)}
+      </div>
+    </div>
+    
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">Attendees</div>
+      <div class="ms-approval-attendees">
+        ${preview.attendees.map(email => `<span class="ms-approval-attendee">${email}</span>`).join('')}
+      </div>
+    </div>
+    
+    ${preview.isOnlineMeeting ? `
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">Meeting Type</div>
+      <div class="ms-approval-value">🎥 Teams Online Meeting</div>
+    </div>
+    ` : ''}
+    
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">Description</div>
+      <textarea class="ms-approval-value editable" id="eventBody">${preview.body || ''}</textarea>
+    </div>
+  `;
+}
+
+function renderEmailApproval(approval) {
+  const { preview, workflow } = approval;
+  
+  return `
+    <div class="ms-approval-workflow-context">
+      <p><strong>From workflow:</strong> ${workflow.title || 'Untitled'}</p>
+      <p style="margin-top: 4px; color: #737373;">${workflow.description || ''}</p>
+    </div>
+    
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">To</div>
+      <div class="ms-approval-attendees">
+        ${preview.to.map(email => `<span class="ms-approval-attendee">${email}</span>`).join('')}
+      </div>
+    </div>
+    
+    ${preview.cc && preview.cc.length > 0 ? `
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">CC</div>
+      <div class="ms-approval-attendees">
+        ${preview.cc.map(email => `<span class="ms-approval-attendee">${email}</span>`).join('')}
+      </div>
+    </div>
+    ` : ''}
+    
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">Subject</div>
+      <input type="text" class="ms-approval-value editable" id="emailSubject" value="${preview.subject || ''}">
+    </div>
+    
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">Message</div>
+      <textarea class="ms-approval-value editable" id="emailBody" style="min-height: 200px;">${preview.body || ''}</textarea>
+    </div>
+    
+    <div class="ms-approval-section">
+      <div class="ms-approval-label">Priority</div>
+      <div class="ms-approval-value">${preview.importance === 'high' ? '🔴 High' : preview.importance === 'low' ? '🔵 Low' : '⚪ Normal'}</div>
+    </div>
+  `;
+}
+
+async function approveMicrosoftAction() {
+  if (!currentApproval) return;
+  
+  try {
+    // Collect edits from the form
+    const edits = {};
+    
+    if (currentApproval.type === 'calendar_event') {
+      const subject = document.getElementById('eventSubject')?.value;
+      const body = document.getElementById('eventBody')?.value;
+      if (subject) edits.subject = subject;
+      if (body) edits.body = body;
+    } else if (currentApproval.type === 'email') {
+      const subject = document.getElementById('emailSubject')?.value;
+      const body = document.getElementById('emailBody')?.value;
+      if (subject) edits.subject = subject;
+      if (body) edits.body = body;
+    }
+    
+    // Send approval to backend
+    await window.electronAPI.approveMicrosoftAction(currentApproval.approvalId, edits);
+    
+    // Close modal
+    closeApprovalDialog();
+    
+    // Show success notification
+    console.log('✅ Action approved and executed');
+  } catch (error) {
+    console.error('❌ Failed to approve action:', error);
+    alert('Failed to approve action: ' + error.message);
+  }
+}
+
+async function rejectMicrosoftAction() {
+  if (!currentApproval) return;
+  
+  try {
+    await window.electronAPI.rejectMicrosoftAction(currentApproval.approvalId);
+    closeApprovalDialog();
+    console.log('❌ Action rejected');
+  } catch (error) {
+    console.error('Failed to reject action:', error);
+  }
+}
+
+function closeApprovalDialog() {
+  document.getElementById('msApprovalModal').classList.remove('show');
+  currentApproval = null;
+}
+
+function formatDateTime(isoString) {
+  if (!isoString) return 'Not set';
+  const date = new Date(isoString);
+  return date.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && currentApproval) {
+    closeApprovalDialog();
+  }
+});
+</script>

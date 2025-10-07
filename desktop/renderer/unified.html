@@ -289,6 +289,140 @@
       border: 2px solid white;
     }
 
+    /* Microsoft 365 Button */
+    .ms-auth-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #737373;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .ms-auth-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: #171717;
+    }
+
+    .ms-auth-btn.connected {
+      color: #10b981;
+    }
+
+    .ms-auth-btn.connected:hover {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .ms-status-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #737373;
+      transition: all 0.2s ease;
+    }
+
+    .ms-auth-btn.connected .ms-status-dot {
+      background: #10b981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+      animation: msPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes msPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .ms-auth-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .ms-auth-modal.show {
+      display: flex;
+    }
+
+    .ms-auth-content {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ms-auth-content h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #171717;
+    }
+
+    .ms-auth-content p {
+      font-size: 14px;
+      color: #737373;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .ms-auth-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .ms-auth-actions button {
+      flex: 1;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .ms-auth-primary {
+      background: linear-gradient(135deg, #0078d4 0%, #5856d6 100%);
+      color: white;
+    }
+
+    .ms-auth-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+    }
+
+    .ms-auth-secondary {
+      background: rgba(0, 0, 0, 0.05);
+      color: #171717;
+    }
+
+    .ms-auth-secondary:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    @keyframes msSpinAnimation {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+
     .header-chat-container {
       display: none;
       align-items: center;
@@ -1337,13 +1471,98 @@
       background: rgba(0, 212, 255, 0.3);
       border-radius: 3px;
     }
+
+    /* User dropdown styles */
+    .user-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .user-dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: rgba(10, 10, 15, 0.98);
+      backdrop-filter: blur(20px);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 8px;
+      z-index: 10000;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .user-dropdown-content.show {
+      display: block;
+    }
+
+    .user-dropdown-item {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .user-dropdown-item:hover {
+      background: rgba(0, 212, 255, 0.1);
+      color: #00d4ff;
+    }
+
+    .user-dropdown-item svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    #appTitle {
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s ease;
+      position: relative;
+      z-index: 10;
+    }
+
+    #appTitle:hover {
+      color: #00d4ff;
+    }
+
+    .copilot-title {
+      -webkit-app-region: drag;
+    }
+
+    .user-dropdown {
+      -webkit-app-region: no-drag;
+      z-index: 100;
+    }
   </style>
 </head>
 <body class="collapsed">
   <div class="copilot-header">
     <div class="copilot-title" id="dragHandle">
       <img src="../../Jarvis.png" alt="Jarvis" class="copilot-icon">
-      <span id="appTitle">HeyJarvis</span>
+      <div class="user-dropdown">
+        <span id="appTitle" onclick="toggleUserDropdown()">HeyJarvis</span>
+        <div id="userDropdown" class="user-dropdown-content">
+          <button class="user-dropdown-item" onclick="handleLogout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Log Out
+          </button>
+        </div>
+      </div>
     </div>
     
     <div class="header-input-wrapper">
@@ -1384,6 +1603,13 @@
           <path d="m21 21-4.35-4.35"></path>
         </svg>
       </button>
+      <button class="ms-auth-btn" id="msAuthBtn" onclick="toggleMicrosoftAuth()" title="Microsoft 365">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zm12.6 0H12.6V0H24v11.4z"/>
+        </svg>
+        <span class="ms-status-dot"></span>
+      </button>
+
     </div>
     
     <div class="copilot-controls">
@@ -1996,6 +2222,49 @@
       }
     }
 
+    // User dropdown functions
+    function toggleUserDropdown() {
+      console.log('🔽 Toggle dropdown clicked');
+      const dropdown = document.getElementById('userDropdown');
+      console.log('🔽 Dropdown element:', dropdown);
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+        console.log('🔽 Dropdown classes:', dropdown.className);
+      } else {
+        console.error('❌ Dropdown element not found!');
+      }
+    }
+
+    // Close dropdown if clicking outside
+    window.addEventListener('click', function(event) {
+      if (!event.target.matches('#appTitle')) {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown && dropdown.classList.contains('show')) {
+          dropdown.classList.remove('show');
+        }
+      }
+    });
+
+    async function handleLogout() {
+      try {
+        console.log('🚪 Logging out...');
+        
+        // Close dropdown
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.remove('show');
+        
+        // Call logout API
+        if (window.electronAPI?.auth?.signOut) {
+          await window.electronAPI.auth.signOut();
+          console.log('✅ Logged out successfully');
+        } else {
+          console.error('❌ Logout API not available');
+        }
+      } catch (error) {
+        console.error('❌ Logout failed:', error);
+      }
+    }
+
     // Services initialization
     async function initializeServices() {
       if (servicesInitialized) return;
@@ -2272,9 +2541,12 @@
         if (window.electronAPI && window.electronAPI.auth) {
           const user = await window.electronAPI.auth.getUser();
           console.log('👤 User data received:', user);
+          console.log('🆔 Slack User ID:', user?.slack_user_id);
+          console.log('📧 Email:', user?.email);
+          console.log('👤 Name:', user?.name);
           
           if (user) {
-            // Update the title to show "Hey [Name]"
+            // Update the title to show "Hey [Name] (Slack ID)"
             const appTitle = document.getElementById('appTitle');
             if (appTitle) {
               // Try different name sources
@@ -2291,8 +2563,10 @@
               // Capitalize first letter
               const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
               
-              appTitle.textContent = `Hey ${capitalizedName}`;
-              console.log('✅ Title updated to: Hey', capitalizedName);
+              // Add Slack ID for debugging
+              const slackId = user.slack_user_id || 'NO_SLACK_ID';
+              appTitle.textContent = `Hey ${capitalizedName} (${slackId})`;
+              console.log('✅ Title updated to: Hey', capitalizedName, `(${slackId})`);
             }
           } else {
             console.warn('⚠️ No user data found');
@@ -2342,6 +2616,338 @@
         }
       });
     });
+
+
+    // ===== MICROSOFT 365 AUTHENTICATION =====
+    let microsoftConnected = false;
+    let microsoftUser = null;
+
+    async function toggleMicrosoftAuth() {
+      if (microsoftConnected) {
+        const confirmed = confirm(`Disconnect from Microsoft 365 (${microsoftUser})?`);
+        if (confirmed) {
+          microsoftConnected = false;
+          microsoftUser = null;
+          updateMicrosoftButton();
+        }
+      } else {
+        document.getElementById('msAuthModal').classList.add('show');
+      }
+    }
+
+    function closeMicrosoftModal() {
+      document.getElementById('msAuthModal').classList.remove('show');
+    }
+
+    async function authenticateMicrosoft() {
+      try {
+        console.log('🔐 Starting Microsoft authentication...');
+        const modal = document.getElementById('msAuthModal');
+        const content = modal.querySelector('.ms-auth-content');
+        content.innerHTML = `
+          <h3>Authenticating...</h3>
+          <p style="text-align: center;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: msSpinAnimation 1s linear infinite;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+          </p>
+          <p>Opening your browser for authentication...</p>
+        `;
+        
+        const result = await window.electronAPI.microsoft.authenticate();
+        
+        if (result.success) {
+          console.log('✅ Microsoft authenticated:', result.account);
+          microsoftConnected = true;
+          microsoftUser = result.account.username;
+          updateMicrosoftButton();
+          
+          content.innerHTML = `
+            <h3>✅ Connected!</h3>
+            <p>Successfully connected to Microsoft 365 as <strong>${result.account.username}</strong></p>
+            <div class="ms-auth-actions">
+              <button class="ms-auth-primary" onclick="closeMicrosoftModal()" style="width: 100%;">Done</button>
+            </div>
+          `;
+          
+          setTimeout(() => closeMicrosoftModal(), 2000);
+        } else {
+          throw new Error(result.error || 'Authentication failed');
+        }
+      } catch (error) {
+        console.error('❌ Microsoft authentication failed:', error);
+        const content = document.querySelector('.ms-auth-content');
+        content.innerHTML = `
+          <h3>❌ Authentication Failed</h3>
+          <p style="color: #ef4444;">${error.message}</p>
+          <div class="ms-auth-actions">
+            <button class="ms-auth-secondary" onclick="closeMicrosoftModal()">Close</button>
+            <button class="ms-auth-primary" onclick="authenticateMicrosoft()">Try Again</button>
+          </div>
+        `;
+      }
+    }
+
+    function updateMicrosoftButton() {
+      const btn = document.getElementById('msAuthBtn');
+      if (microsoftConnected) {
+        btn.classList.add('connected');
+        btn.title = `Microsoft 365 Connected (${microsoftUser}) - Click to disconnect`;
+      } else {
+        btn.classList.remove('connected');
+        btn.title = 'Connect Microsoft 365';
+      }
+    }
+
+    async function checkMicrosoftConnection() {
+      try {
+        if (window.electronAPI?.microsoft?.getUserProfile) {
+          const result = await window.electronAPI.microsoft.getUserProfile();
+          if (result.success) {
+            microsoftConnected = true;
+            microsoftUser = result.user.mail || result.user.userPrincipalName;
+            updateMicrosoftButton();
+            console.log('✅ Microsoft 365 already connected:', microsoftUser);
+          }
+        }
+      } catch (error) {
+        console.log('ℹ️ Microsoft 365 not connected');
+      }
+    }
+
+    setTimeout(checkMicrosoftConnection, 1000);
+
+    // ===== MEETING APPROVAL SYSTEM =====
+    let pendingMeeting = null;
+
+    function showMeetingApproval(meetingData) {
+      pendingMeeting = meetingData;
+      const modal = document.getElementById('meetingApprovalModal');
+      const detailsDiv = document.getElementById('meetingDetails');
+      
+      // Format the meeting time
+      const startTime = new Date(meetingData.startTime);
+      const endTime = new Date(meetingData.endTime);
+      const timeOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZone: meetingData.timeZone || 'America/Denver'
+      };
+      
+      detailsDiv.innerHTML = `
+        <div style="margin-bottom: 12px;">
+          <strong style="color: #666; font-size: 12px; text-transform: uppercase;">Subject</strong>
+          <div style="font-size: 16px; font-weight: 600; margin-top: 4px;">${meetingData.subject}</div>
+        </div>
+        <div style="margin-bottom: 12px;">
+          <strong style="color: #666; font-size: 12px; text-transform: uppercase;">When</strong>
+          <div style="font-size: 14px; margin-top: 4px;">
+            ${startTime.toLocaleString('en-US', timeOptions)}
+          </div>
+          <div style="font-size: 13px; color: #666; margin-top: 2px;">
+            Duration: ${Math.round((endTime - startTime) / 60000)} minutes
+          </div>
+        </div>
+        ${meetingData.attendeeList && meetingData.attendeeList.length > 0 ? `
+          <div style="margin-bottom: 12px;">
+            <strong style="color: #666; font-size: 12px; text-transform: uppercase;">Attendees (To Be Added Manually)</strong>
+            <div style="font-size: 14px; margin-top: 4px;">
+              ${meetingData.attendeeList.map(email => `
+                <div style="display: flex; align-items: center; margin-top: 4px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  ${email}
+                </div>
+              `).join('')}
+            </div>
+            <div style="font-size: 12px; color: #f59e0b; margin-top: 8px; padding: 8px; background: #fffbeb; border-radius: 4px;">
+              💡 These attendees will NOT be added automatically to avoid email delivery issues. You can add them in Outlook or share the Teams link directly.
+            </div>
+          </div>
+        ` : ''}
+        ${meetingData.isOnlineMeeting ? `
+          <div style="margin-bottom: 12px;">
+            <strong style="color: #666; font-size: 12px; text-transform: uppercase;">Meeting Type</strong>
+            <div style="font-size: 14px; margin-top: 4px; display: flex; align-items: center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B5FC7" stroke-width="2" style="margin-right: 6px;">
+                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                <polyline points="17 2 12 7 7 2"></polyline>
+              </svg>
+              <span style="color: #5B5FC7; font-weight: 500;">Microsoft Teams Online Meeting</span>
+            </div>
+          </div>
+        ` : ''}
+        ${meetingData.body ? `
+          <div style="margin-bottom: 12px;">
+            <strong style="color: #666; font-size: 12px; text-transform: uppercase;">Description</strong>
+            <div style="font-size: 13px; margin-top: 4px; color: #666;">${meetingData.body}</div>
+          </div>
+        ` : ''}
+      `;
+      
+      modal.style.display = 'flex';
+      modal.classList.add('show');
+    }
+
+    async function approveMeeting() {
+      if (!pendingMeeting) return;
+      
+      const modal = document.getElementById('meetingApprovalModal');
+      const content = modal.querySelector('.ms-auth-content');
+      
+      // Show loading state
+      content.innerHTML = `
+        <h3>Creating Meeting...</h3>
+        <p style="text-align: center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: msSpinAnimation 1s linear infinite;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+        </p>
+        <p>Creating calendar event and sending invitations...</p>
+      `;
+      
+      try {
+        // Call the backend to create the meeting
+        console.log('🔄 Creating meeting with data:', pendingMeeting);
+        const result = await window.electronAPI.microsoft.createEvent(pendingMeeting);
+        console.log('📅 Meeting creation result:', result);
+        
+        if (result.success) {
+          // Extract meeting link from various possible locations
+          const meetingLink = result.meetingLink 
+            || result.event?.onlineMeeting?.joinUrl 
+            || result.event?.webLink;
+          
+          console.log('✅ Meeting created successfully!', {
+            eventId: result.event?.id,
+            meetingLink: meetingLink,
+            subject: result.event?.subject
+          });
+          
+          content.innerHTML = `
+            <h3>✅ Meeting Created!</h3>
+            <p>The calendar event has been created on your calendar${meetingLink ? ' with a Teams meeting link' : ''}.</p>
+            ${meetingLink ? `
+              <div style="background: #f0f9ff; border: 1px solid #0ea5e9; padding: 12px; border-radius: 6px; margin: 16px 0;">
+                <strong style="color: #0369a1;">📋 Teams Meeting Link:</strong>
+                <div style="font-size: 12px; word-break: break-all; margin-top: 6px; color: #0369a1; user-select: all;">
+                  ${meetingLink}
+                </div>
+                <button onclick="navigator.clipboard.writeText('${meetingLink}'); this.textContent='✓ Copied!'" style="margin-top: 8px; padding: 6px 12px; background: #0ea5e9; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                  Copy Link
+                </button>
+              </div>
+            ` : `
+              <div style="background: #fffbeb; border: 1px solid #f59e0b; padding: 12px; border-radius: 6px; margin: 16px 0; font-size: 13px;">
+                <strong style="color: #d97706;">⚠️ Teams Link Not Available Yet</strong>
+                <p style="margin: 8px 0 0 0; color: #92400e;">The meeting was created but the Teams link may take a moment to generate. Check the meeting in your Outlook calendar in a few seconds.</p>
+              </div>
+            `}
+            <div style="background: #fffbeb; border: 1px solid #f59e0b; padding: 12px; border-radius: 6px; margin: 16px 0; font-size: 13px;">
+              <strong style="color: #d97706;">Next Steps:</strong>
+              <ol style="margin: 8px 0 0 20px; color: #92400e;">
+                ${meetingLink ? '<li>Copy the Teams link above</li>' : '<li>Open the meeting in Outlook to get the Teams link</li>'}
+                <li>Share it with attendees via email, Slack, or any messaging app</li>
+                <li>Or add attendees directly in Outlook</li>
+              </ol>
+            </div>
+            <div class="ms-auth-actions">
+              <button class="ms-auth-primary" onclick="closeMeetingApproval()" style="width: 100%;">Done</button>
+            </div>
+          `;
+          
+          // Don't auto-close if there's no meeting link yet
+          if (meetingLink) {
+            setTimeout(() => closeMeetingApproval(), 5000);
+          }
+        } else {
+          throw new Error(result.error || 'Failed to create meeting');
+        }
+      } catch (error) {
+        console.error('❌ Failed to create meeting:', error);
+        content.innerHTML = `
+          <h3>❌ Meeting Creation Failed</h3>
+          <p style="color: #ef4444;">${error.message}</p>
+          <p style="font-size: 13px; color: #666; margin-top: 12px;">The meeting was not created. Please try again or create it manually in Outlook.</p>
+          <div class="ms-auth-actions">
+            <button class="ms-auth-secondary" onclick="closeMeetingApproval()">Close</button>
+            <button class="ms-auth-primary" onclick="retryMeetingCreation()">Try Again</button>
+          </div>
+        `;
+      }
+    }
+
+    function retryMeetingCreation() {
+      if (pendingMeeting) {
+        showMeetingApproval(pendingMeeting);
+      }
+    }
+
+    function rejectMeeting() {
+      pendingMeeting = null;
+      closeMeetingApproval();
+      
+      // Optionally add a message to chat
+      addMessage('Meeting creation cancelled.', 'assistant');
+    }
+
+    function closeMeetingApproval() {
+      const modal = document.getElementById('meetingApprovalModal');
+      modal.style.display = 'none';
+      modal.classList.remove('show');
+      pendingMeeting = null;
+    }
+
+    // Listen for meeting approval requests from main process
+    if (window.electronAPI && window.electronAPI.onMeetingApprovalRequest) {
+      window.electronAPI.onMeetingApprovalRequest((meetingData) => {
+        showMeetingApproval(meetingData);
+      });
+    }
+
   </script>
+
+  <!-- Microsoft 365 Auth Modal -->
+  <div class="ms-auth-modal" id="msAuthModal">
+    <div class="ms-auth-content">
+      <h3>Connect Microsoft 365</h3>
+      <p>Connect your Microsoft account to enable calendar automation, email notifications, and Teams integration.</p>
+      <div class="ms-auth-actions">
+        <button class="ms-auth-secondary" onclick="closeMicrosoftModal()">Cancel</button>
+        <button class="ms-auth-primary" onclick="authenticateMicrosoft()">Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meeting Approval Modal -->
+  <div class="ms-auth-modal" id="meetingApprovalModal" style="display: none;">
+    <div class="ms-auth-content" style="max-width: 500px;">
+      <h3>📅 Approve Meeting</h3>
+      <div id="meetingDetails" style="background: #f5f5f5; padding: 16px; border-radius: 8px; margin: 16px 0; text-align: left;">
+        <!-- Meeting details will be inserted here -->
+      </div>
+      <p style="font-size: 13px; color: #666; margin-bottom: 16px;">
+        💡 <strong>Note:</strong> The meeting will be created on your calendar with a Teams link. Attendees are NOT added automatically to avoid email delivery issues. You can add them manually in Outlook or share the Teams link directly.
+      </p>
+      <div class="ms-auth-actions">
+        <button class="ms-auth-secondary" onclick="rejectMeeting()">Cancel</button>
+        <button class="ms-auth-primary" onclick="approveMeeting()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; vertical-align: middle;">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Create Meeting
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

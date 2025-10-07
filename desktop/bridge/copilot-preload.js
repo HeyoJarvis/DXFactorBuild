@@ -179,6 +179,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getSlackUserInfo: (slackUserId) => ipcRenderer.invoke('tasks:getSlackUserInfo', slackUserId)
   },
   
+
+  // Microsoft 365 API
+  microsoft: {
+    authenticate: () => ipcRenderer.invoke('microsoft:authenticate'),
+    createEvent: (eventData) => ipcRenderer.invoke('microsoft:createEvent', eventData),
+    sendEmail: (emailData) => ipcRenderer.invoke('microsoft:sendEmail', emailData),
+    executeWorkflowActions: (workflow, userEmails) => ipcRenderer.invoke('microsoft:executeWorkflowActions', workflow, userEmails),
+    findMeetingTimes: (attendees, durationMinutes, options) => ipcRenderer.invoke('microsoft:findMeetingTimes', attendees, durationMinutes, options),
+    getUserProfile: () => ipcRenderer.invoke('microsoft:getUserProfile')
+  },
+
+  // Meeting approval event listener
+  onMeetingApprovalRequest: (callback) => {
+    ipcRenderer.on('meeting:approval-request', (event, meetingData) => callback(meetingData));
+  },
+
   // Copilot API
   copilot: {
     sendMessage: (message) => ipcRenderer.invoke('copilot:sendMessage', message),

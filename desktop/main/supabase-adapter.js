@@ -454,7 +454,25 @@ class DesktopSupabaseAdapter {
         .order('last_activity_at', { ascending: false })
         .limit(limit);
 
-      const { data, error } = await query;
+      
+    console.log('🔍 Task query params:', {
+      userId,
+      userSlackId,
+      filters
+    });
+    
+    const { data, error } = await query;
+
+    console.log('🔍 Raw query result:', {
+      taskCount: data?.length || 0,
+      error: error?.message,
+      sampleTask: data?.[0] ? {
+        id: data[0].id,
+        title: data[0].session_title,
+        user_id: data[0].user_id,
+        workflow_metadata: data[0].workflow_metadata
+      } : null
+    });
 
       if (error) throw error;
 
@@ -578,147 +596,143 @@ class DesktopSupabaseAdapter {
 
   /**
    * Get user's tasks (conversation_sessions where workflow_type='task')
-   */
-  async getUserTasks(userId, filters = {}) {
-    try {
-      // Get user's Slack ID for filtering
-      const { data: userData } = await this.supabase
-        .from('users')
-        .select('slack_user_id')
-        .eq('id', userId)
-        .single();
-      
-      const userSlackId = userData?.slack_user_id;
-      
-      let query = this.supabase
-        .from('conversation_sessions')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('workflow_type', 'task');
+   * */
+async getUserTasks(userId, filters = {}) {
+  try {
+    // Get user's Slack ID for filtering
+    const { data: userData } = await this.supabase
+      .from('users')
+      .select('slack_user_id')
+      .eq('id', userId)
+      .single();
+    
+    const userSlackId = userData?.slack_user_id;
+    
+    // Get ALL tasks, then filter in JavaScript
+    let query = this.supabase
+      .from('conversation_sessions')
+      .select('*')
+      .eq('workflow_type', 'task');
 
-      // Filter by completion status
-      if (!filters.includeCompleted) {
-        query = query.eq('is_completed', false);
-      }
-
-      // Filter by priority (stored in workflow_metadata)
-      if (filters.priority) {
-        query = query.contains('workflow_metadata', { priority: filters.priority });
-      }
-
-      // Sort by creation time
-      query = query.order('started_at', { ascending: false });
-
-      const limit = filters.limit || 50;
-      query = query.limit(limit);
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      // Transform to task format for UI compatibility
-      let tasks = (data || []).map(session => ({
-        id: session.id,
-        user_id: session.user_id,
-        title: session.session_title,
-        description: session.workflow_metadata?.description || null,
-        status: session.is_completed ? 'completed' : 'todo',
-        priority: session.workflow_metadata?.priority || 'medium',
-        tags: session.workflow_metadata?.tags || [],
-        due_date: session.workflow_metadata?.due_date || null,
-        parent_session_id: session.workflow_metadata?.parent_session_id || null,
-        assignor: session.workflow_metadata?.assignor || null,
-        assignee: session.workflow_metadata?.assignee || null,
-        mentioned_users: session.workflow_metadata?.mentioned_users || [],
-        created_at: session.started_at,
-        updated_at: session.last_activity_at,
-        completed_at: session.completed_at
-      }));
-
-      // Apply assignment view filtering
-      const assignmentView = filters.assignmentView || 'assigned_to_me';
-      
-      if (userSlackId && assignmentView !== 'all') {
-        this.logger.info('Applying assignment filter', { 
-          assignmentView, 
-          userSlackId,
-          totalTasks: tasks.length
-        });
-
-        if (assignmentView === 'assigned_by_me') {
-          // Show tasks where user is assignor but NOT assignee (delegated to others)
-          tasks = tasks.filter(task => {
-            const isAssignor = task.assignor === userSlackId;
-            const isAssignee = task.assignee === userSlackId;
-            
-            // Check if title starts with someone else's name (e.g., "John, can you...")
-            const startsWithName = /^([A-Z][a-z]+),?\s+(can|could|please|would you|will you)/i.test(task.title);
-            
-            // Include if:
-            // - Has a different assignee, OR
-            // - Starts with someone else's name (intended delegation even if assignee not found)
-            const hasDifferentAssignee = task.assignee && !isAssignee;
-            const isIntendedDelegation = isAssignor && startsWithName && !isAssignee;
-            const matches = isAssignor && (hasDifferentAssignee || isIntendedDelegation);
-            
-            this.logger.debug('Filter assigned_by_me', {
-              title: task.title,
-              assignor: task.assignor,
-              assignee: task.assignee,
-              userSlackId,
-              isAssignor,
-              isAssignee,
-              startsWithName,
-              hasDifferentAssignee,
-              isIntendedDelegation,
-              matches
-            });
-            
-            return matches;
-          });
-        } else if (assignmentView === 'assigned_to_me') {
-          // Show tasks where user is assignee OR self-created without someone else's name
-          tasks = tasks.filter(task => {
-            // Check if title starts with someone else's name (e.g., "John, can you...")
-            const startsWithName = /^([A-Z][a-z]+),?\s+(can|could|please|would you|will you)/i.test(task.title);
-            
-            // Include if:
-            // - Explicitly assigned to this user
-            // - Self-assigned (assignor == assignee == this user)
-            // - Created by user with no assignee and doesn't start with someone else's name
-            const isAssignee = task.assignee === userSlackId;
-            const isSelfAssigned = task.assignor === userSlackId && task.assignee === userSlackId;
-            const isSelfCreatedNoDelegate = task.assignor === userSlackId && !task.assignee && !startsWithName;
-            const matches = isAssignee || isSelfAssigned || isSelfCreatedNoDelegate;
-            
-            this.logger.debug('Filter assigned_to_me', {
-              title: task.title,
-              assignor: task.assignor,
-              assignee: task.assignee,
-              userSlackId,
-              startsWithName,
-              isAssignee,
-              isSelfAssigned,
-              isSelfCreatedNoDelegate,
-              matches
-            });
-            
-            return matches;
-          });
-        }
-
-        this.logger.info('Filtered tasks result', { 
-          assignmentView, 
-          filteredCount: tasks.length 
-        });
-      }
-
-      return { success: true, tasks };
-    } catch (error) {
-      this.logger.error('Failed to get tasks', { error: error.message });
-      return { success: false, error: error.message, tasks: [] };
+    // Filter by completion status
+    if (!filters.includeCompleted) {
+      query = query.eq('is_completed', false);
     }
+
+    // Sort by creation time
+    query = query.order('started_at', { ascending: false });
+
+    const limit = filters.limit || 100;  // Increased limit
+    query = query.limit(limit);
+
+    console.log('🔍 Task query params:', {
+      userId,
+      userSlackId,
+      includeCompleted: filters.includeCompleted,
+      limit
+    });
+
+    const { data, error } = await query;
+
+    console.log('🔍 Raw query result:', {
+      taskCount: data?.length || 0,
+      error: error?.message,
+      firstTask: data?.[0] ? {
+        id: data[0].id,
+        title: data[0].session_title,
+        metadata: data[0].workflow_metadata
+      } : null
+    });
+
+    if (error) {
+      console.error('❌ Supabase query error:', error);
+      throw error;
+    }
+
+    // Transform to task format
+    let tasks = (data || []).map(session => ({
+      id: session.id,
+      user_id: session.user_id,
+      title: session.session_title,
+      description: session.workflow_metadata?.description || null,
+      status: session.is_completed ? 'completed' : 'todo',
+      priority: session.workflow_metadata?.priority || 'medium',
+      tags: session.workflow_metadata?.tags || [],
+      due_date: session.workflow_metadata?.due_date || null,
+      parent_session_id: session.workflow_metadata?.parent_session_id || null,
+      assignor: session.workflow_metadata?.assignor || null,
+      assignee: session.workflow_metadata?.assignee || null,
+      mentioned_users: session.workflow_metadata?.mentioned_users || [],
+      created_at: session.started_at,
+      updated_at: session.last_activity_at,
+      completed_at: session.completed_at
+    }));
+
+    // NOW filter by user involvement (owner, assignor, or assignee)
+    if (userSlackId) {
+      tasks = tasks.filter(task => {
+        const isOwner = task.user_id === userId;
+        const isAssignor = task.assignor === userSlackId;
+        const isAssignee = task.assignee === userSlackId;
+        
+        return isOwner || isAssignor || isAssignee;
+      });
+    } else {
+      // Fallback to just owned tasks if no Slack ID
+      tasks = tasks.filter(task => task.user_id === userId);
+    }
+
+    // Apply assignment view filtering
+    const assignmentView = filters.assignmentView || 'assigned_to_me';
+    
+    if (userSlackId && assignmentView !== 'all') {
+      this.logger.info('Applying assignment filter', { 
+        assignmentView, 
+        userSlackId,
+        totalTasks: tasks.length
+      });
+
+      if (assignmentView === 'assigned_by_me') {
+        // Show tasks where user is assignor but NOT assignee (delegated to others)
+        tasks = tasks.filter(task => {
+          const isAssignor = task.assignor === userSlackId;
+          const isAssignee = task.assignee === userSlackId;
+          
+          // Check if title starts with someone else's name
+          const startsWithName = /^([A-Z][a-z]+),?\s+(can|could|please|would you|will you)/i.test(task.title);
+          
+          const hasDifferentAssignee = task.assignee && !isAssignee;
+          const isIntendedDelegation = isAssignor && startsWithName && !isAssignee;
+          const matches = isAssignor && (hasDifferentAssignee || isIntendedDelegation);
+          
+          return matches;
+        });
+      } else if (assignmentView === 'assigned_to_me') {
+        // Show tasks where user is assignee OR self-created
+        tasks = tasks.filter(task => {
+          const startsWithName = /^([A-Z][a-z]+),?\s+(can|could|please|would you|will you)/i.test(task.title);
+          
+          const isAssignee = task.assignee === userSlackId;
+          const isSelfAssigned = task.assignor === userSlackId && task.assignee === userSlackId;
+          const isSelfCreatedNoDelegate = task.assignor === userSlackId && !task.assignee && !startsWithName;
+          const matches = isAssignee || isSelfAssigned || isSelfCreatedNoDelegate;
+          
+          return matches;
+        });
+      }
+
+      this.logger.info('Filtered tasks result', { 
+        assignmentView, 
+        filteredCount: tasks.length 
+      });
+    }
+
+    return { success: true, tasks };
+  } catch (error) {
+    this.logger.error('Failed to get tasks', { error: error.message });
+    return { success: false, error: error.message, tasks: [] };
   }
+}
 
   /**
    * Update a task
