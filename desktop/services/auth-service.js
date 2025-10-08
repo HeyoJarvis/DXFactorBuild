@@ -468,6 +468,23 @@ class AuthService {
   }
   
   /**
+   * Get current session token for API calls
+   */
+  getSessionToken() {
+    if (this.currentSession && this.currentSession.access_token) {
+      return this.currentSession.access_token;
+    }
+    
+    // Try to get from stored session
+    const storedSession = this.store.get('session');
+    if (storedSession && storedSession.access_token) {
+      return storedSession.access_token;
+    }
+    
+    return null;
+  }
+  
+  /**
    * Sign out
    */
   async signOut() {

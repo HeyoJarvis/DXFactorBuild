@@ -18,6 +18,7 @@ const AuthService = require('./services/auth-service');
 const FactCheckerService = require('./main/fact-checker-service');
 const MicrosoftOAuthHandler = require('../oauth/microsoft-oauth-handler');
 const MicrosoftWorkflowAutomation = require('../core/automation/microsoft-workflow-automation');
+const EngineeringIntelligenceService = require('../core/intelligence/engineering-intelligence-service');
 
 // Global error handlers to prevent crashes
 process.on('uncaughtException', (error) => {
@@ -43,6 +44,7 @@ let authService; // Authentication service
 let factCheckerService; // Fact-checker service
 let microsoftOAuthHandler; // Microsoft OAuth handler
 let microsoftAutomation; // Microsoft workflow automation
+let engineeringIntelligence; // Engineering intelligence service
 let currentUser = null; // Currently authenticated user
 let conversationHistory = []; // Store conversation history
 let currentSessionId = null; // Track current conversation session
@@ -841,6 +843,29 @@ function initializeServices() {
     microsoftOAuthHandler = null;
   }
   
+  // Initialize Engineering Intelligence (optional - only if GitHub token is configured)
+  if (process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN !== 'your_github_token_here') {
+    try {
+      engineeringIntelligence = new EngineeringIntelligenceService({
+        githubToken: process.env.GITHUB_TOKEN,
+        repository: {
+          owner: process.env.GITHUB_REPO_OWNER,
+          repo: process.env.GITHUB_REPO_NAME
+        },
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ Engineering Intelligence initialized');
+      console.log(`📊 Monitoring repository: ${process.env.GITHUB_REPO_OWNER}/${process.env.GITHUB_REPO_NAME}`);
+    } catch (error) {
+      console.warn('⚠️ Engineering Intelligence initialization failed:', error.message);
+      console.log('💡 Engineering queries will be disabled. Add GITHUB_TOKEN to .env to enable.');
+      engineeringIntelligence = null;
+    }
+  } else {
+    console.log('ℹ️ Engineering Intelligence not configured (optional - add GITHUB_TOKEN to .env)');
+    engineeringIntelligence = null;
+  }
+  
   workflowIntelligence = new WorkflowIntelligenceSystem({
     logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
     analysisWindow: 7, // days
@@ -1226,6 +1251,9 @@ ACTIVE INTEGRATIONS:
 ${microsoftAutomation ? `- ✅ Microsoft 365: AUTHENTICATED and ACTIVE - You CAN schedule meetings, send emails, and create calendar events
 - ✅ Outlook Calendar: Direct access to create calendar events with Teams meeting links
 - ✅ Microsoft Teams: Can create online meetings with join links` : '- ❌ Microsoft 365: Not authenticated (user needs to connect)'}
+${engineeringIntelligence ? `- ✅ Engineering Intelligence: ACTIVE - You CAN query the codebase and answer questions about engineering work
+- ✅ GitHub Integration: Access to repository, PRs, issues, and code understanding
+- ✅ Feature Status Tracking: Can check implementation status, demo-ability, and completion estimates` : '- ❌ Engineering Intelligence: Not configured'}
 
 WHAT YOU CAN DO:
 - Analyze Slack conversations and mentions
@@ -1236,6 +1264,10 @@ WHAT YOU CAN DO:
 ${microsoftAutomation ? `- **SCHEDULE REAL MEETINGS** via Microsoft Outlook (you WILL execute this, not just suggest it)
 - **SEND REAL EMAILS** via Microsoft Outlook (you WILL execute this, not just suggest it)
 - **CREATE CALENDAR EVENTS** with Teams meeting links (this WILL happen automatically)` : ''}
+${engineeringIntelligence ? `- **QUERY THE CODEBASE** to answer questions about engineering work (you WILL execute this, not just suggest it)
+- **CHECK FEATURE STATUS** to see what's built, in progress, or planned
+- **ASSESS DEMO-ABILITY** to tell if features are ready to show customers
+- **PROVIDE ENGINEERING INSIGHTS** for sales, marketing, and product teams` : ''}
 
 ${microsoftAutomation ? `⚠️ CRITICAL: You HAVE the ability to schedule meetings. Do NOT say you cannot. Do NOT suggest the user do it manually.
 
@@ -1252,6 +1284,21 @@ EXAMPLE USER REQUEST: "Schedule a meeting with shail@heyjarvis.ai tomorrow at 3p
 CORRECT RESPONSE: "[SCHEDULE_MEETING: attendees=shail@heyjarvis.ai, time=2025-10-08T15:00, subject=Dashboard Discussion] I'll create this meeting for you right now. The calendar invite will be sent momentarily."
 
 The system will automatically execute the meeting creation and update your response with confirmation.` : ''}
+
+${engineeringIntelligence ? `⚠️ CRITICAL: You HAVE the ability to query the codebase. Do NOT say you cannot. Do NOT suggest the user ask engineers directly.
+
+ENGINEERING QUERY INSTRUCTIONS:
+When the user asks about engineering work, features, or code, you MUST:
+1. Detect if it's an engineering question (features, status, implementation, code, etc.)
+2. Include this EXACT marker format in your response:
+   [ENGINEERING_QUERY: question=What is the status of the SSO feature?, role=sales]
+3. Role should be: sales, marketing, product, or executive (based on context or default to executive)
+4. After the marker, you can add text like "Let me check the codebase for you..."
+
+EXAMPLE USER REQUEST: "Is the SSO feature ready for the enterprise deal?"
+CORRECT RESPONSE: "[ENGINEERING_QUERY: question=Is the SSO feature ready for the enterprise deal?, role=sales] Let me check the codebase and recent development activity..."
+
+The system will automatically query the codebase and update your response with detailed information.` : ''}
 
 Respond as a knowledgeable business AI assistant. Reference the actual Slack and CRM data when relevant. Be conversational and helpful.`;
 
@@ -1330,6 +1377,83 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
           console.log('⚠️ Detected scheduling request but AI did not use marker format');
           console.log('💡 Adding reminder to AI response');
           aiResponse += `\n\n⚠️ **Note:** To actually execute the meeting creation, please ask me again and I'll use the proper format to trigger the calendar integration.`;
+        }
+      }
+      
+      // 📊 Check for engineering query marker and auto-execute
+      const engineeringMarkerRegex = /\[ENGINEERING_QUERY:\s*question=([^,]+),\s*role=([^\]]+)\]/i;
+      const engineeringMatch = aiResponse.match(engineeringMarkerRegex);
+      
+      console.log('🔍 Checking for engineering query marker in AI response...');
+      console.log('🎯 Engineering marker found:', !!engineeringMatch);
+      console.log('🔧 Engineering intelligence API available:', !!process.env.API_BASE_URL);
+      
+      if (engineeringMatch) {
+        console.log('📊 Engineering query detected in AI response!');
+        
+        const [, question, role] = engineeringMatch;
+        
+        try {
+          console.log('📊 Querying codebase via API:', { question, role });
+          
+          // Get user's session token from auth service
+          const sessionToken = authService ? authService.getSessionToken() : null;
+          
+          if (!sessionToken) {
+            throw new Error('No authentication token available');
+          }
+          
+          // Call backend API for engineering intelligence
+          const apiUrl = process.env.API_BASE_URL || 'http://localhost:3002';
+          console.log('🔗 Engineering API URL:', apiUrl);
+          const response = await fetch(`${apiUrl}/api/engineering/query`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionToken}`
+            },
+            body: JSON.stringify({
+              query: question,
+              context: { role }
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `API request failed with status ${response.status}`);
+          }
+          
+          const engineeringData = await response.json();
+          const engineeringResponse = engineeringData.result;
+          
+          // Remove the marker from the response and add engineering insights
+          aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
+          aiResponse += `\n\n📊 **Engineering Insights:**\n\n${engineeringResponse.summary}`;
+          
+          if (engineeringResponse.businessImpact) {
+            aiResponse += `\n\n💼 **Business Impact:**\n${engineeringResponse.businessImpact}`;
+          }
+          
+          if (engineeringResponse.actionItems && engineeringResponse.actionItems.length > 0) {
+            aiResponse += `\n\n✅ **Action Items:**\n${engineeringResponse.actionItems.map(item => `- ${item}`).join('\n')}`;
+          }
+          
+          if (engineeringResponse.technicalDetails) {
+            aiResponse += `\n\n<details>\n<summary>🔧 Technical Details (click to expand)</summary>\n\n${engineeringResponse.technicalDetails}\n</details>`;
+          }
+          
+          console.log('✅ Engineering query completed successfully');
+          
+        } catch (error) {
+          console.error('❌ Failed to query codebase:', error);
+          aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
+          aiResponse += `\n\n⚠️ **Engineering Query Failed**\n\nI encountered an error while querying the codebase: ${error.message}. The engineering intelligence system may need configuration.`;
+        }
+      } else {
+        // Check if the user is asking about engineering but AI didn't use the marker
+        const engineeringKeywords = /\b(feature|code|implementation|built|develop|engineering|sprint|pr|pull request|commit)\b/i;
+        if (engineeringKeywords.test(message) && !aiResponse.includes('ENGINEERING_QUERY')) {
+          console.log('ℹ️ Detected potential engineering question but AI did not use marker format');
         }
       }
       
