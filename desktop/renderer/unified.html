@@ -1609,6 +1609,15 @@
         </svg>
         <span class="ms-status-dot"></span>
       </button>
+      <button class="ms-auth-btn" id="googleAuthBtn" onclick="toggleGoogleAuth()" title="Google Workspace">
+        <svg width="16" height="16" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <span class="ms-status-dot"></span>
+      </button>
 
     </div>
     
@@ -2700,6 +2709,90 @@
       }
     }
 
+    // ===== GOOGLE WORKSPACE AUTHENTICATION =====
+    let googleConnected = false;
+    let googleUser = null;
+
+    async function toggleGoogleAuth() {
+      console.log('🔘 Google button clicked, googleConnected:', googleConnected);
+      if (googleConnected) {
+        const confirmed = confirm(`Disconnect from Google Workspace (${googleUser})?`);
+        if (confirmed) {
+          googleConnected = false;
+          googleUser = null;
+          updateGoogleButton();
+        }
+      } else {
+        console.log('📂 Opening Google auth modal');
+        document.getElementById('googleAuthModal').classList.add('show');
+      }
+    }
+
+    function closeGoogleModal() {
+      document.getElementById('googleAuthModal').classList.remove('show');
+    }
+
+    async function authenticateGoogle() {
+      try {
+        console.log('🔐 Starting Google authentication...');
+        const modal = document.getElementById('googleAuthModal');
+        const content = modal.querySelector('.ms-auth-content');
+        content.innerHTML = `
+          <h3>Authenticating...</h3>
+          <p style="text-align: center;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: msSpinAnimation 1s linear infinite;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+          </p>
+          <p>Opening your browser for authentication...</p>
+        `;
+        
+        const result = await window.electronAPI.google.authenticate();
+        
+        if (result.success) {
+          console.log('✅ Google authenticated:', result.account);
+          googleConnected = true;
+          googleUser = result.account.email;
+          updateGoogleButton();
+          
+          content.innerHTML = `
+            <h3>✅ Connected!</h3>
+            <p>Successfully connected to Google Workspace as <strong>${result.account.email}</strong></p>
+            <div class="ms-auth-actions">
+              <button class="ms-auth-primary" onclick="closeGoogleModal()" style="width: 100%;">Done</button>
+            </div>
+          `;
+          
+          setTimeout(() => closeGoogleModal(), 2000);
+        } else {
+          throw new Error(result.error || 'Authentication failed');
+        }
+      } catch (error) {
+        console.error('❌ Google authentication failed:', error);
+        const content = document.querySelector('#googleAuthModal .ms-auth-content');
+        content.innerHTML = `
+          <h3>❌ Authentication Failed</h3>
+          <p style="color: #ef4444;">${error.message}</p>
+          <div class="ms-auth-actions">
+            <button class="ms-auth-secondary" onclick="closeGoogleModal()">Close</button>
+            <button class="ms-auth-primary" onclick="authenticateGoogle()">Try Again</button>
+          </div>
+        `;
+      }
+    }
+
+    function updateGoogleButton() {
+      const btn = document.getElementById('googleAuthBtn');
+      if (googleConnected) {
+        btn.classList.add('connected');
+        btn.title = `Google Workspace Connected (${googleUser}) - Click to disconnect`;
+      } else {
+        btn.classList.remove('connected');
+        btn.title = 'Connect Google Workspace';
+      }
+    }
+
     async function checkMicrosoftConnection() {
       try {
         if (window.electronAPI?.microsoft?.getUserProfile) {
@@ -2815,9 +2908,14 @@
       `;
       
       try {
-        // Call the backend to create the meeting
-        console.log('🔄 Creating meeting with data:', pendingMeeting);
-        const result = await window.electronAPI.microsoft.createEvent(pendingMeeting);
+        // Call the backend to create the meeting using the correct service
+        const service = pendingMeeting.service || 'microsoft';
+        console.log(`🔄 Creating meeting with ${service} service:`, pendingMeeting);
+        
+        const result = service === 'google' 
+          ? await window.electronAPI.google.createEvent(pendingMeeting)
+          : await window.electronAPI.microsoft.createEvent(pendingMeeting);
+        
         console.log('📅 Meeting creation result:', result);
         
         if (result.success) {
@@ -2923,6 +3021,18 @@
       <div class="ms-auth-actions">
         <button class="ms-auth-secondary" onclick="closeMicrosoftModal()">Cancel</button>
         <button class="ms-auth-primary" onclick="authenticateMicrosoft()">Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Workspace Auth Modal -->
+  <div class="ms-auth-modal" id="googleAuthModal">
+    <div class="ms-auth-content">
+      <h3>Connect Google Workspace</h3>
+      <p>Connect your Google account to enable Gmail automation, Google Calendar integration, and Google Meet links.</p>
+      <div class="ms-auth-actions">
+        <button class="ms-auth-secondary" onclick="closeGoogleModal()">Cancel</button>
+        <button class="ms-auth-primary" onclick="authenticateGoogle()">Connect</button>
       </div>
     </div>
   </div>

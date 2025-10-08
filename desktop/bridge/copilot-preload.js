@@ -190,6 +190,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getUserProfile: () => ipcRenderer.invoke('microsoft:getUserProfile')
   },
 
+  google: {
+    authenticate: () => ipcRenderer.invoke('google:authenticate'),
+    createEvent: (eventData) => ipcRenderer.invoke('google:createEvent', eventData),
+    sendEmail: (emailData) => ipcRenderer.invoke('google:sendEmail', emailData),
+    getUserProfile: () => ipcRenderer.invoke('google:getUserProfile')
+  },
+
   // Meeting approval event listener
   onMeetingApprovalRequest: (callback) => {
     ipcRenderer.on('meeting:approval-request', (event, meetingData) => callback(meetingData));

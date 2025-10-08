@@ -19,14 +19,17 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@azure/msal-node": "^3.8.0",
     "@heyjarvis/core": "file:../core",
     "@heyjarvis/data": "file:../data",
+    "@heyjarvis/desktop": "file:",
     "@slack/bolt": "^4.4.0",
     "@slack/web-api": "^7.10.0",
     "axios": "^1.6.7",
     "dotenv": "^17.2.2",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.7",
+    "googleapis": "^161.0.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.7.0",
     "tesseract.js": "^6.0.1",

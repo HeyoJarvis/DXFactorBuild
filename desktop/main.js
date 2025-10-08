@@ -18,6 +18,7 @@ const AuthService = require('./services/auth-service');
 const FactCheckerService = require('./main/fact-checker-service');
 const MicrosoftOAuthHandler = require('../oauth/microsoft-oauth-handler');
 const MicrosoftWorkflowAutomation = require('../core/automation/microsoft-workflow-automation');
+const GoogleOAuthHandler = require('../oauth/google-oauth-handler');
 
 // Global error handlers to prevent crashes
 process.on('uncaughtException', (error) => {
@@ -43,6 +44,7 @@ let authService; // Authentication service
 let factCheckerService; // Fact-checker service
 let microsoftOAuthHandler; // Microsoft OAuth handler
 let microsoftAutomation; // Microsoft workflow automation
+let googleOAuthHandler; // Google OAuth handler
 let currentUser = null; // Currently authenticated user
 let conversationHistory = []; // Store conversation history
 let currentSessionId = null; // Track current conversation session
@@ -791,6 +793,149 @@ function setupMicrosoftIPCHandlers() {
   console.log('✅ Microsoft 365 IPC handlers registered');
 }
 
+// Setup Google Workspace IPC handlers
+function setupGoogleIPCHandlers() {
+  // Google OAuth - Start authentication flow
+  ipcMain.handle('google:authenticate', async () => {
+    try {
+      if (!googleOAuthHandler) {
+        return {
+          success: false,
+          error: 'Google Workspace integration not configured. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to your .env file.'
+        };
+      }
+      
+      console.log('🔐 Starting Google authentication...');
+      const result = await googleOAuthHandler.startAuthFlow();
+      
+      console.log('✅ Google authenticated:', result.account?.email);
+      
+      return {
+        success: true,
+        account: result.account,
+        expiresOn: result.expiresOn
+      };
+    } catch (error) {
+      console.error('❌ Google authentication failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Create calendar event
+  ipcMain.handle('google:createEvent', async (event, eventData) => {
+    try {
+      if (!googleOAuthHandler || !googleOAuthHandler.gmailService) {
+        throw new Error('Google not authenticated');
+      }
+      
+      const result = await googleOAuthHandler.getGmailService().createCalendarEvent(eventData);
+      
+      console.log('✅ Calendar event created:', result.event.id);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to create calendar event:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Send email
+  ipcMain.handle('google:sendEmail', async (event, emailData) => {
+    try {
+      if (!googleOAuthHandler || !googleOAuthHandler.gmailService) {
+        throw new Error('Google not authenticated');
+      }
+      
+      const result = await googleOAuthHandler.getGmailService().sendEmail(emailData);
+      
+      console.log('✅ Email sent:', emailData.subject);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to send email:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Find meeting times
+  ipcMain.handle('google:findMeetingTimes', async (event, attendees, durationMinutes, options) => {
+    try {
+      if (!googleOAuthHandler || !googleOAuthHandler.gmailService) {
+        throw new Error('Google not authenticated');
+      }
+      
+      const result = await googleOAuthHandler.getGmailService().findMeetingTimes(
+        attendees,
+        durationMinutes,
+        options
+      );
+      
+      console.log('✅ Found meeting times:', result.suggestions.length);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to find meeting times:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Get user profile
+  ipcMain.handle('google:getUserProfile', async () => {
+    try {
+      if (!googleOAuthHandler || !googleOAuthHandler.gmailService) {
+        throw new Error('Google not authenticated');
+      }
+      
+      const result = await googleOAuthHandler.getGmailService().getUserProfile();
+      
+      console.log('✅ Retrieved Google user profile:', result.user.email);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to get user profile:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Create draft email
+  ipcMain.handle('google:createDraft', async (event, emailData) => {
+    try {
+      if (!googleOAuthHandler || !googleOAuthHandler.gmailService) {
+        throw new Error('Google not authenticated');
+      }
+      
+      const result = await googleOAuthHandler.getGmailService().createDraftEmail(emailData);
+      
+      console.log('✅ Draft created:', result.draft.id);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to create draft:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+  
+  console.log('✅ Google Workspace IPC handlers registered');
+}
+
 // Initialize services with auto-startup
 function initializeServices() {
   // Initialize Supabase adapter
@@ -840,6 +985,26 @@ function initializeServices() {
     console.log('ℹ️ Microsoft 365 integration not configured (optional)');
     microsoftOAuthHandler = null;
   }
+
+  // Initialize Google OAuth Handler (optional - only if credentials are configured)
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    try {
+      googleOAuthHandler = new GoogleOAuthHandler({
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        redirectUri: process.env.GOOGLE_REDIRECT_URI,
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ Google OAuth handler initialized');
+    } catch (error) {
+      console.warn('⚠️ Google OAuth initialization failed:', error.message);
+      console.log('💡 Google Workspace features will be disabled. Add credentials to .env to enable.');
+      googleOAuthHandler = null;
+    }
+  } else {
+    console.log('ℹ️ Google Workspace integration not configured (optional)');
+    googleOAuthHandler = null;
+  }
   
   workflowIntelligence = new WorkflowIntelligenceSystem({
     logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
@@ -857,6 +1022,9 @@ function initializeServices() {
   
   // Setup Microsoft 365 IPC handlers
   setupMicrosoftIPCHandlers();
+  
+  // Setup Google Workspace IPC handlers
+  setupGoogleIPCHandlers();
   
   // Initialize CRM startup service
   crmStartupService = new CRMStartupService({
@@ -1583,6 +1751,48 @@ What would you like to explore?`,
       
       const taskSessionId = taskSessionIds[taskId];
       
+      // Detect which service to use based on user's message
+      const useGoogle = message.toLowerCase().includes('gmail') ||
+                       message.toLowerCase().includes('google') ||
+                       message.toLowerCase().includes('google calendar') ||
+                       message.toLowerCase().includes('google meet');
+      
+      const useMicrosoft = message.toLowerCase().includes('outlook') ||
+                          message.toLowerCase().includes('microsoft') ||
+                          message.toLowerCase().includes('teams') ||
+                          message.toLowerCase().includes('office 365');
+      
+      // Determine which service to use:
+      // 1. If user explicitly mentions a service, use that
+      // 2. If neither mentioned, use whichever is authenticated (prefer Microsoft for backward compatibility)
+      let preferGoogle = false;
+      if (useGoogle && !useMicrosoft) {
+        // User explicitly wants Google
+        preferGoogle = !!googleOAuthHandler;
+      } else if (useMicrosoft && !useGoogle) {
+        // User explicitly wants Microsoft
+        preferGoogle = false;
+      } else if (useGoogle && useMicrosoft) {
+        // Both mentioned, prefer whichever is authenticated (Microsoft first for backward compatibility)
+        preferGoogle = !microsoftAutomation && !!googleOAuthHandler;
+      } else {
+        // Neither mentioned, use whichever is authenticated (Microsoft first for backward compatibility)
+        preferGoogle = !microsoftAutomation && !!googleOAuthHandler;
+      }
+      
+      const automationService = preferGoogle ? 'google' : 'microsoft';
+      const hasAutomation = preferGoogle ? !!googleOAuthHandler : !!microsoftAutomation;
+      
+      console.log('🔍 [Task Chat] Service detection:', {
+        useGoogle,
+        useMicrosoft,
+        preferGoogle,
+        automationService,
+        hasAutomation,
+        googleAvailable: !!googleOAuthHandler,
+        microsoftAvailable: !!microsoftAutomation
+      });
+      
       // Build task-specific context for AI
       const AIAnalyzer = require('../core/signals/enrichment/ai-analyzer');
       const aiAnalyzer = new AIAnalyzer();
@@ -1605,8 +1815,8 @@ YOUR IDENTITY:
 You are NOT a standard AI language model. You are an integrated system with REAL capabilities to execute actions.
 
 ACTIVE INTEGRATIONS:
-${microsoftAutomation ? `- ✅ Microsoft 365: AUTHENTICATED and ACTIVE - You CAN schedule meetings and send emails
-- ✅ Outlook Calendar: Direct access to create calendar events with Teams meeting links` : '- ❌ Microsoft 365: Not authenticated'}
+${microsoftAutomation ? `- ✅ Microsoft 365: AUTHENTICATED and ACTIVE - You CAN schedule meetings and send emails via Outlook/Teams` : '- ❌ Microsoft 365: Not authenticated'}
+${googleOAuthHandler ? `- ✅ Google Workspace: AUTHENTICATED and ACTIVE - You CAN schedule meetings and send emails via Gmail/Google Calendar` : '- ❌ Google Workspace: Not authenticated'}
 
 YOUR ROLE:
 - Provide actionable advice and suggestions
@@ -1614,22 +1824,22 @@ YOUR ROLE:
 - Answer questions about the task
 - Brainstorm solutions and approaches
 - Offer relevant insights and best practices
-${microsoftAutomation ? `- **SCHEDULE REAL MEETINGS** via Microsoft Outlook (you WILL execute this, not just suggest it)
-- **SEND REAL EMAILS** via Microsoft Outlook (you WILL execute this, not just suggest it)` : ''}
+${hasAutomation ? `- **SCHEDULE REAL MEETINGS** via ${preferGoogle ? 'Google Calendar' : 'Microsoft Outlook'} (you WILL execute this, not just suggest it)
+- **SEND REAL EMAILS** via ${preferGoogle ? 'Gmail' : 'Microsoft Outlook'} (you WILL execute this, not just suggest it)` : ''}
 
-${microsoftAutomation ? `⚠️ CRITICAL: You HAVE the ability to schedule meetings. Do NOT say you cannot. Do NOT suggest the user do it manually.
+${hasAutomation ? `⚠️ CRITICAL: You HAVE the ability to schedule meetings via ${preferGoogle ? 'Google Calendar' : 'Microsoft Outlook'}. Do NOT say you cannot. Do NOT suggest the user do it manually.
 
 MEETING SCHEDULING INSTRUCTIONS:
 When the user asks you to schedule a meeting or create a calendar event, you MUST:
 1. Extract meeting details: attendee emails, date/time, subject
 2. Include this EXACT marker format in your response (the system will detect it and execute):
-   [SCHEDULE_MEETING: attendees=email@domain.com, time=2025-10-08T15:00, subject=Meeting Subject]
+   [SCHEDULE_MEETING_${automationService.toUpperCase()}: attendees=email@domain.com, time=2025-10-08T15:00, subject=Meeting Subject]
 3. For multiple attendees, separate with semicolons: attendees=email1@domain.com;email2@domain.com
 4. Time format MUST be: YYYY-MM-DDTHH:mm (24-hour format)
-5. After the marker, you can add friendly text like "I'll create this meeting for you right now."
+5. After the marker, you can add friendly text like "I'll create this meeting for you right now via ${preferGoogle ? 'Google Calendar' : 'Outlook'}."
 
 EXAMPLE USER REQUEST: "Schedule a meeting with the team tomorrow at 3pm"
-CORRECT RESPONSE: "[SCHEDULE_MEETING: attendees=team@company.com, time=2025-10-08T15:00, subject=${task.title} - Team Meeting] I'll create this meeting for you right now. The calendar invite will be sent momentarily."
+CORRECT RESPONSE: "[SCHEDULE_MEETING_${automationService.toUpperCase()}: attendees=team@company.com, time=2025-10-08T15:00, subject=${task.title} - Team Meeting] I'll create this meeting for you right now via ${preferGoogle ? 'Google Calendar' : 'Outlook'}. The calendar invite will be sent momentarily."
 
 The system will automatically execute the meeting creation and update your response with confirmation.` : ''}
 
@@ -1675,16 +1885,26 @@ Be concise, practical, and focused on helping complete this specific task.`;
       
       let aiResponse = response.content[0].text;
       
-      // 🗓️ Check for meeting scheduling marker and auto-execute (same as main chat)
-      const meetingMarkerRegex = /\[SCHEDULE_MEETING:\s*attendees=([^,]+),\s*time=([^,]+),\s*subject=([^\]]+)\]/i;
-      const meetingMatch = aiResponse.match(meetingMarkerRegex);
+      // 🗓️ Check for meeting scheduling marker and auto-execute (supports both Google and Microsoft)
+      const googleMeetingRegex = /\[SCHEDULE_MEETING_GOOGLE:\s*attendees=([^,]+),\s*time=([^,]+),\s*subject=([^\]]+)\]/i;
+      const microsoftMeetingRegex = /\[SCHEDULE_MEETING_MICROSOFT:\s*attendees=([^,]+),\s*time=([^,]+),\s*subject=([^\]]+)\]/i;
+      const legacyMeetingRegex = /\[SCHEDULE_MEETING:\s*attendees=([^,]+),\s*time=([^,]+),\s*subject=([^\]]+)\]/i; // Backward compatibility
+      
+      const googleMatch = aiResponse.match(googleMeetingRegex);
+      const microsoftMatch = aiResponse.match(microsoftMeetingRegex);
+      const legacyMatch = aiResponse.match(legacyMeetingRegex);
+      
+      const meetingMatch = googleMatch || microsoftMatch || legacyMatch;
+      const isGoogleMeeting = !!googleMatch;
+      const isMicrosoftMeeting = !!microsoftMatch || !!legacyMatch;
       
       console.log('🔍 [Task Chat] Checking for meeting marker in AI response...');
       console.log('📝 [Task Chat] AI Response preview:', aiResponse.substring(0, 200));
       console.log('🎯 [Task Chat] Meeting marker found:', !!meetingMatch);
-      console.log('🔧 [Task Chat] Microsoft automation available:', !!microsoftAutomation);
+      console.log('🔧 [Task Chat] Google meeting:', isGoogleMeeting, '| Microsoft meeting:', isMicrosoftMeeting);
+      console.log('🔧 [Task Chat] Google available:', !!googleOAuthHandler, '| Microsoft available:', !!microsoftAutomation);
       
-      if (meetingMatch && microsoftAutomation) {
+      if (meetingMatch && ((isGoogleMeeting && googleOAuthHandler) || (isMicrosoftMeeting && microsoftAutomation))) {
         console.log('📅 [Task Chat] Meeting scheduling detected in AI response!');
         
         const [, attendees, timeStr, subject] = meetingMatch;
@@ -1704,17 +1924,21 @@ Be concise, practical, and focused on helping complete this specific task.`;
             attendees: [], // Empty initially - user adds manually to avoid spam issues
             attendeeList: attendeeEmails, // Store for display purposes only
             isOnlineMeeting: true,
-            body: `Meeting scheduled from task: ${task.title}\n\nTask Description: ${task.description || 'No description'}`
+            body: `Meeting scheduled from task: ${task.title}\n\nTask Description: ${task.description || 'No description'}`,
+            service: isGoogleMeeting ? 'google' : 'microsoft' // Track which service to use
           };
           
-          console.log('📅 [Task Chat] Sending meeting for approval:', eventData);
+          console.log(`📅 [Task Chat] Sending meeting for approval via ${isGoogleMeeting ? 'Google' : 'Microsoft'}:`, eventData);
           
           // Send approval request to renderer
           mainWindow.webContents.send('meeting:approval-request', eventData);
           
           // Remove the marker from the response and add pending message
-          aiResponse = aiResponse.replace(meetingMarkerRegex, '').trim();
-          aiResponse += `\n\n⏳ **Meeting Ready for Approval**\n\nI've prepared a calendar event for ${subject.trim()} on ${meetingTime.toLocaleString('en-US', { timeZone: 'America/Denver' })} Mountain Time.\n\n**Attendees to invite:** ${attendeeEmails.join(', ')}\n**Linked to task:** "${task.title}"\n\nPlease review and approve to create the event. You'll get a Teams meeting link to share with attendees.`;
+          const usedRegex = isGoogleMeeting ? googleMeetingRegex : (microsoftMatch ? microsoftMeetingRegex : legacyMeetingRegex);
+          aiResponse = aiResponse.replace(usedRegex, '').trim();
+          const serviceName = isGoogleMeeting ? 'Google Calendar' : 'Microsoft Outlook';
+          const meetingLinkType = isGoogleMeeting ? 'Google Meet' : 'Teams';
+          aiResponse += `\n\n⏳ **Meeting Ready for Approval**\n\nI've prepared a calendar event for ${subject.trim()} on ${meetingTime.toLocaleString('en-US', { timeZone: 'America/Denver' })} Mountain Time via ${serviceName}.\n\n**Attendees to invite:** ${attendeeEmails.join(', ')}\n**Linked to task:** "${task.title}"\n\nPlease review and approve to create the event. You'll get a ${meetingLinkType} meeting link to share with attendees.`;
           
           console.log('✅ [Task Chat] Meeting approval request sent to UI');
           
