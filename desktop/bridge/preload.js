@@ -81,6 +81,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getIntelligence: (orgId) => ipcRenderer.invoke('crm:getIntelligence', orgId),
     healthCheck: () => ipcRenderer.invoke('crm:healthCheck')
   },
+
+  // Engineering Intelligence (GitHub integration)
+  engineering: {
+    query: (query, repository, context) => ipcRenderer.invoke('engineering:query', { query, repository, context }),
+    getFeatureStatus: (feature, repository, context) => ipcRenderer.invoke('engineering:getFeatureStatus', { feature, repository, context }),
+    healthCheck: () => ipcRenderer.invoke('engineering:healthCheck'),
+    listRepos: () => ipcRenderer.invoke('engineering:listRepos')
+  },
   
   // Event listeners
   on: (channel, callback) => {

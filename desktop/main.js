@@ -843,26 +843,36 @@ function initializeServices() {
     microsoftOAuthHandler = null;
   }
   
-  // Initialize Engineering Intelligence (optional - only if GitHub token is configured)
-  if (process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN !== 'your_github_token_here') {
+  // Initialize Engineering Intelligence (supports GitHub App or Personal Token)
+  const hasGitHubApp = process.env.GITHUB_APP_ID && process.env.GITHUB_APP_INSTALLATION_ID;
+  const hasGitHubToken = process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN !== 'your_github_token_here';
+  
+  if (hasGitHubApp || hasGitHubToken) {
     try {
       engineeringIntelligence = new EngineeringIntelligenceService({
-        githubToken: process.env.GITHUB_TOKEN,
-        repository: {
-          owner: process.env.GITHUB_REPO_OWNER,
-          repo: process.env.GITHUB_REPO_NAME
-        },
         logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+        // Repository can be set dynamically per query
       });
-      console.log('✅ Engineering Intelligence initialized');
-      console.log(`📊 Monitoring repository: ${process.env.GITHUB_REPO_OWNER}/${process.env.GITHUB_REPO_NAME}`);
+      
+      if (hasGitHubApp) {
+        console.log('✅ Engineering Intelligence initialized with GitHub App');
+        console.log(`📊 App ID: ${process.env.GITHUB_APP_ID}`);
+        console.log(`📦 Installation ID: ${process.env.GITHUB_APP_INSTALLATION_ID}`);
+        console.log(`📚 Multi-repository access enabled`);
+      } else {
+        console.log('✅ Engineering Intelligence initialized with Personal Token');
+        if (process.env.GITHUB_REPO_OWNER && process.env.GITHUB_REPO_NAME) {
+          console.log(`📊 Default repository: ${process.env.GITHUB_REPO_OWNER}/${process.env.GITHUB_REPO_NAME}`);
+        }
+      }
     } catch (error) {
       console.warn('⚠️ Engineering Intelligence initialization failed:', error.message);
-      console.log('💡 Engineering queries will be disabled. Add GITHUB_TOKEN to .env to enable.');
+      console.log('💡 Engineering queries will be disabled.');
       engineeringIntelligence = null;
     }
   } else {
-    console.log('ℹ️ Engineering Intelligence not configured (optional - add GITHUB_TOKEN to .env)');
+    console.log('ℹ️ Engineering Intelligence not configured');
+    console.log('   Add GITHUB_APP_ID + GITHUB_APP_INSTALLATION_ID or GITHUB_TOKEN to .env');
     engineeringIntelligence = null;
   }
   
@@ -1394,52 +1404,82 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
         const [, question, role] = engineeringMatch;
         
         try {
-          console.log('📊 Querying codebase via API:', { question, role });
-          
-          // Get user's session token from auth service
-          const sessionToken = authService ? authService.getSessionToken() : null;
-          
-          if (!sessionToken) {
-            throw new Error('No authentication token available');
+          if (!engineeringIntelligence) {
+            throw new Error('Engineering Intelligence not initialized. Add GitHub credentials to .env');
           }
           
-          // Call backend API for engineering intelligence
-          const apiUrl = process.env.API_BASE_URL || 'http://localhost:3002';
-          console.log('🔗 Engineering API URL:', apiUrl);
-          const response = await fetch(`${apiUrl}/api/engineering/query`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${sessionToken}`
-            },
-            body: JSON.stringify({
-              query: question,
-              context: { role }
-            })
-          });
+          console.log('📊 Querying local GitHub service:', { question: question.substring(0, 50) + '...', role });
           
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `API request failed with status ${response.status}`);
-          }
+          // Detect if user is asking for list of repos
+          const listReposKeywords = /what.*repo|list.*repo|which.*repo|show.*repo|access.*repo|available.*repo/i;
           
-          const engineeringData = await response.json();
-          const engineeringResponse = engineeringData.result;
-          
-          // Remove the marker from the response and add engineering insights
-          aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
-          aiResponse += `\n\n📊 **Engineering Insights:**\n\n${engineeringResponse.summary}`;
-          
-          if (engineeringResponse.businessImpact) {
-            aiResponse += `\n\n💼 **Business Impact:**\n${engineeringResponse.businessImpact}`;
-          }
-          
-          if (engineeringResponse.actionItems && engineeringResponse.actionItems.length > 0) {
-            aiResponse += `\n\n✅ **Action Items:**\n${engineeringResponse.actionItems.map(item => `- ${item}`).join('\n')}`;
-          }
-          
-          if (engineeringResponse.technicalDetails) {
-            aiResponse += `\n\n<details>\n<summary>🔧 Technical Details (click to expand)</summary>\n\n${engineeringResponse.technicalDetails}\n</details>`;
+          if (listReposKeywords.test(question)) {
+            // List accessible repositories
+            console.log('📋 List repositories query detected');
+            
+            const octokit = await engineeringIntelligence._getOctokit();
+            const { data } = await octokit.apps.listReposAccessibleToInstallation();
+            
+            aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
+            aiResponse += `\n\n📚 **Accessible GitHub Repositories** (${data.total_count} repos)\n\n`;
+            
+            data.repositories.forEach((repo, index) => {
+              const isPrivate = repo.private ? '🔒' : '🌐';
+              aiResponse += `${index + 1}. ${isPrivate} **${repo.full_name}**\n`;
+              if (repo.description) {
+                aiResponse += `   _${repo.description}_\n`;
+              }
+              aiResponse += `   Last updated: ${new Date(repo.updated_at).toLocaleDateString()}\n\n`;
+            });
+            
+            aiResponse += `\n_Ask me about any of these repositories to get insights!_`;
+            
+          } else {
+            // Query specific repository or default
+            let repository = null;
+            
+            // Try to extract repository from question (e.g., "status of Mark-I")
+            const repoMatch = question.match(/\b([a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+)\b/);
+            if (repoMatch) {
+              const [owner, repo] = repoMatch[1].split('/');
+              repository = { owner, repo };
+              console.log('📦 Repository extracted from question:', repository);
+            } else if (process.env.GITHUB_REPO_OWNER && process.env.GITHUB_REPO_NAME) {
+              // Use default repo if configured
+              repository = {
+                owner: process.env.GITHUB_REPO_OWNER,
+                repo: process.env.GITHUB_REPO_NAME
+              };
+              console.log('📦 Using default repository:', repository);
+            }
+            
+            // Call LOCAL engineering intelligence service
+            const engineeringResponse = await engineeringIntelligence.queryCodebase(question, {
+              role: role.trim(),
+              repository: repository,
+              userId: userId
+            });
+            
+            // Remove the marker and add engineering insights
+            aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
+            
+            if (repository) {
+              aiResponse += `\n\n📊 **Engineering Insights** (${repository.owner}/${repository.repo})\n\n`;
+            } else {
+              aiResponse += `\n\n📊 **Engineering Insights**\n\n`;
+            }
+            
+            aiResponse += engineeringResponse.summary;
+            
+            if (engineeringResponse.businessImpact) {
+              aiResponse += `\n\n💼 **Business Impact:**\n${engineeringResponse.businessImpact}`;
+            }
+            
+            if (engineeringResponse.actionItems && engineeringResponse.actionItems.length > 0) {
+              aiResponse += `\n\n✅ **Action Items:**\n${engineeringResponse.actionItems.map(item => `- ${item}`).join('\n')}`;
+            }
+            
+            aiResponse += `\n\n_Using real data from GitHub ${repository ? `• ${repository.owner}/${repository.repo}` : ''}_`;
           }
           
           console.log('✅ Engineering query completed successfully');
@@ -1447,7 +1487,7 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
         } catch (error) {
           console.error('❌ Failed to query codebase:', error);
           aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
-          aiResponse += `\n\n⚠️ **Engineering Query Failed**\n\nI encountered an error while querying the codebase: ${error.message}. The engineering intelligence system may need configuration.`;
+          aiResponse += `\n\n⚠️ **Engineering Query Failed**\n\n${error.message}`;
         }
       } else {
         // Check if the user is asking about engineering but AI didn't use the marker
@@ -2817,6 +2857,112 @@ function registerAllIPCHandlers() {
     } catch (error) {
       console.error('Failed to delete task:', error);
       return { success: false, error: error.message };
+    }
+  });
+
+  // Engineering Intelligence IPC handlers
+  ipcMain.handle('engineering:query', async (event, { query, repository, context }) => {
+    try {
+      if (!engineeringIntelligence) {
+        return {
+          success: false,
+          error: 'Engineering Intelligence not configured. Add GitHub credentials to .env'
+        };
+      }
+
+      console.log('📊 Engineering query via IPC:', query.substring(0, 50) + '...');
+      
+      const result = await engineeringIntelligence.queryCodebase(query, {
+        ...context,
+        repository: repository || (process.env.GITHUB_REPO_OWNER && process.env.GITHUB_REPO_NAME ? {
+          owner: process.env.GITHUB_REPO_OWNER,
+          repo: process.env.GITHUB_REPO_NAME
+        } : null),
+        role: context?.role || 'sales'
+      });
+      
+      return {
+        success: true,
+        result
+      };
+    } catch (error) {
+      console.error('❌ Engineering query failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  ipcMain.handle('engineering:healthCheck', async () => {
+    try {
+      if (!engineeringIntelligence) {
+        return {
+          status: 'unhealthy',
+          github: 'disconnected',
+          error: 'Engineering Intelligence not configured'
+        };
+      }
+
+      const health = await engineeringIntelligence.healthCheck();
+      return health;
+    } catch (error) {
+      console.error('❌ Engineering health check failed:', error);
+      return {
+        status: 'unhealthy',
+        github: 'disconnected',
+        error: error.message
+      };
+    }
+  });
+
+  ipcMain.handle('engineering:getFeatureStatus', async (event, { featureName, repository }) => {
+    try {
+      if (!engineeringIntelligence) {
+        return {
+          success: false,
+          error: 'Engineering Intelligence not configured'
+        };
+      }
+
+      const context = repository ? { repository } : {};
+      const result = await engineeringIntelligence.getFeatureStatus(featureName, context);
+      
+      return {
+        success: true,
+        result
+      };
+    } catch (error) {
+      console.error('❌ Feature status query failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  ipcMain.handle('engineering:listRepos', async () => {
+    try {
+      if (!engineeringIntelligence) {
+        return {
+          success: false,
+          error: 'Engineering Intelligence not configured'
+        };
+      }
+
+      const octokit = await engineeringIntelligence._getOctokit();
+      const { data } = await octokit.apps.listReposAccessibleToInstallation();
+      
+      return {
+        success: true,
+        repos: data.repositories
+      };
+    } catch (error) {
+      console.error('❌ List repos failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
     }
   });
   

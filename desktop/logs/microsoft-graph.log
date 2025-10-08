@@ -150,3 +150,45 @@
 {"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T02:59:28.228Z"}
 {"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T03:00:09.224Z"}
 {"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T03:00:10.349Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T17:49:19.944Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T17:49:21.090Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T17:51:18.093Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T17:51:30.890Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T17:51:32.020Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T17:53:24.040Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T17:53:25.159Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T17:56:04.674Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T17:56:05.824Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T17:58:19.800Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T17:58:20.924Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T17:58:27.225Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T17:58:28.330Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:03:52.887Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:03:54.009Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:04:20.229Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:04:21.359Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:07:53.318Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:07:54.454Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:08:06.155Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:08:30.400Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:10:06.448Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:10:07.579Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:11:47.021Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:11:48.143Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:14:35.130Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:14:36.272Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:16:10.618Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:16:12.618Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:19:13.581Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:19:53.612Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:19:54.743Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:20:59.694Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:21:00.837Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:31:22.982Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:31:24.123Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:42:38.733Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:42:39.888Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:48:43.889Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:48:45.046Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":6,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-08T18:51:04.740Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-08T18:51:05.868Z"}

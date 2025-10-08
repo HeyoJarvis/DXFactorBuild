@@ -23,10 +23,13 @@ class EngineeringIntelligenceService extends EventEmitter {
     
     this.options = {
       githubToken: options.githubToken || process.env.GITHUB_TOKEN,
-      repository: options.repository || {
-        owner: process.env.GITHUB_REPO_OWNER || 'yourorg',
-        repo: process.env.GITHUB_REPO_NAME || 'yourrepo'
-      },
+      // Repository is now OPTIONAL - can be specified per-query for multi-repo support
+      repository: options.repository || (
+        process.env.GITHUB_REPO_OWNER && process.env.GITHUB_REPO_NAME ? {
+          owner: process.env.GITHUB_REPO_OWNER,
+          repo: process.env.GITHUB_REPO_NAME
+        } : null
+      ),
       copilotModel: options.copilotModel || 'gpt-4',
       logLevel: options.logLevel || 'info',
       ...options
@@ -53,8 +56,12 @@ class EngineeringIntelligenceService extends EventEmitter {
     // Lazy GitHub client initialization (ESM dynamic import)
     this._octokit = null;
 
+    const repoInfo = this.options.repository 
+      ? `${this.options.repository.owner}/${this.options.repository.repo}`
+      : 'multi-repo mode';
+    
     this.logger.info('Engineering Intelligence Service initialized', {
-      repository: `${this.options.repository.owner}/${this.options.repository.repo}`
+      repository: repoInfo
     });
   }
 
@@ -69,8 +76,8 @@ class EngineeringIntelligenceService extends EventEmitter {
     // Option 1: Try GitHub App authentication first (PRODUCTION - Recommended)
     if (process.env.GITHUB_APP_ID && process.env.GITHUB_APP_INSTALLATION_ID) {
       try {
-        // Dynamic import for ESM module
-        const { createAppAuth } = require('@octokit/auth-app');
+        // Dynamic import for ESM modules
+        const { createAppAuth } = await import('@octokit/auth-app');
         
         // Load private key from file or environment variable
         let privateKey;
@@ -132,28 +139,43 @@ class EngineeringIntelligenceService extends EventEmitter {
    */
   async queryCodebase(question, context = {}) {
     try {
+      // Allow repository to be specified per-query or use default
+      const repository = context.repository || this.options.repository;
+      const repoInfo = repository ? `${repository.owner}/${repository.repo}` : 'all accessible repos';
+      
       this.logger.info('Querying codebase', {
         question: question.substring(0, 100),
         role: context.role,
-        repository: `${this.options.repository.owner}/${this.options.repository.repo}`
+        repository: repoInfo
       });
 
-      // Build system prompt based on user role
-      const systemPrompt = this._buildSystemPrompt(context.role);
-
-      // Query GitHub Copilot
-      const copilotResponse = await this._queryCopilot(question, systemPrompt);
+      // 🆕 STEP 1: Fetch REAL GitHub data based on query type
+      const githubData = await this._fetchRealGitHubData(question, repository);
+      
+      // 🆕 STEP 2: Try to use AI (Copilot or Claude) to analyze the real data
+      let aiResponse;
+      try {
+        const systemPrompt = this._buildSystemPrompt(context.role);
+        const enhancedQuestion = this._buildEnhancedQuestion(question, githubData);
+        
+        aiResponse = await this._queryCopilot(enhancedQuestion, systemPrompt, context);
+      } catch (aiError) {
+        // 🆕 STEP 3: If AI fails, format the real data directly
+        this.logger.warn('AI analysis unavailable, formatting raw data', { error: aiError.message });
+        aiResponse = this._formatRealDataDirectly(githubData, question);
+      }
 
       // Format response for executives
       const formattedResponse = await this._formatForExecutive(
-        copilotResponse,
+        aiResponse,
         question,
         context
       );
 
       this.logger.info('Codebase query completed', {
         question: question.substring(0, 100),
-        responseLength: formattedResponse.summary.length
+        responseLength: formattedResponse.summary.length,
+        dataSource: githubData ? githubData.type : 'none'
       });
 
       this.emit('query_completed', {
@@ -175,11 +197,302 @@ class EngineeringIntelligenceService extends EventEmitter {
   }
 
   /**
+   * Fetch REAL GitHub data based on query type
+   * @private
+   */
+  async _fetchRealGitHubData(question, repository) {
+    if (!repository) {
+      this.logger.warn('No repository specified, cannot fetch real data');
+      return null;
+    }
+
+    const lowerQuestion = question.toLowerCase();
+    const octokit = await this._getOctokit();
+    
+    try {
+      // Detect query type and fetch appropriate data
+      if (lowerQuestion.includes('issue') || lowerQuestion.includes('bug') || lowerQuestion.includes('problem')) {
+        this.logger.info('Fetching real issues from GitHub', { repository: `${repository.owner}/${repository.repo}` });
+        
+        const { data } = await octokit.issues.listForRepo({
+          owner: repository.owner,
+          repo: repository.repo,
+          state: 'all',
+          sort: 'updated',
+          direction: 'desc',
+          per_page: 50
+        });
+        
+        return { type: 'issues', data, count: data.length };
+        
+      } else if (lowerQuestion.includes('pr') || lowerQuestion.includes('pull request') || lowerQuestion.includes('merge')) {
+        this.logger.info('Fetching real PRs from GitHub', { repository: `${repository.owner}/${repository.repo}` });
+        
+        const { data } = await octokit.pulls.list({
+          owner: repository.owner,
+          repo: repository.repo,
+          state: 'all',
+          sort: 'updated',
+          direction: 'desc',
+          per_page: 50
+        });
+        
+        return { type: 'prs', data, count: data.length };
+        
+      } else if (lowerQuestion.includes('commit') || lowerQuestion.includes('change') || lowerQuestion.includes('recent')) {
+        this.logger.info('Fetching real commits from GitHub', { repository: `${repository.owner}/${repository.repo}` });
+        
+        const { data } = await octokit.repos.listCommits({
+          owner: repository.owner,
+          repo: repository.repo,
+          per_page: 50
+        });
+        
+        return { type: 'commits', data, count: data.length };
+        
+      } else if (lowerQuestion.includes('feature') || lowerQuestion.includes('built') || lowerQuestion.includes('developed')) {
+        this.logger.info('Fetching combined data (PRs + issues) from GitHub', { repository: `${repository.owner}/${repository.repo}` });
+        
+        // Fetch both PRs and issues for feature queries
+        const [prsResponse, issuesResponse] = await Promise.all([
+          octokit.pulls.list({
+            owner: repository.owner,
+            repo: repository.repo,
+            state: 'closed',
+            sort: 'updated',
+            direction: 'desc',
+            per_page: 30
+          }),
+          octokit.issues.listForRepo({
+            owner: repository.owner,
+            repo: repository.repo,
+            state: 'closed',
+            sort: 'updated',
+            direction: 'desc',
+            per_page: 30
+          })
+        ]);
+        
+        return {
+          type: 'features',
+          prs: prsResponse.data,
+          issues: issuesResponse.data,
+          count: prsResponse.data.length + issuesResponse.data.length
+        };
+      }
+      
+      // Default: fetch recent activity (commits)
+      this.logger.info('Fetching recent commits as default', { repository: `${repository.owner}/${repository.repo}` });
+      
+      const { data } = await octokit.repos.listCommits({
+        owner: repository.owner,
+        repo: repository.repo,
+        per_page: 30
+      });
+      
+      return { type: 'commits', data, count: data.length };
+      
+    } catch (error) {
+      this.logger.error('Failed to fetch real GitHub data', { error: error.message });
+      return null;
+    }
+  }
+
+  /**
+   * Build enhanced question with real GitHub data
+   * @private
+   */
+  _buildEnhancedQuestion(question, githubData) {
+    if (!githubData) {
+      return question;
+    }
+
+    let dataContext = `\n\n=== REAL GITHUB DATA (${githubData.type.toUpperCase()}) ===\n`;
+    
+    if (githubData.type === 'issues') {
+      dataContext += `Found ${githubData.count} issues:\n\n`;
+      githubData.data.slice(0, 10).forEach((issue, i) => {
+        dataContext += `${i + 1}. #${issue.number} - ${issue.title}\n`;
+        dataContext += `   State: ${issue.state} | Labels: ${issue.labels.map(l => l.name).join(', ') || 'none'}\n`;
+        dataContext += `   Assignee: ${issue.assignee?.login || 'Unassigned'}\n`;
+        dataContext += `   Created: ${new Date(issue.created_at).toLocaleDateString()}\n`;
+        if (issue.closed_at) {
+          dataContext += `   Closed: ${new Date(issue.closed_at).toLocaleDateString()}\n`;
+        }
+        dataContext += `\n`;
+      });
+    } else if (githubData.type === 'prs') {
+      dataContext += `Found ${githubData.count} pull requests:\n\n`;
+      githubData.data.slice(0, 10).forEach((pr, i) => {
+        dataContext += `${i + 1}. #${pr.number} - ${pr.title}\n`;
+        dataContext += `   State: ${pr.state} | Merged: ${pr.merged_at ? 'Yes' : 'No'}\n`;
+        dataContext += `   Author: ${pr.user.login}\n`;
+        dataContext += `   Created: ${new Date(pr.created_at).toLocaleDateString()}\n`;
+        if (pr.merged_at) {
+          dataContext += `   Merged: ${new Date(pr.merged_at).toLocaleDateString()}\n`;
+        }
+        dataContext += `\n`;
+      });
+    } else if (githubData.type === 'commits') {
+      dataContext += `Found ${githubData.count} commits:\n\n`;
+      githubData.data.slice(0, 15).forEach((commit, i) => {
+        dataContext += `${i + 1}. ${commit.commit.message.split('\n')[0]}\n`;
+        dataContext += `   Author: ${commit.commit.author.name}\n`;
+        dataContext += `   Date: ${new Date(commit.commit.author.date).toLocaleDateString()}\n`;
+        dataContext += `\n`;
+      });
+    } else if (githubData.type === 'features') {
+      dataContext += `Found ${githubData.prs.length} merged PRs and ${githubData.issues.length} closed issues:\n\n`;
+      dataContext += `Recent Merged PRs:\n`;
+      githubData.prs.slice(0, 5).forEach((pr, i) => {
+        dataContext += `${i + 1}. #${pr.number} - ${pr.title} (merged ${new Date(pr.merged_at).toLocaleDateString()})\n`;
+      });
+      dataContext += `\nRecent Closed Issues:\n`;
+      githubData.issues.slice(0, 5).forEach((issue, i) => {
+        dataContext += `${i + 1}. #${issue.number} - ${issue.title} (closed ${new Date(issue.closed_at).toLocaleDateString()})\n`;
+      });
+    }
+    
+    dataContext += `\n=== END REAL DATA ===\n\n`;
+    dataContext += `Based on the REAL GitHub data above, please answer: ${question}`;
+    
+    return dataContext;
+  }
+
+  /**
+   * Format real GitHub data directly (when AI unavailable)
+   * @private
+   */
+  _formatRealDataDirectly(githubData, question) {
+    if (!githubData) {
+      return {
+        content: `Unable to fetch real GitHub data. Please check repository access.`
+      };
+    }
+
+    let content = `Based on real GitHub data:\n\n`;
+    
+    if (githubData.type === 'issues') {
+      content += `**Issues Found:** ${githubData.count} total\n\n`;
+      
+      const openIssues = githubData.data.filter(i => i.state === 'open');
+      const closedIssues = githubData.data.filter(i => i.state === 'closed');
+      
+      content += `📊 **Summary:**\n`;
+      content += `- Open: ${openIssues.length}\n`;
+      content += `- Closed: ${closedIssues.length}\n\n`;
+      
+      content += `**Recent Issues:**\n`;
+      githubData.data.slice(0, 10).forEach((issue, i) => {
+        const stateIcon = issue.state === 'open' ? '🔴' : '✅';
+        content += `${i + 1}. ${stateIcon} #${issue.number} "${issue.title}"\n`;
+        content += `   - Priority: ${issue.labels.find(l => l.name.toLowerCase().includes('priority'))?.name || 'Not set'}\n`;
+        content += `   - Labels: ${issue.labels.map(l => l.name).join(', ') || 'none'}\n`;
+        content += `   - Assigned: ${issue.assignee?.login || 'Unassigned'}\n`;
+        content += `   - Created: ${new Date(issue.created_at).toLocaleDateString()}\n`;
+        if (issue.closed_at) {
+          content += `   - Closed: ${new Date(issue.closed_at).toLocaleDateString()}\n`;
+        }
+        content += `\n`;
+      });
+      
+    } else if (githubData.type === 'prs') {
+      content += `**Pull Requests Found:** ${githubData.count} total\n\n`;
+      
+      const merged = githubData.data.filter(pr => pr.merged_at);
+      const open = githubData.data.filter(pr => pr.state === 'open');
+      const closed = githubData.data.filter(pr => pr.state === 'closed' && !pr.merged_at);
+      
+      content += `📊 **Summary:**\n`;
+      content += `- Merged: ${merged.length}\n`;
+      content += `- Open: ${open.length}\n`;
+      content += `- Closed (not merged): ${closed.length}\n\n`;
+      
+      content += `**Recent Pull Requests:**\n`;
+      githubData.data.slice(0, 10).forEach((pr, i) => {
+        const stateIcon = pr.merged_at ? '✅' : (pr.state === 'open' ? '🔵' : '⚪');
+        content += `${i + 1}. ${stateIcon} #${pr.number} "${pr.title}"\n`;
+        content += `   - Author: ${pr.user.login}\n`;
+        content += `   - Status: ${pr.merged_at ? 'Merged' : pr.state}\n`;
+        content += `   - Created: ${new Date(pr.created_at).toLocaleDateString()}\n`;
+        if (pr.merged_at) {
+          content += `   - Merged: ${new Date(pr.merged_at).toLocaleDateString()}\n`;
+        }
+        content += `\n`;
+      });
+      
+    } else if (githubData.type === 'commits') {
+      content += `**Commits Found:** ${githubData.count} recent commits\n\n`;
+      
+      content += `**Recent Activity:**\n`;
+      githubData.data.slice(0, 15).forEach((commit, i) => {
+        content += `${i + 1}. ${commit.commit.message.split('\n')[0]}\n`;
+        content += `   - Author: ${commit.commit.author.name}\n`;
+        content += `   - Date: ${new Date(commit.commit.author.date).toLocaleDateString()}\n`;
+        content += `\n`;
+      });
+      
+    } else if (githubData.type === 'features') {
+      content += `**Features & Development Activity:**\n\n`;
+      content += `📊 **Summary:**\n`;
+      content += `- Merged PRs: ${githubData.prs.length}\n`;
+      content += `- Closed Issues: ${githubData.issues.length}\n\n`;
+      
+      content += `**Recent Features (Merged PRs):**\n`;
+      githubData.prs.slice(0, 8).forEach((pr, i) => {
+        content += `${i + 1}. ✅ #${pr.number} "${pr.title}"\n`;
+        content += `   - Author: ${pr.user.login}\n`;
+        content += `   - Merged: ${new Date(pr.merged_at).toLocaleDateString()}\n`;
+        content += `\n`;
+      });
+      
+      if (githubData.issues.length > 0) {
+        content += `\n**Recently Closed Issues:**\n`;
+        githubData.issues.slice(0, 5).forEach((issue, i) => {
+          content += `${i + 1}. ✅ #${issue.number} "${issue.title}"\n`;
+          content += `   - Closed: ${new Date(issue.closed_at).toLocaleDateString()}\n`;
+          content += `\n`;
+        });
+      }
+    }
+    
+    return { content };
+  }
+
+  /**
    * Query GitHub Copilot API
    * @private
    */
-  async _queryCopilot(question, systemPrompt) {
+  async _queryCopilot(question, systemPrompt, context = {}) {
     try {
+      // Use repository from context or default
+      const repository = context.repository || this.options.repository;
+      
+      // Build request body
+      const requestBody = {
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
+          },
+          {
+            role: 'user',
+            content: question
+          }
+        ],
+        model: this.options.copilotModel,
+        temperature: 0.7,
+        max_tokens: 2000
+      };
+      
+      // Only include repository if specified
+      if (repository) {
+        requestBody.repository = {
+          owner: repository.owner,
+          name: repository.repo
+        };
+      }
+      
       // GitHub Copilot Chat API endpoint
       const response = await fetch('https://api.github.com/copilot/chat/completions', {
         method: 'POST',
@@ -188,35 +501,17 @@ class EngineeringIntelligenceService extends EventEmitter {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt
-            },
-            {
-              role: 'user',
-              content: question
-            }
-          ],
-          model: this.options.copilotModel,
-          temperature: 0.7,
-          max_tokens: 2000,
-          repository: {
-            owner: this.options.repository.owner,
-            name: this.options.repository.repo
-          }
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
         const errorText = await response.text();
         
-        // If Copilot API is not available (404), fall back to mock responses
-        if (response.status === 404) {
-          this.logger.warn('GitHub Copilot API not available, using mock responses');
-          return this._getMockResponse(question);
-        }
+        // Throw error so queryCodebase can use real data formatter
+        this.logger.warn('GitHub Copilot API not available', {
+          status: response.status,
+          error: errorText
+        });
         
         throw new Error(`GitHub Copilot API error: ${response.status} - ${errorText}`);
       }
@@ -230,13 +525,13 @@ class EngineeringIntelligenceService extends EventEmitter {
       };
 
     } catch (error) {
-      this.logger.error('Copilot API request failed', {
-        error: error.message
+      this.logger.warn('Copilot API not available', {
+        error: error.message,
+        statusCode: error.response?.status || 'unknown'
       });
       
-      // Fall back to mock responses on any error
-      this.logger.warn('Falling back to mock responses due to error');
-      return this._getMockResponse(question);
+      // Throw error so queryCodebase can use real data formatter
+      throw new Error(`Copilot API unavailable: ${error.message}`);
     }
   }
   
@@ -389,6 +684,10 @@ When discussing features:
     const actionItems = this._extractActionItems(content);
     const technicalDetails = this._extractTechnicalDetails(content);
 
+    // Get repository from context or default
+    const repository = context.repository || this.options.repository;
+    const repoInfo = repository ? `${repository.owner}/${repository.repo}` : 'multi-repo';
+    
     return {
       summary,
       businessImpact,
@@ -399,7 +698,7 @@ When discussing features:
         role: context.role,
         timestamp: new Date().toISOString(),
         model: copilotResponse.model,
-        repository: `${this.options.repository.owner}/${this.options.repository.repo}`
+        repository: repoInfo
       }
     };
   }
@@ -409,6 +708,11 @@ When discussing features:
    * @private
    */
   _extractSummary(content) {
+    // If content is already formatted real GitHub data, return it all
+    if (content.includes('Based on real GitHub data:') || content.includes('Issues Found:') || content.includes('Pull Requests Found:')) {
+      return content;
+    }
+    
     // Look for summary section or use first paragraph
     const summaryMatch = content.match(/(?:Summary|Overview|TL;DR):?\s*\n?(.*?)(?:\n\n|\n#|$)/is);
     if (summaryMatch) {
@@ -477,10 +781,11 @@ When discussing features:
       );
 
       // 2. Get related PRs from GitHub
-      const prs = await this._searchPRs(featureName);
+      const repository = context.repository || this.options.repository;
+      const prs = await this._searchPRs(featureName, repository);
 
       // 3. Get related issues
-      const issues = await this._searchIssues(featureName);
+      const issues = await this._searchIssues(featureName, repository);
 
       // 4. Combine into comprehensive status
       return {
@@ -520,11 +825,16 @@ When discussing features:
    * Search GitHub PRs
    * @private
    */
-  async _searchPRs(query) {
+  async _searchPRs(query, repository = null) {
     try {
+      if (!repository) {
+        this.logger.warn('No repository specified for PR search');
+        return [];
+      }
+      
       const octokit = await this._getOctokit();
       const { data } = await octokit.search.issuesAndPullRequests({
-        q: `${query} repo:${this.options.repository.owner}/${this.options.repository.repo} is:pr`,
+        q: `${query} repo:${repository.owner}/${repository.repo} is:pr`,
         sort: 'updated',
         order: 'desc',
         per_page: 10
@@ -540,11 +850,16 @@ When discussing features:
    * Search GitHub issues
    * @private
    */
-  async _searchIssues(query) {
+  async _searchIssues(query, repository = null) {
     try {
+      if (!repository) {
+        this.logger.warn('No repository specified for issue search');
+        return [];
+      }
+      
       const octokit = await this._getOctokit();
       const { data } = await octokit.search.issuesAndPullRequests({
-        q: `${query} repo:${this.options.repository.owner}/${this.options.repository.repo} is:issue`,
+        q: `${query} repo:${repository.owner}/${repository.repo} is:issue`,
         sort: 'updated',
         order: 'desc',
         per_page: 10
@@ -661,31 +976,63 @@ When discussing features:
   }
 
   /**
-   * Health check
+   * Health check - Verifies GitHub App is installed and authenticated
    */
   async healthCheck() {
     try {
-      // Test GitHub API access
+      // Simply verify we can get an authenticated Octokit client
       const octokit = await this._getOctokit();
-      await octokit.repos.get({
-        owner: this.options.repository.owner,
-        repo: this.options.repository.repo
-      });
+      
+      // Test authentication by checking rate limit (works for both PAT and GitHub App)
+      const { data } = await octokit.rateLimit.get();
+      
+      // Determine auth type based on what's configured
+      let authType = 'none';
+      let appId = null;
+      let installationId = null;
+      let repoCount = null;
+      
+      if (process.env.GITHUB_APP_ID && process.env.GITHUB_APP_INSTALLATION_ID) {
+        authType = 'GitHub App';
+        appId = process.env.GITHUB_APP_ID;
+        installationId = process.env.GITHUB_APP_INSTALLATION_ID;
+        
+        // Get accessible repo count for GitHub App
+        try {
+          const { data: repos } = await octokit.apps.listReposAccessibleToInstallation();
+          repoCount = repos.total_count;
+        } catch (e) {
+          // If this fails, it's okay - we're still connected
+        }
+      } else if (this.options.githubToken) {
+        authType = 'Personal Access Token';
+      }
 
-      // Test Copilot API with simple query
-      await this._queryCopilot('What is this repository about?', 'You are a helpful assistant.');
+      this.logger.info('GitHub health check passed', {
+        authType,
+        rateLimit: data.rate.limit,
+        remaining: data.rate.remaining
+      });
 
       return {
         status: 'healthy',
         github: 'connected',
-        copilot: 'connected',
-        repository: `${this.options.repository.owner}/${this.options.repository.repo}`
+        authType,
+        appId,
+        installationId,
+        repoCount,
+        rateLimit: {
+          limit: data.rate.limit,
+          remaining: data.rate.remaining,
+          reset: new Date(data.rate.reset * 1000).toISOString()
+        }
       };
 
     } catch (error) {
-      this.logger.error('Health check failed', { error: error.message });
+      this.logger.error('GitHub health check failed', { error: error.message });
       return {
         status: 'unhealthy',
+        github: 'disconnected',
         error: error.message
       };
     }

@@ -190,6 +190,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getUserProfile: () => ipcRenderer.invoke('microsoft:getUserProfile')
   },
 
+  // Engineering Intelligence (GitHub integration)
+  engineering: {
+    query: (query, repository, context) => ipcRenderer.invoke('engineering:query', { query, repository, context }),
+    getFeatureStatus: (featureName, repository) => ipcRenderer.invoke('engineering:getFeatureStatus', { featureName, repository }),
+    healthCheck: () => ipcRenderer.invoke('engineering:healthCheck'),
+    listRepos: () => ipcRenderer.invoke('engineering:listRepos')
+  },
+
   // Meeting approval event listener
   onMeetingApprovalRequest: (callback) => {
     ipcRenderer.on('meeting:approval-request', (event, meetingData) => callback(meetingData));
