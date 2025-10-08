@@ -69,6 +69,7 @@
     "@anthropic-ai/sdk": "^0.63.1",
     "@azure/msal-node": "^3.8.0",
     "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@octokit/auth-app": "^8.1.1",
     "@octokit/rest": "^22.0.0",
     "@slack/bolt": "^4.4.0",
     "@slack/web-api": "^7.10.0",

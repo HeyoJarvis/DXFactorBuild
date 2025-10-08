@@ -15,6 +15,7 @@
 // Octokit (@octokit/rest) is ESM-only; use dynamic import from CommonJS context
 const winston = require('winston');
 const EventEmitter = require('events');
+const fs = require('fs');
 
 class EngineeringIntelligenceService extends EventEmitter {
   constructor(options = {}) {
@@ -59,16 +60,68 @@ class EngineeringIntelligenceService extends EventEmitter {
 
   /**
    * Lazy-load Octokit client (ESM) and cache instance
+   * Supports both GitHub App authentication (production) and Personal Access Token (development)
    * @private
    */
   async _getOctokit() {
     if (this._octokit) return this._octokit;
-    if (!this.options.githubToken) {
-      throw new Error('GitHub token not configured');
+    
+    // Option 1: Try GitHub App authentication first (PRODUCTION - Recommended)
+    if (process.env.GITHUB_APP_ID && process.env.GITHUB_APP_INSTALLATION_ID) {
+      try {
+        // Dynamic import for ESM module
+        const { createAppAuth } = require('@octokit/auth-app');
+        
+        // Load private key from file or environment variable
+        let privateKey;
+        if (process.env.GITHUB_APP_PRIVATE_KEY) {
+          privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
+        } else if (process.env.GITHUB_APP_PRIVATE_KEY_PATH) {
+          privateKey = fs.readFileSync(process.env.GITHUB_APP_PRIVATE_KEY_PATH, 'utf8');
+        } else {
+          throw new Error('GitHub App private key not found. Set GITHUB_APP_PRIVATE_KEY or GITHUB_APP_PRIVATE_KEY_PATH');
+        }
+        
+        const mod = await import('@octokit/rest');
+        this._octokit = new mod.Octokit({
+          authStrategy: createAppAuth,
+          auth: {
+            appId: process.env.GITHUB_APP_ID,
+            privateKey: privateKey,
+            installationId: process.env.GITHUB_APP_INSTALLATION_ID,
+          },
+        });
+        
+        this.logger.info('GitHub App authentication successful', {
+          appId: process.env.GITHUB_APP_ID,
+          installationId: process.env.GITHUB_APP_INSTALLATION_ID,
+          authType: 'github-app'
+        });
+        
+        return this._octokit;
+      } catch (error) {
+        this.logger.error('GitHub App authentication failed, trying fallback', {
+          error: error.message,
+          stack: error.stack
+        });
+        // Don't throw, continue to fallback
+      }
     }
-    const mod = await import('@octokit/rest');
-    this._octokit = new mod.Octokit({ auth: this.options.githubToken });
-    return this._octokit;
+    
+    // Option 2: Fallback to Personal Access Token (DEVELOPMENT)
+    if (this.options.githubToken || process.env.GITHUB_TOKEN) {
+      const token = this.options.githubToken || process.env.GITHUB_TOKEN;
+      this.logger.warn('Using Personal Access Token authentication (development mode)', {
+        authType: 'personal-token'
+      });
+      
+      const mod = await import('@octokit/rest');
+      this._octokit = new mod.Octokit({ auth: token });
+      return this._octokit;
+    }
+    
+    // No authentication configured
+    throw new Error('GitHub authentication not configured. Set GITHUB_APP_ID + GITHUB_APP_INSTALLATION_ID + private key, or GITHUB_TOKEN');
   }
 
   /**

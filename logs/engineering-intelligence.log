@@ -78,3 +78,12 @@
 {"level":"info","message":"Querying codebase","question":"Test query 12","repository":"your_github_username_or_org/HeyJarvis","role":"sales","service":"engineering-intelligence","timestamp":"2025-10-07T23:48:06.851Z"}
 {"level":"warn","message":"GitHub Copilot API not available, using mock responses","service":"engineering-intelligence","timestamp":"2025-10-07T23:48:07.007Z"}
 {"level":"info","message":"Codebase query completed","question":"Test query 12","responseLength":34,"service":"engineering-intelligence","timestamp":"2025-10-07T23:48:07.008Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"HeyoJarvis/Mark-I","service":"engineering-intelligence","timestamp":"2025-10-08T04:18:00.513Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-08T04:18:00.547Z"}
+{"feature":"authentication","level":"info","message":"Getting feature status","service":"engineering-intelligence","timestamp":"2025-10-08T04:18:01.812Z"}
+{"level":"info","message":"Querying codebase","question":"What is the implementation status of the authentication feature? Include: completion percentage, wha","repository":"HeyoJarvis/Mark-I","role":"sales","service":"engineering-intelligence","timestamp":"2025-10-08T04:18:01.812Z"}
+{"level":"warn","message":"GitHub Copilot API not available, using mock responses","service":"engineering-intelligence","timestamp":"2025-10-08T04:18:01.870Z"}
+{"level":"info","message":"Codebase query completed","question":"What is the implementation status of the authentication feature? Include: completion percentage, wha","responseLength":31,"service":"engineering-intelligence","timestamp":"2025-10-08T04:18:01.872Z"}
+{"level":"info","message":"Querying codebase","question":"What features have been built recently?","repository":"HeyoJarvis/Mark-I","role":"sales","service":"engineering-intelligence","timestamp":"2025-10-08T04:18:02.631Z"}
+{"level":"warn","message":"GitHub Copilot API not available, using mock responses","service":"engineering-intelligence","timestamp":"2025-10-08T04:18:02.684Z"}
+{"level":"info","message":"Codebase query completed","question":"What features have been built recently?","responseLength":34,"service":"engineering-intelligence","timestamp":"2025-10-08T04:18:02.686Z"}
