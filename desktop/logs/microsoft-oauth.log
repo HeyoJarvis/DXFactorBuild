@@ -62,3 +62,19 @@
 {"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-07T19:32:10.208Z"}
 {"account":"avi@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-07T19:32:11.686Z"}
 {"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-07T19:32:16.687Z"}
+{"level":"info","message":"OAuth server started","port":8889,"service":"microsoft-oauth-handler","timestamp":"2025-10-07T21:53:43.799Z"}
+{"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-07T21:53:43.806Z"}
+{"account":"shail@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-07T21:54:19.052Z"}
+{"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-07T21:54:24.114Z"}
+{"level":"info","message":"OAuth server started","port":8889,"service":"microsoft-oauth-handler","timestamp":"2025-10-07T23:05:26.495Z"}
+{"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-07T23:05:26.502Z"}
+{"account":"shail@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-07T23:07:25.882Z"}
+{"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-07T23:07:26.883Z"}
+{"level":"info","message":"OAuth server started","port":8889,"service":"microsoft-oauth-handler","timestamp":"2025-10-08T02:55:20.926Z"}
+{"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-08T02:55:20.934Z"}
+{"account":"shail@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-08T02:55:29.931Z"}
+{"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-08T02:55:34.934Z"}
+{"level":"info","message":"OAuth server started","port":8889,"service":"microsoft-oauth-handler","timestamp":"2025-10-08T02:59:09.865Z"}
+{"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-08T02:59:09.871Z"}
+{"account":"shail@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-08T02:59:21.476Z"}
+{"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-08T02:59:26.478Z"}
