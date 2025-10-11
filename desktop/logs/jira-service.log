@@ -1,0 +1,58 @@
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:32:50.753Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:34:15.161Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:34:33.264Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:34:34.908Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:35:11.529Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:37:33.980Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-10T01:37:55.840Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8889/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-10T01:37:55.841Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:40:43.259Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-10T01:40:46.420Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8889/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-10T01:40:46.420Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:41:13.983Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-10T01:41:16.436Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8889/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-10T01:41:16.436Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:43:12.814Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-10T01:43:23.640Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8889/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-10T01:43:23.640Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:44:18.580Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-10T01:44:20.531Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-10T01:44:20.531Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-10T01:44:36.062Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-10T01:44:38.541Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-10T01:44:38.541Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-11T18:21:31.253Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-11T18:21:33.309Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-11T18:21:33.309Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-11T18:27:26.317Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-11T18:27:28.199Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-11T18:27:28.199Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"jira-service","timestamp":"2025-10-11T18:27:36.637Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","count":1,"level":"info","message":"Accessible resources retrieved","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:27:37.061Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","expiresIn":3600,"level":"info","message":"Successfully authenticated with JIRA","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:27:37.061Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-11T18:27:43.414Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-11T18:27:43.414Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"jira-service","timestamp":"2025-10-11T18:27:59.262Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","count":1,"level":"info","message":"Accessible resources retrieved","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:27:59.606Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","expiresIn":3600,"level":"info","message":"Successfully authenticated with JIRA","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:27:59.606Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-11T18:29:39.503Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-11T18:29:41.554Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-11T18:29:41.554Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"jira-service","timestamp":"2025-10-11T18:29:47.950Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","count":1,"level":"info","message":"Accessible resources retrieved","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:29:48.323Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","expiresIn":3600,"level":"info","message":"Successfully authenticated with JIRA","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:29:48.323Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-11T18:29:52.666Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-11T18:29:52.666Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"jira-service","timestamp":"2025-10-11T18:29:56.146Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","count":1,"level":"info","message":"Accessible resources retrieved","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:29:56.484Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","expiresIn":3600,"level":"info","message":"Successfully authenticated with JIRA","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:29:56.484Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-11T18:36:35.467Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-11T18:36:38.159Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-11T18:36:41.862Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-11T18:36:41.862Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"jira-service","timestamp":"2025-10-11T18:36:46.042Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","count":1,"level":"info","message":"Accessible resources retrieved","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:36:46.452Z"}
+{"cloudId":"cd9594ee-15d2-4206-9eb1-359435599084","expiresIn":3600,"level":"info","message":"Successfully authenticated with JIRA","service":"jira-service","siteUrl":"https://hey-jarvis.atlassian.net","timestamp":"2025-10-11T18:36:46.452Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-11T18:37:01.167Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-11T18:37:01.167Z"}
+{"clientId":"***rtD2","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-11T18:37:10.118Z"}

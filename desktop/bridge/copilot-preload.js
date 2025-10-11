@@ -211,6 +211,32 @@ contextBridge.exposeInMainWorld('electronAPI', {
     close: () => ipcRenderer.invoke('copilot:close'),
     clearHistory: () => ipcRenderer.invoke('copilot:clearHistory'),
     getHistory: () => ipcRenderer.invoke('copilot:getHistory')
+  },
+
+  // JIRA Integration
+  jira: {
+    authenticate: () => ipcRenderer.invoke('jira:authenticate'),
+    getMyIssues: (options) => ipcRenderer.invoke('jira:getMyIssues', options),
+    checkConnection: () => ipcRenderer.invoke('jira:checkConnection')
+  },
+
+  // Code Indexer
+  codeIndexer: {
+    listRepositories: () => ipcRenderer.invoke('codeIndexer:listRepositories'),
+    indexRepository: (params) => ipcRenderer.invoke('codeIndexer:indexRepository', params),
+    batchIndex: (params) => ipcRenderer.invoke('codeIndexer:batchIndex', params),
+    query: (params) => ipcRenderer.invoke('codeIndexer:query', params),
+    getStatus: (params) => ipcRenderer.invoke('codeIndexer:getStatus', params),
+    checkAvailability: () => ipcRenderer.invoke('codeIndexer:checkAvailability'),
+    getStats: () => ipcRenderer.invoke('codeIndexer:getStats')
+  },
+
+  // Engineering Intelligence (GitHub integration)
+  engineering: {
+    query: (query, repository, context) => ipcRenderer.invoke('engineering:query', { query, repository, context }),
+    getFeatureStatus: (feature, repository, context) => ipcRenderer.invoke('engineering:getFeatureStatus', { feature, repository, context }),
+    healthCheck: () => ipcRenderer.invoke('engineering:healthCheck'),
+    listRepos: () => ipcRenderer.invoke('engineering:listRepos')
   }
 });
 

@@ -22,8 +22,16 @@ class EngineeringIntelligenceService extends EventEmitter {
     super();
     
     this.options = {
+      // GitHub App authentication (primary)
+      githubAppId: options.githubAppId || process.env.GITHUB_APP_ID,
+      githubAppInstallationId: options.githubAppInstallationId || process.env.GITHUB_APP_INSTALLATION_ID,
+      githubAppPrivateKeyPath: options.githubAppPrivateKeyPath || process.env.GITHUB_APP_PRIVATE_KEY_PATH,
+      githubAppPrivateKey: options.githubAppPrivateKey || process.env.GITHUB_APP_PRIVATE_KEY,
+      
+      // Personal Access Token (fallback - optional)
       githubToken: options.githubToken || process.env.GITHUB_TOKEN,
-      // Repository is now OPTIONAL - can be specified per-query for multi-repo support
+      
+      // Repository is OPTIONAL - will be auto-detected from GitHub App installation
       repository: options.repository || (
         process.env.GITHUB_REPO_OWNER && process.env.GITHUB_REPO_NAME ? {
           owner: process.env.GITHUB_REPO_OWNER,
@@ -74,17 +82,17 @@ class EngineeringIntelligenceService extends EventEmitter {
     if (this._octokit) return this._octokit;
     
     // Option 1: Try GitHub App authentication first (PRODUCTION - Recommended)
-    if (process.env.GITHUB_APP_ID && process.env.GITHUB_APP_INSTALLATION_ID) {
+    if (this.options.githubAppId && this.options.githubAppInstallationId) {
       try {
         // Dynamic import for ESM modules
         const { createAppAuth } = await import('@octokit/auth-app');
         
         // Load private key from file or environment variable
         let privateKey;
-        if (process.env.GITHUB_APP_PRIVATE_KEY) {
-          privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
-        } else if (process.env.GITHUB_APP_PRIVATE_KEY_PATH) {
-          privateKey = fs.readFileSync(process.env.GITHUB_APP_PRIVATE_KEY_PATH, 'utf8');
+        if (this.options.githubAppPrivateKey) {
+          privateKey = this.options.githubAppPrivateKey;
+        } else if (this.options.githubAppPrivateKeyPath) {
+          privateKey = fs.readFileSync(this.options.githubAppPrivateKeyPath, 'utf8');
         } else {
           throw new Error('GitHub App private key not found. Set GITHUB_APP_PRIVATE_KEY or GITHUB_APP_PRIVATE_KEY_PATH');
         }
@@ -93,30 +101,41 @@ class EngineeringIntelligenceService extends EventEmitter {
         this._octokit = new mod.Octokit({
           authStrategy: createAppAuth,
           auth: {
-            appId: process.env.GITHUB_APP_ID,
+            appId: this.options.githubAppId,
             privateKey: privateKey,
-            installationId: process.env.GITHUB_APP_INSTALLATION_ID,
+            installationId: this.options.githubAppInstallationId,
           },
         });
         
         this.logger.info('GitHub App authentication successful', {
-          appId: process.env.GITHUB_APP_ID,
-          installationId: process.env.GITHUB_APP_INSTALLATION_ID,
+          appId: this.options.githubAppId,
+          installationId: this.options.githubAppInstallationId,
           authType: 'github-app'
         });
         
+        // If no repository specified, auto-detect from first accessible repo
+        if (!this.options.repository) {
+          await this._autoDetectRepository();
+        }
+        
         return this._octokit;
       } catch (error) {
-        this.logger.error('GitHub App authentication failed, trying fallback', {
+        this.logger.error('GitHub App authentication failed', {
           error: error.message,
           stack: error.stack
         });
-        // Don't throw, continue to fallback
+        
+        // Only try fallback if token is configured
+        if (!this.options.githubToken) {
+          throw new Error(`GitHub App authentication failed: ${error.message}`);
+        }
+        
+        this.logger.warn('Falling back to Personal Access Token');
       }
     }
     
-    // Option 2: Fallback to Personal Access Token (DEVELOPMENT)
-    if (this.options.githubToken || process.env.GITHUB_TOKEN) {
+    // Option 2: Fallback to Personal Access Token (DEVELOPMENT - Optional)
+    if (this.options.githubToken) {
       const token = this.options.githubToken || process.env.GITHUB_TOKEN;
       this.logger.warn('Using Personal Access Token authentication (development mode)', {
         authType: 'personal-token'
@@ -128,7 +147,42 @@ class EngineeringIntelligenceService extends EventEmitter {
     }
     
     // No authentication configured
-    throw new Error('GitHub authentication not configured. Set GITHUB_APP_ID + GITHUB_APP_INSTALLATION_ID + private key, or GITHUB_TOKEN');
+    throw new Error('No GitHub authentication configured. Set GITHUB_APP_ID + GITHUB_APP_INSTALLATION_ID + GITHUB_APP_PRIVATE_KEY_PATH');
+  }
+
+  /**
+   * Auto-detect repository from GitHub App installation
+   * @private
+   */
+  async _autoDetectRepository() {
+    try {
+      this.logger.info('Auto-detecting repository from GitHub App installation');
+      
+      // Get list of repositories accessible to this installation
+      const { data } = await this._octokit.apps.listReposAccessibleToInstallation({
+        per_page: 1
+      });
+      
+      if (data.repositories && data.repositories.length > 0) {
+        const repo = data.repositories[0];
+        this.options.repository = {
+          owner: repo.owner.login,
+          repo: repo.name
+        };
+        
+        this.logger.info('Repository auto-detected', {
+          owner: this.options.repository.owner,
+          repo: this.options.repository.repo
+        });
+      } else {
+        this.logger.warn('No repositories found for GitHub App installation');
+      }
+    } catch (error) {
+      this.logger.error('Failed to auto-detect repository', {
+        error: error.message
+      });
+      // Don't throw - repository can be specified per-query
+    }
   }
 
   /**

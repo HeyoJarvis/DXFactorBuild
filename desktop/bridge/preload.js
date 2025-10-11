@@ -10,7 +10,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   auth: {
     signInWithSlack: () => ipcRenderer.invoke('auth:sign-in-slack'),
     signOut: () => ipcRenderer.invoke('auth:sign-out'),
-    getUser: () => ipcRenderer.invoke('auth:get-user')
+    getUser: () => ipcRenderer.invoke('auth:get-user'),
+    saveUserRole: (role) => ipcRenderer.invoke('auth:save-user-role', role),
+    completeRoleSelection: () => ipcRenderer.invoke('auth:complete-role-selection')
   },
   
   // Signal management
@@ -88,6 +90,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getFeatureStatus: (feature, repository, context) => ipcRenderer.invoke('engineering:getFeatureStatus', { feature, repository, context }),
     healthCheck: () => ipcRenderer.invoke('engineering:healthCheck'),
     listRepos: () => ipcRenderer.invoke('engineering:listRepos')
+  },
+
+  // Code Indexer
+  codeIndexer: {
+    listRepositories: () => ipcRenderer.invoke('codeIndexer:listRepositories'),
+    indexRepository: (params) => ipcRenderer.invoke('codeIndexer:indexRepository', params),
+    batchIndex: (params) => ipcRenderer.invoke('codeIndexer:batchIndex', params),
+    query: (params) => ipcRenderer.invoke('codeIndexer:query', params),
+    getStatus: (params) => ipcRenderer.invoke('codeIndexer:getStatus', params),
+    checkAvailability: () => ipcRenderer.invoke('codeIndexer:checkAvailability'),
+    getStats: () => ipcRenderer.invoke('codeIndexer:getStats')
+  },
+
+  // JIRA Integration
+  jira: {
+    authenticate: () => ipcRenderer.invoke('jira:authenticate'),
+    getMyIssues: (options) => ipcRenderer.invoke('jira:getMyIssues', options),
+    checkConnection: () => ipcRenderer.invoke('jira:checkConnection')
   },
   
   // Event listeners

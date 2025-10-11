@@ -1,0 +1,75 @@
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:32:51.181Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:32:51.181Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:36:01.386Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:36:01.386Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:36:37.173Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:36:37.173Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:37:49.421Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:37:49.421Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:38:14.372Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:38:14.372Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:40:59.179Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:40:59.179Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:42:26.193Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:42:26.193Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:44:58.404Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:44:58.404Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:45:58.832Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:45:58.833Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:46:20.400Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:46:20.400Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:46:43.230Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:46:43.231Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:49:57.142Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:49:57.143Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:50:24.296Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:50:24.297Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:51:04.893Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:51:04.894Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:54:29.220Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:54:29.220Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:57:15.077Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T00:57:15.078Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:32:50.754Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:32:50.754Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:34:15.162Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:34:15.162Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:34:33.266Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:34:33.266Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:34:34.910Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:34:34.909Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:35:11.530Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:35:11.530Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:37:33.981Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:37:33.982Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:40:43.260Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:40:43.260Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:41:13.985Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:41:13.985Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T01:42:14.498Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:43:12.815Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:43:12.816Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:44:18.581Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:44:18.581Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:44:36.063Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-10T01:44:36.063Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T01:48:58.302Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T01:50:44.972Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T01:53:37.858Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T01:54:41.555Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T01:56:41.016Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T01:57:55.539Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T02:09:37.458Z"}
+{"error":"Could not find the table 'public.code_indexing_status' in the schema cache","level":"error","message":"Failed to list indexed repositories","service":"vector-store","timestamp":"2025-10-10T02:09:41.830Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:21:31.254Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:21:31.254Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:27:26.318Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:27:26.319Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:29:39.504Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:29:39.504Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:36:35.468Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:36:35.468Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:36:38.160Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:36:38.161Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:37:10.119Z"}
+{"level":"info","message":"Code Vector Store initialized","service":"vector-store","timestamp":"2025-10-11T18:37:10.120Z"}

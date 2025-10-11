@@ -18,7 +18,9 @@ const AuthService = require('./services/auth-service');
 const FactCheckerService = require('./main/fact-checker-service');
 const MicrosoftOAuthHandler = require('../oauth/microsoft-oauth-handler');
 const MicrosoftWorkflowAutomation = require('../core/automation/microsoft-workflow-automation');
+const JIRAOAuthHandler = require('../oauth/jira-oauth-handler');
 const EngineeringIntelligenceService = require('../core/intelligence/engineering-intelligence-service');
+const CodeIndexer = require('../core/intelligence/code-indexer');
 
 // Global error handlers to prevent crashes
 process.on('uncaughtException', (error) => {
@@ -44,13 +46,16 @@ let authService; // Authentication service
 let factCheckerService; // Fact-checker service
 let microsoftOAuthHandler; // Microsoft OAuth handler
 let microsoftAutomation; // Microsoft workflow automation
+let jiraOAuthHandler; // JIRA OAuth handler
 let engineeringIntelligence; // Engineering intelligence service
+let codeIndexer; // Code repository indexer for semantic search
 let currentUser = null; // Currently authenticated user
 let conversationHistory = []; // Store conversation history
 let currentSessionId = null; // Track current conversation session
 let taskSessionIds = {}; // Track task-specific session IDs: { taskId: sessionId }
 let lastSlackContext = null; // Cache Slack context
 let isExpanded = false; // Track if top bar is expanded
+let roleSelectionWindow = null; // Role selection window
 let isManuallyPositioned = false; // Track if user has manually moved the bar
 let activeHighlights = []; // Store active highlight data
 let userDefinedSize = null; // Track user's custom window size
@@ -793,6 +798,142 @@ function setupMicrosoftIPCHandlers() {
   console.log('✅ Microsoft 365 IPC handlers registered');
 }
 
+// ===== JIRA IPC HANDLERS =====
+// Always register handlers, check initialization inside
+ipcMain.handle('jira:authenticate', async () => {
+  try {
+    if (!jiraOAuthHandler) {
+      return {
+        success: false,
+        error: 'JIRA integration not configured. Please add JIRA_CLIENT_ID and JIRA_CLIENT_SECRET to your .env file.'
+      };
+    }
+    
+    console.log('🔐 Starting JIRA authentication...');
+    const result = await jiraOAuthHandler.startAuthFlow();
+    
+    console.log('📋 JIRA auth result:', result);
+    
+    // Save tokens to user settings
+    if (result.access_token && currentUser) {
+      try {
+        const { data: userData, error: userError } = await dbAdapter.supabase
+          .from('users')
+          .select('integration_settings')
+          .eq('id', currentUser.id)
+          .single();
+        
+        if (userError) throw userError;
+        
+        const integrationSettings = userData?.integration_settings || {};
+        integrationSettings.jira = {
+          access_token: result.access_token,
+          refresh_token: result.refresh_token,
+          token_expiry: Date.now() + (result.expires_in * 1000),
+          cloud_id: result.cloud_id,
+          site_url: result.site_url,
+          connected_at: new Date().toISOString()
+        };
+        
+        const { error: updateError } = await dbAdapter.supabase
+          .from('users')
+          .update({ integration_settings: integrationSettings })
+          .eq('id', currentUser.id);
+        
+        if (updateError) throw updateError;
+        
+        console.log('✅ JIRA tokens saved to user settings');
+      } catch (error) {
+        console.error('⚠️ Failed to save JIRA tokens:', error);
+      }
+    }
+    
+    console.log('✅ JIRA authenticated:', result.site_url);
+    
+    // Return in expected format
+    return {
+      success: true,
+      accessToken: result.access_token,
+      refreshToken: result.refresh_token,
+      expiresAt: Date.now() + (result.expires_in * 1000),
+      cloudId: result.cloud_id,
+      siteUrl: result.site_url
+    };
+  } catch (error) {
+    console.error('❌ JIRA authentication failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// Get JIRA Issues (Tasks for current user)
+ipcMain.handle('jira:getMyIssues', async (event, options = {}) => {
+  try {
+    if (!jiraOAuthHandler || !jiraOAuthHandler.jiraService) {
+      return {
+        success: false,
+        error: 'JIRA not authenticated'
+      };
+    }
+    
+    console.log('📋 Fetching JIRA issues for current user...');
+    
+    const jiraService = jiraOAuthHandler.jiraService;
+    const issues = await jiraService.getMyIssues({
+      maxResults: options.maxResults || 50,
+      fields: ['summary', 'status', 'priority', 'assignee', 'created', 'updated', 'duedate', 'description', 'project', 'issuetype']
+    });
+    
+    console.log(`✅ Retrieved ${issues.length} JIRA issues`);
+    
+    return {
+      success: true,
+      issues: issues
+    };
+  } catch (error) {
+    console.error('❌ Failed to fetch JIRA issues:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// Check if JIRA is connected
+ipcMain.handle('jira:checkConnection', async () => {
+  try {
+    if (!currentUser) {
+      return { connected: false };
+    }
+    
+    const { data: userData, error } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+    
+    if (error || !userData) {
+      return { connected: false };
+    }
+    
+    const jiraSettings = userData.integration_settings?.jira;
+    const connected = !!(jiraSettings?.access_token && jiraSettings?.cloud_id);
+    
+    return {
+      connected,
+      siteUrl: jiraSettings?.site_url,
+      connectedAt: jiraSettings?.connected_at
+    };
+  } catch (error) {
+    console.error('❌ Failed to check JIRA connection:', error);
+    return { connected: false };
+  }
+});
+
+console.log('✅ JIRA IPC handlers registered');
+
 // Initialize services with auto-startup
 function initializeServices() {
   // Initialize Supabase adapter
@@ -842,38 +983,98 @@ function initializeServices() {
     console.log('ℹ️ Microsoft 365 integration not configured (optional)');
     microsoftOAuthHandler = null;
   }
+
+  // Initialize JIRA OAuth Handler (optional - only if credentials are configured)
+  if (process.env.JIRA_CLIENT_ID && process.env.JIRA_CLIENT_SECRET) {
+    try {
+      jiraOAuthHandler = new JIRAOAuthHandler({
+        clientId: process.env.JIRA_CLIENT_ID,
+        clientSecret: process.env.JIRA_CLIENT_SECRET,
+        redirectUri: process.env.JIRA_REDIRECT_URI,
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ JIRA OAuth handler initialized');
+    } catch (error) {
+      console.warn('⚠️ JIRA OAuth initialization failed:', error.message);
+      console.log('💡 JIRA features will be disabled. Add credentials to .env to enable.');
+      jiraOAuthHandler = null;
+    }
+  } else {
+    console.log('ℹ️ JIRA integration not configured (optional)');
+    jiraOAuthHandler = null;
+  }
   
-  // Initialize Engineering Intelligence (supports GitHub App or Personal Token)
-  const hasGitHubApp = process.env.GITHUB_APP_ID && process.env.GITHUB_APP_INSTALLATION_ID;
-  const hasGitHubToken = process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN !== 'your_github_token_here';
+  // Initialize Engineering Intelligence (GitHub App ONLY)
+  const hasGitHubApp = process.env.GITHUB_APP_ID && 
+                       process.env.GITHUB_APP_INSTALLATION_ID && 
+                       (process.env.GITHUB_APP_PRIVATE_KEY_PATH || process.env.GITHUB_APP_PRIVATE_KEY);
   
-  if (hasGitHubApp || hasGitHubToken) {
+  if (hasGitHubApp) {
     try {
       engineeringIntelligence = new EngineeringIntelligenceService({
         logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
-        // Repository can be set dynamically per query
+        // Repository will be auto-detected from GitHub App installation
       });
       
-      if (hasGitHubApp) {
-        console.log('✅ Engineering Intelligence initialized with GitHub App');
-        console.log(`📊 App ID: ${process.env.GITHUB_APP_ID}`);
-        console.log(`📦 Installation ID: ${process.env.GITHUB_APP_INSTALLATION_ID}`);
-        console.log(`📚 Multi-repository access enabled`);
-      } else {
-        console.log('✅ Engineering Intelligence initialized with Personal Token');
-        if (process.env.GITHUB_REPO_OWNER && process.env.GITHUB_REPO_NAME) {
-          console.log(`📊 Default repository: ${process.env.GITHUB_REPO_OWNER}/${process.env.GITHUB_REPO_NAME}`);
-        }
-      }
+      console.log('✅ Engineering Intelligence initialized with GitHub App');
+      console.log(`📊 App ID: ${process.env.GITHUB_APP_ID}`);
+      console.log(`📦 Installation ID: ${process.env.GITHUB_APP_INSTALLATION_ID}`);
+      console.log(`🔐 Private Key: ${process.env.GITHUB_APP_PRIVATE_KEY_PATH ? 'Loaded from file' : 'Loaded from env'}`);
+      console.log(`📚 Repository: Auto-detected from installation`);
+      
     } catch (error) {
       console.warn('⚠️ Engineering Intelligence initialization failed:', error.message);
       console.log('💡 Engineering queries will be disabled.');
       engineeringIntelligence = null;
     }
+    
+    // Initialize Code Indexer separately (independent of EngineeringIntelligence)
+    try {
+      codeIndexer = new CodeIndexer({
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ Code Indexer initialized (GitHub + OpenAI + Anthropic + Supabase)');
+      
+      // Set up event listeners for indexing progress
+      codeIndexer.on('indexing:started', (job) => {
+        console.log(`🚀 Indexing started: ${job.owner}/${job.repo}`);
+        if (mainWindow) {
+          mainWindow.webContents.send('indexing:started', job);
+        }
+      });
+      
+      codeIndexer.on('indexing:progress', (job) => {
+        console.log(`⏳ Indexing progress: ${job.owner}/${job.repo} - ${job.phase} (${job.progress}%)`);
+        if (mainWindow) {
+          mainWindow.webContents.send('indexing:progress', job);
+        }
+      });
+      
+      codeIndexer.on('indexing:completed', (job) => {
+        console.log(`✅ Indexing completed: ${job.owner}/${job.repo} - ${job.result.chunks} chunks in ${job.duration}ms`);
+        if (mainWindow) {
+          mainWindow.webContents.send('indexing:completed', job);
+        }
+      });
+      
+      codeIndexer.on('indexing:failed', (job) => {
+        console.error(`❌ Indexing failed: ${job.owner}/${job.repo} - ${job.error}`);
+        if (mainWindow) {
+          mainWindow.webContents.send('indexing:failed', job);
+        }
+      });
+      
+    } catch (error) {
+      console.warn('⚠️ Code Indexer initialization failed:', error.message);
+      console.warn('Stack:', error.stack);
+      console.log('💡 Code indexing will be disabled.');
+      codeIndexer = null;
+    }
   } else {
-    console.log('ℹ️ Engineering Intelligence not configured');
-    console.log('   Add GITHUB_APP_ID + GITHUB_APP_INSTALLATION_ID or GITHUB_TOKEN to .env');
+    console.log('ℹ️ Engineering Intelligence not configured (GitHub App required)');
+    console.log('   Set GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, and GITHUB_APP_PRIVATE_KEY_PATH in .env');
     engineeringIntelligence = null;
+    codeIndexer = null;
   }
   
   workflowIntelligence = new WorkflowIntelligenceSystem({
@@ -2715,6 +2916,32 @@ function createLoginWindow() {
   console.log('🔐 Login window created');
 }
 
+// Create role selection window
+function createRoleSelectionWindow() {
+  roleSelectionWindow = new BrowserWindow({
+    width: 900,
+    height: 700,
+    show: true,
+    center: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'bridge', 'preload.js')
+    },
+    titleBarStyle: 'hiddenInset',
+    frame: true
+  });
+
+  roleSelectionWindow.loadFile(path.join(__dirname, 'renderer', 'role-selection.html'));
+  
+  roleSelectionWindow.on('closed', () => {
+    roleSelectionWindow = null;
+  });
+  
+  console.log('🎯 Role selection window created');
+}
+
 // Check authentication and show appropriate window
 async function initializeApp() {
   try {
@@ -2728,6 +2955,15 @@ async function initializeApp() {
       // User is authenticated
       currentUser = session.user;
       console.log('✅ User authenticated:', currentUser.email);
+      
+      // Check if user needs to select role
+      if (authService.needsRoleSelection()) {
+        console.log('🎯 User needs to select role');
+        createRoleSelectionWindow();
+        return;
+      }
+      
+      console.log('👤 User role:', currentUser.user_role);
       
       // Show main app
       createWindow();
@@ -2747,7 +2983,7 @@ async function initializeApp() {
   } catch (error) {
     console.error('❌ App initialization failed:', error);
     // Only show login if we haven't already created a window
-    if (!mainWindow && !loginWindow) {
+    if (!mainWindow && !loginWindow && !roleSelectionWindow) {
       createLoginWindow();
     }
   }
@@ -2951,7 +3187,7 @@ function registerAllIPCHandlers() {
       }
 
       const octokit = await engineeringIntelligence._getOctokit();
-      const { data } = await octokit.apps.listReposAccessibleToInstallation();
+      const { data} = await octokit.apps.listReposAccessibleToInstallation();
       
       return {
         success: true,
@@ -2959,6 +3195,191 @@ function registerAllIPCHandlers() {
       };
     } catch (error) {
       console.error('❌ List repos failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // ===== CODE INDEXER IPC HANDLERS =====
+  
+  // List indexed repositories
+  ipcMain.handle('codeIndexer:listRepositories', async () => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured. Set GITHUB_APP_ID, OPENAI_API_KEY, and ANTHROPIC_API_KEY in .env'
+        };
+      }
+
+      console.log('📋 Listing indexed repositories...');
+      const repositories = await codeIndexer.listIndexedRepositories();
+      
+      return {
+        success: true,
+        repositories
+      };
+    } catch (error) {
+      console.error('❌ List repositories failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Index a single repository
+  ipcMain.handle('codeIndexer:indexRepository', async (event, { owner, repo, branch = 'main' }) => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      console.log(`🔍 Indexing repository: ${owner}/${repo} (${branch})`);
+      const result = await codeIndexer.indexRepository(owner, repo, branch);
+      
+      return {
+        success: true,
+        result
+      };
+    } catch (error) {
+      console.error('❌ Repository indexing failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Batch index multiple repositories
+  ipcMain.handle('codeIndexer:batchIndex', async (event, { repositories }) => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      console.log(`🔍 Batch indexing ${repositories.length} repositories...`);
+      const results = await codeIndexer.indexRepositories(repositories);
+      
+      return {
+        success: true,
+        results
+      };
+    } catch (error) {
+      console.error('❌ Batch indexing failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Query a repository with natural language
+  ipcMain.handle('codeIndexer:query', async (event, { owner, repo, question, options = {} }) => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      console.log(`💬 Querying ${owner}/${repo}: ${question.substring(0, 50)}...`);
+      const result = await codeIndexer.query(question, { owner, repo, ...options });
+      
+      return {
+        success: true,
+        ...result
+      };
+    } catch (error) {
+      console.error('❌ Repository query failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Get indexing status for a repository
+  ipcMain.handle('codeIndexer:getStatus', async (event, { owner, repo, branch = 'main' }) => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      const status = await codeIndexer.getIndexingStatus(owner, repo, branch);
+      
+      return {
+        success: true,
+        status
+      };
+    } catch (error) {
+      console.error('❌ Get indexing status failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Check if code indexer is available and configured
+  ipcMain.handle('codeIndexer:checkAvailability', async () => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          available: false,
+          error: 'Code Indexer not initialized'
+        };
+      }
+
+      console.log('🔍 Checking Code Indexer availability...');
+      const checks = await codeIndexer.checkAvailability();
+      
+      return {
+        success: true,
+        available: checks.overall,
+        checks
+      };
+    } catch (error) {
+      console.error('❌ Check availability failed:', error);
+      return {
+        success: false,
+        available: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Get code indexer statistics
+  ipcMain.handle('codeIndexer:getStats', async () => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      const stats = codeIndexer.getStats();
+      
+      return {
+        success: true,
+        stats
+      };
+    } catch (error) {
+      console.error('❌ Get stats failed:', error);
       return {
         success: false,
         error: error.message
@@ -3232,6 +3653,17 @@ ipcMain.handle('auth:sign-in-slack', async () => {
         loginWindow = null;
       }
       
+      // Check if user needs to select role
+      if (authService.needsRoleSelection()) {
+        console.log('🎯 User needs to select role after sign-in');
+        createRoleSelectionWindow();
+        return {
+          success: true,
+          user: currentUser,
+          needsRoleSelection: true
+        };
+      }
+      
       // Create main window
       createWindow();
       
@@ -3245,7 +3677,8 @@ ipcMain.handle('auth:sign-in-slack', async () => {
       
       return {
         success: true,
-        user: currentUser
+        user: currentUser,
+        needsRoleSelection: false
       };
     }
     
@@ -3298,6 +3731,71 @@ ipcMain.handle('auth:sign-out', async () => {
 // Get current user
 ipcMain.handle('auth:get-user', async () => {
   return currentUser;
+});
+
+// Save user role
+ipcMain.handle('auth:save-user-role', async (event, role) => {
+  try {
+    console.log('🎯 Saving user role:', role);
+    
+    if (!authService) {
+      return {
+        success: false,
+        error: 'Auth service not initialized'
+      };
+    }
+    
+    const result = await authService.saveUserRole(role);
+    
+    if (result.success) {
+      currentUser = result.user;
+      return result;
+    }
+    
+    return {
+      success: false,
+      error: 'Failed to save role'
+    };
+    
+  } catch (error) {
+    console.error('❌ Save role failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// Complete role selection (close role window, open main app)
+ipcMain.handle('auth:complete-role-selection', async () => {
+  try {
+    console.log('✅ Role selection complete');
+    
+    // Close role selection window
+    if (roleSelectionWindow) {
+      roleSelectionWindow.close();
+      roleSelectionWindow = null;
+    }
+    
+    // Create main window
+    createWindow();
+    
+    // Initialize services
+    try {
+      initializeServices();
+    } catch (serviceError) {
+      console.error('⚠️ Service initialization failed (non-fatal):', serviceError.message);
+    }
+    
+    return { success: true };
+    
+  } catch (error) {
+    console.error('❌ Complete role selection failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
 });
 
 // ===== FACT CHECK IPC HANDLERS =====
