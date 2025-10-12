@@ -261,6 +261,25 @@ class JIRAService extends EventEmitter {
           status: response.status,
           error: errorText
         });
+        
+        // Check if refresh token is invalid (403 unauthorized_client)
+        if (response.status === 403 || errorText.includes('unauthorized_client') || errorText.includes('refresh_token is invalid')) {
+          this.logger.error('Refresh token is invalid - user needs to re-authenticate');
+          
+          // Clear invalid tokens to stop retry loops
+          this.accessToken = null;
+          this.refreshToken = null;
+          this.tokenExpiry = null;
+          
+          // Emit event to notify UI
+          this.emit('auth_required', {
+            reason: 'refresh_token_invalid',
+            message: 'JIRA authentication expired. Please reconnect your JIRA account.'
+          });
+          
+          throw new Error('JIRA refresh token expired. Please re-authenticate with JIRA.');
+        }
+        
         throw new Error(`Token refresh failed: ${response.status}`);
       }
 

@@ -1534,6 +1534,18 @@ function initializeServices() {
         }
       } catch (error) {
         console.log('❌ Initial JIRA sync error:', error.message);
+        
+        // Check if it's an auth error
+        if (error.message && (error.message.includes('re-authenticate') || error.message.includes('refresh token expired'))) {
+          console.log('⚠️ JIRA authentication expired - user needs to reconnect');
+          if (mainWindow) {
+            mainWindow.webContents.send('notification', {
+              type: 'jira_auth_required',
+              message: 'JIRA authentication expired. Please reconnect your JIRA account.',
+              action: 'reconnect_jira'
+            });
+          }
+        }
       }
     }, 10000);
     
@@ -1555,11 +1567,33 @@ function initializeServices() {
                   message: `${result.tasksCreated} new JIRA task(s) added`
                 });
               }
+            } else if (result.error && (result.error.includes('re-authenticate') || result.error.includes('refresh token expired'))) {
+              // Auth error - notify user and stop retrying until reconnect
+              console.log('⚠️ JIRA authentication expired - user needs to reconnect');
+              if (mainWindow) {
+                mainWindow.webContents.send('notification', {
+                  type: 'jira_auth_required',
+                  message: 'JIRA authentication expired. Please reconnect your JIRA account.',
+                  action: 'reconnect_jira'
+                });
+              }
             }
           }
         }
       } catch (error) {
         console.log('❌ Periodic JIRA sync error:', error.message);
+        
+        // Check if it's an auth error
+        if (error.message && (error.message.includes('re-authenticate') || error.message.includes('refresh token expired'))) {
+          console.log('⚠️ JIRA authentication expired - user needs to reconnect');
+          if (mainWindow) {
+            mainWindow.webContents.send('notification', {
+              type: 'jira_auth_required',
+              message: 'JIRA authentication expired. Please reconnect your JIRA account.',
+              action: 'reconnect_jira'
+            });
+          }
+        }
       }
     }, 10 * 60 * 1000); // Every 10 minutes
   };
