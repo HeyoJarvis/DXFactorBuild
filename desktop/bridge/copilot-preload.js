@@ -217,7 +217,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   jira: {
     authenticate: () => ipcRenderer.invoke('jira:authenticate'),
     getMyIssues: (options) => ipcRenderer.invoke('jira:getMyIssues', options),
-    checkConnection: () => ipcRenderer.invoke('jira:checkConnection')
+    checkConnection: () => ipcRenderer.invoke('jira:checkConnection'),
+    syncTasks: (options) => ipcRenderer.invoke('jira:syncTasks', options)
   },
 
   // Code Indexer
