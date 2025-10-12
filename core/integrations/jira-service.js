@@ -461,7 +461,7 @@ class JIRAService extends EventEmitter {
         fields: fields.join(',')
       });
 
-      const response = await this._makeRequest(`/rest/api/3/search?${params.toString()}`);
+      const response = await this._makeRequest(`/rest/api/3/search/jql?${params.toString()}`);
 
       this.logger.info('Issues retrieved', {
         total: response.total,

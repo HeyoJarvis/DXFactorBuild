@@ -576,7 +576,19 @@ class DesktopSupabaseAdapter {
             parent_session_id: taskData.parentSessionId || null, // Link to chat that spawned this task
             assignor: taskData.assignor || null, // Who assigned/created the task
             assignee: taskData.assignee || null, // Who the task is assigned to
-            mentioned_users: taskData.mentionedUsers || [] // All mentioned users
+            mentioned_users: taskData.mentionedUsers || [], // All mentioned users
+            // JIRA integration fields
+            externalId: taskData.externalId || null,
+            externalKey: taskData.externalKey || null,
+            externalUrl: taskData.externalUrl || null,
+            externalSource: taskData.externalSource || null,
+            jira_issue_type: taskData.jira_issue_type || null,
+            jira_status: taskData.jira_status || null,
+            jira_priority: taskData.jira_priority || null,
+            story_points: taskData.story_points || null,
+            sprint: taskData.sprint || null,
+            labels: taskData.labels || [],
+            jira_updated_at: taskData.jira_updated_at || null
           },
           is_active: true,
           is_completed: false
@@ -649,7 +661,7 @@ async getUserTasks(userId, filters = {}) {
       throw error;
     }
 
-    // Transform to task format
+    // Transform to task format (including JIRA fields for filtering)
     let tasks = (data || []).map(session => ({
       id: session.id,
       user_id: session.user_id,
@@ -665,7 +677,19 @@ async getUserTasks(userId, filters = {}) {
       mentioned_users: session.workflow_metadata?.mentioned_users || [],
       created_at: session.started_at,
       updated_at: session.last_activity_at,
-      completed_at: session.completed_at
+      completed_at: session.completed_at,
+      // JIRA integration fields
+      externalSource: session.workflow_metadata?.externalSource || null,
+      externalId: session.workflow_metadata?.externalId || null,
+      externalKey: session.workflow_metadata?.externalKey || null,
+      externalUrl: session.workflow_metadata?.externalUrl || null,
+      jira_issue_type: session.workflow_metadata?.jira_issue_type || null,
+      jira_status: session.workflow_metadata?.jira_status || null,
+      jira_priority: session.workflow_metadata?.jira_priority || null,
+      story_points: session.workflow_metadata?.story_points || null,
+      sprint: session.workflow_metadata?.sprint || null,
+      labels: session.workflow_metadata?.labels || [],
+      workflow_metadata: session.workflow_metadata // Keep for filter checks
     }));
 
     // NOW filter by user involvement (owner, assignor, or assignee)
@@ -708,8 +732,16 @@ async getUserTasks(userId, filters = {}) {
           return matches;
         });
       } else if (assignmentView === 'assigned_to_me') {
-        // Show tasks where user is assignee OR self-created
+        // Show tasks where user is assignee OR self-created OR from external sources (JIRA)
         tasks = tasks.filter(task => {
+          // JIRA tasks (and other external integrations) always show in assigned_to_me view
+          const isExternalTask = task.externalSource === 'jira' || 
+                                  task.tags?.includes('jira-auto');
+          
+          if (isExternalTask) {
+            return true;
+          }
+          
           const startsWithName = /^([A-Z][a-z]+),?\s+(can|could|please|would you|will you)/i.test(task.title);
           
           const isAssignee = task.assignee === userSlackId;
@@ -811,6 +843,41 @@ async getUserTasks(userId, filters = {}) {
     } catch (error) {
       this.logger.error('Failed to delete task', { error: error.message });
       return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Get task by external ID (e.g., JIRA issue ID)
+   */
+  async getTaskByExternalId(externalId) {
+    try {
+      const { data, error } = await this.supabase
+        .from('conversation_sessions')
+        .select('*')
+        .eq('workflow_type', 'task')
+        .contains('workflow_metadata', { externalId: externalId });
+
+      if (error && error.code !== 'PGRST116') { // Ignore "not found" error
+        throw error;
+      }
+
+      // Return first match (should only be one)
+      const task = data && data.length > 0 ? data[0] : null;
+      
+      if (task) {
+        this.logger.info('Task found by external ID', { 
+          external_id: externalId,
+          task_id: task.id 
+        });
+      }
+
+      return task;
+    } catch (error) {
+      this.logger.error('Failed to get task by external ID', { 
+        external_id: externalId,
+        error: error.message 
+      });
+      return null;
     }
   }
 

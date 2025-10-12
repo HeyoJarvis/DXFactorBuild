@@ -68,6 +68,11 @@
       50% { opacity: 0.4; transform: scale(1.02); }
     }
 
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
     /* Header - Compact Premium Design */
     .copilot-header {
       display: flex;
@@ -984,6 +989,47 @@
       box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
     }
 
+    .jira-sync-btn {
+      padding: 8px 14px;
+      border: 1px solid #0052CC;
+      border-radius: 8px;
+      background: #0052CC;
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .jira-sync-btn:hover {
+      background: #0747A6;
+      border-color: #0747A6;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 82, 204, 0.3);
+    }
+
+    .jira-sync-btn:active {
+      transform: translateY(0);
+    }
+
+    .jira-sync-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .jira-sync-btn svg {
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
     .task-input-section {
       background: white;
       border-radius: 10px;
@@ -1802,6 +1848,15 @@
             <option value="assigned_by_me">📤 Assigned by Me</option>
             <option value="all">📋 All Tasks</option>
           </select>
+          <button onclick="loadTasks()" style="padding: 8px 12px; background: #22c55e; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-right: 8px;" title="Refresh tasks from database">
+            🔄 Refresh
+          </button>
+          <button id="jiraSyncButton" class="jira-sync-btn" onclick="syncJIRATasks()" style="display: none;" title="Sync JIRA issues as tasks">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+              <path d="M13.657 2.343a8 8 0 1 1-11.314 0M8 1v7"></path>
+            </svg>
+            Sync JIRA
+          </button>
         </div>
 
         <div class="task-input-section">
@@ -2060,29 +2115,118 @@
     }
 
     async function loadTasks() {
+      console.log('🔥 loadTasks() called, currentAssignmentView:', currentAssignmentView);
+      
       try {
         if (!window.electronAPI || !window.electronAPI.tasks) {
-          console.warn('Task API not available');
+          console.error('❌ Task API not available!');
           renderTasks(); // Show empty state
           return;
         }
         
+        console.log('🔄 Calling electronAPI.tasks.getAll...');
         const result = await window.electronAPI.tasks.getAll({
           assignmentView: currentAssignmentView
         });
         
+        console.log('📦 Backend response:', result);
+        
         if (result.success) {
           tasks = result.tasks;
-          console.log(`📋 Loaded ${tasks.length} tasks for view: ${currentAssignmentView}`);
+          console.log(`✅ Loaded ${tasks.length} tasks for view: ${currentAssignmentView}`);
+          console.log('Tasks:', tasks);
           await renderTasks();
           updateStats();
         } else {
-          console.error('Failed to load tasks:', result.error);
+          console.error('❌ Failed to load tasks:', result.error);
           await renderTasks();
         }
       } catch (error) {
-        console.error('Error loading tasks:', error);
+        console.error('❌ Error loading tasks:', error);
         await renderTasks();
+      }
+    }
+
+    // Sync JIRA tasks
+    async function syncJIRATasks() {
+      const syncBtn = document.getElementById('jiraSyncButton');
+      
+      if (!syncBtn) return;
+      
+      try {
+        // Disable button and show loading state
+        syncBtn.disabled = true;
+        syncBtn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px; animation: spin 1s linear infinite;">
+            <path d="M13.657 2.343a8 8 0 1 1-11.314 0M8 1v7"></path>
+          </svg>
+          Syncing...
+        `;
+        
+        console.log('🔄 Starting JIRA task sync...');
+        
+        const result = await window.electronAPI.jira.syncTasks();
+        
+        if (result.success) {
+          console.log(`✅ JIRA sync complete: ${result.tasksCreated} created, ${result.tasksUpdated} updated`);
+          
+          // Show success notification
+          showNotification(
+            `JIRA sync complete! ${result.tasksCreated} new, ${result.tasksUpdated} updated`,
+            'success'
+          );
+          
+          // Reload tasks to show the new JIRA tasks
+          await loadTasks();
+        } else {
+          console.error('❌ JIRA sync failed:', result.error);
+          showNotification(`Sync failed: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        console.error('❌ JIRA sync error:', error);
+        showNotification(`Sync error: ${error.message}`, 'error');
+      } finally {
+        // Re-enable button and restore original text
+        syncBtn.disabled = false;
+        syncBtn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+            <path d="M13.657 2.343a8 8 0 1 1-11.314 0M8 1v7"></path>
+          </svg>
+          Sync JIRA
+        `;
+      }
+    }
+
+    // Check JIRA connection and show sync button if connected
+    async function checkJIRAConnection() {
+      try {
+        if (!window.electronAPI || !window.electronAPI.jira) {
+          console.log('ℹ️ JIRA API not available');
+          return;
+        }
+        
+        const result = await window.electronAPI.jira.checkConnection();
+        
+        // Update sync button visibility
+        const syncBtn = document.getElementById('jiraSyncButton');
+        if (syncBtn && result.connected) {
+          syncBtn.style.display = 'flex';
+          console.log('✅ JIRA connected - sync button visible');
+        }
+        
+        // Update auth button state
+        const authBtn = document.getElementById('jiraAuthBtn');
+        if (authBtn) {
+          if (result.connected) {
+            authBtn.classList.add('connected');
+            authBtn.title = `JIRA Connected (${result.siteUrl}) - Click to refresh`;
+          } else {
+            authBtn.classList.remove('connected');
+            authBtn.title = 'JIRA Not Connected - Click to authenticate';
+          }
+        }
+      } catch (error) {
+        console.error('Error checking JIRA connection:', error);
       }
     }
 
@@ -2173,7 +2317,7 @@
       }
       
       console.log('🔄 Resolving user names and mentions for tasks...');
-      // Resolve all user names and mentions first
+      // Resolve all user names and mentions first (with timeout protection)
       const tasksWithNames = await Promise.all(tasks.map(async (task, index) => {
         console.log(`📝 Task ${index + 1}:`, {
           title: task.title,
@@ -2181,51 +2325,103 @@
           assignee: task.assignee
         });
         
-        const assignorName = task.assignor ? await getSlackUserName(task.assignor) : null;
-        const assigneeName = task.assignee ? await getSlackUserName(task.assignee) : null;
-        
-        // Resolve mentions in title and description
-        const resolvedTitle = await resolveSlackMentions(task.title);
-        const resolvedDescription = await resolveSlackMentions(task.description);
-        
-        console.log(`✅ Task ${index + 1} names resolved:`, {
-          assignorName,
-          assigneeName,
-          resolvedTitle,
-          resolvedDescription: resolvedDescription?.substring(0, 50) + '...'
-        });
-        
-        return {
-          ...task,
-          title: resolvedTitle,
-          description: resolvedDescription,
-          assignorName,
-          assigneeName
-        };
+        try {
+          // Add timeout to prevent blocking
+          const assignorName = task.assignor ? await Promise.race([
+            getSlackUserName(task.assignor),
+            new Promise(resolve => setTimeout(() => resolve(null), 1000))
+          ]) : null;
+          
+          const assigneeName = task.assignee ? await Promise.race([
+            getSlackUserName(task.assignee),
+            new Promise(resolve => setTimeout(() => resolve(null), 1000))
+          ]) : null;
+          
+          // Resolve mentions in title and description
+          const resolvedTitle = await Promise.race([
+            resolveSlackMentions(task.title),
+            new Promise(resolve => setTimeout(() => resolve(task.title), 1000))
+          ]);
+          
+          const resolvedDescription = await Promise.race([
+            resolveSlackMentions(task.description || ''),
+            new Promise(resolve => setTimeout(() => resolve(task.description || ''), 1000))
+          ]);
+          
+          console.log(`✅ Task ${index + 1} names resolved:`, {
+            assignorName,
+            assigneeName,
+            resolvedTitle
+          });
+          
+          return {
+            ...task,
+            title: resolvedTitle,
+            description: resolvedDescription,
+            assignorName,
+            assigneeName
+          };
+        } catch (error) {
+          console.error(`❌ Error resolving task ${index + 1}:`, error);
+          // Return task as-is if resolution fails
+          return {
+            ...task,
+            assignorName: null,
+            assigneeName: null
+          };
+        }
       }));
       
       console.log('✅ All names resolved, rendering', tasksWithNames.length, 'tasks');
+      console.log('📊 Tasks to render:', tasksWithNames);
       
-      tasksList.innerHTML = tasksWithNames.map(task => `
-        <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
-          <div class="task-header">
-            <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" 
-                 onclick="toggleTask('${task.id}', '${task.status}')"></div>
-            <div class="task-title">${escapeHtml(task.title)}</div>
-            <div class="task-priority ${task.priority}">${task.priority}</div>
-            <div class="task-actions">
-              <button class="task-action-btn chat" onclick="openTaskChat('${task.id}')" title="AI Chat">💬</button>
-              <button class="task-action-btn delete" onclick="deleteTask('${task.id}')">🗑️</button>
+      // Get the container
+      if (!tasksList) {
+        console.error('❌ tasksList element not found!');
+        return;
+      }
+      
+      console.log('📝 Generating HTML for tasks...');
+      tasksList.innerHTML = tasksWithNames.map((task, idx) => {
+        console.log(`  Rendering task ${idx + 1}:`, task.title);
+        
+        // Check if this is a JIRA task
+        const isJiraTask = task.externalSource === 'jira' || (task.tags && task.tags.includes('jira-auto'));
+        const jiraKey = task.externalKey || '';
+        const jiraUrl = task.externalUrl || '';
+        
+        return `
+          <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
+            <div class="task-header">
+              <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" 
+                   onclick="toggleTask('${task.id}', '${task.status}')"></div>
+              <div class="task-title">
+                ${escapeHtml(task.title)}
+                ${isJiraTask && jiraKey ? `
+                  <a href="${jiraUrl}" target="_blank" style="margin-left: 8px; font-size: 11px; color: #0052CC; text-decoration: none; background: #E9F2FF; padding: 2px 6px; border-radius: 3px; font-weight: 600;" title="View in JIRA">
+                    ${jiraKey}
+                  </a>
+                ` : ''}
+              </div>
+              <div class="task-priority ${task.priority}">${task.priority}</div>
+              <div class="task-actions">
+                <button class="task-action-btn chat" onclick="openTaskChat('${task.id}')" title="AI Chat">💬</button>
+                <button class="task-action-btn delete" onclick="deleteTask('${task.id}')">🗑️</button>
+              </div>
+            </div>
+            ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
+            <div class="task-meta">
+              ${isJiraTask ? `<span style="color: #0052CC; font-weight: 600;">🔗 JIRA</span>` : ''}
+              ${task.assignorName ? `<span class="task-assignor">👤 From: ${escapeHtml(task.assignorName)}</span>` : ''}
+              ${task.assigneeName ? `<span class="task-assignee">👉 To: ${escapeHtml(task.assigneeName)}</span>` : ''}
+              <span class="task-date">Created ${formatDate(task.created_at)}</span>
             </div>
           </div>
-          ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
-          <div class="task-meta">
-            ${task.assignorName ? `<span class="task-assignor">👤 From: ${escapeHtml(task.assignorName)}</span>` : ''}
-            ${task.assigneeName ? `<span class="task-assignee">👉 To: ${escapeHtml(task.assigneeName)}</span>` : ''}
-            <span class="task-date">Created ${formatDate(task.created_at)}</span>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+      
+      console.log('✅ HTML rendered successfully, tasksList updated');
+      console.log('📊 Final HTML length:', tasksList.innerHTML.length);
     }
 
     async function toggleTask(taskId, currentStatus) {
@@ -3028,6 +3224,12 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
     // Re-check every 30 seconds
     setInterval(checkGitHubConnection, 30000);
 
+    // Check JIRA connection on startup
+    setTimeout(checkJIRAConnection, 1500);
+
+    // Re-check JIRA connection every 60 seconds
+    setInterval(checkJIRAConnection, 60000);
+
     // ===== ROLE-BASED UI =====
     let userRole = null;
 
@@ -3050,9 +3252,6 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
           
           // Show dev-specific features
           showDeveloperFeatures();
-          
-          // Load JIRA tasks
-          loadJIRATasks();
         } else if (userRole === 'sales') {
           console.log('📊 Configuring for sales role');
           
@@ -3060,6 +3259,10 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
           // Currently GitHub is shown to both, but can hide if needed
           // document.getElementById('githubAuthBtn').style.display = 'none';
         }
+        
+        // Load tasks for all roles
+        console.log('📋 Loading tasks...');
+        await loadTasks();
 
       } catch (error) {
         console.error('❌ Failed to initialize role-based UI:', error);
@@ -3082,6 +3285,20 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
         
         // Check JIRA connection status
         checkJIRAConnection();
+      }
+      
+      // Disable manual task creation for devs (use JIRA instead)
+      const taskInput = document.getElementById('taskInput');
+      const addTaskBtn = document.querySelector('.add-task-btn');
+      
+      if (taskInput) {
+        taskInput.disabled = true;
+        taskInput.placeholder = 'Tasks are synced from JIRA...';
+      }
+      
+      if (addTaskBtn) {
+        addTaskBtn.disabled = true;
+        addTaskBtn.style.opacity = '0.5';
       }
       
       console.log('✨ Developer features enabled');
@@ -3155,23 +3372,23 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
             Low: '#34C759',
             Lowest: '#007AFF'
           };
-          const priorityColor = priorityColors[issue.fields.priority?.name] || '#737373';
+          const priorityColor = priorityColors[issue.priority?.name] || '#737373';
           
           return `
             <div class="task-item" style="padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px;">
               <div style="display: flex; align-items: start; gap: 12px;">
-                <input type="checkbox" ${issue.fields.status?.name === 'Done' ? 'checked' : ''} disabled style="margin-top: 2px;">
+                <input type="checkbox" ${issue.status?.name === 'Done' ? 'checked' : ''} disabled style="margin-top: 2px;">
                 <div style="flex: 1;">
                   <div style="font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 4px;">
-                    ${issue.fields.summary}
+                    ${issue.summary}
                   </div>
                   <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #737373;">
                     <span style="background: ${priorityColor}; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">
-                      ${issue.fields.priority?.name || 'Medium'}
+                      ${issue.priority?.name || 'Medium'}
                     </span>
-                    <span>${issue.fields.status?.name || 'To Do'}</span>
+                    <span>${issue.status?.name || 'To Do'}</span>
                     <span>•</span>
-                    <span>${issue.fields.issuetype?.name || 'Task'}</span>
+                    <span>${issue.issue_type?.name || 'Task'}</span>
                     <span>•</span>
                     <span>${issue.key}</span>
                   </div>
@@ -3194,7 +3411,7 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
             <div style="font-size: 14px; color: #737373; margin-bottom: 20px;">
               ${error.message}
             </div>
-            <button onclick="loadJIRATasks()" style="padding: 12px 24px; background: #171717; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+            <button onclick="loadTasks()" style="padding: 12px 24px; background: #171717; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
               Retry
             </button>
           </div>
@@ -3220,10 +3437,10 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
     async function handleJIRAButtonClick() {
       const btn = document.getElementById('jiraAuthBtn');
       
-      // If already connected, refresh tasks instead of re-authenticating
+      // If already connected, sync and refresh tasks instead of re-authenticating
       if (btn && btn.classList.contains('connected')) {
-        console.log('🔄 Refreshing JIRA tasks...');
-        loadJIRATasks();
+        console.log('🔄 Syncing JIRA tasks...');
+        await syncJIRATasks();
         return;
       }
       
@@ -3256,9 +3473,9 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
           
           alert(`Successfully connected to JIRA!\n\nSite: ${result.siteUrl}`);
           
-          // Load tasks immediately for developers
+          // Sync and load tasks immediately for developers
           if (userRole === 'developer') {
-            loadJIRATasks();
+            await syncJIRATasks();
           }
         } else {
           console.error('❌ JIRA authentication failed:', result.error);
@@ -3271,27 +3488,6 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
     }
     
     // Check JIRA connection status
-    async function checkJIRAConnection() {
-      try {
-        const status = await window.electronAPI.jira.checkConnection();
-        const btn = document.getElementById('jiraAuthBtn');
-        
-        if (status.connected) {
-          btn.classList.add('connected');
-          btn.title = `JIRA Connected (${status.siteUrl}) - Click to refresh`;
-          
-          // Load tasks if on Tasks tab and user is developer
-          if (userRole === 'developer') {
-            loadJIRATasks();
-          }
-        } else {
-          btn.classList.remove('connected');
-          btn.title = 'JIRA Not Connected - Click to authenticate';
-        }
-      } catch (error) {
-        console.error('❌ Failed to check JIRA connection:', error);
-      }
-    }
 
     // Initialize on page load
     setTimeout(initializeRoleBasedUI, 1000);

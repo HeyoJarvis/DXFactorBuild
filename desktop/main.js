@@ -814,6 +814,23 @@ ipcMain.handle('jira:authenticate', async () => {
     
     console.log('📋 JIRA auth result:', result);
     
+    // Load user if not already loaded
+    if (!currentUser) {
+      console.log('👤 Loading user from database...');
+      const { data: loadedUser, error: loadError } = await dbAdapter.supabase
+        .from('users')
+        .select('*')
+        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2')
+        .single();
+      
+      if (!loadError && loadedUser) {
+        currentUser = loadedUser;
+        console.log('✅ User loaded:', currentUser.name);
+      } else {
+        console.error('❌ Failed to load user:', loadError?.message);
+      }
+    }
+    
     // Save tokens to user settings
     if (result.access_token && currentUser) {
       try {
@@ -871,27 +888,73 @@ ipcMain.handle('jira:authenticate', async () => {
 // Get JIRA Issues (Tasks for current user)
 ipcMain.handle('jira:getMyIssues', async (event, options = {}) => {
   try {
-    if (!jiraOAuthHandler || !jiraOAuthHandler.jiraService) {
+    // Load user if not already loaded
+    if (!currentUser) {
+      console.log('👤 Loading user from database for getMyIssues...');
+      const { data: loadedUser, error: loadError } = await dbAdapter.supabase
+        .from('users')
+        .select('*')
+        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2')
+        .single();
+      
+      if (!loadError && loadedUser) {
+        currentUser = loadedUser;
+        console.log('✅ User loaded for getMyIssues:', currentUser.name);
+      } else {
+        return {
+          success: false,
+          error: 'Not authenticated'
+        };
+      }
+    }
+
+    console.log('📋 Fetching JIRA issues for current user...');
+
+    // Get user's JIRA tokens from Supabase
+    const { data: userData, error: userError } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (userError || !userData) {
       return {
         success: false,
-        error: 'JIRA not authenticated'
+        error: 'Failed to get user data'
       };
     }
+
+    const jiraTokens = userData.integration_settings?.jira;
     
-    console.log('📋 Fetching JIRA issues for current user...');
-    
-    const jiraService = jiraOAuthHandler.jiraService;
-    const issues = await jiraService.getMyIssues({
-      maxResults: options.maxResults || 50,
-      fields: ['summary', 'status', 'priority', 'assignee', 'created', 'updated', 'duedate', 'description', 'project', 'issuetype']
+    if (!jiraTokens || !jiraTokens.access_token) {
+      return {
+        success: false,
+        error: 'JIRA not connected'
+      };
+    }
+
+    // Initialize JIRA service with stored tokens
+    const JIRAService = require('../core/integrations/jira-service');
+    const jiraService = new JIRAService();
+    jiraService.accessToken = jiraTokens.access_token;
+    jiraService.refreshToken = jiraTokens.refresh_token;
+    jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
+    jiraService.cloudId = jiraTokens.cloud_id;
+    jiraService.siteUrl = jiraTokens.site_url;
+
+    // Fetch assigned issues using JQL
+    const jql = 'assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC';
+    const result = await jiraService.getIssues(jql, {
+      maxResults: options.maxResults || 50
     });
-    
-    console.log(`✅ Retrieved ${issues.length} JIRA issues`);
-    
+
+    console.log(`✅ Retrieved ${result.issues.length} JIRA issues`);
+
     return {
       success: true,
-      issues: issues
+      issues: result.issues
     };
+
   } catch (error) {
     console.error('❌ Failed to fetch JIRA issues:', error);
     return {
@@ -929,6 +992,172 @@ ipcMain.handle('jira:checkConnection', async () => {
   } catch (error) {
     console.error('❌ Failed to check JIRA connection:', error);
     return { connected: false };
+  }
+});
+
+// Sync JIRA issues and create/update tasks
+ipcMain.handle('jira:syncTasks', async (event, options = {}) => {
+  try {
+    // Load user if not already loaded
+    if (!currentUser) {
+      console.log('👤 Loading user from database for sync...');
+      const { data: loadedUser, error: loadError } = await dbAdapter.supabase
+        .from('users')
+        .select('*')
+        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2')
+        .single();
+      
+      if (!loadError && loadedUser) {
+        currentUser = loadedUser;
+        console.log('✅ User loaded for sync:', currentUser.name);
+      } else {
+        return {
+          success: false,
+          error: 'Not authenticated'
+        };
+      }
+    }
+
+    console.log('🔄 Starting JIRA task sync...');
+
+    // Get user's JIRA tokens from Supabase
+    const { data: userData, error: userError } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (userError || !userData) {
+      return {
+        success: false,
+        error: 'Failed to get user data'
+      };
+    }
+
+    const jiraTokens = userData.integration_settings?.jira;
+    
+    if (!jiraTokens || !jiraTokens.access_token) {
+      return {
+        success: false,
+        error: 'JIRA not connected'
+      };
+    }
+
+    // Initialize JIRA service with stored tokens
+    const JIRAService = require('../core/integrations/jira-service');
+    const jiraService = new JIRAService();
+    jiraService.accessToken = jiraTokens.access_token;
+    jiraService.refreshToken = jiraTokens.refresh_token;
+    jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
+    jiraService.cloudId = jiraTokens.cloud_id;
+    jiraService.siteUrl = jiraTokens.site_url;
+
+    // Fetch assigned issues (JQL: assignee = currentUser() AND status != Done)
+    const jql = options.jql || 'assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC';
+    const result = await jiraService.getIssues(jql, { maxResults: options.maxResults || 50 });
+
+    console.log(`📋 Found ${result.issues.length} JIRA issues`);
+
+    // Helper function to map JIRA priority to task priority
+    const mapJiraPriority = (jiraPriority) => {
+      if (!jiraPriority) return 'medium';
+      
+      const priority = jiraPriority.toLowerCase();
+      
+      if (priority.includes('highest') || priority.includes('critical')) {
+        return 'urgent';
+      } else if (priority.includes('high')) {
+        return 'high';
+      } else if (priority.includes('low')) {
+        return 'low';
+      }
+      
+      return 'medium';
+    };
+
+    // Create/update tasks for each JIRA issue
+    let tasksCreated = 0;
+    let tasksUpdated = 0;
+    let tasksFailed = 0;
+
+    for (const issue of result.issues) {
+      try {
+        const externalId = `jira_${issue.id}`;
+        
+        // Check if task already exists for this JIRA issue
+        const existingTask = await dbAdapter.getTaskByExternalId(externalId);
+        
+        const taskData = {
+          title: issue.summary,
+          priority: mapJiraPriority(issue.priority?.name),
+          description: issue.description || issue.summary,
+          tags: [
+            'jira-auto',
+            issue.issue_type?.name?.toLowerCase() || 'task',
+            issue.status?.name?.toLowerCase().replace(/\s+/g, '-') || 'unknown'
+          ],
+          externalId: externalId,
+          externalKey: issue.key,
+          externalUrl: issue.url,
+          externalSource: 'jira',
+          jira_issue_type: issue.issue_type?.name,
+          jira_status: issue.status?.name,
+          jira_priority: issue.priority?.name,
+          story_points: issue.story_points,
+          sprint: issue.sprint,
+          labels: issue.labels,
+          jira_updated_at: issue.updated_at
+        };
+
+        if (existingTask) {
+          // Update existing task
+          await dbAdapter.updateTask(existingTask.id, taskData);
+          tasksUpdated++;
+          console.log(`📝 Updated task for ${issue.key}`);
+        } else {
+          // Create new task
+          const createResult = await dbAdapter.createTask(currentUser.id, taskData);
+          
+          if (createResult.success) {
+            tasksCreated++;
+            console.log(`✅ Created task for ${issue.key}: ${issue.summary}`);
+            
+            // Notify UI
+            if (mainWindow) {
+              mainWindow.webContents.send('task:created', createResult.task);
+              mainWindow.webContents.send('notification', {
+                type: 'jira_task_synced',
+                message: `New JIRA task: ${issue.key} - ${issue.summary}`,
+                priority: taskData.priority
+              });
+            }
+          } else {
+            tasksFailed++;
+            console.error(`❌ Failed to create task for ${issue.key}:`, createResult.error);
+          }
+        }
+      } catch (taskError) {
+        tasksFailed++;
+        console.error(`❌ Error processing JIRA issue ${issue.key}:`, taskError.message);
+      }
+    }
+
+    console.log(`✅ JIRA sync complete: ${tasksCreated} created, ${tasksUpdated} updated, ${tasksFailed} failed`);
+
+    return {
+      success: true,
+      tasksCreated,
+      tasksUpdated,
+      tasksFailed,
+      totalIssues: result.issues.length
+    };
+
+  } catch (error) {
+    console.error('❌ JIRA sync error:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
   }
 });
 
@@ -1120,6 +1349,141 @@ function initializeServices() {
     }
   }, 3000); // 3 second delay to allow UI to load
   
+  // Auto-sync JIRA tasks for developer users
+  const startJIRAAutoSync = () => {
+    // Initial sync after 10 seconds to allow app to fully load
+    setTimeout(async () => {
+      try {
+        if (currentUser && currentUser.user_role === 'developer') {
+          const jiraSettings = currentUser.integration_settings?.jira;
+          if (jiraSettings && jiraSettings.access_token) {
+            console.log('🔄 Running initial JIRA task sync...');
+            const result = await triggerJIRASync();
+            if (result.success) {
+              console.log(`✅ Initial JIRA sync complete: ${result.tasksCreated} created, ${result.tasksUpdated} updated`);
+            }
+          }
+        }
+      } catch (error) {
+        console.log('❌ Initial JIRA sync error:', error.message);
+      }
+    }, 10000);
+    
+    // Then sync every 10 minutes
+    setInterval(async () => {
+      try {
+        if (currentUser && currentUser.user_role === 'developer') {
+          const jiraSettings = currentUser.integration_settings?.jira;
+          if (jiraSettings && jiraSettings.access_token) {
+            console.log('🔄 Running periodic JIRA task sync...');
+            const result = await triggerJIRASync();
+            if (result.success) {
+              console.log(`✅ Periodic JIRA sync complete: ${result.tasksCreated} created, ${result.tasksUpdated} updated`);
+              
+              // Notify UI if there are new tasks
+              if (result.tasksCreated > 0 && mainWindow) {
+                mainWindow.webContents.send('notification', {
+                  type: 'jira_tasks_synced',
+                  message: `${result.tasksCreated} new JIRA task(s) added`
+                });
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.log('❌ Periodic JIRA sync error:', error.message);
+      }
+    }, 10 * 60 * 1000); // Every 10 minutes
+  };
+  
+  // Helper function to trigger JIRA sync
+  const triggerJIRASync = async () => {
+    if (!currentUser) {
+      const { data: userData } = await dbAdapter.supabase
+        .from('users')
+        .select('*')
+        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2') // Desktop user UUID
+        .single();
+      
+      if (userData) {
+        currentUser = userData;
+      }
+    }
+    
+    if (!currentUser) {
+      return { success: false, error: 'No user authenticated' };
+    }
+    
+    // Use the existing jira:syncTasks handler logic
+    const { data: userData, error: userError } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (userError || !userData) {
+      return { success: false, error: 'Failed to get user data' };
+    }
+
+    const jiraTokens = userData.integration_settings?.jira;
+    
+    if (!jiraTokens || !jiraTokens.access_token) {
+      return { success: false, error: 'JIRA not connected' };
+    }
+
+    const JIRAService = require('../core/integrations/jira-service');
+    const jiraService = new JIRAService();
+    jiraService.accessToken = jiraTokens.access_token;
+    jiraService.refreshToken = jiraTokens.refresh_token;
+    jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
+    jiraService.cloudId = jiraTokens.cloud_id;
+    jiraService.siteUrl = jiraTokens.site_url;
+
+    const jql = 'assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC';
+    const result = await jiraService.getIssues(jql, { maxResults: 50 });
+
+    let tasksCreated = 0;
+    let tasksUpdated = 0;
+
+    for (const issue of result.issues) {
+      const externalId = `jira_${issue.id}`;
+      const existingTask = await dbAdapter.getTaskByExternalId(externalId);
+      
+      const taskData = {
+        title: issue.summary,
+        priority: mapJiraPriority(issue.priority?.name),
+        description: issue.description || issue.summary,
+        tags: ['jira-auto', issue.issue_type?.name?.toLowerCase() || 'task'],
+        externalId,
+        externalKey: issue.key,
+        externalUrl: issue.url,
+        externalSource: 'jira'
+      };
+
+      if (existingTask) {
+        await dbAdapter.updateTask(existingTask.id, taskData);
+        tasksUpdated++;
+      } else {
+        const createResult = await dbAdapter.createTask(currentUser.id, taskData);
+        if (createResult.success) tasksCreated++;
+      }
+    }
+
+    return { success: true, tasksCreated, tasksUpdated, totalIssues: result.issues.length };
+  };
+  
+  const mapJiraPriority = (jiraPriority) => {
+    if (!jiraPriority) return 'medium';
+    const priority = jiraPriority.toLowerCase();
+    if (priority.includes('highest') || priority.includes('critical')) return 'urgent';
+    if (priority.includes('high')) return 'high';
+    if (priority.includes('low')) return 'low';
+    return 'medium';
+  };
+  
+  // Start JIRA auto-sync
+  startJIRAAutoSync();
+  
   // Note: Slack IPC handlers are now registered in registerAllIPCHandlers() at module level
 
   ipcMain.handle('slack:stopMonitoring', async () => {
@@ -1227,7 +1591,7 @@ function initializeServices() {
 
   ipcMain.handle('tasks:getStats', async () => {
     try {
-      const userId = 'desktop-user'; // TODO: Get actual user ID
+      const userId = '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2'; // Desktop user UUID
       const result = await dbAdapter.getTaskStats(userId);
       return result;
     } catch (error) {
@@ -1313,7 +1677,7 @@ function initializeServices() {
   // Copilot IPC handlers with persistent context and real data integration
   ipcMain.handle('copilot:sendMessage', async (event, message) => {
     try {
-      const userId = currentUser?.id || 'desktop-user';
+      const userId = currentUser?.id || '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2';
       console.log('💬 Processing copilot message for user:', userId, '- Message:', message.substring(0, 50) + '...');
       
       // ✨ Check for fact-check command
@@ -1919,7 +2283,7 @@ What would you like to explore?`,
       console.log('💬 Processing task chat message:', { taskId, message: message.substring(0, 50) + '...' });
       
       const task = context.task;
-      const userId = 'desktop-user'; // TODO: Get actual user ID
+      const userId = '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2'; // Desktop user UUID
       
       // Get or create task-specific session
       if (!taskSessionIds[taskId]) {
@@ -3030,7 +3394,7 @@ function registerAllIPCHandlers() {
       if (!dbAdapter) {
         return { success: false, error: 'Database not initialized', tasks: [] };
       }
-      const userId = currentUser?.id || 'desktop-user';
+      const userId = currentUser?.id || '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2';
       const result = await dbAdapter.getUserTasks(userId, { 
         includeCompleted: false,
         ...filters
@@ -3047,7 +3411,7 @@ function registerAllIPCHandlers() {
       if (!dbAdapter) {
         return { success: false, error: 'Database not initialized' };
       }
-      const userId = currentUser?.id || 'desktop-user';
+      const userId = currentUser?.id || '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2';
       const result = await dbAdapter.createTask(userId, taskData);
       return result;
     } catch (error) {

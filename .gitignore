@@ -4,3 +4,7 @@ node_modules
 dxfactor*
 analysis-results/
 __pycache__/
+
+# Desktop logs
+desktop/logs/*.log
+logs/*.log
