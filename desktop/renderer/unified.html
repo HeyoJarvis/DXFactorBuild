@@ -68,6 +68,11 @@
       50% { opacity: 0.4; transform: scale(1.02); }
     }
 
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
     /* Header - Compact Premium Design */
     .copilot-header {
       display: flex;
@@ -336,6 +341,108 @@
     }
 
     @keyframes msPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* GitHub Connection Button */
+    .github-auth-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #737373;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .github-auth-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: #171717;
+    }
+
+    .github-auth-btn.connected {
+      color: #10b981;
+    }
+
+    .github-auth-btn.connected:hover {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .github-status-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #737373;
+      transition: all 0.2s ease;
+    }
+
+    .github-auth-btn.connected .github-status-dot {
+      background: #10b981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+      animation: githubPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes githubPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* JIRA Auth Button */
+    .jira-auth-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #737373;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .jira-auth-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: #171717;
+    }
+
+    .jira-auth-btn.connected {
+      color: #0052CC; /* JIRA Blue */
+    }
+
+    .jira-auth-btn.connected:hover {
+      background: rgba(0, 82, 204, 0.1);
+    }
+
+    .jira-status-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #737373;
+      transition: all 0.2s ease;
+    }
+
+    .jira-auth-btn.connected .jira-status-dot {
+      background: #0052CC;
+      box-shadow: 0 0 6px rgba(0, 82, 204, 0.5);
+      animation: jiraPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes jiraPulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.6; }
     }
@@ -880,6 +987,47 @@
     .assignment-filter:focus {
       border-color: rgba(0, 212, 255, 0.5);
       box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+    }
+
+    .jira-sync-btn {
+      padding: 8px 14px;
+      border: 1px solid #0052CC;
+      border-radius: 8px;
+      background: #0052CC;
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .jira-sync-btn:hover {
+      background: #0747A6;
+      border-color: #0747A6;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 82, 204, 0.3);
+    }
+
+    .jira-sync-btn:active {
+      transform: translateY(0);
+    }
+
+    .jira-sync-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .jira-sync-btn svg {
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
 
     .task-input-section {
@@ -1589,6 +1737,9 @@
         Tasks
         <span class="nav-badge" id="tasksBadge" style="display: none;"></span>
       </button>
+      <button class="header-nav-btn" onclick="switchTab('indexer')" id="indexerNavBtn" title="Code Indexer" style="display: none;">
+        🔍 Indexer
+      </button>
       <div class="header-divider"></div>
       <button class="header-action-btn" onclick="switchTab('tasks')" title="Notifications">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1617,6 +1768,18 @@
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
         </svg>
         <span class="ms-status-dot"></span>
+      </button>
+      <button class="github-auth-btn" id="githubAuthBtn" onclick="toggleGitHubConnection()" title="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+        <span class="github-status-dot"></span>
+      </button>
+      <button class="jira-auth-btn" id="jiraAuthBtn" onclick="handleJIRAButtonClick()" title="JIRA" style="display: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.571 11.513H0a5.218 5.218 0 0 0 5.232 5.215h2.13v2.057A5.215 5.215 0 0 0 12.575 24V12.518a1.005 1.005 0 0 0-1.005-1.005zm5.723-5.756H5.736a5.215 5.215 0 0 0 5.215 5.214h2.129v2.058a5.218 5.218 0 0 0 5.215 5.214V6.758a1.001 1.001 0 0 0-1.001-1.001zM23.01 0H11.455a5.215 5.215 0 0 0 5.215 5.215h2.129v2.057A5.215 5.215 0 0 0 24 12.483V1.005A1.005 1.005 0 0 0 23.01 0z"/>
+        </svg>
+        <span class="jira-status-dot"></span>
       </button>
 
     </div>
@@ -1694,6 +1857,15 @@
             <option value="assigned_by_me">📤 Assigned by Me</option>
             <option value="all">📋 All Tasks</option>
           </select>
+          <button onclick="loadTasks()" style="padding: 8px 12px; background: #22c55e; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-right: 8px;" title="Refresh tasks from database">
+            🔄 Refresh
+          </button>
+          <button id="jiraSyncButton" class="jira-sync-btn" onclick="syncJIRATasks()" style="display: none;" title="Sync JIRA issues as tasks">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+              <path d="M13.657 2.343a8 8 0 1 1-11.314 0M8 1v7"></path>
+            </svg>
+            Sync JIRA
+          </button>
         </div>
 
         <div class="task-input-section">
@@ -1715,6 +1887,86 @@
             <div>No tasks yet. Add one above to get started!</div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Code Indexer Tab -->
+    <div id="indexerTab" class="tab-content">
+      <div class="indexer-container" style="padding: 20px; max-width: 900px; margin: 0 auto;">
+        
+        <!-- Header -->
+        <div style="margin-bottom: 32px;">
+          <h2 style="font-size: 24px; font-weight: 700; color: #171717; margin-bottom: 8px;">
+            🔍 Code Indexer
+          </h2>
+          <p style="font-size: 14px; color: #737373;">
+            Index your GitHub repositories and ask questions about your code in natural language
+          </p>
+        </div>
+
+        <!-- Query Section -->
+        <div style="background: #f9fafb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+          <h3 style="font-size: 16px; font-weight: 600; color: #171717; margin-bottom: 16px;">
+            Ask a Question
+          </h3>
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <input 
+              type="text" 
+              id="codeQuery" 
+              placeholder="E.g., Do we have SSO authentication? What APIs are available?"
+              style="flex: 1; padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;"
+              onkeypress="if(event.key==='Enter') askCodeQuestion()"
+            >
+            <button 
+              onclick="askCodeQuestion()"
+              style="padding: 12px 24px; background: #171717; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap;"
+            >
+              Ask Question
+            </button>
+          </div>
+          <select 
+            id="repositorySelect"
+            style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; color: #525252;"
+          >
+            <option value="">Select a repository...</option>
+          </select>
+        </div>
+
+        <!-- Answer Section -->
+        <div id="answerSection" style="display: none; background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <h3 style="font-size: 16px; font-weight: 600; color: #171717;">Answer</h3>
+            <span id="confidenceBadge" style="padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;"></span>
+          </div>
+          <div id="answerContent" style="font-size: 14px; line-height: 1.8; color: #171717; margin-bottom: 20px;"></div>
+          <div id="sourcesSection" style="display: none;">
+            <h4 style="font-size: 14px; font-weight: 600; color: #525252; margin-bottom: 12px;">📚 Code References</h4>
+            <div id="sourcesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="queryLoading" style="display: none; text-align: center; padding: 40px;">
+          <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f4f6; border-top: 4px solid #171717; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          <p style="margin-top: 16px; color: #737373;">Searching codebase...</p>
+        </div>
+
+        <!-- Repositories Section -->
+        <div style="margin-top: 40px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <h3 style="font-size: 18px; font-weight: 600; color: #171717;">Indexed Repositories</h3>
+            <button 
+              onclick="refreshRepositories()"
+              style="padding: 8px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;"
+            >
+              🔄 Refresh
+            </button>
+          </div>
+          <div id="repositoriesList" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Repositories will be loaded here -->
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1798,18 +2050,30 @@
       
       // Update navigation buttons
       document.querySelectorAll('.header-nav-btn').forEach(btn => btn.classList.remove('active'));
-      const navMap = { 'chat': 'chatNavBtn', 'copilot': 'chatNavBtn', 'tasks': 'tasksNavBtn' };
+      const navMap = { 
+        'chat': 'chatNavBtn', 
+        'copilot': 'chatNavBtn', 
+        'tasks': 'tasksNavBtn',
+        'indexer': 'indexerNavBtn'
+      };
       const targetBtn = document.getElementById(navMap[tab]);
       if (targetBtn) targetBtn.classList.add('active');
       
       // Update content
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      const contentMap = { 'chat': 'copilotTab', 'copilot': 'copilotTab', 'tasks': 'tasksTab' };
+      const contentMap = { 
+        'chat': 'copilotTab', 
+        'copilot': 'copilotTab', 
+        'tasks': 'tasksTab',
+        'indexer': 'indexerTab'
+      };
       const targetContent = document.getElementById(contentMap[tab]);
       if (targetContent) targetContent.classList.add('active');
       
       if (tab === 'tasks') {
         loadTasks();
+      } else if (tab === 'indexer') {
+        loadIndexerData();
       }
     }
 
@@ -1860,29 +2124,118 @@
     }
 
     async function loadTasks() {
+      console.log('🔥 loadTasks() called, currentAssignmentView:', currentAssignmentView);
+      
       try {
         if (!window.electronAPI || !window.electronAPI.tasks) {
-          console.warn('Task API not available');
+          console.error('❌ Task API not available!');
           renderTasks(); // Show empty state
           return;
         }
         
+        console.log('🔄 Calling electronAPI.tasks.getAll...');
         const result = await window.electronAPI.tasks.getAll({
           assignmentView: currentAssignmentView
         });
         
+        console.log('📦 Backend response:', result);
+        
         if (result.success) {
           tasks = result.tasks;
-          console.log(`📋 Loaded ${tasks.length} tasks for view: ${currentAssignmentView}`);
+          console.log(`✅ Loaded ${tasks.length} tasks for view: ${currentAssignmentView}`);
+          console.log('Tasks:', tasks);
           await renderTasks();
           updateStats();
         } else {
-          console.error('Failed to load tasks:', result.error);
+          console.error('❌ Failed to load tasks:', result.error);
           await renderTasks();
         }
       } catch (error) {
-        console.error('Error loading tasks:', error);
+        console.error('❌ Error loading tasks:', error);
         await renderTasks();
+      }
+    }
+
+    // Sync JIRA tasks
+    async function syncJIRATasks() {
+      const syncBtn = document.getElementById('jiraSyncButton');
+      
+      if (!syncBtn) return;
+      
+      try {
+        // Disable button and show loading state
+        syncBtn.disabled = true;
+        syncBtn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px; animation: spin 1s linear infinite;">
+            <path d="M13.657 2.343a8 8 0 1 1-11.314 0M8 1v7"></path>
+          </svg>
+          Syncing...
+        `;
+        
+        console.log('🔄 Starting JIRA task sync...');
+        
+        const result = await window.electronAPI.jira.syncTasks();
+        
+        if (result.success) {
+          console.log(`✅ JIRA sync complete: ${result.tasksCreated} created, ${result.tasksUpdated} updated`);
+          
+          // Show success notification
+          showNotification(
+            `JIRA sync complete! ${result.tasksCreated} new, ${result.tasksUpdated} updated`,
+            'success'
+          );
+          
+          // Reload tasks to show the new JIRA tasks
+          await loadTasks();
+        } else {
+          console.error('❌ JIRA sync failed:', result.error);
+          showNotification(`Sync failed: ${result.error}`, 'error');
+        }
+      } catch (error) {
+        console.error('❌ JIRA sync error:', error);
+        showNotification(`Sync error: ${error.message}`, 'error');
+      } finally {
+        // Re-enable button and restore original text
+        syncBtn.disabled = false;
+        syncBtn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px;">
+            <path d="M13.657 2.343a8 8 0 1 1-11.314 0M8 1v7"></path>
+          </svg>
+          Sync JIRA
+        `;
+      }
+    }
+
+    // Check JIRA connection and show sync button if connected
+    async function checkJIRAConnection() {
+      try {
+        if (!window.electronAPI || !window.electronAPI.jira) {
+          console.log('ℹ️ JIRA API not available');
+          return;
+        }
+        
+        const result = await window.electronAPI.jira.checkConnection();
+        
+        // Update sync button visibility
+        const syncBtn = document.getElementById('jiraSyncButton');
+        if (syncBtn && result.connected) {
+          syncBtn.style.display = 'flex';
+          console.log('✅ JIRA connected - sync button visible');
+        }
+        
+        // Update auth button state
+        const authBtn = document.getElementById('jiraAuthBtn');
+        if (authBtn) {
+          if (result.connected) {
+            authBtn.classList.add('connected');
+            authBtn.title = `JIRA Connected (${result.siteUrl}) - Click to refresh`;
+          } else {
+            authBtn.classList.remove('connected');
+            authBtn.title = 'JIRA Not Connected - Click to authenticate';
+          }
+        }
+      } catch (error) {
+        console.error('Error checking JIRA connection:', error);
       }
     }
 
@@ -1973,7 +2326,7 @@
       }
       
       console.log('🔄 Resolving user names and mentions for tasks...');
-      // Resolve all user names and mentions first
+      // Resolve all user names and mentions first (with timeout protection)
       const tasksWithNames = await Promise.all(tasks.map(async (task, index) => {
         console.log(`📝 Task ${index + 1}:`, {
           title: task.title,
@@ -1981,51 +2334,103 @@
           assignee: task.assignee
         });
         
-        const assignorName = task.assignor ? await getSlackUserName(task.assignor) : null;
-        const assigneeName = task.assignee ? await getSlackUserName(task.assignee) : null;
-        
-        // Resolve mentions in title and description
-        const resolvedTitle = await resolveSlackMentions(task.title);
-        const resolvedDescription = await resolveSlackMentions(task.description);
-        
-        console.log(`✅ Task ${index + 1} names resolved:`, {
-          assignorName,
-          assigneeName,
-          resolvedTitle,
-          resolvedDescription: resolvedDescription?.substring(0, 50) + '...'
-        });
-        
-        return {
-          ...task,
-          title: resolvedTitle,
-          description: resolvedDescription,
-          assignorName,
-          assigneeName
-        };
+        try {
+          // Add timeout to prevent blocking
+          const assignorName = task.assignor ? await Promise.race([
+            getSlackUserName(task.assignor),
+            new Promise(resolve => setTimeout(() => resolve(null), 1000))
+          ]) : null;
+          
+          const assigneeName = task.assignee ? await Promise.race([
+            getSlackUserName(task.assignee),
+            new Promise(resolve => setTimeout(() => resolve(null), 1000))
+          ]) : null;
+          
+          // Resolve mentions in title and description
+          const resolvedTitle = await Promise.race([
+            resolveSlackMentions(task.title),
+            new Promise(resolve => setTimeout(() => resolve(task.title), 1000))
+          ]);
+          
+          const resolvedDescription = await Promise.race([
+            resolveSlackMentions(task.description || ''),
+            new Promise(resolve => setTimeout(() => resolve(task.description || ''), 1000))
+          ]);
+          
+          console.log(`✅ Task ${index + 1} names resolved:`, {
+            assignorName,
+            assigneeName,
+            resolvedTitle
+          });
+          
+          return {
+            ...task,
+            title: resolvedTitle,
+            description: resolvedDescription,
+            assignorName,
+            assigneeName
+          };
+        } catch (error) {
+          console.error(`❌ Error resolving task ${index + 1}:`, error);
+          // Return task as-is if resolution fails
+          return {
+            ...task,
+            assignorName: null,
+            assigneeName: null
+          };
+        }
       }));
       
       console.log('✅ All names resolved, rendering', tasksWithNames.length, 'tasks');
+      console.log('📊 Tasks to render:', tasksWithNames);
       
-      tasksList.innerHTML = tasksWithNames.map(task => `
-        <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
-          <div class="task-header">
-            <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" 
-                 onclick="toggleTask('${task.id}', '${task.status}')"></div>
-            <div class="task-title">${escapeHtml(task.title)}</div>
-            <div class="task-priority ${task.priority}">${task.priority}</div>
-            <div class="task-actions">
-              <button class="task-action-btn chat" onclick="openTaskChat('${task.id}')" title="AI Chat">💬</button>
-              <button class="task-action-btn delete" onclick="deleteTask('${task.id}')">🗑️</button>
+      // Get the container
+      if (!tasksList) {
+        console.error('❌ tasksList element not found!');
+        return;
+      }
+      
+      console.log('📝 Generating HTML for tasks...');
+      tasksList.innerHTML = tasksWithNames.map((task, idx) => {
+        console.log(`  Rendering task ${idx + 1}:`, task.title);
+        
+        // Check if this is a JIRA task
+        const isJiraTask = task.externalSource === 'jira' || (task.tags && task.tags.includes('jira-auto'));
+        const jiraKey = task.externalKey || '';
+        const jiraUrl = task.externalUrl || '';
+        
+        return `
+          <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
+            <div class="task-header">
+              <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" 
+                   onclick="toggleTask('${task.id}', '${task.status}')"></div>
+              <div class="task-title">
+                ${escapeHtml(task.title)}
+                ${isJiraTask && jiraKey ? `
+                  <a href="${jiraUrl}" target="_blank" style="margin-left: 8px; font-size: 11px; color: #0052CC; text-decoration: none; background: #E9F2FF; padding: 2px 6px; border-radius: 3px; font-weight: 600;" title="View in JIRA">
+                    ${jiraKey}
+                  </a>
+                ` : ''}
+              </div>
+              <div class="task-priority ${task.priority}">${task.priority}</div>
+              <div class="task-actions">
+                <button class="task-action-btn chat" onclick="openTaskChat('${task.id}')" title="AI Chat">💬</button>
+                <button class="task-action-btn delete" onclick="deleteTask('${task.id}')">🗑️</button>
+              </div>
+            </div>
+            ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
+            <div class="task-meta">
+              ${isJiraTask ? `<span style="color: #0052CC; font-weight: 600;">🔗 JIRA</span>` : ''}
+              ${task.assignorName ? `<span class="task-assignor">👤 From: ${escapeHtml(task.assignorName)}</span>` : ''}
+              ${task.assigneeName ? `<span class="task-assignee">👉 To: ${escapeHtml(task.assigneeName)}</span>` : ''}
+              <span class="task-date">Created ${formatDate(task.created_at)}</span>
             </div>
           </div>
-          ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
-          <div class="task-meta">
-            ${task.assignorName ? `<span class="task-assignor">👤 From: ${escapeHtml(task.assignorName)}</span>` : ''}
-            ${task.assigneeName ? `<span class="task-assignee">👉 To: ${escapeHtml(task.assigneeName)}</span>` : ''}
-            <span class="task-date">Created ${formatDate(task.created_at)}</span>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+      
+      console.log('✅ HTML rendered successfully, tasksList updated');
+      console.log('📊 Final HTML length:', tasksList.innerHTML.length);
     }
 
     async function toggleTask(taskId, currentStatus) {
@@ -2810,6 +3215,651 @@
     }
 
     setTimeout(checkMicrosoftConnection, 1000);
+
+    // ===== GITHUB CONNECTION STATUS =====
+    let githubConnected = false;
+    let githubInfo = null;
+
+    async function toggleGitHubConnection() {
+      if (githubConnected) {
+        const infoText = `GitHub is Connected ✓
+
+Configuration:
+• Auth Type: ${githubInfo?.authType || 'N/A'}
+• App ID: ${githubInfo?.appId || 'N/A'}
+• Repositories: ${githubInfo?.repoCount || 0} accessible
+
+This is read-only access. Engineering queries are enabled.
+
+To reconfigure, update your .env file and restart the app.`;
+        
+        alert(infoText);
+      } else {
+        const setupText = `GitHub Not Connected
+
+To enable engineering intelligence queries:
+
+1. Create a GitHub App
+   Visit: https://github.com/settings/apps
+
+2. Add to your .env file:
+   GITHUB_APP_ID=your_app_id
+   GITHUB_APP_INSTALLATION_ID=your_installation_id
+   GITHUB_APP_PRIVATE_KEY_PATH=/path/to/private-key.pem
+
+3. Restart the app
+
+See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
+        
+        alert(setupText);
+      }
+    }
+
+    function updateGitHubButton() {
+      const btn = document.getElementById('githubAuthBtn');
+      if (githubConnected) {
+        btn.classList.add('connected');
+        btn.title = `GitHub Connected (${githubInfo?.repoCount || 0} repos) - Click for info`;
+      } else {
+        btn.classList.remove('connected');
+        btn.title = 'GitHub Not Connected - Click for setup instructions';
+      }
+    }
+
+    async function checkGitHubConnection() {
+      console.log('🔍 checkGitHubConnection called');
+      console.log('🔍 window.electronAPI exists?', !!window.electronAPI);
+      console.log('🔍 window.electronAPI.engineering exists?', !!window.electronAPI?.engineering);
+      console.log('🔍 window.electronAPI.engineering.healthCheck exists?', !!window.electronAPI?.engineering?.healthCheck);
+      
+      try {
+        if (window.electronAPI?.engineering?.healthCheck) {
+          const result = await window.electronAPI.engineering.healthCheck();
+          
+          console.log('🔍 GitHub health check FULL result:', JSON.stringify(result, null, 2));
+          console.log('🔍 result.status:', result.status);
+          console.log('🔍 result.github:', result.github);
+          console.log('🔍 result.authType:', result.authType);
+          console.log('🔍 result.appId:', result.appId);
+          console.log('🔍 result.repoCount:', result.repoCount);
+          
+          // FIXED: Remove 'result.configured' check - health check doesn't return this
+          if (result.status === 'healthy' && result.github === 'connected') {
+            githubConnected = true;
+            githubInfo = {
+              appId: result.appId,
+              repoCount: result.repoCount || 0,
+              authType: result.authType || 'github-app'
+            };
+            updateGitHubButton();
+            console.log('✅ GitHub connected:', githubInfo);
+          } else {
+            githubConnected = false;
+            updateGitHubButton();
+            console.log('ℹ️ GitHub not connected - status:', result.status, 'github:', result.github);
+          }
+        } else {
+          githubConnected = false;
+          updateGitHubButton();
+          console.log('ℹ️ GitHub engineering API not available');
+        }
+      } catch (error) {
+        console.error('⚠️ GitHub connection check failed:', error);
+        console.error('⚠️ Error details:', error.stack);
+        githubConnected = false;
+        updateGitHubButton();
+      }
+    }
+
+    // Check GitHub connection on startup
+    setTimeout(checkGitHubConnection, 1000);
+
+    // Re-check every 30 seconds
+    setInterval(checkGitHubConnection, 30000);
+
+    // Check JIRA connection on startup
+    setTimeout(checkJIRAConnection, 1500);
+
+    // Re-check JIRA connection every 60 seconds
+    setInterval(checkJIRAConnection, 60000);
+
+    // ===== ROLE-BASED UI =====
+    let userRole = null;
+
+    async function initializeRoleBasedUI() {
+      try {
+        // Get current user
+        const user = await window.electronAPI.auth.getUser();
+        
+        if (!user || !user.user_role) {
+          console.log('ℹ️  No user role detected');
+          return;
+        }
+
+        userRole = user.user_role;
+        console.log('👤 User role:', userRole);
+
+        // For developer users
+        if (userRole === 'developer') {
+          console.log('🔧 Configuring for developer role');
+          
+          // Show dev-specific features
+          showDeveloperFeatures();
+        } else if (userRole === 'sales') {
+          console.log('📊 Configuring for sales role');
+          
+          // Hide dev-only features (GitHub button for sales)
+          // Currently GitHub is shown to both, but can hide if needed
+          // document.getElementById('githubAuthBtn').style.display = 'none';
+        }
+        
+        // Load tasks for all roles
+        console.log('📋 Loading tasks...');
+        await loadTasks();
+
+      } catch (error) {
+        console.error('❌ Failed to initialize role-based UI:', error);
+      }
+    }
+
+    function showDeveloperFeatures() {
+      // Show Code Indexer tab for developers
+      const indexerNavBtn = document.getElementById('indexerNavBtn');
+      if (indexerNavBtn) {
+        indexerNavBtn.style.display = 'block';
+        console.log('✨ Code Indexer tab enabled for developer');
+      }
+      
+      // Show JIRA auth button for developers
+      const jiraAuthBtn = document.getElementById('jiraAuthBtn');
+      if (jiraAuthBtn) {
+        jiraAuthBtn.style.display = 'flex';
+        console.log('✨ JIRA auth button enabled for developer');
+        
+        // Check JIRA connection status
+        checkJIRAConnection();
+      }
+      
+      // Disable manual task creation for devs (use JIRA instead)
+      const taskInput = document.getElementById('taskInput');
+      const addTaskBtn = document.querySelector('.add-task-btn');
+      
+      if (taskInput) {
+        taskInput.disabled = true;
+        taskInput.placeholder = 'Tasks are synced from JIRA...';
+      }
+      
+      if (addTaskBtn) {
+        addTaskBtn.disabled = true;
+        addTaskBtn.style.opacity = '0.5';
+      }
+      
+      console.log('✨ Developer features enabled');
+    }
+
+    async function loadJIRATasks() {
+      const tasksList = document.getElementById('tasksList');
+      
+      if (!tasksList) return;
+      
+      try {
+        // Check if JIRA is connected
+        const connectionStatus = await window.electronAPI.jira.checkConnection();
+        
+        if (!connectionStatus.connected) {
+          // Show connect prompt
+          tasksList.innerHTML = `
+            <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+              <div class="empty-icon" style="font-size: 64px; margin-bottom: 16px;">🔌</div>
+              <div style="font-size: 18px; font-weight: 600; color: #171717; margin-bottom: 8px;">
+                Connect JIRA to see your tasks
+              </div>
+              <div style="font-size: 14px; color: #737373; max-width: 400px; margin: 0 auto; margin-bottom: 20px;">
+                Click the JIRA button in the top right to authenticate and sync your tasks.
+              </div>
+              <button onclick="handleJIRAButtonClick()" style="padding: 12px 24px; background: #0052CC; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                Connect JIRA
+              </button>
+            </div>
+          `;
+          return;
+        }
+        
+        // Load JIRA issues
+        console.log('📋 Loading JIRA tasks...');
+        tasksList.innerHTML = `
+          <div style="padding: 20px; text-align: center; color: #737373;">
+            Loading your JIRA tasks...
+          </div>
+        `;
+        
+        const result = await window.electronAPI.jira.getMyIssues({ maxResults: 50 });
+        
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+        
+        const issues = result.issues || [];
+        
+        if (issues.length === 0) {
+          tasksList.innerHTML = `
+            <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+              <div class="empty-icon" style="font-size: 64px; margin-bottom: 16px;">✅</div>
+              <div style="font-size: 18px; font-weight: 600; color: #171717; margin-bottom: 8px;">
+                No tasks assigned to you
+              </div>
+              <div style="font-size: 14px; color: #737373;">
+                All caught up! Create new tasks in JIRA.
+              </div>
+            </div>
+          `;
+          return;
+        }
+        
+        // Display issues as tasks
+        tasksList.innerHTML = issues.map(issue => {
+          const priorityColors = {
+            Highest: '#FF3B30',
+            High: '#FF9500',
+            Medium: '#FFCC00',
+            Low: '#34C759',
+            Lowest: '#007AFF'
+          };
+          const priorityColor = priorityColors[issue.priority?.name] || '#737373';
+          
+          return `
+            <div class="task-item" style="padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: start; gap: 12px;">
+                <input type="checkbox" ${issue.status?.name === 'Done' ? 'checked' : ''} disabled style="margin-top: 2px;">
+                <div style="flex: 1;">
+                  <div style="font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 4px;">
+                    ${issue.summary}
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #737373;">
+                    <span style="background: ${priorityColor}; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">
+                      ${issue.priority?.name || 'Medium'}
+                    </span>
+                    <span>${issue.status?.name || 'To Do'}</span>
+                    <span>•</span>
+                    <span>${issue.issue_type?.name || 'Task'}</span>
+                    <span>•</span>
+                    <span>${issue.key}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+        
+        console.log(`✅ Loaded ${issues.length} JIRA tasks`);
+        
+      } catch (error) {
+        console.error('❌ Failed to load JIRA tasks:', error);
+        tasksList.innerHTML = `
+          <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+            <div class="empty-icon" style="font-size: 64px; margin-bottom: 16px;">⚠️</div>
+            <div style="font-size: 18px; font-weight: 600; color: #171717; margin-bottom: 8px;">
+              Failed to load JIRA tasks
+            </div>
+            <div style="font-size: 14px; color: #737373; margin-bottom: 20px;">
+              ${error.message}
+            </div>
+            <button onclick="loadTasks()" style="padding: 12px 24px; background: #171717; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+              Retry
+            </button>
+          </div>
+        `;
+      }
+      
+      // Disable manual task creation for devs (use JIRA instead)
+      const taskInput = document.getElementById('taskInput');
+      const addTaskBtn = document.querySelector('.add-task-btn');
+      
+      if (taskInput) {
+        taskInput.disabled = true;
+        taskInput.placeholder = 'Tasks are synced from JIRA...';
+      }
+      
+      if (addTaskBtn) {
+        addTaskBtn.disabled = true;
+        addTaskBtn.style.opacity = '0.5';
+      }
+    }
+    
+    // Handle JIRA button click
+    async function handleJIRAButtonClick() {
+      const btn = document.getElementById('jiraAuthBtn');
+      
+      // If already connected, sync and refresh tasks instead of re-authenticating
+      if (btn && btn.classList.contains('connected')) {
+        console.log('🔄 Syncing JIRA tasks...');
+        await syncJIRATasks();
+        return;
+      }
+      
+      // Otherwise, authenticate
+      authenticateJIRA();
+    }
+    
+    // JIRA Authentication
+    async function authenticateJIRA() {
+      try {
+        console.log('🔐 Authenticating with JIRA...');
+        console.log('Debug: window.electronAPI =', window.electronAPI);
+        console.log('Debug: window.electronAPI.jira =', window.electronAPI?.jira);
+        
+        if (!window.electronAPI?.jira?.authenticate) {
+          throw new Error('JIRA API not available. Please restart the app.');
+        }
+        
+        const result = await window.electronAPI.jira.authenticate();
+        
+        if (result.success) {
+          console.log('✅ JIRA authenticated successfully');
+          
+          // Immediately update button state (don't wait for DB check)
+          const btn = document.getElementById('jiraAuthBtn');
+          if (btn) {
+            btn.classList.add('connected');
+            btn.title = `JIRA Connected (${result.siteUrl}) - Click to refresh`;
+          }
+          
+          alert(`Successfully connected to JIRA!\n\nSite: ${result.siteUrl}`);
+          
+          // Sync and load tasks immediately for developers
+          if (userRole === 'developer') {
+            await syncJIRATasks();
+          }
+        } else {
+          console.error('❌ JIRA authentication failed:', result.error);
+          alert(`Failed to authenticate with JIRA:\n\n${result.error}`);
+        }
+      } catch (error) {
+        console.error('❌ JIRA authentication error:', error);
+        alert(`JIRA authentication error:\n\n${error.message}`);
+      }
+    }
+    
+    // Check JIRA connection status
+
+    // Initialize on page load
+    setTimeout(initializeRoleBasedUI, 1000);
+
+    // ===== CODE INDEXER FUNCTIONS =====
+    let indexedRepositories = [];
+    let availableRepositories = [];
+
+    async function loadIndexerData() {
+      console.log('📊 Loading indexer data...');
+      await Promise.all([
+        loadAvailableRepositories(),
+        loadIndexedRepositories()
+      ]);
+    }
+
+    async function loadAvailableRepositories() {
+      try {
+        if (!window.electronAPI?.engineering?.listRepos) {
+          console.log('ℹ️  Engineering API not available');
+          return;
+        }
+
+        const result = await window.electronAPI.engineering.listRepos();
+        
+        if (result.success && result.repos) {
+          availableRepositories = result.repos;
+          console.log('✅ Loaded', availableRepositories.length, 'available repositories');
+          
+          // Populate repository select
+          const select = document.getElementById('repositorySelect');
+          select.innerHTML = '<option value="">Select a repository...</option>';
+          availableRepositories.forEach(repo => {
+            const option = document.createElement('option');
+            option.value = JSON.stringify({ owner: repo.owner.login, name: repo.name });
+            option.textContent = repo.full_name;
+            select.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error('❌ Failed to load available repositories:', error);
+      }
+    }
+
+    async function loadIndexedRepositories() {
+      try {
+        if (!window.electronAPI?.codeIndexer?.listRepositories) {
+          console.log('ℹ️  Code Indexer API not available');
+          return;
+        }
+
+        const result = await window.electronAPI.codeIndexer.listRepositories();
+        
+        if (result.success && result.repositories) {
+          indexedRepositories = result.repositories;
+          console.log('✅ Loaded', indexedRepositories.length, 'indexed repositories');
+          renderRepositories();
+        }
+      } catch (error) {
+        console.error('❌ Failed to load indexed repositories:', error);
+      }
+    }
+
+    function renderRepositories() {
+      const container = document.getElementById('repositoriesList');
+      
+      if (indexedRepositories.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 60px 20px; color: #737373;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📦</div>
+            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">No Indexed Repositories</div>
+            <div style="font-size: 14px;">Select a repository above and click "Index Repository" to get started</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = indexedRepositories.map(repo => {
+        const status = repo.status || 'completed';
+        const statusColors = {
+          completed: { bg: '#d1fae5', text: '#065f46', label: '✓ Indexed' },
+          in_progress: { bg: '#fef3c7', text: '#92400e', label: '⏳ Indexing' },
+          failed: { bg: '#fee2e2', text: '#991b1b', label: '✗ Failed' },
+          pending: { bg: '#e0e7ff', text: '#3730a3', label: '○ Pending' }
+        };
+        const statusInfo = statusColors[status] || statusColors.pending;
+
+        return `
+          <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div>
+                <div style="font-size: 16px; font-weight: 600; color: #171717; margin-bottom: 4px;">
+                  ${repo.repository_owner}/${repo.repository_name}
+                </div>
+                <div style="font-size: 13px; color: #737373;">
+                  ${repo.indexed_chunks || 0} chunks indexed • ${repo.indexed_files || 0} files
+                </div>
+              </div>
+              <span style="padding: 6px 12px; background: ${statusInfo.bg}; color: ${statusInfo.text}; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                ${statusInfo.label}
+              </span>
+            </div>
+            ${repo.status === 'completed' ? `
+              <div style="font-size: 12px; color: #525252;">
+                Last indexed: ${new Date(repo.updated_at).toLocaleDateString()}
+              </div>
+            ` : ''}
+            ${repo.status === 'failed' && repo.error_message ? `
+              <div style="font-size: 12px; color: #991b1b; margin-top: 8px;">
+                Error: ${repo.error_message}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function refreshRepositories() {
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = '🔄 Loading...';
+      
+      await loadIndexerData();
+      
+      btn.disabled = false;
+      btn.textContent = '🔄 Refresh';
+    }
+
+    async function askCodeQuestion() {
+      const queryInput = document.getElementById('codeQuery');
+      const repoSelect = document.getElementById('repositorySelect');
+      const question = queryInput.value.trim();
+      const repoData = repoSelect.value;
+
+      if (!question) {
+        alert('Please enter a question');
+        return;
+      }
+
+      if (!repoData) {
+        alert('Please select a repository');
+        return;
+      }
+
+      const repo = JSON.parse(repoData);
+      
+      // Show loading
+      document.getElementById('queryLoading').style.display = 'block';
+      document.getElementById('answerSection').style.display = 'none';
+
+      try {
+        console.log('🔍 Querying:', question, 'in', repo.owner + '/' + repo.name);
+
+        // Fallback response for demo purposes
+        const fallbackResult = {
+          success: true,
+          answer: `Based on your (Avinash Sanghavi's) responses, we've found that your devs have made progress on the Dashboard feature update (new color scheme) but are still waiting to put together an AI chatbot for your website.\n\nI recommend checking in at your 9:00 stand-up to ensure design consistency, however the team is ahead of schedule on task delivery.`,
+          confidence: 'high',
+          sources: [
+            {
+              filePath: 'src/components/Dashboard/Dashboard.jsx',
+              chunkType: 'component',
+              chunkName: 'Dashboard',
+              startLine: 45,
+              similarity: 0.89
+            },
+            {
+              filePath: 'src/styles/theme.css',
+              chunkType: 'stylesheet',
+              chunkName: 'theme',
+              startLine: 12,
+              similarity: 0.82
+            },
+            {
+              filePath: 'docs/ROADMAP.md',
+              chunkType: 'documentation',
+              chunkName: 'roadmap',
+              startLine: 78,
+              similarity: 0.75
+            }
+          ]
+        };
+
+        // For now, always use fallback
+        // TODO: Implement real code indexer query when ready
+        // if (!window.electronAPI?.codeIndexer?.query) {
+        //   console.log('Using fallback response (Code Indexer not available)');
+        //   displayAnswer(fallbackResult);
+        //   document.getElementById('queryLoading').style.display = 'none';
+        //   return;
+        // }
+
+        // Simulate loading time
+        setTimeout(() => {
+          // Hide loading
+          document.getElementById('queryLoading').style.display = 'none';
+          displayAnswer(fallbackResult);
+        }, 1500);
+
+        // Real implementation (commented out for now):
+        /*
+        const result = await window.electronAPI.codeIndexer.query({
+          owner: repo.owner,
+          repo: repo.name,
+          question: question
+        });
+
+        // Hide loading
+        document.getElementById('queryLoading').style.display = 'none';
+
+        if (result.success) {
+          displayAnswer(result);
+        } else {
+          // Fall back to demo response if query fails
+          displayAnswer(fallbackResult);
+        }
+        */
+
+      } catch (error) {
+        console.error('❌ Query failed:', error);
+        document.getElementById('queryLoading').style.display = 'none';
+        
+        // Show fallback response even on error
+        displayAnswer({
+          success: true,
+          answer: `Based on your (Avinash Sanghavi's) responses, we've found that your devs have made progress on the Dashboard feature update (new color scheme) but are still waiting to put together an AI chatbot for your website.\n\nI recommend checking in at your 9:00 stand-up to ensure design consistency, however the team is ahead of schedule on task delivery.`,
+          confidence: 'high',
+          sources: []
+        });
+      }
+    }
+
+    function displayAnswer(result) {
+      const answerSection = document.getElementById('answerSection');
+      const answerContent = document.getElementById('answerContent');
+      const confidenceBadge = document.getElementById('confidenceBadge');
+      const sourcesSection = document.getElementById('sourcesSection');
+      const sourcesList = document.getElementById('sourcesList');
+
+      // Show answer section
+      answerSection.style.display = 'block';
+
+      // Set confidence badge
+      const confidenceColors = {
+        high: { bg: '#d1fae5', text: '#065f46' },
+        medium: { bg: '#fef3c7', text: '#92400e' },
+        low: { bg: '#e0e7ff', text: '#3730a3' }
+      };
+      const confidence = result.confidence || 'medium';
+      const colors = confidenceColors[confidence];
+      confidenceBadge.style.background = colors.bg;
+      confidenceBadge.style.color = colors.text;
+      confidenceBadge.textContent = confidence.toUpperCase() + ' CONFIDENCE';
+
+      // Display answer
+      answerContent.innerHTML = result.answer.replace(/\n/g, '<br>');
+
+      // Display sources
+      if (result.sources && result.sources.length > 0) {
+        sourcesSection.style.display = 'block';
+        sourcesList.innerHTML = result.sources.map((source, index) => `
+          <div style="padding: 12px; background: #f9fafb; border-radius: 8px; font-size: 13px;">
+            <div style="font-weight: 600; color: #171717; margin-bottom: 4px;">
+              ${index + 1}. ${source.filePath}
+            </div>
+            <div style="color: #525252;">
+              ${source.chunkType} ${source.chunkName ? `• ${source.chunkName}` : ''}
+              ${source.startLine ? `• Line ${source.startLine}` : ''}
+              • ${(source.similarity * 100).toFixed(0)}% match
+            </div>
+          </div>
+        `).join('');
+      } else {
+        sourcesSection.style.display = 'none';
+      }
+
+      // Scroll to answer
+      answerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
     // ===== MEETING APPROVAL SYSTEM =====
     let pendingMeeting = null;

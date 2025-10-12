@@ -19,6 +19,9 @@ const FactCheckerService = require('./main/fact-checker-service');
 const MicrosoftOAuthHandler = require('../oauth/microsoft-oauth-handler');
 const MicrosoftWorkflowAutomation = require('../core/automation/microsoft-workflow-automation');
 const GoogleOAuthHandler = require('../oauth/google-oauth-handler');
+const JIRAOAuthHandler = require('../oauth/jira-oauth-handler');
+const EngineeringIntelligenceService = require('../core/intelligence/engineering-intelligence-service');
+const CodeIndexer = require('../core/intelligence/code-indexer');
 
 // Global error handlers to prevent crashes
 process.on('uncaughtException', (error) => {
@@ -45,12 +48,16 @@ let factCheckerService; // Fact-checker service
 let microsoftOAuthHandler; // Microsoft OAuth handler
 let microsoftAutomation; // Microsoft workflow automation
 let googleOAuthHandler; // Google OAuth handler
+let jiraOAuthHandler; // JIRA OAuth handler
+let engineeringIntelligence; // Engineering intelligence service
+let codeIndexer; // Code repository indexer for semantic search
 let currentUser = null; // Currently authenticated user
 let conversationHistory = []; // Store conversation history
 let currentSessionId = null; // Track current conversation session
 let taskSessionIds = {}; // Track task-specific session IDs: { taskId: sessionId }
 let lastSlackContext = null; // Cache Slack context
 let isExpanded = false; // Track if top bar is expanded
+let roleSelectionWindow = null; // Role selection window
 let isManuallyPositioned = false; // Track if user has manually moved the bar
 let activeHighlights = []; // Store active highlight data
 let userDefinedSize = null; // Track user's custom window size
@@ -935,7 +942,371 @@ function setupGoogleIPCHandlers() {
   
   console.log('✅ Google Workspace IPC handlers registered');
 }
+=======
+// Always register handlers, check initialization inside
+ipcMain.handle('jira:authenticate', async () => {
+  try {
+    if (!jiraOAuthHandler) {
+      return {
+        success: false,
+        error: 'JIRA integration not configured. Please add JIRA_CLIENT_ID and JIRA_CLIENT_SECRET to your .env file.'
+      };
+    }
+    
+    console.log('🔐 Starting JIRA authentication...');
+    const result = await jiraOAuthHandler.startAuthFlow();
+    
+    console.log('📋 JIRA auth result:', result);
+    
+    // Load user if not already loaded
+    if (!currentUser) {
+      console.log('👤 Loading user from database...');
+      const { data: loadedUser, error: loadError } = await dbAdapter.supabase
+        .from('users')
+        .select('*')
+        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2')
+        .single();
+      
+      if (!loadError && loadedUser) {
+        currentUser = loadedUser;
+        console.log('✅ User loaded:', currentUser.name);
+      } else {
+        console.error('❌ Failed to load user:', loadError?.message);
+      }
+    }
+    
+    // Save tokens to user settings
+    if (result.access_token && currentUser) {
+      try {
+        const { data: userData, error: userError } = await dbAdapter.supabase
+          .from('users')
+          .select('integration_settings')
+          .eq('id', currentUser.id)
+          .single();
+        
+        if (userError) throw userError;
+        
+        const integrationSettings = userData?.integration_settings || {};
+        integrationSettings.jira = {
+          access_token: result.access_token,
+          refresh_token: result.refresh_token,
+          token_expiry: Date.now() + (result.expires_in * 1000),
+          cloud_id: result.cloud_id,
+          site_url: result.site_url,
+          connected_at: new Date().toISOString()
+        };
+        
+        const { error: updateError } = await dbAdapter.supabase
+          .from('users')
+          .update({ integration_settings: integrationSettings })
+          .eq('id', currentUser.id);
+        
+        if (updateError) throw updateError;
+        
+        console.log('✅ JIRA tokens saved to user settings');
+      } catch (error) {
+        console.error('⚠️ Failed to save JIRA tokens:', error);
+      }
+    }
+    
+    console.log('✅ JIRA authenticated:', result.site_url);
+    
+    // Return in expected format
+    return {
+      success: true,
+      accessToken: result.access_token,
+      refreshToken: result.refresh_token,
+      expiresAt: Date.now() + (result.expires_in * 1000),
+      cloudId: result.cloud_id,
+      siteUrl: result.site_url
+    };
+  } catch (error) {
+    console.error('❌ JIRA authentication failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
 
+// Get JIRA Issues (Tasks for current user)
+ipcMain.handle('jira:getMyIssues', async (event, options = {}) => {
+  try {
+    // Load user if not already loaded
+    if (!currentUser) {
+      console.log('👤 Loading user from database for getMyIssues...');
+      const { data: loadedUser, error: loadError } = await dbAdapter.supabase
+        .from('users')
+        .select('*')
+        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2')
+        .single();
+      
+      if (!loadError && loadedUser) {
+        currentUser = loadedUser;
+        console.log('✅ User loaded for getMyIssues:', currentUser.name);
+      } else {
+        return {
+          success: false,
+          error: 'Not authenticated'
+        };
+      }
+    }
+
+    console.log('📋 Fetching JIRA issues for current user...');
+
+    // Get user's JIRA tokens from Supabase
+    const { data: userData, error: userError } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (userError || !userData) {
+      return {
+        success: false,
+        error: 'Failed to get user data'
+      };
+    }
+
+    const jiraTokens = userData.integration_settings?.jira;
+    
+    if (!jiraTokens || !jiraTokens.access_token) {
+      return {
+        success: false,
+        error: 'JIRA not connected'
+      };
+    }
+
+    // Initialize JIRA service with stored tokens
+    const JIRAService = require('../core/integrations/jira-service');
+    const jiraService = new JIRAService();
+    jiraService.accessToken = jiraTokens.access_token;
+    jiraService.refreshToken = jiraTokens.refresh_token;
+    jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
+    jiraService.cloudId = jiraTokens.cloud_id;
+    jiraService.siteUrl = jiraTokens.site_url;
+
+    // Fetch assigned issues using JQL
+    const jql = 'assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC';
+    const result = await jiraService.getIssues(jql, {
+      maxResults: options.maxResults || 50
+    });
+
+    console.log(`✅ Retrieved ${result.issues.length} JIRA issues`);
+
+    return {
+      success: true,
+      issues: result.issues
+    };
+
+  } catch (error) {
+    console.error('❌ Failed to fetch JIRA issues:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// Check if JIRA is connected
+ipcMain.handle('jira:checkConnection', async () => {
+  try {
+    if (!currentUser) {
+      return { connected: false };
+    }
+    
+    const { data: userData, error } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+    
+    if (error || !userData) {
+      return { connected: false };
+    }
+    
+    const jiraSettings = userData.integration_settings?.jira;
+    const connected = !!(jiraSettings?.access_token && jiraSettings?.cloud_id);
+    
+    return {
+      connected,
+      siteUrl: jiraSettings?.site_url,
+      connectedAt: jiraSettings?.connected_at
+    };
+  } catch (error) {
+    console.error('❌ Failed to check JIRA connection:', error);
+    return { connected: false };
+  }
+});
+
+// Sync JIRA issues and create/update tasks
+ipcMain.handle('jira:syncTasks', async (event, options = {}) => {
+  try {
+    // Load user if not already loaded
+    if (!currentUser) {
+      console.log('👤 Loading user from database for sync...');
+      const { data: loadedUser, error: loadError } = await dbAdapter.supabase
+        .from('users')
+        .select('*')
+        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2')
+        .single();
+      
+      if (!loadError && loadedUser) {
+        currentUser = loadedUser;
+        console.log('✅ User loaded for sync:', currentUser.name);
+      } else {
+        return {
+          success: false,
+          error: 'Not authenticated'
+        };
+      }
+    }
+
+    console.log('🔄 Starting JIRA task sync...');
+
+    // Get user's JIRA tokens from Supabase
+    const { data: userData, error: userError } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (userError || !userData) {
+      return {
+        success: false,
+        error: 'Failed to get user data'
+      };
+    }
+
+    const jiraTokens = userData.integration_settings?.jira;
+    
+    if (!jiraTokens || !jiraTokens.access_token) {
+      return {
+        success: false,
+        error: 'JIRA not connected'
+      };
+    }
+
+    // Initialize JIRA service with stored tokens
+    const JIRAService = require('../core/integrations/jira-service');
+    const jiraService = new JIRAService();
+    jiraService.accessToken = jiraTokens.access_token;
+    jiraService.refreshToken = jiraTokens.refresh_token;
+    jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
+    jiraService.cloudId = jiraTokens.cloud_id;
+    jiraService.siteUrl = jiraTokens.site_url;
+
+    // Fetch assigned issues (JQL: assignee = currentUser() AND status != Done)
+    const jql = options.jql || 'assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC';
+    const result = await jiraService.getIssues(jql, { maxResults: options.maxResults || 50 });
+
+    console.log(`📋 Found ${result.issues.length} JIRA issues`);
+
+    // Helper function to map JIRA priority to task priority
+    const mapJiraPriority = (jiraPriority) => {
+      if (!jiraPriority) return 'medium';
+      
+      const priority = jiraPriority.toLowerCase();
+      
+      if (priority.includes('highest') || priority.includes('critical')) {
+        return 'urgent';
+      } else if (priority.includes('high')) {
+        return 'high';
+      } else if (priority.includes('low')) {
+        return 'low';
+      }
+      
+      return 'medium';
+    };
+
+    // Create/update tasks for each JIRA issue
+    let tasksCreated = 0;
+    let tasksUpdated = 0;
+    let tasksFailed = 0;
+
+    for (const issue of result.issues) {
+      try {
+        const externalId = `jira_${issue.id}`;
+        
+        // Check if task already exists for this JIRA issue
+        const existingTask = await dbAdapter.getTaskByExternalId(externalId);
+        
+        const taskData = {
+          title: issue.summary,
+          priority: mapJiraPriority(issue.priority?.name),
+          description: issue.description || issue.summary,
+          tags: [
+            'jira-auto',
+            issue.issue_type?.name?.toLowerCase() || 'task',
+            issue.status?.name?.toLowerCase().replace(/\s+/g, '-') || 'unknown'
+          ],
+          externalId: externalId,
+          externalKey: issue.key,
+          externalUrl: issue.url,
+          externalSource: 'jira',
+          jira_issue_type: issue.issue_type?.name,
+          jira_status: issue.status?.name,
+          jira_priority: issue.priority?.name,
+          story_points: issue.story_points,
+          sprint: issue.sprint,
+          labels: issue.labels,
+          jira_updated_at: issue.updated_at
+        };
+
+        if (existingTask) {
+          // Update existing task
+          await dbAdapter.updateTask(existingTask.id, taskData);
+          tasksUpdated++;
+          console.log(`📝 Updated task for ${issue.key}`);
+        } else {
+          // Create new task
+          const createResult = await dbAdapter.createTask(currentUser.id, taskData);
+          
+          if (createResult.success) {
+            tasksCreated++;
+            console.log(`✅ Created task for ${issue.key}: ${issue.summary}`);
+            
+            // Notify UI
+            if (mainWindow) {
+              mainWindow.webContents.send('task:created', createResult.task);
+              mainWindow.webContents.send('notification', {
+                type: 'jira_task_synced',
+                message: `New JIRA task: ${issue.key} - ${issue.summary}`,
+                priority: taskData.priority
+              });
+            }
+          } else {
+            tasksFailed++;
+            console.error(`❌ Failed to create task for ${issue.key}:`, createResult.error);
+          }
+        }
+      } catch (taskError) {
+        tasksFailed++;
+        console.error(`❌ Error processing JIRA issue ${issue.key}:`, taskError.message);
+      }
+    }
+
+    console.log(`✅ JIRA sync complete: ${tasksCreated} created, ${tasksUpdated} updated, ${tasksFailed} failed`);
+
+    return {
+      success: true,
+      tasksCreated,
+      tasksUpdated,
+      tasksFailed,
+      totalIssues: result.issues.length
+    };
+
+  } catch (error) {
+    console.error('❌ JIRA sync error:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+console.log('✅ JIRA IPC handlers registered');
+>>>>>>> Feature/GithubCopilot
 // Initialize services with auto-startup
 function initializeServices() {
   // Initialize Supabase adapter
@@ -1006,6 +1377,100 @@ function initializeServices() {
     googleOAuthHandler = null;
   }
   
+  // Initialize JIRA OAuth Handler (optional - only if credentials are configured)
+  if (process.env.JIRA_CLIENT_ID && process.env.JIRA_CLIENT_SECRET) {
+    try {
+      jiraOAuthHandler = new JIRAOAuthHandler({
+        clientId: process.env.JIRA_CLIENT_ID,
+        clientSecret: process.env.JIRA_CLIENT_SECRET,
+        redirectUri: process.env.JIRA_REDIRECT_URI,
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ JIRA OAuth handler initialized');
+    } catch (error) {
+      console.warn('⚠️ JIRA OAuth initialization failed:', error.message);
+      console.log('💡 JIRA features will be disabled. Add credentials to .env to enable.');
+      jiraOAuthHandler = null;
+    }
+  } else {
+    console.log('ℹ️ JIRA integration not configured (optional)');
+    jiraOAuthHandler = null;
+  }
+  
+  // Initialize Engineering Intelligence (GitHub App ONLY)
+  const hasGitHubApp = process.env.GITHUB_APP_ID && 
+                       process.env.GITHUB_APP_INSTALLATION_ID && 
+                       (process.env.GITHUB_APP_PRIVATE_KEY_PATH || process.env.GITHUB_APP_PRIVATE_KEY);
+  
+  if (hasGitHubApp) {
+    try {
+      engineeringIntelligence = new EngineeringIntelligenceService({
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+        // Repository will be auto-detected from GitHub App installation
+      });
+      
+      console.log('✅ Engineering Intelligence initialized with GitHub App');
+      console.log(`📊 App ID: ${process.env.GITHUB_APP_ID}`);
+      console.log(`📦 Installation ID: ${process.env.GITHUB_APP_INSTALLATION_ID}`);
+      console.log(`🔐 Private Key: ${process.env.GITHUB_APP_PRIVATE_KEY_PATH ? 'Loaded from file' : 'Loaded from env'}`);
+      console.log(`📚 Repository: Auto-detected from installation`);
+      
+    } catch (error) {
+      console.warn('⚠️ Engineering Intelligence initialization failed:', error.message);
+      console.log('💡 Engineering queries will be disabled.');
+      engineeringIntelligence = null;
+    }
+    
+    // Initialize Code Indexer separately (independent of EngineeringIntelligence)
+    try {
+      codeIndexer = new CodeIndexer({
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ Code Indexer initialized (GitHub + OpenAI + Anthropic + Supabase)');
+      
+      // Set up event listeners for indexing progress
+      codeIndexer.on('indexing:started', (job) => {
+        console.log(`🚀 Indexing started: ${job.owner}/${job.repo}`);
+        if (mainWindow) {
+          mainWindow.webContents.send('indexing:started', job);
+        }
+      });
+      
+      codeIndexer.on('indexing:progress', (job) => {
+        console.log(`⏳ Indexing progress: ${job.owner}/${job.repo} - ${job.phase} (${job.progress}%)`);
+        if (mainWindow) {
+          mainWindow.webContents.send('indexing:progress', job);
+        }
+      });
+      
+      codeIndexer.on('indexing:completed', (job) => {
+        console.log(`✅ Indexing completed: ${job.owner}/${job.repo} - ${job.result.chunks} chunks in ${job.duration}ms`);
+        if (mainWindow) {
+          mainWindow.webContents.send('indexing:completed', job);
+        }
+      });
+      
+      codeIndexer.on('indexing:failed', (job) => {
+        console.error(`❌ Indexing failed: ${job.owner}/${job.repo} - ${job.error}`);
+        if (mainWindow) {
+          mainWindow.webContents.send('indexing:failed', job);
+        }
+      });
+      
+    } catch (error) {
+      console.warn('⚠️ Code Indexer initialization failed:', error.message);
+      console.warn('Stack:', error.stack);
+      console.log('💡 Code indexing will be disabled.');
+      codeIndexer = null;
+    }
+  } else {
+    console.log('ℹ️ Engineering Intelligence not configured (GitHub App required)');
+    console.log('   Set GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, and GITHUB_APP_PRIVATE_KEY_PATH in .env');
+    engineeringIntelligence = null;
+    codeIndexer = null;
+>>>>>>> Feature/GithubCopilot
+  }
+  
   workflowIntelligence = new WorkflowIntelligenceSystem({
     logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
     analysisWindow: 7, // days
@@ -1051,6 +1516,141 @@ function initializeServices() {
       console.log('❌ Slack auto-start error:', error.message);
     }
   }, 3000); // 3 second delay to allow UI to load
+  
+  // Auto-sync JIRA tasks for developer users
+  const startJIRAAutoSync = () => {
+    // Initial sync after 10 seconds to allow app to fully load
+    setTimeout(async () => {
+      try {
+        if (currentUser && currentUser.user_role === 'developer') {
+          const jiraSettings = currentUser.integration_settings?.jira;
+          if (jiraSettings && jiraSettings.access_token) {
+            console.log('🔄 Running initial JIRA task sync...');
+            const result = await triggerJIRASync();
+            if (result.success) {
+              console.log(`✅ Initial JIRA sync complete: ${result.tasksCreated} created, ${result.tasksUpdated} updated`);
+            }
+          }
+        }
+      } catch (error) {
+        console.log('❌ Initial JIRA sync error:', error.message);
+      }
+    }, 10000);
+    
+    // Then sync every 10 minutes
+    setInterval(async () => {
+      try {
+        if (currentUser && currentUser.user_role === 'developer') {
+          const jiraSettings = currentUser.integration_settings?.jira;
+          if (jiraSettings && jiraSettings.access_token) {
+            console.log('🔄 Running periodic JIRA task sync...');
+            const result = await triggerJIRASync();
+            if (result.success) {
+              console.log(`✅ Periodic JIRA sync complete: ${result.tasksCreated} created, ${result.tasksUpdated} updated`);
+              
+              // Notify UI if there are new tasks
+              if (result.tasksCreated > 0 && mainWindow) {
+                mainWindow.webContents.send('notification', {
+                  type: 'jira_tasks_synced',
+                  message: `${result.tasksCreated} new JIRA task(s) added`
+                });
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.log('❌ Periodic JIRA sync error:', error.message);
+      }
+    }, 10 * 60 * 1000); // Every 10 minutes
+  };
+  
+  // Helper function to trigger JIRA sync
+  const triggerJIRASync = async () => {
+    if (!currentUser) {
+      const { data: userData } = await dbAdapter.supabase
+        .from('users')
+        .select('*')
+        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2') // Desktop user UUID
+        .single();
+      
+      if (userData) {
+        currentUser = userData;
+      }
+    }
+    
+    if (!currentUser) {
+      return { success: false, error: 'No user authenticated' };
+    }
+    
+    // Use the existing jira:syncTasks handler logic
+    const { data: userData, error: userError } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (userError || !userData) {
+      return { success: false, error: 'Failed to get user data' };
+    }
+
+    const jiraTokens = userData.integration_settings?.jira;
+    
+    if (!jiraTokens || !jiraTokens.access_token) {
+      return { success: false, error: 'JIRA not connected' };
+    }
+
+    const JIRAService = require('../core/integrations/jira-service');
+    const jiraService = new JIRAService();
+    jiraService.accessToken = jiraTokens.access_token;
+    jiraService.refreshToken = jiraTokens.refresh_token;
+    jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
+    jiraService.cloudId = jiraTokens.cloud_id;
+    jiraService.siteUrl = jiraTokens.site_url;
+
+    const jql = 'assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC';
+    const result = await jiraService.getIssues(jql, { maxResults: 50 });
+
+    let tasksCreated = 0;
+    let tasksUpdated = 0;
+
+    for (const issue of result.issues) {
+      const externalId = `jira_${issue.id}`;
+      const existingTask = await dbAdapter.getTaskByExternalId(externalId);
+      
+      const taskData = {
+        title: issue.summary,
+        priority: mapJiraPriority(issue.priority?.name),
+        description: issue.description || issue.summary,
+        tags: ['jira-auto', issue.issue_type?.name?.toLowerCase() || 'task'],
+        externalId,
+        externalKey: issue.key,
+        externalUrl: issue.url,
+        externalSource: 'jira'
+      };
+
+      if (existingTask) {
+        await dbAdapter.updateTask(existingTask.id, taskData);
+        tasksUpdated++;
+      } else {
+        const createResult = await dbAdapter.createTask(currentUser.id, taskData);
+        if (createResult.success) tasksCreated++;
+      }
+    }
+
+    return { success: true, tasksCreated, tasksUpdated, totalIssues: result.issues.length };
+  };
+  
+  const mapJiraPriority = (jiraPriority) => {
+    if (!jiraPriority) return 'medium';
+    const priority = jiraPriority.toLowerCase();
+    if (priority.includes('highest') || priority.includes('critical')) return 'urgent';
+    if (priority.includes('high')) return 'high';
+    if (priority.includes('low')) return 'low';
+    return 'medium';
+  };
+  
+  // Start JIRA auto-sync
+  startJIRAAutoSync();
   
   // Note: Slack IPC handlers are now registered in registerAllIPCHandlers() at module level
 
@@ -1159,7 +1759,7 @@ function initializeServices() {
 
   ipcMain.handle('tasks:getStats', async () => {
     try {
-      const userId = 'desktop-user'; // TODO: Get actual user ID
+      const userId = '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2'; // Desktop user UUID
       const result = await dbAdapter.getTaskStats(userId);
       return result;
     } catch (error) {
@@ -1245,7 +1845,7 @@ function initializeServices() {
   // Copilot IPC handlers with persistent context and real data integration
   ipcMain.handle('copilot:sendMessage', async (event, message) => {
     try {
-      const userId = currentUser?.id || 'desktop-user';
+      const userId = currentUser?.id || '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2';
       console.log('💬 Processing copilot message for user:', userId, '- Message:', message.substring(0, 50) + '...');
       
       // ✨ Check for fact-check command
@@ -1394,6 +1994,9 @@ ACTIVE INTEGRATIONS:
 ${microsoftAutomation ? `- ✅ Microsoft 365: AUTHENTICATED and ACTIVE - You CAN schedule meetings, send emails, and create calendar events
 - ✅ Outlook Calendar: Direct access to create calendar events with Teams meeting links
 - ✅ Microsoft Teams: Can create online meetings with join links` : '- ❌ Microsoft 365: Not authenticated (user needs to connect)'}
+${engineeringIntelligence ? `- ✅ Engineering Intelligence: ACTIVE - You CAN query the codebase and answer questions about engineering work
+- ✅ GitHub Integration: Access to repository, PRs, issues, and code understanding
+- ✅ Feature Status Tracking: Can check implementation status, demo-ability, and completion estimates` : '- ❌ Engineering Intelligence: Not configured'}
 
 WHAT YOU CAN DO:
 - Analyze Slack conversations and mentions
@@ -1404,6 +2007,10 @@ WHAT YOU CAN DO:
 ${microsoftAutomation ? `- **SCHEDULE REAL MEETINGS** via Microsoft Outlook (you WILL execute this, not just suggest it)
 - **SEND REAL EMAILS** via Microsoft Outlook (you WILL execute this, not just suggest it)
 - **CREATE CALENDAR EVENTS** with Teams meeting links (this WILL happen automatically)` : ''}
+${engineeringIntelligence ? `- **QUERY THE CODEBASE** to answer questions about engineering work (you WILL execute this, not just suggest it)
+- **CHECK FEATURE STATUS** to see what's built, in progress, or planned
+- **ASSESS DEMO-ABILITY** to tell if features are ready to show customers
+- **PROVIDE ENGINEERING INSIGHTS** for sales, marketing, and product teams` : ''}
 
 ${microsoftAutomation ? `⚠️ CRITICAL: You HAVE the ability to schedule meetings. Do NOT say you cannot. Do NOT suggest the user do it manually.
 
@@ -1420,6 +2027,21 @@ EXAMPLE USER REQUEST: "Schedule a meeting with shail@heyjarvis.ai tomorrow at 3p
 CORRECT RESPONSE: "[SCHEDULE_MEETING: attendees=shail@heyjarvis.ai, time=2025-10-08T15:00, subject=Dashboard Discussion] I'll create this meeting for you right now. The calendar invite will be sent momentarily."
 
 The system will automatically execute the meeting creation and update your response with confirmation.` : ''}
+
+${engineeringIntelligence ? `⚠️ CRITICAL: You HAVE the ability to query the codebase. Do NOT say you cannot. Do NOT suggest the user ask engineers directly.
+
+ENGINEERING QUERY INSTRUCTIONS:
+When the user asks about engineering work, features, or code, you MUST:
+1. Detect if it's an engineering question (features, status, implementation, code, etc.)
+2. Include this EXACT marker format in your response:
+   [ENGINEERING_QUERY: question=What is the status of the SSO feature?, role=sales]
+3. Role should be: sales, marketing, product, or executive (based on context or default to executive)
+4. After the marker, you can add text like "Let me check the codebase for you..."
+
+EXAMPLE USER REQUEST: "Is the SSO feature ready for the enterprise deal?"
+CORRECT RESPONSE: "[ENGINEERING_QUERY: question=Is the SSO feature ready for the enterprise deal?, role=sales] Let me check the codebase and recent development activity..."
+
+The system will automatically query the codebase and update your response with detailed information.` : ''}
 
 Respond as a knowledgeable business AI assistant. Reference the actual Slack and CRM data when relevant. Be conversational and helpful.`;
 
@@ -1498,6 +2120,113 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
           console.log('⚠️ Detected scheduling request but AI did not use marker format');
           console.log('💡 Adding reminder to AI response');
           aiResponse += `\n\n⚠️ **Note:** To actually execute the meeting creation, please ask me again and I'll use the proper format to trigger the calendar integration.`;
+        }
+      }
+      
+      // 📊 Check for engineering query marker and auto-execute
+      const engineeringMarkerRegex = /\[ENGINEERING_QUERY:\s*question=([^,]+),\s*role=([^\]]+)\]/i;
+      const engineeringMatch = aiResponse.match(engineeringMarkerRegex);
+      
+      console.log('🔍 Checking for engineering query marker in AI response...');
+      console.log('🎯 Engineering marker found:', !!engineeringMatch);
+      console.log('🔧 Engineering intelligence API available:', !!process.env.API_BASE_URL);
+      
+      if (engineeringMatch) {
+        console.log('📊 Engineering query detected in AI response!');
+        
+        const [, question, role] = engineeringMatch;
+        
+        try {
+          if (!engineeringIntelligence) {
+            throw new Error('Engineering Intelligence not initialized. Add GitHub credentials to .env');
+          }
+          
+          console.log('📊 Querying local GitHub service:', { question: question.substring(0, 50) + '...', role });
+          
+          // Detect if user is asking for list of repos
+          const listReposKeywords = /what.*repo|list.*repo|which.*repo|show.*repo|access.*repo|available.*repo/i;
+          
+          if (listReposKeywords.test(question)) {
+            // List accessible repositories
+            console.log('📋 List repositories query detected');
+            
+            const octokit = await engineeringIntelligence._getOctokit();
+            const { data } = await octokit.apps.listReposAccessibleToInstallation();
+            
+            aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
+            aiResponse += `\n\n📚 **Accessible GitHub Repositories** (${data.total_count} repos)\n\n`;
+            
+            data.repositories.forEach((repo, index) => {
+              const isPrivate = repo.private ? '🔒' : '🌐';
+              aiResponse += `${index + 1}. ${isPrivate} **${repo.full_name}**\n`;
+              if (repo.description) {
+                aiResponse += `   _${repo.description}_\n`;
+              }
+              aiResponse += `   Last updated: ${new Date(repo.updated_at).toLocaleDateString()}\n\n`;
+            });
+            
+            aiResponse += `\n_Ask me about any of these repositories to get insights!_`;
+            
+          } else {
+            // Query specific repository or default
+            let repository = null;
+            
+            // Try to extract repository from question (e.g., "status of Mark-I")
+            const repoMatch = question.match(/\b([a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+)\b/);
+            if (repoMatch) {
+              const [owner, repo] = repoMatch[1].split('/');
+              repository = { owner, repo };
+              console.log('📦 Repository extracted from question:', repository);
+            } else if (process.env.GITHUB_REPO_OWNER && process.env.GITHUB_REPO_NAME) {
+              // Use default repo if configured
+              repository = {
+                owner: process.env.GITHUB_REPO_OWNER,
+                repo: process.env.GITHUB_REPO_NAME
+              };
+              console.log('📦 Using default repository:', repository);
+            }
+            
+            // Call LOCAL engineering intelligence service
+            const engineeringResponse = await engineeringIntelligence.queryCodebase(question, {
+              role: role.trim(),
+              repository: repository,
+              userId: userId
+            });
+            
+            // Remove the marker and add engineering insights
+            aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
+            
+            if (repository) {
+              aiResponse += `\n\n📊 **Engineering Insights** (${repository.owner}/${repository.repo})\n\n`;
+            } else {
+              aiResponse += `\n\n📊 **Engineering Insights**\n\n`;
+            }
+            
+            aiResponse += engineeringResponse.summary;
+            
+            if (engineeringResponse.businessImpact) {
+              aiResponse += `\n\n💼 **Business Impact:**\n${engineeringResponse.businessImpact}`;
+            }
+            
+            if (engineeringResponse.actionItems && engineeringResponse.actionItems.length > 0) {
+              aiResponse += `\n\n✅ **Action Items:**\n${engineeringResponse.actionItems.map(item => `- ${item}`).join('\n')}`;
+            }
+            
+            aiResponse += `\n\n_Using real data from GitHub ${repository ? `• ${repository.owner}/${repository.repo}` : ''}_`;
+          }
+          
+          console.log('✅ Engineering query completed successfully');
+          
+        } catch (error) {
+          console.error('❌ Failed to query codebase:', error);
+          aiResponse = aiResponse.replace(engineeringMarkerRegex, '').trim();
+          aiResponse += `\n\n⚠️ **Engineering Query Failed**\n\n${error.message}`;
+        }
+      } else {
+        // Check if the user is asking about engineering but AI didn't use the marker
+        const engineeringKeywords = /\b(feature|code|implementation|built|develop|engineering|sprint|pr|pull request|commit)\b/i;
+        if (engineeringKeywords.test(message) && !aiResponse.includes('ENGINEERING_QUERY')) {
+          console.log('ℹ️ Detected potential engineering question but AI did not use marker format');
         }
       }
       
@@ -1722,7 +2451,7 @@ What would you like to explore?`,
       console.log('💬 Processing task chat message:', { taskId, message: message.substring(0, 50) + '...' });
       
       const task = context.task;
-      const userId = 'desktop-user'; // TODO: Get actual user ID
+      const userId = '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2'; // Desktop user UUID
       
       // Get or create task-specific session
       if (!taskSessionIds[taskId]) {
@@ -2775,6 +3504,32 @@ function createLoginWindow() {
   console.log('🔐 Login window created');
 }
 
+// Create role selection window
+function createRoleSelectionWindow() {
+  roleSelectionWindow = new BrowserWindow({
+    width: 900,
+    height: 700,
+    show: true,
+    center: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'bridge', 'preload.js')
+    },
+    titleBarStyle: 'hiddenInset',
+    frame: true
+  });
+
+  roleSelectionWindow.loadFile(path.join(__dirname, 'renderer', 'role-selection.html'));
+  
+  roleSelectionWindow.on('closed', () => {
+    roleSelectionWindow = null;
+  });
+  
+  console.log('🎯 Role selection window created');
+}
+
 // Check authentication and show appropriate window
 async function initializeApp() {
   try {
@@ -2788,6 +3543,15 @@ async function initializeApp() {
       // User is authenticated
       currentUser = session.user;
       console.log('✅ User authenticated:', currentUser.email);
+      
+      // Check if user needs to select role
+      if (authService.needsRoleSelection()) {
+        console.log('🎯 User needs to select role');
+        createRoleSelectionWindow();
+        return;
+      }
+      
+      console.log('👤 User role:', currentUser.user_role);
       
       // Show main app
       createWindow();
@@ -2807,7 +3571,7 @@ async function initializeApp() {
   } catch (error) {
     console.error('❌ App initialization failed:', error);
     // Only show login if we haven't already created a window
-    if (!mainWindow && !loginWindow) {
+    if (!mainWindow && !loginWindow && !roleSelectionWindow) {
       createLoginWindow();
     }
   }
@@ -2854,7 +3618,7 @@ function registerAllIPCHandlers() {
       if (!dbAdapter) {
         return { success: false, error: 'Database not initialized', tasks: [] };
       }
-      const userId = currentUser?.id || 'desktop-user';
+      const userId = currentUser?.id || '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2';
       const result = await dbAdapter.getUserTasks(userId, { 
         includeCompleted: false,
         ...filters
@@ -2871,7 +3635,7 @@ function registerAllIPCHandlers() {
       if (!dbAdapter) {
         return { success: false, error: 'Database not initialized' };
       }
-      const userId = currentUser?.id || 'desktop-user';
+      const userId = currentUser?.id || '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2';
       const result = await dbAdapter.createTask(userId, taskData);
       return result;
     } catch (error) {
@@ -2917,6 +3681,297 @@ function registerAllIPCHandlers() {
     } catch (error) {
       console.error('Failed to delete task:', error);
       return { success: false, error: error.message };
+    }
+  });
+
+  // Engineering Intelligence IPC handlers
+  ipcMain.handle('engineering:query', async (event, { query, repository, context }) => {
+    try {
+      if (!engineeringIntelligence) {
+        return {
+          success: false,
+          error: 'Engineering Intelligence not configured. Add GitHub credentials to .env'
+        };
+      }
+
+      console.log('📊 Engineering query via IPC:', query.substring(0, 50) + '...');
+      
+      const result = await engineeringIntelligence.queryCodebase(query, {
+        ...context,
+        repository: repository || (process.env.GITHUB_REPO_OWNER && process.env.GITHUB_REPO_NAME ? {
+          owner: process.env.GITHUB_REPO_OWNER,
+          repo: process.env.GITHUB_REPO_NAME
+        } : null),
+        role: context?.role || 'sales'
+      });
+      
+      return {
+        success: true,
+        result
+      };
+    } catch (error) {
+      console.error('❌ Engineering query failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  ipcMain.handle('engineering:healthCheck', async () => {
+    try {
+      if (!engineeringIntelligence) {
+        return {
+          status: 'unhealthy',
+          github: 'disconnected',
+          error: 'Engineering Intelligence not configured'
+        };
+      }
+
+      const health = await engineeringIntelligence.healthCheck();
+      return health;
+    } catch (error) {
+      console.error('❌ Engineering health check failed:', error);
+      return {
+        status: 'unhealthy',
+        github: 'disconnected',
+        error: error.message
+      };
+    }
+  });
+
+  ipcMain.handle('engineering:getFeatureStatus', async (event, { featureName, repository }) => {
+    try {
+      if (!engineeringIntelligence) {
+        return {
+          success: false,
+          error: 'Engineering Intelligence not configured'
+        };
+      }
+
+      const context = repository ? { repository } : {};
+      const result = await engineeringIntelligence.getFeatureStatus(featureName, context);
+      
+      return {
+        success: true,
+        result
+      };
+    } catch (error) {
+      console.error('❌ Feature status query failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  ipcMain.handle('engineering:listRepos', async () => {
+    try {
+      if (!engineeringIntelligence) {
+        return {
+          success: false,
+          error: 'Engineering Intelligence not configured'
+        };
+      }
+
+      const octokit = await engineeringIntelligence._getOctokit();
+      const { data} = await octokit.apps.listReposAccessibleToInstallation();
+      
+      return {
+        success: true,
+        repos: data.repositories
+      };
+    } catch (error) {
+      console.error('❌ List repos failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // ===== CODE INDEXER IPC HANDLERS =====
+  
+  // List indexed repositories
+  ipcMain.handle('codeIndexer:listRepositories', async () => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured. Set GITHUB_APP_ID, OPENAI_API_KEY, and ANTHROPIC_API_KEY in .env'
+        };
+      }
+
+      console.log('📋 Listing indexed repositories...');
+      const repositories = await codeIndexer.listIndexedRepositories();
+      
+      return {
+        success: true,
+        repositories
+      };
+    } catch (error) {
+      console.error('❌ List repositories failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Index a single repository
+  ipcMain.handle('codeIndexer:indexRepository', async (event, { owner, repo, branch = 'main' }) => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      console.log(`🔍 Indexing repository: ${owner}/${repo} (${branch})`);
+      const result = await codeIndexer.indexRepository(owner, repo, branch);
+      
+      return {
+        success: true,
+        result
+      };
+    } catch (error) {
+      console.error('❌ Repository indexing failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Batch index multiple repositories
+  ipcMain.handle('codeIndexer:batchIndex', async (event, { repositories }) => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      console.log(`🔍 Batch indexing ${repositories.length} repositories...`);
+      const results = await codeIndexer.indexRepositories(repositories);
+      
+      return {
+        success: true,
+        results
+      };
+    } catch (error) {
+      console.error('❌ Batch indexing failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Query a repository with natural language
+  ipcMain.handle('codeIndexer:query', async (event, { owner, repo, question, options = {} }) => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      console.log(`💬 Querying ${owner}/${repo}: ${question.substring(0, 50)}...`);
+      const result = await codeIndexer.query(question, { owner, repo, ...options });
+      
+      return {
+        success: true,
+        ...result
+      };
+    } catch (error) {
+      console.error('❌ Repository query failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Get indexing status for a repository
+  ipcMain.handle('codeIndexer:getStatus', async (event, { owner, repo, branch = 'main' }) => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      const status = await codeIndexer.getIndexingStatus(owner, repo, branch);
+      
+      return {
+        success: true,
+        status
+      };
+    } catch (error) {
+      console.error('❌ Get indexing status failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Check if code indexer is available and configured
+  ipcMain.handle('codeIndexer:checkAvailability', async () => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          available: false,
+          error: 'Code Indexer not initialized'
+        };
+      }
+
+      console.log('🔍 Checking Code Indexer availability...');
+      const checks = await codeIndexer.checkAvailability();
+      
+      return {
+        success: true,
+        available: checks.overall,
+        checks
+      };
+    } catch (error) {
+      console.error('❌ Check availability failed:', error);
+      return {
+        success: false,
+        available: false,
+        error: error.message
+      };
+    }
+  });
+
+  // Get code indexer statistics
+  ipcMain.handle('codeIndexer:getStats', async () => {
+    try {
+      if (!codeIndexer) {
+        return {
+          success: false,
+          error: 'Code Indexer not configured'
+        };
+      }
+
+      const stats = codeIndexer.getStats();
+      
+      return {
+        success: true,
+        stats
+      };
+    } catch (error) {
+      console.error('❌ Get stats failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
     }
   });
   
@@ -3186,6 +4241,17 @@ ipcMain.handle('auth:sign-in-slack', async () => {
         loginWindow = null;
       }
       
+      // Check if user needs to select role
+      if (authService.needsRoleSelection()) {
+        console.log('🎯 User needs to select role after sign-in');
+        createRoleSelectionWindow();
+        return {
+          success: true,
+          user: currentUser,
+          needsRoleSelection: true
+        };
+      }
+      
       // Create main window
       createWindow();
       
@@ -3199,7 +4265,8 @@ ipcMain.handle('auth:sign-in-slack', async () => {
       
       return {
         success: true,
-        user: currentUser
+        user: currentUser,
+        needsRoleSelection: false
       };
     }
     
@@ -3252,6 +4319,71 @@ ipcMain.handle('auth:sign-out', async () => {
 // Get current user
 ipcMain.handle('auth:get-user', async () => {
   return currentUser;
+});
+
+// Save user role
+ipcMain.handle('auth:save-user-role', async (event, role) => {
+  try {
+    console.log('🎯 Saving user role:', role);
+    
+    if (!authService) {
+      return {
+        success: false,
+        error: 'Auth service not initialized'
+      };
+    }
+    
+    const result = await authService.saveUserRole(role);
+    
+    if (result.success) {
+      currentUser = result.user;
+      return result;
+    }
+    
+    return {
+      success: false,
+      error: 'Failed to save role'
+    };
+    
+  } catch (error) {
+    console.error('❌ Save role failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// Complete role selection (close role window, open main app)
+ipcMain.handle('auth:complete-role-selection', async () => {
+  try {
+    console.log('✅ Role selection complete');
+    
+    // Close role selection window
+    if (roleSelectionWindow) {
+      roleSelectionWindow.close();
+      roleSelectionWindow = null;
+    }
+    
+    // Create main window
+    createWindow();
+    
+    // Initialize services
+    try {
+      initializeServices();
+    } catch (serviceError) {
+      console.error('⚠️ Service initialization failed (non-fatal):', serviceError.message);
+    }
+    
+    return { success: true };
+    
+  } catch (error) {
+    console.error('❌ Complete role selection failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
 });
 
 // ===== FACT CHECK IPC HANDLERS =====

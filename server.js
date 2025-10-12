@@ -98,6 +98,14 @@ app.all('/api/slack-events', (req, res) => {
   require('./api/slack-events/index')(req, res);
 });
 
+app.all('/api/engineering/query', (req, res) => {
+  require('./api/engineering/query')(req, res);
+});
+
+app.all('/api/engineering/repos', (req, res) => {
+  require('./api/engineering/repos')(req, res);
+});
+
 // Static file serving
 app.use(express.static(__dirname));
 

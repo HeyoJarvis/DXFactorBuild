@@ -125,9 +125,12 @@ const IntegrationSettings = z.object({
   }),
   
   jira: z.object({
-    instance_url: z.string().optional(),
-    username: z.string().optional(),
-    api_token: z.string().optional(),
+    cloud_id: z.string().optional(),
+    site_url: z.string().optional(),
+    access_token: z.string().optional(),
+    refresh_token: z.string().optional(),
+    token_expiry: z.number().optional(),
+    scopes: z.array(z.string()).optional(),
     project_key: z.string().optional(),
     connected: z.boolean().default(false)
   }),

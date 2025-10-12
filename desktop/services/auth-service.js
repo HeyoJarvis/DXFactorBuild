@@ -468,6 +468,23 @@ class AuthService {
   }
   
   /**
+   * Get current session token for API calls
+   */
+  getSessionToken() {
+    if (this.currentSession && this.currentSession.access_token) {
+      return this.currentSession.access_token;
+    }
+    
+    // Try to get from stored session
+    const storedSession = this.store.get('session');
+    if (storedSession && storedSession.access_token) {
+      return storedSession.access_token;
+    }
+    
+    return null;
+  }
+  
+  /**
    * Sign out
    */
   async signOut() {
@@ -525,6 +542,59 @@ class AuthService {
    */
   getSupabaseClient() {
     return this.supabase;
+  }
+  
+  /**
+   * Save user role
+   */
+  async saveUserRole(role) {
+    try {
+      if (!this.currentUser) {
+        throw new Error('No authenticated user');
+      }
+      
+      // Update user in database
+      const { data, error } = await this.supabase
+        .from('users')
+        .update({ user_role: role })
+        .eq('id', this.currentUser.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      // Update current user
+      this.currentUser = data;
+      
+      // Update local session
+      const storedSession = this.store.get('session');
+      if (storedSession) {
+        storedSession.user = data;
+        this.store.set('session', storedSession);
+      }
+      
+      this.logger.info('User role saved', { role, user_id: this.currentUser.id });
+      
+      return { success: true, user: this.currentUser };
+      
+    } catch (error) {
+      this.logger.error('Failed to save user role', { error: error.message });
+      throw error;
+    }
+  }
+  
+  /**
+   * Get user role
+   */
+  getUserRole() {
+    return this.currentUser?.user_role || null;
+  }
+  
+  /**
+   * Check if user needs to select role
+   */
+  needsRoleSelection() {
+    return this.currentUser && !this.currentUser.user_role;
   }
 }
 

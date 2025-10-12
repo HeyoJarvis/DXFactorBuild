@@ -1,0 +1,8 @@
+[dotenv@17.2.2] injecting env (27) from .env -- tip: 📡 auto-backup env with Radar: https://dotenvx.com/radar
+🚀 HeyJarvis server running on port 3002
+📊 Health check: http://localhost:3002/health
+💬 Chat interface: http://localhost:3002/chat
+🔗 Slack events: http://localhost:3002/api/slack-events
+🔒 Private mode: DISABLED
+📝 Environment loaded: 63 variables
+🏠 Working directory: /Users/jarvis/Code/HeyJarvis
