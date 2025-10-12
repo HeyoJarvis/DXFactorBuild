@@ -2031,15 +2031,29 @@ The system will automatically execute the meeting creation and update your respo
 ${engineeringIntelligence ? `⚠️ CRITICAL: You HAVE the ability to query the codebase. Do NOT say you cannot. Do NOT suggest the user ask engineers directly.
 
 ENGINEERING QUERY INSTRUCTIONS:
-When the user asks about engineering work, features, or code, you MUST:
-1. Detect if it's an engineering question (features, status, implementation, code, etc.)
-2. Include this EXACT marker format in your response:
+ONLY use this when the user EXPLICITLY asks about:
+- Feature status, readiness, or completion (e.g., "Is SSO feature ready?")
+- Code implementation or development progress
+- Sprint progress or velocity
+- Pull requests, commits, or recent development activity
+- What features are built/in progress
+
+DO NOT use this for:
+- Integration setup questions (Google, Microsoft, JIRA, etc.)
+- General API or authentication questions  
+- Configuration or environment setup
+- Troubleshooting authentication issues
+
+When user asks an ENGINEERING-SPECIFIC question, you MUST:
+1. Include this EXACT marker format:
    [ENGINEERING_QUERY: question=What is the status of the SSO feature?, role=sales]
-3. Role should be: sales, marketing, product, or executive (based on context or default to executive)
-4. After the marker, you can add text like "Let me check the codebase for you..."
+2. Role should be: sales, marketing, product, or executive (based on context or default to executive)
+3. After the marker, add text like "Let me check the codebase..."
 
 EXAMPLE USER REQUEST: "Is the SSO feature ready for the enterprise deal?"
 CORRECT RESPONSE: "[ENGINEERING_QUERY: question=Is the SSO feature ready for the enterprise deal?, role=sales] Let me check the codebase and recent development activity..."
+
+WRONG EXAMPLE: User asks "How do I set up Google API?" → Do NOT use ENGINEERING_QUERY marker!
 
 The system will automatically query the codebase and update your response with detailed information.` : ''}
 
@@ -2224,9 +2238,10 @@ Respond as a knowledgeable business AI assistant. Reference the actual Slack and
         }
       } else {
         // Check if the user is asking about engineering but AI didn't use the marker
-        const engineeringKeywords = /\b(feature|code|implementation|built|develop|engineering|sprint|pr|pull request|commit)\b/i;
-        if (engineeringKeywords.test(message) && !aiResponse.includes('ENGINEERING_QUERY')) {
-          console.log('ℹ️ Detected potential engineering question but AI did not use marker format');
+        // Only log for debugging - don't auto-inject engineering data
+        const engineeringKeywords = /\b(feature status|code review|implementation status|sprint progress|pull request|commit history|development progress)\b/i;
+        if (engineeringKeywords.test(message) && !aiResponse.includes('ENGINEERING_QUERY') && engineeringIntelligence) {
+          console.log('ℹ️ Detected potential engineering question but AI did not use marker format. User can ask explicitly for engineering insights.');
         }
       }
       
@@ -2422,6 +2437,7 @@ What would you like to explore?`,
 
   ipcMain.handle('copilot:clearHistory', () => {
     conversationHistory = [];
+    lastSlackContext = null; // Clear cached context to prevent data mixing
     
     // Close current session and start a new one on next message
     if (currentSessionId && dbAdapter) {
@@ -2433,8 +2449,8 @@ What would you like to explore?`,
       currentSessionId = null;
     }
     
-    console.log('🗑️ Conversation history cleared');
-    return { success: true, message: 'Conversation history cleared' };
+    console.log('🗑️ Conversation history and context cleared');
+    return { success: true, message: 'Conversation history cleared - context reset' };
   });
 
   ipcMain.handle('copilot:getHistory', () => {
