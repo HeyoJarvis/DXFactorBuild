@@ -1994,6 +1994,9 @@ ACTIVE INTEGRATIONS:
 ${microsoftAutomation ? `- ✅ Microsoft 365: AUTHENTICATED and ACTIVE - You CAN schedule meetings, send emails, and create calendar events
 - ✅ Outlook Calendar: Direct access to create calendar events with Teams meeting links
 - ✅ Microsoft Teams: Can create online meetings with join links` : '- ❌ Microsoft 365: Not authenticated (user needs to connect)'}
+${googleOAuthHandler ? `- ✅ Google Workspace: AUTHENTICATED and ACTIVE - You CAN send emails via Gmail, create calendar events, and schedule Google Meet meetings
+- ✅ Gmail: Direct access to send emails and create drafts
+- ✅ Google Calendar: Create calendar events with Google Meet links` : '- ❌ Google Workspace: Not authenticated (user needs to connect)'}
 ${engineeringIntelligence ? `- ✅ Engineering Intelligence: ACTIVE - You CAN query the codebase and answer questions about engineering work
 - ✅ GitHub Integration: Access to repository, PRs, issues, and code understanding
 - ✅ Feature Status Tracking: Can check implementation status, demo-ability, and completion estimates` : '- ❌ Engineering Intelligence: Not configured'}
@@ -2007,6 +2010,9 @@ WHAT YOU CAN DO:
 ${microsoftAutomation ? `- **SCHEDULE REAL MEETINGS** via Microsoft Outlook (you WILL execute this, not just suggest it)
 - **SEND REAL EMAILS** via Microsoft Outlook (you WILL execute this, not just suggest it)
 - **CREATE CALENDAR EVENTS** with Teams meeting links (this WILL happen automatically)` : ''}
+${googleOAuthHandler ? `- **SEND REAL EMAILS** via Gmail (you CAN do this right now)
+- **CREATE CALENDAR EVENTS** with Google Meet links (you CAN do this right now)
+- **SCHEDULE MEETINGS** via Google Calendar with video conferencing` : ''}
 ${engineeringIntelligence ? `- **QUERY THE CODEBASE** to answer questions about engineering work (you WILL execute this, not just suggest it)
 - **CHECK FEATURE STATUS** to see what's built, in progress, or planned
 - **ASSESS DEMO-ABILITY** to tell if features are ready to show customers
@@ -2027,6 +2033,27 @@ EXAMPLE USER REQUEST: "Schedule a meeting with shail@heyjarvis.ai tomorrow at 3p
 CORRECT RESPONSE: "[SCHEDULE_MEETING: attendees=shail@heyjarvis.ai, time=2025-10-08T15:00, subject=Dashboard Discussion] I'll create this meeting for you right now. The calendar invite will be sent momentarily."
 
 The system will automatically execute the meeting creation and update your response with confirmation.` : ''}
+
+${googleOAuthHandler ? `⚠️ GOOGLE WORKSPACE CAPABILITIES:
+You have FULL access to Google Workspace features. When users ask about email or calendar functionality:
+
+EMAIL CAPABILITIES:
+- Send emails via Gmail API
+- Create draft emails
+- Access email history
+
+CALENDAR CAPABILITIES:
+- Create calendar events with Google Meet links
+- Schedule meetings with multiple attendees
+- Check availability and suggest meeting times
+
+When user asks to send an email, provide guidance like:
+"I can help you send an email via Gmail! To proceed, you'll need to use the Google integration. Would you like me to guide you through:
+1. Composing a new email
+2. Setting up email templates
+3. Creating automated email workflows"
+
+Note: Email and calendar actions require explicit user confirmation through the UI for security.` : ''}
 
 ${engineeringIntelligence ? `⚠️ CRITICAL: You HAVE the ability to query the codebase. Do NOT say you cannot. Do NOT suggest the user ask engineers directly.
 
