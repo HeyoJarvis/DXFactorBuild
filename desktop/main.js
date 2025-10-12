@@ -942,7 +942,8 @@ function setupGoogleIPCHandlers() {
   
   console.log('✅ Google Workspace IPC handlers registered');
 }
-=======
+
+// ===== JIRA IPC HANDLERS =====
 // Always register handlers, check initialization inside
 ipcMain.handle('jira:authenticate', async () => {
   try {
@@ -1306,7 +1307,7 @@ ipcMain.handle('jira:syncTasks', async (event, options = {}) => {
 });
 
 console.log('✅ JIRA IPC handlers registered');
->>>>>>> Feature/GithubCopilot
+
 // Initialize services with auto-startup
 function initializeServices() {
   // Initialize Supabase adapter
@@ -1468,7 +1469,6 @@ function initializeServices() {
     console.log('   Set GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, and GITHUB_APP_PRIVATE_KEY_PATH in .env');
     engineeringIntelligence = null;
     codeIndexer = null;
->>>>>>> Feature/GithubCopilot
   }
   
   workflowIntelligence = new WorkflowIntelligenceSystem({
