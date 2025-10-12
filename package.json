@@ -16,6 +16,9 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:desktop\" \"npm run dev:delivery\" \"npm run dev:admin\"",
     "dev:desktop": "cd desktop && npm run dev",
+    "dev:desktop:developer": "cd desktop && npm run dev:developer",
+    "dev:desktop:sales": "cd desktop && npm run dev:sales",
+    "dev:desktop:admin": "cd desktop && npm run dev:admin",
     "dev:delivery": "cd delivery && npm run dev",
     "dev:admin": "cd admin && npm run dev",
     "build": "npm run build:delivery && npm run build:admin && npm run build:web",

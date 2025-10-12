@@ -12,16 +12,41 @@ const SupabaseClient = require('../../data/storage/supabase-client');
 
 class DesktopSupabaseAdapter {
   constructor(options = {}) {
+    // Check if role override is active (dev mode)
+    const hasRoleOverride = process.env.ROLE_OVERRIDE || 
+                            process.argv.find(arg => arg.startsWith('--role='));
+    
+    const isDev = process.env.NODE_ENV === 'development';
+    
+    // Use service role when:
+    // 1. Development mode with role override (to bypass RLS for testing)
+    // 2. OR when explicitly requested via options
+    const useServiceRole = (hasRoleOverride && isDev) || options.useServiceRole;
+    
     const supabaseOptions = {
-      useServiceRole: true, // Desktop app runs as privileged user
+      useServiceRole,
       ...options
     };
+    
+    if (hasRoleOverride && isDev) {
+      console.log('🔧 Using service role key for role override (bypasses RLS)');
+      console.log(`🎭 Effective role: ${process.env.ROLE_OVERRIDE || 'default'}`);
+      console.log(`📌 NODE_ENV: ${process.env.NODE_ENV}`);
+      console.log(`📌 useServiceRole: ${useServiceRole}`);
+    } else {
+      console.log('🔒 Production mode: Using anon key (RLS active)');
+      console.log(`📌 NODE_ENV: ${process.env.NODE_ENV}`);
+      console.log(`📌 hasRoleOverride: ${!!hasRoleOverride}`);
+      console.log(`📌 isDev: ${isDev}`);
+    }
     
     const supabaseClient = new SupabaseClient(supabaseOptions);
     this.supabase = supabaseClient.getClient(); // Get the actual Supabase client instance
     this.logger = options.logger || console;
     
-    this.logger.info('Desktop Supabase adapter initialized');
+    this.logger.info('Desktop Supabase adapter initialized', {
+      useServiceRole: useServiceRole
+    });
   }
 
   /**
@@ -620,11 +645,38 @@ async getUserTasks(userId, filters = {}) {
     
     const userSlackId = userData?.slack_user_id;
     
+    // Get effective role for filtering (from filters parameter)
+    const effectiveRole = filters.effectiveRole;
+    
     // Get ALL tasks, then filter in JavaScript
     let query = this.supabase
       .from('conversation_sessions')
       .select('*')
       .eq('workflow_type', 'task');
+
+    // ===== ROLE-BASED FILTERING (Dev Mode Override) =====
+    // When using service role key with override, filter by external source
+    if (process.env.ROLE_OVERRIDE && effectiveRole) {
+      console.log(`🎭 Applying role-based source filtering: ${effectiveRole}`);
+      
+      if (effectiveRole === 'developer') {
+        // Developers: ONLY JIRA tasks
+        query = query.eq('workflow_metadata->>externalSource', 'jira');
+        console.log('🔧 SQL Filter: externalSource = jira');
+        
+      } else if (effectiveRole === 'sales') {
+        // Sales: ONLY Slack tasks (or manual/null)
+        query = query.or('workflow_metadata->>externalSource.eq.slack,workflow_metadata->>externalSource.is.null');
+        console.log('📊 SQL Filter: externalSource = slack OR NULL');
+        
+      } else if (effectiveRole === 'admin') {
+        // Admin: See everything (no filter)
+        console.log('⚡ Admin mode: no source filtering (all tasks visible)');
+      }
+    } else {
+      console.log('🔒 Production mode: RLS handles task filtering automatically');
+    }
+    // In production (no override), RLS policies enforce filtering automatically
 
     // Filter by completion status
     if (!filters.includeCompleted) {
@@ -641,7 +693,8 @@ async getUserTasks(userId, filters = {}) {
       userId,
       userSlackId,
       includeCompleted: filters.includeCompleted,
-      limit
+      limit,
+      effectiveRole: effectiveRole || 'from-database'
     });
 
     const { data, error } = await query;

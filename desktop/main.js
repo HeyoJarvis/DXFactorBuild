@@ -23,6 +23,41 @@ const JIRAOAuthHandler = require('../oauth/jira-oauth-handler');
 const EngineeringIntelligenceService = require('../core/intelligence/engineering-intelligence-service');
 const CodeIndexer = require('../core/intelligence/code-indexer');
 
+// ===== DEVELOPMENT MODE ROLE OVERRIDE =====
+// Allows launching app with specific role for testing without changing database
+// Usage: 
+//   npm run dev:developer  - Launch as developer (JIRA, GitHub features)
+//   npm run dev:sales      - Launch as sales (Slack, CRM features)
+//   npm run dev:admin      - Launch as admin (ALL features)
+//   npm run dev -- --role=developer  - Alternative syntax
+const DEV_MODE = process.env.NODE_ENV === 'development';
+const ROLE_OVERRIDE = process.env.ROLE_OVERRIDE || null;
+
+// Also support command line args: --role=developer
+const argv = process.argv.slice(2);
+const roleArg = argv.find(arg => arg.startsWith('--role='));
+const CLI_ROLE = roleArg ? roleArg.split('=')[1] : null;
+
+const EFFECTIVE_ROLE_OVERRIDE = CLI_ROLE || ROLE_OVERRIDE;
+
+if (DEV_MODE && EFFECTIVE_ROLE_OVERRIDE) {
+  console.log('🔧 DEVELOPMENT MODE: Role override active');
+  console.log(`👤 Launching as: ${EFFECTIVE_ROLE_OVERRIDE}`);
+  console.log('📌 Database role will NOT be modified');
+}
+
+/**
+ * Get effective user role (with dev mode override support)
+ * @param {Object} user - User object with user_role property
+ * @returns {string} Effective role ('developer', 'sales', or 'admin')
+ */
+function getEffectiveRole(user) {
+  if (DEV_MODE && EFFECTIVE_ROLE_OVERRIDE) {
+    return EFFECTIVE_ROLE_OVERRIDE;
+  }
+  return user?.user_role || null;
+}
+
 // Global error handlers to prevent crashes
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
@@ -1522,7 +1557,8 @@ function initializeServices() {
     // Initial sync after 10 seconds to allow app to fully load
     setTimeout(async () => {
       try {
-        if (currentUser && currentUser.user_role === 'developer') {
+        const effectiveRole = getEffectiveRole(currentUser);
+        if (currentUser && (effectiveRole === 'developer' || effectiveRole === 'admin')) {
           const jiraSettings = currentUser.integration_settings?.jira;
           if (jiraSettings && jiraSettings.access_token) {
             console.log('🔄 Running initial JIRA task sync...');
@@ -1552,7 +1588,8 @@ function initializeServices() {
     // Then sync every 10 minutes
     setInterval(async () => {
       try {
-        if (currentUser && currentUser.user_role === 'developer') {
+        const effectiveRole = getEffectiveRole(currentUser);
+        if (currentUser && (effectiveRole === 'developer' || effectiveRole === 'admin')) {
           const jiraSettings = currentUser.integration_settings?.jira;
           if (jiraSettings && jiraSettings.access_token) {
             console.log('🔄 Running periodic JIRA task sync...');
@@ -3696,8 +3733,13 @@ function registerAllIPCHandlers() {
         return { success: false, error: 'Database not initialized', tasks: [] };
       }
       const userId = currentUser?.id || '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2';
+      
+      // Get effective role for task filtering
+      const effectiveRole = getEffectiveRole(currentUser);
+      
       const result = await dbAdapter.getUserTasks(userId, { 
         includeCompleted: false,
+        effectiveRole, // Pass effective role for source filtering
         ...filters
       });
       return result;
@@ -4393,9 +4435,17 @@ ipcMain.handle('auth:sign-out', async () => {
   }
 });
 
-// Get current user
+// Get current user (with role override for dev mode)
 ipcMain.handle('auth:get-user', async () => {
-  return currentUser;
+  if (!currentUser) return null;
+  
+  // Add role override info for frontend
+  return {
+    ...currentUser,
+    // Pass effective role override to frontend (null if not in dev mode)
+    roleOverride: (DEV_MODE && EFFECTIVE_ROLE_OVERRIDE) ? EFFECTIVE_ROLE_OVERRIDE : null,
+    effectiveRole: getEffectiveRole(currentUser)
+  };
 });
 
 // Save user role

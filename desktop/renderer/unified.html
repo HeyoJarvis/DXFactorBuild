@@ -1692,6 +1692,107 @@
       -webkit-app-region: no-drag;
       z-index: 100;
     }
+
+    /* Notification Toast System */
+    .notification-container {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    .notification-toast {
+      background: white;
+      color: #171717;
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.06),
+        0 10px 30px -8px rgba(0, 0, 0, 0.15);
+      margin-bottom: 12px;
+      min-width: 300px;
+      max-width: 400px;
+      pointer-events: auto;
+      cursor: pointer;
+      animation: slideIn 0.3s ease-out;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .notification-toast:hover {
+      transform: translateX(-4px);
+      box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.08),
+        0 15px 40px -10px rgba(0, 0, 0, 0.2);
+    }
+
+    .notification-toast.success {
+      border-left: 4px solid #10b981;
+    }
+
+    .notification-toast.error {
+      border-left: 4px solid #ef4444;
+    }
+
+    .notification-toast.warning {
+      border-left: 4px solid #f59e0b;
+    }
+
+    .notification-toast.info {
+      border-left: 4px solid #3b82f6;
+    }
+
+    .notification-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .notification-content {
+      flex: 1;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .notification-close {
+      font-size: 18px;
+      opacity: 0.5;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+
+    .notification-close:hover {
+      opacity: 1;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    .notification-toast.removing {
+      animation: slideOut 0.2s ease-in forwards;
+    }
   </style>
 </head>
 <body class="collapsed">
@@ -3331,26 +3432,37 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
         // Get current user
         const user = await window.electronAPI.auth.getUser();
         
-        if (!user || !user.user_role) {
-          console.log('ℹ️  No user role detected');
+        if (!user) {
+          console.log('ℹ️  No user detected');
           return;
         }
 
-        userRole = user.user_role;
-        console.log('👤 User role:', userRole);
+        // Use effective role (supports dev mode override)
+        userRole = user.effectiveRole || user.user_role;
+        
+        // Log role info
+        if (user.roleOverride) {
+          console.log('🔧 DEVELOPMENT MODE: Role override active');
+          console.log(`👤 Database role: ${user.user_role}`);
+          console.log(`🎭 Overridden to: ${user.roleOverride}`);
+          console.log(`✅ Effective role: ${userRole}`);
+        } else {
+          console.log('👤 User role:', userRole);
+        }
 
-        // For developer users
-        if (userRole === 'developer') {
+        // For developer users (or admin with both)
+        if (userRole === 'developer' || userRole === 'admin') {
           console.log('🔧 Configuring for developer role');
           
           // Show dev-specific features
           showDeveloperFeatures();
-        } else if (userRole === 'sales') {
+        }
+        
+        if (userRole === 'sales' || userRole === 'admin') {
           console.log('📊 Configuring for sales role');
           
-          // Hide dev-only features (GitHub button for sales)
-          // Currently GitHub is shown to both, but can hide if needed
-          // document.getElementById('githubAuthBtn').style.display = 'none';
+          // Sales features are enabled by default
+          // Admin gets both developer AND sales features
         }
         
         // Load tasks for all roles
@@ -4108,6 +4220,88 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
       </div>
     </div>
   </div>
+
+  <!-- Notification Toast Container -->
+  <div id="notificationContainer" class="notification-container"></div>
+
+  <script>
+    // ===== NOTIFICATION SYSTEM =====
+    /**
+     * Show a toast notification
+     * @param {string} message - The message to display
+     * @param {string} type - 'success', 'error', 'warning', or 'info'
+     * @param {number} duration - How long to show (ms), 0 for permanent
+     */
+    function showNotification(message, type = 'info', duration = 5000) {
+      const container = document.getElementById('notificationContainer');
+      if (!container) return;
+
+      const notification = document.createElement('div');
+      notification.className = `notification-toast ${type}`;
+      
+      const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+      };
+      
+      notification.innerHTML = `
+        <div class="notification-icon">${icons[type] || icons.info}</div>
+        <div class="notification-content">${message}</div>
+        <div class="notification-close" onclick="this.parentElement.remove()">✕</div>
+      `;
+      
+      container.appendChild(notification);
+      
+      // Auto-remove after duration (if not permanent)
+      if (duration > 0) {
+        setTimeout(() => {
+          if (notification.parentElement) {
+            notification.classList.add('removing');
+            setTimeout(() => notification.remove(), 200);
+          }
+        }, duration);
+      }
+      
+      // Click notification to close
+      notification.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('notification-close')) {
+          notification.classList.add('removing');
+          setTimeout(() => notification.remove(), 200);
+        }
+      });
+    }
+
+    // Listen for notifications from main process
+    if (window.electronAPI && window.electronAPI.on) {
+      window.electronAPI.on('notification', (data) => {
+        console.log('📬 Received notification:', data);
+        
+        if (data.type === 'jira_auth_required') {
+          showNotification(data.message || 'JIRA authentication expired. Please reconnect.', 'warning', 0);
+          // Optionally trigger re-authentication
+          if (data.action === 'reconnect_jira') {
+            // Show reconnect button or modal
+            setTimeout(() => {
+              if (confirm('JIRA authentication expired. Would you like to reconnect now?')) {
+                handleJIRAButtonClick();
+              }
+            }, 500);
+          }
+        } else {
+          // Generic notification
+          const typeMap = {
+            'success': 'success',
+            'error': 'error',
+            'warning': 'warning',
+            'info': 'info'
+          };
+          showNotification(data.message, typeMap[data.type] || 'info', data.duration || 5000);
+        }
+      });
+    }
+  </script>
 
 </body>
 </html>

@@ -38,3 +38,15 @@
 {"level":"info","message":"OAuth server started","port":8890,"service":"jira-oauth-handler","timestamp":"2025-10-11T18:37:01.166Z"}
 {"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-11T18:37:01.167Z"}
 {"error":"listen EADDRINUSE: address already in use :::8890","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-11T18:37:15.279Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"jira-oauth-handler","timestamp":"2025-10-12T21:00:04.201Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-12T21:00:04.202Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-12T21:00:09.275Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-12T21:00:09.308Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"jira-oauth-handler","timestamp":"2025-10-12T21:02:34.601Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-12T21:02:34.602Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-12T21:02:40.576Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-12T21:02:45.578Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"jira-oauth-handler","timestamp":"2025-10-12T21:06:29.319Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-12T21:06:29.320Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-12T21:06:33.824Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-12T21:06:38.828Z"}

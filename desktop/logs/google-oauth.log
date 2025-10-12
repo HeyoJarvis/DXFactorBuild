@@ -18,3 +18,11 @@
 {"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-08T03:00:41.652Z"}
 {"email":"shail@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-08T03:00:49.201Z"}
 {"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-08T03:00:50.202Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-12T02:48:20.962Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-12T02:48:20.963Z"}
+{"email":"shail@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-12T02:48:31.692Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-12T02:48:32.693Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-12T02:53:14.983Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-12T02:53:14.983Z"}
+{"email":"shail@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-12T02:53:21.799Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-12T02:53:22.801Z"}

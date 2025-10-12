@@ -238,6 +238,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getFeatureStatus: (feature, repository, context) => ipcRenderer.invoke('engineering:getFeatureStatus', { feature, repository, context }),
     healthCheck: () => ipcRenderer.invoke('engineering:healthCheck'),
     listRepos: () => ipcRenderer.invoke('engineering:listRepos')
+  },
+
+  // Generic event listener for IPC events from main process
+  on: (channel, callback) => {
+    const validChannels = [
+      'notification',
+      'copilot:message',
+      'copilot:settingsChanged',
+      'copilot:setState',
+      'crm:dataUpdate',
+      'crm:loadingProgress',
+      'slack:newMessage',
+      'meeting:approval-request'
+    ];
+    
+    if (validChannels.includes(channel)) {
+      ipcRenderer.on(channel, (event, data) => callback(data));
+    } else {
+      console.warn(`⚠️  Attempted to listen to unauthorized channel: ${channel}`);
+    }
   }
 });
 
