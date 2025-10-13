@@ -31,12 +31,37 @@ class MicrosoftGraphService extends EventEmitter {
       tenantId: options.tenantId || process.env.MICROSOFT_TENANT_ID || 'common',
       redirectUri: options.redirectUri || process.env.MICROSOFT_REDIRECT_URI || 'http://localhost:8889/auth/microsoft/callback',
       scopes: options.scopes || [
+        // User & Authentication
         'User.Read',
+        'User.ReadBasic.All',
+        
+        // Email (for task detection & sending)
         'Mail.Send',
         'Mail.ReadWrite',
+        
+        // Calendar (for meeting scheduling)
         'Calendars.ReadWrite',
+        
+        // Teams Chat & Messaging
         'Chat.ReadWrite',
-        'ChannelMessage.Send'
+        'ChatMessage.Read',
+        
+        // Teams Channels
+        'ChannelMessage.Send',
+        'ChannelMessage.Read.All',
+        
+        // Teams Structure (for listing teams/channels)
+        'Team.ReadBasic.All',
+        'Channel.ReadBasic.All',
+        
+        // Online Meetings (for Teams meeting links)
+        'OnlineMeetings.ReadWrite',
+        
+        // Presence (user availability)
+        'Presence.Read',
+        
+        // Essential for refresh tokens
+        'offline_access'
       ],
       logLevel: options.logLevel || 'info',
       ...options
@@ -756,6 +781,330 @@ class MicrosoftGraphService extends EventEmitter {
       low: '#8E8E93'
     };
     return colors[priority] || colors.medium;
+  }
+
+  /**
+   * ========================================
+   * TEAMS MESSAGE MONITORING
+   * ========================================
+   */
+
+  /**
+   * Get messages from a Teams channel
+   * @param {string} teamId - Team ID
+   * @param {string} channelId - Channel ID
+   * @param {Object} options - Query options
+   * @returns {Promise<Array>} Channel messages
+   */
+  async getTeamChannelMessages(teamId, channelId, options = {}) {
+    try {
+      this.logger.info('Fetching Teams channel messages', { teamId, channelId, options });
+
+      const queryParams = new URLSearchParams();
+      if (options.top) queryParams.append('$top', options.top);
+      if (options.orderby) queryParams.append('$orderby', options.orderby);
+      
+      const endpoint = `/teams/${teamId}/channels/${channelId}/messages${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+      
+      const response = await this.graphClient
+        .api(endpoint)
+        .get();
+
+      this.logger.info('Teams channel messages fetched', {
+        teamId,
+        channelId,
+        messageCount: response.value?.length || 0
+      });
+
+      return response.value || [];
+
+    } catch (error) {
+      this.logger.error('Failed to fetch Teams channel messages', {
+        teamId,
+        channelId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get messages from a Teams chat (1:1 or group)
+   * @param {string} chatId - Chat ID
+   * @param {Object} options - Query options
+   * @returns {Promise<Array>} Chat messages
+   */
+  async getTeamChatMessages(chatId, options = {}) {
+    try {
+      this.logger.info('Fetching Teams chat messages', { chatId, options });
+
+      const queryParams = new URLSearchParams();
+      if (options.top) queryParams.append('$top', options.top);
+      if (options.orderby) queryParams.append('$orderby', options.orderby);
+      
+      const endpoint = `/chats/${chatId}/messages${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+      
+      const response = await this.graphClient
+        .api(endpoint)
+        .get();
+
+      this.logger.info('Teams chat messages fetched', {
+        chatId,
+        messageCount: response.value?.length || 0
+      });
+
+      return response.value || [];
+
+    } catch (error) {
+      this.logger.error('Failed to fetch Teams chat messages', {
+        chatId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get all Teams for the authenticated user
+   * @returns {Promise<Array>} List of teams
+   */
+  async getUserTeams() {
+    try {
+      this.logger.info('Fetching user teams');
+
+      const response = await this.graphClient
+        .api('/me/joinedTeams')
+        .get();
+
+      this.logger.info('User teams fetched', {
+        teamCount: response.value?.length || 0
+      });
+
+      return response.value || [];
+
+    } catch (error) {
+      this.logger.error('Failed to fetch user teams', {
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get all channels for a team
+   * @param {string} teamId - Team ID
+   * @returns {Promise<Array>} List of channels
+   */
+  async getTeamChannels(teamId) {
+    try {
+      this.logger.info('Fetching team channels', { teamId });
+
+      const response = await this.graphClient
+        .api(`/teams/${teamId}/channels`)
+        .get();
+
+      this.logger.info('Team channels fetched', {
+        teamId,
+        channelCount: response.value?.length || 0
+      });
+
+      return response.value || [];
+
+    } catch (error) {
+      this.logger.error('Failed to fetch team channels', {
+        teamId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get all chats for the authenticated user
+   * @returns {Promise<Array>} List of chats
+   */
+  async getUserChats() {
+    try {
+      this.logger.info('Fetching user chats');
+
+      const response = await this.graphClient
+        .api('/me/chats')
+        .get();
+
+      this.logger.info('User chats fetched', {
+        chatCount: response.value?.length || 0
+      });
+
+      return response.value || [];
+
+    } catch (error) {
+      this.logger.error('Failed to fetch user chats', {
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Subscribe to Teams channel messages (webhook)
+   * @param {string} teamId - Team ID
+   * @param {string} channelId - Channel ID
+   * @param {string} notificationUrl - Webhook URL to receive notifications
+   * @param {number} expirationMinutes - Subscription expiration in minutes (max 4230 = 3 days)
+   * @returns {Promise<Object>} Subscription details
+   */
+  async subscribeToTeamsMessages(teamId, channelId, notificationUrl, expirationMinutes = 4230) {
+    try {
+      this.logger.info('Creating Teams message subscription', {
+        teamId,
+        channelId,
+        notificationUrl,
+        expirationMinutes
+      });
+
+      const expirationDateTime = new Date();
+      expirationDateTime.setMinutes(expirationDateTime.getMinutes() + expirationMinutes);
+
+      const subscription = {
+        changeType: 'created',
+        notificationUrl: notificationUrl,
+        resource: `/teams/${teamId}/channels/${channelId}/messages`,
+        expirationDateTime: expirationDateTime.toISOString(),
+        clientState: crypto.randomBytes(16).toString('hex')
+      };
+
+      const response = await this.graphClient
+        .api('/subscriptions')
+        .post(subscription);
+
+      this.logger.info('Teams message subscription created', {
+        subscriptionId: response.id,
+        expiresAt: response.expirationDateTime
+      });
+
+      this.emit('teams_subscription_created', response);
+
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to create Teams subscription', {
+        teamId,
+        channelId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * ========================================
+   * EMAIL MONITORING
+   * ========================================
+   */
+
+  /**
+   * Get unread emails from inbox
+   * @param {string} folderId - Folder ID (default: 'inbox')
+   * @param {number} maxResults - Maximum number of emails to fetch
+   * @returns {Promise<Array>} Unread emails
+   */
+  async getUnreadEmails(folderId = 'inbox', maxResults = 50) {
+    try {
+      this.logger.info('Fetching unread emails', { folderId, maxResults });
+
+      const response = await this.graphClient
+        .api(`/me/mailFolders/${folderId}/messages`)
+        .filter('isRead eq false')
+        .top(maxResults)
+        .orderby('receivedDateTime DESC')
+        .select('id,subject,bodyPreview,body,from,receivedDateTime,isRead,importance,hasAttachments')
+        .get();
+
+      this.logger.info('Unread emails fetched', {
+        folderId,
+        emailCount: response.value?.length || 0
+      });
+
+      return response.value || [];
+
+    } catch (error) {
+      this.logger.error('Failed to fetch unread emails', {
+        folderId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Mark an email as read
+   * @param {string} messageId - Email message ID
+   * @returns {Promise<Object>} Updated message
+   */
+  async markEmailAsRead(messageId) {
+    try {
+      this.logger.info('Marking email as read', { messageId });
+
+      const response = await this.graphClient
+        .api(`/me/messages/${messageId}`)
+        .patch({ isRead: true });
+
+      this.logger.info('Email marked as read', { messageId });
+
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to mark email as read', {
+        messageId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Subscribe to email changes (webhook)
+   * @param {string} notificationUrl - Webhook URL to receive notifications
+   * @param {number} expirationMinutes - Subscription expiration in minutes (max 4230 = 3 days)
+   * @returns {Promise<Object>} Subscription details
+   */
+  async subscribeToEmailChanges(notificationUrl, expirationMinutes = 4230) {
+    try {
+      this.logger.info('Creating email subscription', {
+        notificationUrl,
+        expirationMinutes
+      });
+
+      const expirationDateTime = new Date();
+      expirationDateTime.setMinutes(expirationDateTime.getMinutes() + expirationMinutes);
+
+      const subscription = {
+        changeType: 'created',
+        notificationUrl: notificationUrl,
+        resource: '/me/mailFolders/inbox/messages',
+        expirationDateTime: expirationDateTime.toISOString(),
+        clientState: crypto.randomBytes(16).toString('hex')
+      };
+
+      const response = await this.graphClient
+        .api('/subscriptions')
+        .post(subscription);
+
+      this.logger.info('Email subscription created', {
+        subscriptionId: response.id,
+        expiresAt: response.expirationDateTime
+      });
+
+      this.emit('email_subscription_created', response);
+
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to create email subscription', {
+        error: error.message
+      });
+      throw error;
+    }
   }
 }
 

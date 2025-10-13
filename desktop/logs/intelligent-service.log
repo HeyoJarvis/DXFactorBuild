@@ -8204,3 +8204,961 @@
 {"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:11:35.316Z"}
 {"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:11:35.324Z"}
 {"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:11:35.324Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.288Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.290Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.291Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.291Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.291Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.291Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.291Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.291Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.294Z"}
+{"analysis_id":"analysis_1760303952727","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.727Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760303952727","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:12.728Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:15.633Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:15.634Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:15.640Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:15.640Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.341Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.342Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.344Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.344Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.344Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.344Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.344Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.344Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.347Z"}
+{"analysis_id":"analysis_1760303961452","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.452Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760303961452","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:21.453Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760303966348","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:26.348Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760303966348","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:26.349Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:57.291Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:57.291Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:57.297Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:19:57.297Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.281Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.283Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.284Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.284Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.284Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.284Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.284Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.284Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.288Z"}
+{"analysis_id":"analysis_1760304000422","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.422Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304000422","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:00.422Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304005285","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:05.285Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304005285","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:20:05.285Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:01.735Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:01.736Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:01.743Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:01.743Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.437Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.439Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.440Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.440Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.440Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.440Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.440Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.440Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.443Z"}
+{"analysis_id":"analysis_1760304184685","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.685Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304184685","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:04.685Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304189441","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:09.441Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304189441","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:09.441Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:18.285Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:18.285Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:18.292Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:18.292Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.476Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.477Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.478Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.478Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.479Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.479Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.479Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.479Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.481Z"}
+{"analysis_id":"analysis_1760304203771","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.771Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304203771","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:23.771Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304208482","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:28.482Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304208482","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:23:28.482Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:46.235Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.829Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.830Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.831Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.831Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.831Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.831Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.831Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.831Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.834Z"}
+{"analysis_id":"analysis_1760304408968","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.968Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304408968","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:48.968Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304413837","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:53.837Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304413837","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:26:53.837Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:25.755Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:25.756Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.251Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.253Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.254Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.254Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.254Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.254Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.254Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.254Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.257Z"}
+{"analysis_id":"analysis_1760304695385","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.385Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304695385","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:35.385Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304700259","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:40.259Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304700259","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:40.259Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:46.430Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:46.431Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:46.437Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:46.437Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.780Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.782Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.783Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.783Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.783Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.783Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.783Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.783Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.787Z"}
+{"analysis_id":"analysis_1760304709910","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.910Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304709910","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:49.910Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304714784","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:54.784Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304714784","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T21:31:54.785Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760304714784","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T21:37:11.934Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760304714784","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T21:37:11.934Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:37:11.935Z"}
+{"analysis_id":"analysis_1760304714784","level":"info","message":"✅ Intelligent analysis completed","organization_id":"default_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-12T21:37:11.935Z"}
+{"level":"info","message":"Stored CRM analysis","organization_id":"default_org","service":"intelligent-background-service","signal_id":"3eb23777-19ed-4b15-b9f4-dafe4d009c4d","timestamp":"2025-10-12T21:37:12.191Z"}
+{"level":"info","message":"Analysis result stored in Supabase","organizationId":"default_org","service":"intelligent-background-service","signal_id":"3eb23777-19ed-4b15-b9f4-dafe4d009c4d","timestamp":"2025-10-12T21:37:12.191Z","urgency":"medium"}
+{"analysis_id":"analysis_1760304709910","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T21:37:35.315Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760304709910","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T21:37:35.315Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T21:37:35.315Z"}
+{"analysis_id":"analysis_1760304709910","level":"info","message":"✅ Intelligent analysis completed","organization_id":"heyjarvis_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-12T21:37:35.315Z"}
+{"level":"info","message":"Stored CRM analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","signal_id":"765a894e-d70a-427e-be10-a0a50bc4d7e5","timestamp":"2025-10-12T21:37:35.477Z"}
+{"level":"info","message":"Analysis result stored in Supabase","organizationId":"heyjarvis_org","service":"intelligent-background-service","signal_id":"765a894e-d70a-427e-be10-a0a50bc4d7e5","timestamp":"2025-10-12T21:37:35.478Z","urgency":"medium"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:44:50.388Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:44:50.388Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T21:44:50.394Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T21:44:50.394Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T21:44:50.394Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T21:44:50.394Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.921Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.923Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.924Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.924Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.924Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.924Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.924Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.924Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:52.927Z"}
+{"analysis_id":"analysis_1760306753648","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:53.648Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306753648","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:53.648Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306757928","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:57.929Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306757928","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:05:57.929Z","website":"https://dxfactor.com"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.758Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.760Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.760Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.761Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.761Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.761Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.761Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.761Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:32.763Z"}
+{"analysis_id":"analysis_1760306853113","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:33.113Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306853113","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:33.113Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306857766","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:37.766Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306857766","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:37.767Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:53.338Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:53.338Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:53.344Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:53.347Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:53.347Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T22:07:53.347Z"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:05.939Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:05.939Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.734Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.735Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.736Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.736Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.736Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.736Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.736Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.736Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.739Z"}
+{"analysis_id":"analysis_1760306894919","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.919Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306894919","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:14.919Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306899740","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:19.740Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306899740","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:19.740Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:20.430Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:20.430Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:20.434Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:20.434Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.703Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.704Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.705Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.705Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.705Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.705Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.705Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.705Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.708Z"}
+{"analysis_id":"analysis_1760306907828","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.828Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306907828","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:27.828Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306912710","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:32.710Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760306912710","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:32.710Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:48.934Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:48.934Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:48.940Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:08:48.940Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.496Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.498Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.499Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.499Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.499Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.499Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.499Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.499Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.502Z"}
+{"analysis_id":"analysis_1760307070828","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.828Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307070828","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:10.828Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307075501","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:15.501Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307075501","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:11:15.501Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:22.113Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:22.114Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.803Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.805Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.805Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.806Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.806Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.806Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.806Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.806Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:26.809Z"}
+{"analysis_id":"analysis_1760307207011","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:27.011Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307207011","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:27.011Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307211811","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:31.811Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307211811","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:31.811Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:35.739Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:35.739Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:35.746Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:13:35.746Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.915Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.917Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.918Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.918Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.918Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.918Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.918Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.918Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:00.921Z"}
+{"analysis_id":"analysis_1760307421053","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:01.053Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307421053","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:01.053Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307425922","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:05.922Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307425922","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:05.922Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:41.525Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:41.525Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:41.533Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:41.533Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.726Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.727Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.728Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.728Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.728Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.728Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.728Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.729Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.731Z"}
+{"analysis_id":"analysis_1760307463877","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.877Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307463877","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:43.877Z","website":"https://dxfactor.com"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.925Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.927Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.928Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.928Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.928Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.928Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.928Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.928Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:51.931Z"}
+{"analysis_id":"analysis_1760307472051","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:52.051Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307472051","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:52.051Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307476931","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:56.931Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307476931","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:17:56.931Z","website":"https://dxfactor.com"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.399Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.401Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.402Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.402Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.402Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.402Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.402Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.402Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.406Z"}
+{"analysis_id":"analysis_1760307528680","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.680Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307528680","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:48.680Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307533408","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:53.408Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307533408","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:53.408Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:55.459Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:55.459Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:55.464Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:55.467Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:55.467Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T22:18:55.467Z"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:13.113Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:13.113Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.243Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.245Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.246Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.246Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.246Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.246Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.246Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.246Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.249Z"}
+{"analysis_id":"analysis_1760307557371","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.371Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307557371","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:17.371Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307562247","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:22.247Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307562247","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:22.247Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:24.560Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:24.560Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:24.565Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:24.566Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.717Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.719Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.719Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.720Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.720Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.720Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.720Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.720Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.723Z"}
+{"analysis_id":"analysis_1760307576822","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.822Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307576822","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:36.823Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307581725","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:41.725Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307581725","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:19:41.725Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:04.163Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:04.163Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:04.168Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:04.168Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.291Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.292Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.293Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.293Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.293Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.294Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.294Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.294Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.297Z"}
+{"analysis_id":"analysis_1760307651770","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.770Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307651770","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:51.771Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:54.922Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:54.922Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:54.927Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:20:54.927Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.165Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.167Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.167Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.167Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.167Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.168Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.168Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.168Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.171Z"}
+{"analysis_id":"analysis_1760307660390","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.390Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307660390","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:00.390Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:03.713Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:03.713Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:03.720Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:03.721Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.956Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.957Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.958Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.958Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.958Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.958Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.958Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.958Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:37.961Z"}
+{"analysis_id":"analysis_1760307698175","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:38.175Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307698175","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:38.175Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307702960","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:42.960Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307702960","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:21:42.960Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760307698175","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T22:27:16.240Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760307698175","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T22:27:16.240Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:27:16.241Z"}
+{"analysis_id":"analysis_1760307698175","level":"info","message":"✅ Intelligent analysis completed","organization_id":"heyjarvis_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-12T22:27:16.241Z"}
+{"level":"info","message":"Stored CRM analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","signal_id":"264de12b-bd3e-4fb3-9a77-6b083e262cd9","timestamp":"2025-10-12T22:27:16.462Z"}
+{"level":"info","message":"Analysis result stored in Supabase","organizationId":"heyjarvis_org","service":"intelligent-background-service","signal_id":"264de12b-bd3e-4fb3-9a77-6b083e262cd9","timestamp":"2025-10-12T22:27:16.462Z","urgency":"medium"}
+{"analysis_id":"analysis_1760307702960","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T22:27:23.457Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760307702960","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T22:27:23.457Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:27:23.458Z"}
+{"analysis_id":"analysis_1760307702960","level":"info","message":"✅ Intelligent analysis completed","organization_id":"default_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-12T22:27:23.458Z"}
+{"level":"info","message":"Stored CRM analysis","organization_id":"default_org","service":"intelligent-background-service","signal_id":"a18f1c39-80f3-4a1a-a849-d24451ea58b7","timestamp":"2025-10-12T22:27:23.585Z"}
+{"level":"info","message":"Analysis result stored in Supabase","organizationId":"default_org","service":"intelligent-background-service","signal_id":"a18f1c39-80f3-4a1a-a849-d24451ea58b7","timestamp":"2025-10-12T22:27:23.585Z","urgency":"medium"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:35:53.416Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:35:53.416Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T22:35:53.423Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.635Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.636Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.637Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.637Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.637Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.637Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.637Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.637Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.640Z"}
+{"analysis_id":"analysis_1760308564798","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.798Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308564798","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:04.798Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308569639","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:09.639Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308569639","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:09.639Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:10.242Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:10.242Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:10.247Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:10.248Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.478Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.479Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.480Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.480Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.480Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.481Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.481Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.481Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.484Z"}
+{"analysis_id":"analysis_1760308591592","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.592Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308591592","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:31.592Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308596485","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:36.485Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308596485","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:36.486Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:41.882Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:41.883Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:41.889Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:36:41.889Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.495Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.497Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.498Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.498Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.498Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.498Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.498Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.498Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.502Z"}
+{"analysis_id":"analysis_1760308699780","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.781Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308699780","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:19.781Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308704498","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:24.498Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308704498","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:24.498Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:28.383Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:28.384Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:28.390Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:38:28.390Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.888Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.890Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.891Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.891Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.891Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.891Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.891Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.891Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:39.895Z"}
+{"analysis_id":"analysis_1760308780037","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:40.037Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308780037","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:40.037Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308784896","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:44.896Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308784896","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:39:44.896Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:08.801Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:08.801Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:08.810Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:08.810Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.742Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.743Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.744Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.744Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.744Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.744Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.745Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.745Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.747Z"}
+{"analysis_id":"analysis_1760308933944","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.944Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308933944","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:13.944Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308938747","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:18.747Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760308938747","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:18.748Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:28.211Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:28.211Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:28.216Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:42:28.216Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.747Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.748Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.749Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.749Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.749Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.749Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.749Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.750Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.752Z"}
+{"analysis_id":"analysis_1760309516929","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.929Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309516929","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:51:56.930Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309521754","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:52:01.754Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309521754","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:52:01.754Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:52:41.794Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:52:41.795Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:52:41.801Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:52:41.802Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.603Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.604Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.605Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.605Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.605Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.605Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.605Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.605Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:00.609Z"}
+{"analysis_id":"analysis_1760309581011","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:01.011Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309581011","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:01.011Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309585607","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:05.607Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309585607","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:05.608Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:08.319Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:08.319Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:08.326Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:08.326Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.332Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.333Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.334Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.334Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.334Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.334Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.335Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.335Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.337Z"}
+{"analysis_id":"analysis_1760309594477","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.477Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309594477","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:14.477Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309599339","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:19.339Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309599339","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:19.339Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:42.018Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:42.019Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:42.028Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:53:42.029Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.641Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.642Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.643Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.643Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.643Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.644Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.644Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.644Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.646Z"}
+{"analysis_id":"analysis_1760309739843","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.843Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309739843","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:39.844Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:41.193Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:41.193Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:41.197Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:41.197Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.156Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.157Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.158Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.158Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.158Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.158Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.158Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.158Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.161Z"}
+{"analysis_id":"analysis_1760309747278","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.278Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309747278","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:47.278Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309752164","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:52.164Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309752164","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:55:52.165Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:25.838Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:25.838Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:25.846Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:25.846Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.723Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.725Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.726Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.726Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.726Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.726Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.726Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.726Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.729Z"}
+{"analysis_id":"analysis_1760309787872","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.872Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309787872","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:27.872Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309792732","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:32.732Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309792732","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:56:32.732Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:57:41.267Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:57:41.267Z"}
+{"level":"info","message":"SIGTERM received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T22:57:41.275Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T22:57:41.275Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.933Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.934Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.935Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.935Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.935Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.935Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.935Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.936Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:51.939Z"}
+{"analysis_id":"analysis_1760309932088","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:52.088Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309932088","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:52.088Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309936941","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:56.941Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309936941","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T22:58:56.941Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760309932088","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T23:03:51.225Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760309932088","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T23:03:51.225Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:03:51.225Z"}
+{"analysis_id":"analysis_1760309932088","level":"info","message":"✅ Intelligent analysis completed","organization_id":"heyjarvis_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-12T23:03:51.225Z"}
+{"level":"info","message":"Stored CRM analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","signal_id":"11d15f83-84fb-404b-84b3-b66cac8234cc","timestamp":"2025-10-12T23:03:51.382Z"}
+{"level":"info","message":"Analysis result stored in Supabase","organizationId":"heyjarvis_org","service":"intelligent-background-service","signal_id":"11d15f83-84fb-404b-84b3-b66cac8234cc","timestamp":"2025-10-12T23:03:51.382Z","urgency":"medium"}
+{"analysis_id":"analysis_1760309936941","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T23:04:35.358Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760309936941","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-12T23:04:35.358Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:04:35.358Z"}
+{"analysis_id":"analysis_1760309936941","level":"info","message":"✅ Intelligent analysis completed","organization_id":"default_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-12T23:04:35.358Z"}
+{"level":"info","message":"Stored CRM analysis","organization_id":"default_org","service":"intelligent-background-service","signal_id":"b26e84aa-e3f5-463d-b712-0cccbb9f41a5","timestamp":"2025-10-12T23:04:35.468Z"}
+{"level":"info","message":"Analysis result stored in Supabase","organizationId":"default_org","service":"intelligent-background-service","signal_id":"b26e84aa-e3f5-463d-b712-0cccbb9f41a5","timestamp":"2025-10-12T23:04:35.469Z","urgency":"medium"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:06:50.104Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:06:50.105Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T23:06:50.111Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:06:50.111Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:06:50.111Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-12T23:06:50.111Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.992Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.993Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.994Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.994Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.994Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.995Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.995Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.995Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:23.997Z"}
+{"analysis_id":"analysis_1760310504140","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:24.140Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760310504140","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:24.141Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760310508996","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:28.996Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760310508996","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:08:28.996Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:16.240Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:16.240Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:16.255Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:16.256Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.535Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.537Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.538Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.538Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.538Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.538Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.538Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.538Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.541Z"}
+{"analysis_id":"analysis_1760310618680","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.680Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760310618680","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:18.680Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760310623543","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:23.543Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760310623543","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:10:23.543Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:13:49.578Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:13:49.578Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:13:49.588Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:13:49.588Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.355Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.356Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.357Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.357Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.357Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.357Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.357Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.357Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.360Z"}
+{"analysis_id":"analysis_1760311486761","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.761Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311486761","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:46.761Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311491360","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:51.360Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311491360","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:24:51.360Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:25:52.824Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:25:52.824Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:25:52.830Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:25:52.830Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.337Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.338Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.339Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.339Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.339Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.339Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.339Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.339Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.342Z"}
+{"analysis_id":"analysis_1760311855483","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.483Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311855483","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:30:55.483Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311860345","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:00.345Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311860345","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:00.346Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:30.735Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:30.735Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:30.740Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:30.741Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.131Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.133Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.134Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.134Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.134Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.134Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.134Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.134Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.137Z"}
+{"analysis_id":"analysis_1760311893291","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.291Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311893291","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:33.291Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311898136","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:38.136Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760311898136","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:31:38.137Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:32:10.706Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:32:10.707Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:32:10.716Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:32:10.716Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.911Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.913Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.914Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.914Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.914Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.914Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.914Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.914Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:46.917Z"}
+{"analysis_id":"analysis_1760312207366","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:47.366Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312207366","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:47.366Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312211918","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:51.918Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312211918","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:36:51.918Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:37:18.290Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:37:18.290Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:37:18.302Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:37:18.302Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.156Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.158Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.158Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.158Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.158Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.159Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.159Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.159Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.162Z"}
+{"analysis_id":"analysis_1760312470295","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.295Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312470295","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:10.295Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312475164","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:15.164Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312475164","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:15.165Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:27.618Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:27.619Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:27.636Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:41:27.637Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.212Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.214Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.215Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.215Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.215Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.215Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.215Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.215Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.218Z"}
+{"analysis_id":"analysis_1760312701479","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.479Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312701479","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:01.479Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312706220","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:06.220Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312706220","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:45:06.220Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:47:15.206Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:47:15.206Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:47:15.215Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:47:15.215Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.050Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.052Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.053Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.053Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.053Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.053Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.053Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.053Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.056Z"}
+{"analysis_id":"analysis_1760312924184","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.184Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312924184","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:44.184Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312929056","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:49.056Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760312929056","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:48:49.057Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:49:43.164Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:49:43.164Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:49:43.180Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:49:43.180Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.690Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.691Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.692Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.692Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.692Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.692Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.692Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.692Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.695Z"}
+{"analysis_id":"analysis_1760313041865","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.865Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313041865","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:41.865Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313046698","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:46.698Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313046698","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:50:46.698Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:55.225Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:55.226Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:55.233Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:55.233Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.021Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.022Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.023Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.023Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.023Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.023Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.023Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.023Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.026Z"}
+{"analysis_id":"analysis_1760313117174","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.174Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313117174","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:51:57.175Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313122023","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-12T23:52:02.023Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313122023","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-12T23:52:02.023Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:52:47.626Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:52:47.626Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-12T23:52:47.633Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-12T23:52:47.633Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.387Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.388Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.389Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.389Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.389Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.389Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.389Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.390Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.392Z"}
+{"analysis_id":"analysis_1760313625564","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.564Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313625564","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:25.564Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313630391","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:30.391Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760313630391","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T00:00:30.391Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T00:02:27.637Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T00:02:27.637Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T00:02:27.647Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T00:02:27.647Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.727Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.728Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.729Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.729Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.729Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.729Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.729Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.729Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.733Z"}
+{"analysis_id":"analysis_1760317274919","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.919Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317274919","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:14.920Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317279730","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:19.730Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317279730","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:01:19.731Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:03:37.223Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:03:37.224Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:03:37.228Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:03:37.228Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.041Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.042Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.043Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.043Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.043Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.044Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.044Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.044Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.046Z"}
+{"analysis_id":"analysis_1760317579254","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.254Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317579254","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:19.254Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317584046","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:24.046Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317584046","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:06:24.046Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:08:58.248Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:08:58.248Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:08:58.261Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:08:58.261Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.054Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.056Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.057Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.057Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.057Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.057Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.057Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.057Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.060Z"}
+{"analysis_id":"analysis_1760317754190","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.190Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317754190","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:14.190Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317759068","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:19.068Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317759068","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:09:19.068Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:18.574Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:18.575Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:18.582Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:18.582Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.321Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.323Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.324Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.324Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.324Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.324Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.324Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.324Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.327Z"}
+{"analysis_id":"analysis_1760317963454","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.454Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317963454","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:43.454Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317968330","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:48.330Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317968330","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:12:48.330Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760317963454","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:18:16.412Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760317963454","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:18:16.412Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:16.413Z"}
+{"analysis_id":"analysis_1760317963454","level":"info","message":"✅ Intelligent analysis completed","organization_id":"heyjarvis_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:18:16.413Z"}
+{"level":"info","message":"Stored CRM analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","signal_id":"b9d89f95-9979-4202-92bf-a3226210f453","timestamp":"2025-10-13T01:18:16.635Z"}
+{"level":"info","message":"Analysis result stored in Supabase","organizationId":"heyjarvis_org","service":"intelligent-background-service","signal_id":"b9d89f95-9979-4202-92bf-a3226210f453","timestamp":"2025-10-13T01:18:16.636Z","urgency":"medium"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:22.965Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:22.966Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:22.975Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:22.975Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:22.975Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:22.975Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.134Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.136Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.137Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.137Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.137Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.137Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.137Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.137Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.140Z"}
+{"analysis_id":"analysis_1760318334270","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.270Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760318334270","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:54.270Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760318339139","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:59.139Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760318339139","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:18:59.139Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:54.520Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:54.521Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:54.526Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:54.526Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.292Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.293Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.294Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.294Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.294Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.294Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.294Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.294Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.297Z"}
+{"analysis_id":"analysis_1760318458424","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.424Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760318458424","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:20:58.424Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760318463297","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:21:03.297Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760318463297","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:21:03.298Z","website":"https://dxfactor.com"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:22:36.395Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:22:36.396Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:22:36.403Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:22:36.403Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for CRM integration","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.532Z"}
+{"level":"info","message":"🚀 Starting Intelligent Background Service...","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.533Z"}
+{"interval":"*/30 * * * *","level":"info","message":"⏰ Periodic intelligent analysis scheduled","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.534Z"}
+{"level":"info","message":"🔍 Running initial company intelligence analysis...","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.534Z"}
+{"level":"info","message":"✅ Intelligent Background Service started successfully","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.534Z"}
+{"level":"info","message":"📡 Webhook endpoint: http://localhost:3002/webhooks/hubspot","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.534Z"}
+{"level":"info","message":"🏥 Health check: http://localhost:3002/health","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.534Z"}
+{"level":"info","message":"🧠 Analysis API: http://localhost:3002/analysis/trigger","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.534Z"}
+{"level":"info","message":"🌐 Intelligent service listening on port 3002","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.538Z"}
+{"analysis_id":"analysis_1760319299779","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.779Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760319299779","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:34:59.779Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760319304536","level":"info","message":"🧠 Starting intelligent analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:35:04.536Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760319304536","level":"info","message":"🧠 Running intelligent analysis with company intelligence","service":"intelligent-background-service","timestamp":"2025-10-13T01:35:04.536Z","website":"https://dxfactor.com"}
+{"analysis_id":"analysis_1760319299779","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:40:20.157Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760319299779","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:40:20.157Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"heyjarvis_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:40:20.157Z"}
+{"analysis_id":"analysis_1760319299779","level":"info","message":"✅ Intelligent analysis completed","organization_id":"heyjarvis_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:40:20.157Z"}
+{"level":"info","message":"Stored CRM analysis","organization_id":"heyjarvis_org","service":"intelligent-background-service","signal_id":"ebe2b6ef-255f-44b3-bf43-562312081ecb","timestamp":"2025-10-13T01:40:20.362Z"}
+{"level":"info","message":"Analysis result stored in Supabase","organizationId":"heyjarvis_org","service":"intelligent-background-service","signal_id":"ebe2b6ef-255f-44b3-bf43-562312081ecb","timestamp":"2025-10-13T01:40:20.362Z","urgency":"medium"}
+{"analysis_id":"analysis_1760319304536","has_patterns":true,"has_raw_data":true,"has_recommendations":true,"level":"debug","message":"🔍 Raw analysis result structure","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:40:26.171Z","top_level_keys":["analysis_metadata","company_intelligence_summary","workflow_analysis","contextual_recommendations","raw_data"]}
+{"analysis_id":"analysis_1760319304536","level":"info","message":"✅ Intelligent analysis data extracted","patterns_count":6,"recommendations_count":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:40:26.171Z","workflows_count":30}
+{"error":"Cannot read properties of undefined (reading 'get')","level":"error","message":"Failed to generate intelligent alerts","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:40:26.172Z"}
+{"analysis_id":"analysis_1760319304536","level":"info","message":"✅ Intelligent analysis completed","organization_id":"default_org","patterns_found":6,"recommendations":5,"service":"intelligent-background-service","timestamp":"2025-10-13T01:40:26.172Z"}
+{"error":"TypeError: fetch failed","level":"error","message":"Failed to store analysis","organization_id":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:44:41.017Z"}
+{"error":"TypeError: fetch failed","level":"error","message":"Failed to store analysis result","organizationId":"default_org","service":"intelligent-background-service","timestamp":"2025-10-13T01:44:41.017Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:44:45.844Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:44:45.844Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-13T01:44:45.849Z"}
+{"level":"info","message":"SIGINT received, shutting down gracefully...","service":"intelligent-background-service","timestamp":"2025-10-13T01:44:45.850Z"}
+{"level":"info","message":"✅ Graceful shutdown completed","service":"intelligent-background-service","timestamp":"2025-10-13T01:44:45.850Z"}
+{"level":"info","message":"🌐 Server closed","service":"intelligent-background-service","timestamp":"2025-10-13T01:44:45.850Z"}

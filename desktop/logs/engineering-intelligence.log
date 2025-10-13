@@ -830,3 +830,450 @@
 {"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:11:26.466Z"}
 {"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:11:27.004Z"}
 {"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4992,"service":"engineering-intelligence","timestamp":"2025-10-12T21:11:27.433Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T21:19:12.278Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T21:19:13.863Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:19:13.864Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:19:14.384Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4990,"service":"engineering-intelligence","timestamp":"2025-10-12T21:19:14.759Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T21:19:21.333Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T21:19:23.370Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:19:23.370Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:19:23.925Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4988,"service":"engineering-intelligence","timestamp":"2025-10-12T21:19:24.236Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4987,"service":"engineering-intelligence","timestamp":"2025-10-12T21:19:52.787Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T21:20:00.272Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T21:20:02.196Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:20:02.196Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:20:02.664Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4985,"service":"engineering-intelligence","timestamp":"2025-10-12T21:20:03.016Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4984,"service":"engineering-intelligence","timestamp":"2025-10-12T21:20:31.737Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4983,"service":"engineering-intelligence","timestamp":"2025-10-12T21:21:01.623Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4982,"service":"engineering-intelligence","timestamp":"2025-10-12T21:21:31.653Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4981,"service":"engineering-intelligence","timestamp":"2025-10-12T21:22:01.631Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4980,"service":"engineering-intelligence","timestamp":"2025-10-12T21:22:31.642Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T21:23:04.427Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T21:23:06.276Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:23:06.276Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:23:06.768Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4977,"service":"engineering-intelligence","timestamp":"2025-10-12T21:23:07.142Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T21:23:23.469Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T21:23:25.426Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:23:25.427Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:23:26.023Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4975,"service":"engineering-intelligence","timestamp":"2025-10-12T21:23:26.422Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4974,"service":"engineering-intelligence","timestamp":"2025-10-12T21:23:54.892Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4973,"service":"engineering-intelligence","timestamp":"2025-10-12T21:24:24.916Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4972,"service":"engineering-intelligence","timestamp":"2025-10-12T21:24:54.855Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4971,"service":"engineering-intelligence","timestamp":"2025-10-12T21:25:24.799Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4970,"service":"engineering-intelligence","timestamp":"2025-10-12T21:25:54.824Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4969,"service":"engineering-intelligence","timestamp":"2025-10-12T21:26:24.868Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T21:26:48.820Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T21:26:50.812Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:26:50.812Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:26:51.328Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4967,"service":"engineering-intelligence","timestamp":"2025-10-12T21:26:51.616Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4966,"service":"engineering-intelligence","timestamp":"2025-10-12T21:27:20.249Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4965,"service":"engineering-intelligence","timestamp":"2025-10-12T21:27:50.302Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4964,"service":"engineering-intelligence","timestamp":"2025-10-12T21:28:20.179Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4963,"service":"engineering-intelligence","timestamp":"2025-10-12T21:28:50.359Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4962,"service":"engineering-intelligence","timestamp":"2025-10-12T21:29:20.322Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4961,"service":"engineering-intelligence","timestamp":"2025-10-12T21:29:50.326Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4960,"service":"engineering-intelligence","timestamp":"2025-10-12T21:30:20.378Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4959,"service":"engineering-intelligence","timestamp":"2025-10-12T21:30:50.343Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4958,"service":"engineering-intelligence","timestamp":"2025-10-12T21:31:20.206Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T21:31:35.242Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T21:31:36.408Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:31:36.408Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:31:36.911Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4956,"service":"engineering-intelligence","timestamp":"2025-10-12T21:31:37.264Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T21:31:49.773Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T21:31:50.917Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T21:31:50.917Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T21:31:51.489Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4953,"service":"engineering-intelligence","timestamp":"2025-10-12T21:31:51.909Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4952,"service":"engineering-intelligence","timestamp":"2025-10-12T21:32:20.335Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4951,"service":"engineering-intelligence","timestamp":"2025-10-12T21:32:50.319Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4950,"service":"engineering-intelligence","timestamp":"2025-10-12T21:33:20.609Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4949,"service":"engineering-intelligence","timestamp":"2025-10-12T21:33:50.300Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4948,"service":"engineering-intelligence","timestamp":"2025-10-12T21:34:20.323Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4947,"service":"engineering-intelligence","timestamp":"2025-10-12T21:34:50.363Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4946,"service":"engineering-intelligence","timestamp":"2025-10-12T21:35:20.379Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4945,"service":"engineering-intelligence","timestamp":"2025-10-12T21:35:50.343Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4944,"service":"engineering-intelligence","timestamp":"2025-10-12T21:36:20.408Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4943,"service":"engineering-intelligence","timestamp":"2025-10-12T21:36:50.320Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4942,"service":"engineering-intelligence","timestamp":"2025-10-12T21:37:20.313Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4941,"service":"engineering-intelligence","timestamp":"2025-10-12T21:37:50.367Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4940,"service":"engineering-intelligence","timestamp":"2025-10-12T21:38:20.369Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4939,"service":"engineering-intelligence","timestamp":"2025-10-12T21:38:50.330Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4938,"service":"engineering-intelligence","timestamp":"2025-10-12T21:39:20.354Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4937,"service":"engineering-intelligence","timestamp":"2025-10-12T21:39:50.329Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4936,"service":"engineering-intelligence","timestamp":"2025-10-12T21:40:20.312Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4935,"service":"engineering-intelligence","timestamp":"2025-10-12T21:40:50.381Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4934,"service":"engineering-intelligence","timestamp":"2025-10-12T21:41:20.280Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4933,"service":"engineering-intelligence","timestamp":"2025-10-12T21:41:50.330Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4932,"service":"engineering-intelligence","timestamp":"2025-10-12T21:42:20.373Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4931,"service":"engineering-intelligence","timestamp":"2025-10-12T21:42:50.318Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4930,"service":"engineering-intelligence","timestamp":"2025-10-12T21:43:20.304Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4929,"service":"engineering-intelligence","timestamp":"2025-10-12T21:43:50.389Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4928,"service":"engineering-intelligence","timestamp":"2025-10-12T21:44:20.292Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4927,"service":"engineering-intelligence","timestamp":"2025-10-12T21:44:50.318Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:05:52.913Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:05:54.052Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:05:54.052Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:05:54.595Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4925,"service":"engineering-intelligence","timestamp":"2025-10-12T22:05:54.973Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4924,"service":"engineering-intelligence","timestamp":"2025-10-12T22:06:23.408Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4923,"service":"engineering-intelligence","timestamp":"2025-10-12T22:06:53.524Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4922,"service":"engineering-intelligence","timestamp":"2025-10-12T22:07:23.568Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:07:32.750Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:07:34.548Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:07:34.548Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:07:35.072Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4920,"service":"engineering-intelligence","timestamp":"2025-10-12T22:07:35.502Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4919,"service":"engineering-intelligence","timestamp":"2025-10-12T22:07:53.558Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:08:14.727Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:08:15.934Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:08:15.934Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:08:16.444Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4917,"service":"engineering-intelligence","timestamp":"2025-10-12T22:08:16.834Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:08:27.696Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:08:28.835Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:08:28.835Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:08:29.318Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4915,"service":"engineering-intelligence","timestamp":"2025-10-12T22:08:29.664Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:11:10.489Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:11:11.632Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:11:11.633Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:11:12.159Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4999,"service":"engineering-intelligence","timestamp":"2025-10-12T22:11:12.508Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4998,"service":"engineering-intelligence","timestamp":"2025-10-12T22:11:41.030Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4997,"service":"engineering-intelligence","timestamp":"2025-10-12T22:12:11.132Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4996,"service":"engineering-intelligence","timestamp":"2025-10-12T22:12:41.037Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4995,"service":"engineering-intelligence","timestamp":"2025-10-12T22:13:11.132Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:13:26.796Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:13:28.024Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:13:28.024Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:13:28.607Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4993,"service":"engineering-intelligence","timestamp":"2025-10-12T22:13:28.912Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:00.908Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:02.041Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:02.041Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:02.629Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4991,"service":"engineering-intelligence","timestamp":"2025-10-12T22:17:02.971Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4990,"service":"engineering-intelligence","timestamp":"2025-10-12T22:17:31.452Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:43.718Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:44.860Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:44.860Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:45.338Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4988,"service":"engineering-intelligence","timestamp":"2025-10-12T22:17:45.683Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:51.918Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:53.060Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:53.060Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:17:53.531Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4986,"service":"engineering-intelligence","timestamp":"2025-10-12T22:17:53.881Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4985,"service":"engineering-intelligence","timestamp":"2025-10-12T22:18:22.548Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:18:48.392Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:18:50.259Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:18:50.260Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:18:50.765Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4983,"service":"engineering-intelligence","timestamp":"2025-10-12T22:18:51.118Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4982,"service":"engineering-intelligence","timestamp":"2025-10-12T22:18:52.475Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:19:17.236Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:19:18.375Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:19:18.375Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:19:18.865Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4980,"service":"engineering-intelligence","timestamp":"2025-10-12T22:19:19.237Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:19:36.709Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:19:37.847Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:19:37.847Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:19:38.336Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4978,"service":"engineering-intelligence","timestamp":"2025-10-12T22:19:38.644Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:20:51.283Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:20:52.432Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:20:52.432Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:20:52.927Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4975,"service":"engineering-intelligence","timestamp":"2025-10-12T22:20:53.240Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:21:00.157Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:21:01.357Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:21:01.357Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:21:01.830Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4973,"service":"engineering-intelligence","timestamp":"2025-10-12T22:21:02.166Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:21:37.949Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:21:39.081Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:21:39.081Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:21:39.581Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4971,"service":"engineering-intelligence","timestamp":"2025-10-12T22:21:39.955Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4970,"service":"engineering-intelligence","timestamp":"2025-10-12T22:22:08.458Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4969,"service":"engineering-intelligence","timestamp":"2025-10-12T22:22:38.472Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4968,"service":"engineering-intelligence","timestamp":"2025-10-12T22:23:08.493Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4967,"service":"engineering-intelligence","timestamp":"2025-10-12T22:23:38.561Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4966,"service":"engineering-intelligence","timestamp":"2025-10-12T22:24:08.480Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4965,"service":"engineering-intelligence","timestamp":"2025-10-12T22:24:38.522Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4964,"service":"engineering-intelligence","timestamp":"2025-10-12T22:25:08.572Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4963,"service":"engineering-intelligence","timestamp":"2025-10-12T22:25:38.522Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4962,"service":"engineering-intelligence","timestamp":"2025-10-12T22:26:08.585Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4961,"service":"engineering-intelligence","timestamp":"2025-10-12T22:26:38.610Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4960,"service":"engineering-intelligence","timestamp":"2025-10-12T22:27:08.503Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4959,"service":"engineering-intelligence","timestamp":"2025-10-12T22:27:38.481Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4958,"service":"engineering-intelligence","timestamp":"2025-10-12T22:28:08.545Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4957,"service":"engineering-intelligence","timestamp":"2025-10-12T22:28:38.520Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4956,"service":"engineering-intelligence","timestamp":"2025-10-12T22:29:08.486Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4955,"service":"engineering-intelligence","timestamp":"2025-10-12T22:29:38.533Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4954,"service":"engineering-intelligence","timestamp":"2025-10-12T22:30:08.513Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4953,"service":"engineering-intelligence","timestamp":"2025-10-12T22:30:38.474Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4952,"service":"engineering-intelligence","timestamp":"2025-10-12T22:31:08.541Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4951,"service":"engineering-intelligence","timestamp":"2025-10-12T22:31:38.630Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4950,"service":"engineering-intelligence","timestamp":"2025-10-12T22:32:08.479Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4949,"service":"engineering-intelligence","timestamp":"2025-10-12T22:32:38.536Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4948,"service":"engineering-intelligence","timestamp":"2025-10-12T22:33:08.701Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4947,"service":"engineering-intelligence","timestamp":"2025-10-12T22:33:38.527Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4946,"service":"engineering-intelligence","timestamp":"2025-10-12T22:34:09.061Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4945,"service":"engineering-intelligence","timestamp":"2025-10-12T22:34:38.515Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4944,"service":"engineering-intelligence","timestamp":"2025-10-12T22:35:08.524Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4943,"service":"engineering-intelligence","timestamp":"2025-10-12T22:35:38.539Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:36:04.627Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:36:05.823Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:36:05.823Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:36:06.306Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4941,"service":"engineering-intelligence","timestamp":"2025-10-12T22:36:06.654Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:36:31.471Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:36:32.607Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:36:32.607Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:36:33.137Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4939,"service":"engineering-intelligence","timestamp":"2025-10-12T22:36:33.426Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:38:19.483Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:38:20.884Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:38:20.884Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:38:22.457Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4937,"service":"engineering-intelligence","timestamp":"2025-10-12T22:38:22.858Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:39:39.880Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:39:41.027Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:39:41.027Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:39:41.522Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4935,"service":"engineering-intelligence","timestamp":"2025-10-12T22:39:41.894Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4934,"service":"engineering-intelligence","timestamp":"2025-10-12T22:40:10.469Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4933,"service":"engineering-intelligence","timestamp":"2025-10-12T22:40:40.389Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4932,"service":"engineering-intelligence","timestamp":"2025-10-12T22:41:10.449Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4931,"service":"engineering-intelligence","timestamp":"2025-10-12T22:41:40.437Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:42:13.735Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:42:14.873Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:42:14.873Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:42:15.469Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4929,"service":"engineering-intelligence","timestamp":"2025-10-12T22:42:15.835Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:51:56.739Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:51:57.871Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:51:57.871Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:51:58.430Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4927,"service":"engineering-intelligence","timestamp":"2025-10-12T22:51:58.721Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4926,"service":"engineering-intelligence","timestamp":"2025-10-12T22:52:27.260Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:53:00.595Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:53:01.753Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:53:01.753Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:53:02.228Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4924,"service":"engineering-intelligence","timestamp":"2025-10-12T22:53:02.602Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:53:14.325Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:53:15.453Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:53:15.453Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:53:16.025Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4922,"service":"engineering-intelligence","timestamp":"2025-10-12T22:53:16.513Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:55:39.634Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:55:40.772Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:55:40.772Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:55:47.148Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:55:48.297Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:55:48.297Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:55:48.777Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4919,"service":"engineering-intelligence","timestamp":"2025-10-12T22:55:49.153Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4918,"service":"engineering-intelligence","timestamp":"2025-10-12T22:56:17.695Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:56:27.716Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:56:28.844Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:56:28.845Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:56:29.309Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4916,"service":"engineering-intelligence","timestamp":"2025-10-12T22:56:29.684Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4915,"service":"engineering-intelligence","timestamp":"2025-10-12T22:56:58.265Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4914,"service":"engineering-intelligence","timestamp":"2025-10-12T22:57:28.381Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T22:58:51.925Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T22:58:53.100Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T22:58:53.100Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T22:58:53.665Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4912,"service":"engineering-intelligence","timestamp":"2025-10-12T22:58:54.163Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4911,"service":"engineering-intelligence","timestamp":"2025-10-12T22:59:22.521Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4910,"service":"engineering-intelligence","timestamp":"2025-10-12T22:59:52.557Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4909,"service":"engineering-intelligence","timestamp":"2025-10-12T23:00:22.579Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4908,"service":"engineering-intelligence","timestamp":"2025-10-12T23:00:52.528Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4907,"service":"engineering-intelligence","timestamp":"2025-10-12T23:01:22.536Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4904,"service":"engineering-intelligence","timestamp":"2025-10-12T23:01:52.522Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4902,"service":"engineering-intelligence","timestamp":"2025-10-12T23:02:22.544Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4899,"service":"engineering-intelligence","timestamp":"2025-10-12T23:02:52.532Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4897,"service":"engineering-intelligence","timestamp":"2025-10-12T23:03:22.552Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4895,"service":"engineering-intelligence","timestamp":"2025-10-12T23:03:52.537Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4894,"service":"engineering-intelligence","timestamp":"2025-10-12T23:04:22.564Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4893,"service":"engineering-intelligence","timestamp":"2025-10-12T23:04:52.951Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4892,"service":"engineering-intelligence","timestamp":"2025-10-12T23:05:22.519Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4891,"service":"engineering-intelligence","timestamp":"2025-10-12T23:05:52.566Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4890,"service":"engineering-intelligence","timestamp":"2025-10-12T23:06:22.617Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:08:23.984Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:08:25.122Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:08:25.123Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:08:25.654Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4887,"service":"engineering-intelligence","timestamp":"2025-10-12T23:08:25.984Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4886,"service":"engineering-intelligence","timestamp":"2025-10-12T23:08:54.550Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4885,"service":"engineering-intelligence","timestamp":"2025-10-12T23:09:24.523Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4884,"service":"engineering-intelligence","timestamp":"2025-10-12T23:09:54.514Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:10:18.528Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:10:19.666Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:10:19.666Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:10:20.196Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4882,"service":"engineering-intelligence","timestamp":"2025-10-12T23:10:20.512Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4881,"service":"engineering-intelligence","timestamp":"2025-10-12T23:10:49.331Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":5000,"service":"engineering-intelligence","timestamp":"2025-10-12T23:11:19.057Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4999,"service":"engineering-intelligence","timestamp":"2025-10-12T23:11:49.136Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4998,"service":"engineering-intelligence","timestamp":"2025-10-12T23:11:59.678Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4997,"service":"engineering-intelligence","timestamp":"2025-10-12T23:12:28.708Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4996,"service":"engineering-intelligence","timestamp":"2025-10-12T23:12:58.632Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4995,"service":"engineering-intelligence","timestamp":"2025-10-12T23:13:28.691Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:24:46.348Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:24:47.543Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:24:47.543Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:24:48.553Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4993,"service":"engineering-intelligence","timestamp":"2025-10-12T23:24:48.947Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4992,"service":"engineering-intelligence","timestamp":"2025-10-12T23:25:16.991Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4991,"service":"engineering-intelligence","timestamp":"2025-10-12T23:25:46.986Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:30:55.330Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:30:56.525Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:30:56.525Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:30:57.108Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4989,"service":"engineering-intelligence","timestamp":"2025-10-12T23:30:57.506Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4988,"service":"engineering-intelligence","timestamp":"2025-10-12T23:31:26.017Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:31:33.124Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:31:34.336Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:31:34.337Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:31:34.939Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4986,"service":"engineering-intelligence","timestamp":"2025-10-12T23:31:35.328Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4985,"service":"engineering-intelligence","timestamp":"2025-10-12T23:32:03.833Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:36:46.904Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:36:48.096Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:36:48.096Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:36:48.694Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4983,"service":"engineering-intelligence","timestamp":"2025-10-12T23:36:49.072Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4982,"service":"engineering-intelligence","timestamp":"2025-10-12T23:37:17.581Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:41:10.149Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:41:11.345Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:41:11.346Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:41:11.922Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4980,"service":"engineering-intelligence","timestamp":"2025-10-12T23:41:12.272Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:45:01.206Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:45:02.401Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:45:02.401Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:45:02.993Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4978,"service":"engineering-intelligence","timestamp":"2025-10-12T23:45:03.382Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4977,"service":"engineering-intelligence","timestamp":"2025-10-12T23:45:32.633Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4976,"service":"engineering-intelligence","timestamp":"2025-10-12T23:46:01.864Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4975,"service":"engineering-intelligence","timestamp":"2025-10-12T23:46:32.055Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4974,"service":"engineering-intelligence","timestamp":"2025-10-12T23:47:01.842Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:48:44.043Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:48:45.249Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:48:45.249Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:48:45.848Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4971,"service":"engineering-intelligence","timestamp":"2025-10-12T23:48:46.234Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4970,"service":"engineering-intelligence","timestamp":"2025-10-12T23:49:14.796Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:50:41.682Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:50:42.881Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:50:42.881Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:50:43.437Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4968,"service":"engineering-intelligence","timestamp":"2025-10-12T23:50:43.795Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4967,"service":"engineering-intelligence","timestamp":"2025-10-12T23:51:12.410Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4966,"service":"engineering-intelligence","timestamp":"2025-10-12T23:51:42.410Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-12T23:51:57.013Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-12T23:51:58.201Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-12T23:51:58.201Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-12T23:51:58.794Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4964,"service":"engineering-intelligence","timestamp":"2025-10-12T23:51:59.136Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4962,"service":"engineering-intelligence","timestamp":"2025-10-12T23:52:28.153Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-13T00:00:25.379Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-13T00:00:26.587Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-13T00:00:26.587Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-13T00:00:27.250Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4373,"service":"engineering-intelligence","timestamp":"2025-10-13T00:00:27.690Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4372,"service":"engineering-intelligence","timestamp":"2025-10-13T00:00:56.071Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4371,"service":"engineering-intelligence","timestamp":"2025-10-13T00:01:26.081Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4370,"service":"engineering-intelligence","timestamp":"2025-10-13T00:01:56.634Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4369,"service":"engineering-intelligence","timestamp":"2025-10-13T00:02:26.123Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-13T01:01:14.716Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-13T01:01:15.909Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-13T01:01:15.909Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-13T01:01:16.840Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1475,"service":"engineering-intelligence","timestamp":"2025-10-13T01:01:17.385Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1473,"service":"engineering-intelligence","timestamp":"2025-10-13T01:01:45.539Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1472,"service":"engineering-intelligence","timestamp":"2025-10-13T01:02:15.450Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1471,"service":"engineering-intelligence","timestamp":"2025-10-13T01:02:45.382Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1470,"service":"engineering-intelligence","timestamp":"2025-10-13T01:03:15.251Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-13T01:06:19.034Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-13T01:06:20.172Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-13T01:06:20.172Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-13T01:06:20.698Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1468,"service":"engineering-intelligence","timestamp":"2025-10-13T01:06:21.155Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1467,"service":"engineering-intelligence","timestamp":"2025-10-13T01:06:49.608Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1466,"service":"engineering-intelligence","timestamp":"2025-10-13T01:07:19.574Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1465,"service":"engineering-intelligence","timestamp":"2025-10-13T01:07:49.652Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1464,"service":"engineering-intelligence","timestamp":"2025-10-13T01:08:19.569Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1463,"service":"engineering-intelligence","timestamp":"2025-10-13T01:08:49.622Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-13T01:09:14.046Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-13T01:09:15.195Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-13T01:09:15.195Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-13T01:09:15.755Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1461,"service":"engineering-intelligence","timestamp":"2025-10-13T01:09:16.156Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1460,"service":"engineering-intelligence","timestamp":"2025-10-13T01:09:44.611Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1459,"service":"engineering-intelligence","timestamp":"2025-10-13T01:10:14.625Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1458,"service":"engineering-intelligence","timestamp":"2025-10-13T01:10:44.676Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1457,"service":"engineering-intelligence","timestamp":"2025-10-13T01:11:14.614Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1456,"service":"engineering-intelligence","timestamp":"2025-10-13T01:11:44.632Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1455,"service":"engineering-intelligence","timestamp":"2025-10-13T01:12:14.649Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-13T01:12:43.315Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-13T01:12:44.455Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-13T01:12:44.455Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-13T01:12:44.954Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1453,"service":"engineering-intelligence","timestamp":"2025-10-13T01:12:45.343Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1452,"service":"engineering-intelligence","timestamp":"2025-10-13T01:13:13.979Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1451,"service":"engineering-intelligence","timestamp":"2025-10-13T01:13:43.853Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1450,"service":"engineering-intelligence","timestamp":"2025-10-13T01:14:13.903Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1156,"service":"engineering-intelligence","timestamp":"2025-10-13T01:14:44.322Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1155,"service":"engineering-intelligence","timestamp":"2025-10-13T01:15:13.895Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1154,"service":"engineering-intelligence","timestamp":"2025-10-13T01:15:43.867Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1153,"service":"engineering-intelligence","timestamp":"2025-10-13T01:16:13.851Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1152,"service":"engineering-intelligence","timestamp":"2025-10-13T01:16:43.903Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1151,"service":"engineering-intelligence","timestamp":"2025-10-13T01:17:13.861Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1150,"service":"engineering-intelligence","timestamp":"2025-10-13T01:17:43.847Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1149,"service":"engineering-intelligence","timestamp":"2025-10-13T01:18:13.969Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-13T01:18:54.128Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-13T01:18:55.265Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-13T01:18:55.265Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-13T01:18:55.858Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1147,"service":"engineering-intelligence","timestamp":"2025-10-13T01:18:56.224Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":1146,"service":"engineering-intelligence","timestamp":"2025-10-13T01:19:24.699Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":993,"service":"engineering-intelligence","timestamp":"2025-10-13T01:19:54.793Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":851,"service":"engineering-intelligence","timestamp":"2025-10-13T01:20:24.808Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-13T01:20:58.284Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-13T01:20:59.429Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-13T01:20:59.429Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-13T01:21:00.141Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":849,"service":"engineering-intelligence","timestamp":"2025-10-13T01:21:00.658Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":848,"service":"engineering-intelligence","timestamp":"2025-10-13T01:21:28.973Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":847,"service":"engineering-intelligence","timestamp":"2025-10-13T01:21:58.858Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":846,"service":"engineering-intelligence","timestamp":"2025-10-13T01:22:28.869Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-13T01:34:59.524Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-13T01:35:00.659Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-13T01:35:00.659Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-13T01:35:01.271Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4998,"service":"engineering-intelligence","timestamp":"2025-10-13T01:35:01.622Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4997,"service":"engineering-intelligence","timestamp":"2025-10-13T01:35:30.085Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4996,"service":"engineering-intelligence","timestamp":"2025-10-13T01:36:00.055Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4995,"service":"engineering-intelligence","timestamp":"2025-10-13T01:36:30.198Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4994,"service":"engineering-intelligence","timestamp":"2025-10-13T01:37:00.037Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4993,"service":"engineering-intelligence","timestamp":"2025-10-13T01:37:30.087Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4992,"service":"engineering-intelligence","timestamp":"2025-10-13T01:38:00.108Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4991,"service":"engineering-intelligence","timestamp":"2025-10-13T01:38:30.073Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4990,"service":"engineering-intelligence","timestamp":"2025-10-13T01:39:00.054Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4989,"service":"engineering-intelligence","timestamp":"2025-10-13T01:39:30.398Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4988,"service":"engineering-intelligence","timestamp":"2025-10-13T01:40:00.170Z"}
+{"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4987,"service":"engineering-intelligence","timestamp":"2025-10-13T01:44:44.430Z"}

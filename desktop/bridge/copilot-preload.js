@@ -187,7 +187,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     sendEmail: (emailData) => ipcRenderer.invoke('microsoft:sendEmail', emailData),
     executeWorkflowActions: (workflow, userEmails) => ipcRenderer.invoke('microsoft:executeWorkflowActions', workflow, userEmails),
     findMeetingTimes: (attendees, durationMinutes, options) => ipcRenderer.invoke('microsoft:findMeetingTimes', attendees, durationMinutes, options),
-    getUserProfile: () => ipcRenderer.invoke('microsoft:getUserProfile')
+    getUserProfile: () => ipcRenderer.invoke('microsoft:getUserProfile'),
+    test: (testData) => ipcRenderer.invoke('microsoft:test', testData),
+    healthCheck: () => ipcRenderer.invoke('microsoft:healthCheck'),
+    startTeamsMonitoring: () => ipcRenderer.invoke('microsoft:startTeamsMonitoring'),
+    stopTeamsMonitoring: () => ipcRenderer.invoke('microsoft:stopTeamsMonitoring'),
+    startEmailMonitoring: () => ipcRenderer.invoke('microsoft:startEmailMonitoring'),
+    stopEmailMonitoring: () => ipcRenderer.invoke('microsoft:stopEmailMonitoring'),
+    getMonitoringStats: () => ipcRenderer.invoke('microsoft:getMonitoringStats')
   },
 
   // Google Workspace Integration
@@ -218,7 +225,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     authenticate: () => ipcRenderer.invoke('jira:authenticate'),
     getMyIssues: (options) => ipcRenderer.invoke('jira:getMyIssues', options),
     checkConnection: () => ipcRenderer.invoke('jira:checkConnection'),
-    syncTasks: (options) => ipcRenderer.invoke('jira:syncTasks', options)
+    syncTasks: (options) => ipcRenderer.invoke('jira:syncTasks', options),
+    executeCommand: (commandData) => ipcRenderer.invoke('jira:executeCommand', commandData)
   },
 
   // Code Indexer
@@ -238,6 +246,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getFeatureStatus: (feature, repository, context) => ipcRenderer.invoke('engineering:getFeatureStatus', { feature, repository, context }),
     healthCheck: () => ipcRenderer.invoke('engineering:healthCheck'),
     listRepos: () => ipcRenderer.invoke('engineering:listRepos')
+  },
+
+  // Shell operations (open external links)
+  shell: {
+    openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url)
   },
 
   // Generic event listener for IPC events from main process

@@ -2088,6 +2088,167 @@
         <button class="task-chat-close" onclick="closeTaskChat()">×</button>
       </div>
       
+      <!-- Live JIRA Task Card -->
+      <div id="liveJiraTaskCard" style="display: none; margin: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow: hidden;">
+        
+        <!-- Card Header -->
+        <div style="padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.15);">
+          <div style="display: flex; align-items: start; justify-content: space-between; margin-bottom: 8px;">
+            <div style="flex: 1;">
+              <div id="jiraCardTitle" style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 6px; line-height: 1.3;"></div>
+              <div id="jiraCardMeta" style="font-size: 12px; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button onclick="toggleCardExpanded()" id="jiraCardExpandBtn"
+                      style="padding: 6px 10px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; backdrop-filter: blur(10px);"
+                      title="Expand/Collapse">
+                ⬇️
+              </button>
+              <button onclick="refreshJiraTaskCard()" 
+                      style="padding: 6px 10px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; backdrop-filter: blur(10px);"
+                      title="Refresh from JIRA">
+                🔄
+              </button>
+            </div>
+          </div>
+          
+          <!-- Status, Priority, Assignee Badges -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div id="jiraCardStatus" style="padding: 5px 12px; background: rgba(255,255,255,0.25); color: white; border-radius: 6px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px); cursor: pointer;" onclick="showStatusPicker()" title="Click to change status"></div>
+            <div id="jiraCardPriority" style="padding: 5px 12px; background: rgba(255,255,255,0.25); color: white; border-radius: 6px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px); cursor: pointer;" onclick="showPriorityPicker()" title="Click to change priority"></div>
+            <div id="jiraCardAssignee" style="padding: 5px 12px; background: rgba(255,255,255,0.25); color: white; border-radius: 6px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px);"></div>
+            <div id="jiraCardMetrics" style="padding: 5px 12px; background: rgba(255,255,255,0.25); color: white; border-radius: 6px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px);"></div>
+          </div>
+        </div>
+        
+        <!-- Expanded Content (collapsible) -->
+        <div id="jiraCardExpanded" style="display: block; max-height: 400px; overflow-y: auto; background: rgba(0,0,0,0.1);">
+          
+          <!-- Description Section -->
+          <div style="padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9);">📝 Description</div>
+              <button onclick="editDescription()" style="padding: 4px 8px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600;">Edit</button>
+            </div>
+            <div id="jiraCardDescription" style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.5; max-height: 100px; overflow-y: auto;"></div>
+          </div>
+          
+          <!-- Quick Comment -->
+          <div style="padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 8px;">💬 Quick Comment</div>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="jiraCardQuickComment" 
+                     placeholder="Add a quick comment..." 
+                     style="flex: 1; padding: 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; font-size: 13px; backdrop-filter: blur(10px);"
+                     onkeypress="if(event.key==='Enter') addQuickComment()">
+              <button onclick="addQuickComment()" 
+                      style="padding: 8px 16px; background: rgba(255,255,255,0.9); color: #667eea; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                Send
+              </button>
+            </div>
+          </div>
+          
+          <!-- Activity Feed -->
+          <div style="padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 8px;">⚡ Recent Activity</div>
+            <div id="jiraCardActivity" style="max-height: 150px; overflow-y: auto;"></div>
+          </div>
+          
+          <!-- Time Tracking (if available) -->
+          <div id="jiraCardTimeTracking" style="padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: none;">
+            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 8px;">⏱️ Time Tracking</div>
+            <div id="jiraCardTimeContent"></div>
+          </div>
+          
+          <!-- Labels/Tags -->
+          <div id="jiraCardLabels" style="padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: none;">
+            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 8px;">🏷️ Labels</div>
+            <div id="jiraCardLabelsContent" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
+          </div>
+        </div>
+        
+        <!-- Quick Actions Footer -->
+        <div style="padding: 12px 16px; background: rgba(0,0,0,0.15); border-top: 1px solid rgba(255,255,255,0.1);">
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button onclick="quickJiraAction('In Progress')" 
+                    style="flex: 1; min-width: 90px; padding: 10px 12px; background: rgba(255,255,255,0.95); color: #667eea; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;"
+                    onmouseenter="this.style.background='white'; this.style.transform='translateY(-1px)'"
+                    onmouseleave="this.style.background='rgba(255,255,255,0.95)'; this.style.transform='translateY(0)'">
+              ▶️ Start
+            </button>
+            <button onclick="quickJiraAction('Done')" 
+                    style="flex: 1; min-width: 90px; padding: 10px 12px; background: rgba(52, 199, 89, 0.95); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;"
+                    onmouseenter="this.style.background='#34C759'; this.style.transform='translateY(-1px)'"
+                    onmouseleave="this.style.background='rgba(52, 199, 89, 0.95)'; this.style.transform='translateY(0)'">
+              ✓ Done
+            </button>
+            <button onclick="openJiraInBrowser()" 
+                    style="flex: 1; min-width: 90px; padding: 10px 12px; background: rgba(0, 82, 204, 0.95); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;"
+                    onmouseenter="this.style.background='#0052CC'; this.style.transform='translateY(-1px)'"
+                    onmouseleave="this.style.background='rgba(0, 82, 204, 0.95)'; this.style.transform='translateY(0)'">
+              🔗 Open
+            </button>
+          </div>
+        </div>
+        
+        <!-- Last Updated & Live Indicator -->
+        <div style="padding: 8px 16px; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <div id="jiraCardLiveIndicator" style="width: 8px; height: 8px; background: #34C759; border-radius: 50%; animation: pulse 2s infinite;" title="Live syncing"></div>
+            <div id="jiraCardLastUpdated" style="font-size: 11px; color: rgba(255,255,255,0.7);"></div>
+          </div>
+          <div id="jiraCardSyncStatus" style="font-size: 11px; color: rgba(255,255,255,0.7);"></div>
+        </div>
+      </div>
+      
+      <!-- CSS for animations -->
+      <style>
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.9); }
+        }
+        
+        @keyframes flash {
+          0%, 100% { background: rgba(255,255,255,0.25); box-shadow: 0 0 0 rgba(255,215,0,0.5); }
+          50% { background: rgba(255,215,0,0.5); box-shadow: 0 0 10px rgba(255,215,0,0.8); }
+        }
+        
+        #jiraCardExpanded::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        #jiraCardExpanded::-webkit-scrollbar-track {
+          background: rgba(255,255,255,0.1);
+          border-radius: 4px;
+        }
+        
+        #jiraCardExpanded::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.3);
+          border-radius: 4px;
+        }
+        
+        #jiraCardExpanded::-webkit-scrollbar-thumb:hover {
+          background: rgba(255,255,255,0.5);
+        }
+        
+        #jiraCardActivity::-webkit-scrollbar,
+        #jiraCardDescription::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        #jiraCardActivity::-webkit-scrollbar-track,
+        #jiraCardDescription::-webkit-scrollbar-track {
+          background: rgba(255,255,255,0.1);
+          border-radius: 3px;
+        }
+        
+        #jiraCardActivity::-webkit-scrollbar-thumb,
+        #jiraCardDescription::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.3);
+          border-radius: 3px;
+        }
+      </style>
+      
       <div class="task-chat-context">
         <div class="task-context-label">Task Context:</div>
         <div class="task-context-content" id="taskChatContext"></div>
@@ -2569,17 +2730,29 @@
       const inProgressCount = tasks.filter(t => t.status === 'in_progress').length;
       const completedCount = tasks.filter(t => t.status === 'completed').length;
       
-      document.getElementById('todoCount').textContent = todoCount;
-      document.getElementById('inProgressCount').textContent = inProgressCount;
-      document.getElementById('completedCount').textContent = completedCount;
+      const todoCountEl = document.getElementById('todoCount');
+      if (todoCountEl) {
+        todoCountEl.textContent = todoCount;
+      }
+      
+      const inProgressCountEl = document.getElementById('inProgressCount');
+      if (inProgressCountEl) {
+        inProgressCountEl.textContent = inProgressCount;
+      }
+      const completedCountEl = document.getElementById('completedCount');
+      if (completedCountEl) {
+        completedCountEl.textContent = completedCount;
+      }
       
       const badge = document.getElementById('taskBadge');
-      const activeCount = todoCount + inProgressCount;
-      if (activeCount > 0) {
-        badge.textContent = activeCount;
-        badge.style.display = 'inline';
-      } else {
-        badge.style.display = 'none';
+      if (badge) {
+        const activeCount = todoCount + inProgressCount;
+        if (activeCount > 0) {
+          badge.textContent = activeCount;
+          badge.style.display = 'inline';
+        } else {
+          badge.style.display = 'none';
+        }
       }
     }
 
@@ -2875,6 +3048,14 @@
         </span>
       `;
       
+      // Show live JIRA card if this is a JIRA task
+      const isJiraTask = task.externalSource === 'jira' || (task.tags && task.tags.includes('jira-auto'));
+      if (isJiraTask && task.externalKey) {
+        await updateLiveJiraCard(task);
+      } else {
+        document.getElementById('liveJiraTaskCard').style.display = 'none';
+      }
+      
       // Load chat history from Supabase if not already in memory
       if (!taskChatHistories[taskId]) {
         const messagesContainer = document.getElementById('taskChatMessages');
@@ -2908,6 +3089,11 @@
       // Show modal
       document.getElementById('taskChatModal').style.display = 'flex';
       
+      // Start auto-refresh for JIRA cards
+      if (isJiraTask && task.externalKey) {
+        startJiraCardAutoRefresh();
+      }
+      
       // Focus input after a brief delay to allow animation
       setTimeout(() => {
         document.getElementById('taskChatInput').focus();
@@ -2915,6 +3101,9 @@
     }
     
     function closeTaskChat() {
+      // Stop auto-refresh
+      stopJiraCardAutoRefresh();
+      
       document.getElementById('taskChatModal').style.display = 'none';
       currentTaskChat = null;
     }
@@ -3568,7 +3757,7 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
           return;
         }
         
-        // Display issues as tasks
+        // Display issues as tasks with editing capabilities
         tasksList.innerHTML = issues.map(issue => {
           const priorityColors = {
             Highest: '#FF3B30',
@@ -3579,23 +3768,64 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
           };
           const priorityColor = priorityColors[issue.priority?.name] || '#737373';
           
+          const statusColors = {
+            'To Do': '#737373',
+            'In Progress': '#007AFF',
+            'Done': '#34C759',
+            'Backlog': '#8E8E93',
+            'In Review': '#FF9500'
+          };
+          const statusColor = statusColors[issue.status?.name] || '#737373';
+          
           return `
-            <div class="task-item" style="padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px;">
+            <div class="task-item jira-issue" 
+                 data-issue-id="${issue.id}" 
+                 data-issue-key="${issue.key}"
+                 style="padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s;"
+                 onmouseenter="this.style.borderColor='#007AFF'; this.style.boxShadow='0 2px 8px rgba(0,122,255,0.1)'"
+                 onmouseleave="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'"
+                 onclick="openJIRAIssueEditor('${issue.key}', ${JSON.stringify(issue).replace(/"/g, '&quot;')})">
               <div style="display: flex; align-items: start; gap: 12px;">
-                <input type="checkbox" ${issue.status?.name === 'Done' ? 'checked' : ''} disabled style="margin-top: 2px;">
+                <div style="margin-top: 2px; color: ${statusColor}; font-size: 16px;">
+                  ${issue.status?.name === 'Done' ? '✓' : '○'}
+                </div>
                 <div style="flex: 1;">
-                  <div style="font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 4px;">
-                    ${issue.summary}
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #171717;">
+                      ${issue.summary}
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                      <button onclick="event.stopPropagation(); quickTransitionIssue('${issue.key}', 'In Progress')" 
+                              style="padding: 4px 8px; background: #007AFF; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;"
+                              title="Start working">
+                        Start
+                      </button>
+                      <button onclick="event.stopPropagation(); quickTransitionIssue('${issue.key}', 'Done')" 
+                              style="padding: 4px 8px; background: #34C759; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600;"
+                              title="Mark as done">
+                        Done
+                      </button>
+                      <button onclick="event.stopPropagation(); window.electronAPI.shell.openExternal('${issue.url}')" 
+                              style="padding: 4px 8px; background: #f3f4f6; color: #737373; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;"
+                              title="Open in JIRA">
+                        🔗
+                      </button>
+                    </div>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #737373;">
+                  <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #737373; flex-wrap: wrap;">
                     <span style="background: ${priorityColor}; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">
                       ${issue.priority?.name || 'Medium'}
                     </span>
-                    <span>${issue.status?.name || 'To Do'}</span>
-                    <span>•</span>
+                    <span style="background: ${statusColor}; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">
+                      ${issue.status?.name || 'To Do'}
+                    </span>
                     <span>${issue.issue_type?.name || 'Task'}</span>
                     <span>•</span>
-                    <span>${issue.key}</span>
+                    <span style="font-family: monospace; font-weight: 600;">${issue.key}</span>
+                    ${issue.assignee ? `
+                      <span>•</span>
+                      <span title="${issue.assignee.display_name}">👤 ${issue.assignee.display_name}</span>
+                    ` : ''}
                   </div>
                 </div>
               </div>
@@ -3651,6 +3881,845 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
       
       // Otherwise, authenticate
       authenticateJIRA();
+    }
+    
+    // Quick transition JIRA issue status
+    async function quickTransitionIssue(issueKey, targetStatus) {
+      try {
+        console.log(`🔄 Transitioning ${issueKey} to ${targetStatus}...`);
+        
+        showNotification(`Moving ${issueKey} to ${targetStatus}...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `transition ${issueKey} to ${targetStatus}`
+        });
+        
+        if (result.success) {
+          console.log(`✅ ${issueKey} transitioned to ${targetStatus}`);
+          showNotification(`✅ ${issueKey} moved to ${targetStatus}`, 'success');
+          
+          // Refresh tasks to show updated status
+          if (currentView === 'tasks') {
+            await loadTasks();
+          }
+        } else {
+          throw new Error(result.error || 'Failed to transition issue');
+        }
+      } catch (error) {
+        console.error('❌ Failed to transition issue:', error);
+        showNotification(`Failed to transition: ${error.message}`, 'error');
+      }
+    }
+    
+    // Open JIRA issue editor modal
+    function openJIRAIssueEditor(issueKey, issueData) {
+      console.log('📝 Opening editor for', issueKey, issueData);
+      
+      const issue = typeof issueData === 'string' ? JSON.parse(issueData.replace(/&quot;/g, '"')) : issueData;
+      
+      // Create modal overlay
+      const modal = document.createElement('div');
+      modal.id = 'jiraEditorModal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(4px);
+      `;
+      
+      // Create modal content
+      modal.innerHTML = `
+        <div style="background: white; border-radius: 16px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+          <div style="padding: 24px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 1;">
+            <div>
+              <div style="font-size: 20px; font-weight: 700; color: #171717; margin-bottom: 4px;">
+                ${issue.summary}
+              </div>
+              <div style="font-size: 14px; color: #737373;">
+                <span style="font-family: monospace; font-weight: 600;">${issue.key}</span>
+                • ${issue.issue_type?.name || 'Task'}
+              </div>
+            </div>
+            <button onclick="closeJIRAEditorModal()" style="padding: 8px; background: #f3f4f6; border: none; border-radius: 8px; cursor: pointer; font-size: 20px; line-height: 1; color: #737373;">×</button>
+          </div>
+          
+          <div style="padding: 24px;">
+            <!-- Status -->
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 8px;">Status</label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                ${['To Do', 'In Progress', 'In Review', 'Done'].map(status => `
+                  <button onclick="updateIssueStatus('${issue.key}', '${status}')" 
+                          style="padding: 8px 16px; background: ${issue.status?.name === status ? '#007AFF' : '#f3f4f6'}; color: ${issue.status?.name === status ? 'white' : '#171717'}; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px;">
+                    ${status}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+            
+            <!-- Priority -->
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 8px;">Priority</label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                ${['Highest', 'High', 'Medium', 'Low', 'Lowest'].map(priority => {
+                  const colors = { Highest: '#FF3B30', High: '#FF9500', Medium: '#FFCC00', Low: '#34C759', Lowest: '#007AFF' };
+                  return `
+                    <button onclick="updateIssuePriority('${issue.key}', '${priority}')" 
+                            style="padding: 8px 16px; background: ${issue.priority?.name === priority ? colors[priority] : '#f3f4f6'}; color: ${issue.priority?.name === priority ? 'white' : '#171717'}; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px;">
+                      ${priority}
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+            
+            <!-- Description -->
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 8px;">Description</label>
+              <textarea id="jiraIssueDescription" 
+                        style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; resize: vertical;"
+                        placeholder="Add a description...">${issue.description || ''}</textarea>
+              <button onclick="updateIssueDescription('${issue.key}')" 
+                      style="margin-top: 8px; padding: 8px 16px; background: #007AFF; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px;">
+                Update Description
+              </button>
+            </div>
+            
+            <!-- Add Comment -->
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 8px;">Add Comment</label>
+              <textarea id="jiraIssueComment" 
+                        style="width: 100%; min-height: 80px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; resize: vertical;"
+                        placeholder="Write a comment..."></textarea>
+              <button onclick="addIssueComment('${issue.key}')" 
+                      style="margin-top: 8px; padding: 8px 16px; background: #34C759; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px;">
+                Add Comment
+              </button>
+            </div>
+            
+            <!-- Assignee -->
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 8px;">Assigned to</label>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f3f4f6; border-radius: 8px;">
+                ${issue.assignee ? `
+                  <div style="width: 32px; height: 32px; border-radius: 50%; background: #007AFF; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                    ${issue.assignee.display_name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #171717;">${issue.assignee.display_name}</div>
+                    <div style="font-size: 12px; color: #737373;">${issue.assignee.email || ''}</div>
+                  </div>
+                ` : `
+                  <div style="font-size: 14px; color: #737373;">Unassigned</div>
+                `}
+              </div>
+            </div>
+            
+            <!-- Actions -->
+            <div style="display: flex; gap: 12px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+              <button onclick="window.electronAPI.shell.openExternal('${issue.url}')" 
+                      style="flex: 1; padding: 12px; background: #0052CC; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                Open in JIRA →
+              </button>
+              <button onclick="closeJIRAEditorModal()" 
+                      style="flex: 1; padding: 12px; background: #f3f4f6; color: #171717; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      // Close on overlay click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeJIRAEditorModal();
+        }
+      });
+    }
+    
+    // Close JIRA editor modal
+    function closeJIRAEditorModal() {
+      const modal = document.getElementById('jiraEditorModal');
+      if (modal) {
+        modal.remove();
+      }
+    }
+    
+    // Update issue status
+    async function updateIssueStatus(issueKey, newStatus) {
+      try {
+        showNotification(`Updating ${issueKey} status...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `transition ${issueKey} to ${newStatus}`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ Status updated to ${newStatus}`, 'success');
+          closeJIRAEditorModal();
+          if (currentView === 'tasks') {
+            await loadTasks();
+          }
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Update issue priority
+    async function updateIssuePriority(issueKey, newPriority) {
+      try {
+        showNotification(`Updating ${issueKey} priority...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `update ${issueKey} set priority to ${newPriority}`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ Priority updated to ${newPriority}`, 'success');
+          closeJIRAEditorModal();
+          if (currentView === 'tasks') {
+            await loadTasks();
+          }
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Update issue description
+    async function updateIssueDescription(issueKey) {
+      try {
+        const description = document.getElementById('jiraIssueDescription').value;
+        
+        if (!description.trim()) {
+          showNotification('Description cannot be empty', 'error');
+          return;
+        }
+        
+        showNotification(`Updating ${issueKey} description...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `update ${issueKey} set description to "${description.replace(/"/g, '\\"')}"`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ Description updated`, 'success');
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Add issue comment
+    async function addIssueComment(issueKey) {
+      try {
+        const commentText = document.getElementById('jiraIssueComment').value;
+        
+        if (!commentText.trim()) {
+          showNotification('Comment cannot be empty', 'error');
+          return;
+        }
+        
+        showNotification(`Adding comment to ${issueKey}...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `comment on ${issueKey} "${commentText.replace(/"/g, '\\"')}"`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ Comment added`, 'success');
+          document.getElementById('jiraIssueComment').value = '';
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // ===== LIVE JIRA CARD FUNCTIONS =====
+    
+    // Global variable to track card state
+    let cardExpanded = true;
+    let lastKnownJiraState = null;
+    
+    // Update live JIRA card with latest data
+    async function updateLiveJiraCard(task, silentUpdate = false) {
+      try {
+        const card = document.getElementById('liveJiraTaskCard');
+        if (!task || !task.externalKey) {
+          card.style.display = 'none';
+          return;
+        }
+        
+        // Show loading state only if not silent
+        if (!silentUpdate) {
+          card.style.display = 'block';
+          document.getElementById('jiraCardTitle').textContent = 'Loading...';
+          document.getElementById('jiraCardSyncStatus').textContent = 'Syncing...';
+        }
+        
+        // Fetch latest JIRA data
+        const result = await window.electronAPI.jira.getMyIssues({ 
+          maxResults: 100 
+        });
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to fetch JIRA data');
+        }
+        
+        // Find the specific issue
+        const jiraIssue = result.issues.find(issue => issue.key === task.externalKey);
+        
+        if (!jiraIssue) {
+          // Issue not found - maybe it was deleted or user doesn't have access
+          card.style.display = 'none';
+          return;
+        }
+        
+        // Check if state changed (for highlighting changes)
+        const stateChanged = detectChanges(lastKnownJiraState, jiraIssue);
+        lastKnownJiraState = JSON.parse(JSON.stringify(jiraIssue));
+        
+        // Store the full JIRA data for actions
+        currentTaskChat.jiraData = jiraIssue;
+        
+        // Update header
+        document.getElementById('jiraCardTitle').textContent = jiraIssue.summary;
+        document.getElementById('jiraCardMeta').innerHTML = `
+          <span style="font-family: monospace; font-weight: 600;">${jiraIssue.key}</span>
+          <span>•</span>
+          <span>${jiraIssue.issue_type?.name || 'Task'}</span>
+          ${jiraIssue.story_points ? `<span>• ${jiraIssue.story_points} pts</span>` : ''}
+        `;
+        
+        // Status badge with click to change
+        const statusColors = {
+          'To Do': 'rgba(115, 115, 115, 0.5)',
+          'In Progress': 'rgba(0, 122, 255, 0.5)',
+          'Done': 'rgba(52, 199, 89, 0.5)',
+          'Backlog': 'rgba(142, 142, 147, 0.5)',
+          'In Review': 'rgba(255, 149, 0, 0.5)'
+        };
+        const statusColor = statusColors[jiraIssue.status?.name] || 'rgba(255,255,255,0.25)';
+        const statusEl = document.getElementById('jiraCardStatus');
+        statusEl.textContent = jiraIssue.status?.name || 'Unknown';
+        statusEl.style.background = statusColor;
+        
+        // Highlight if changed
+        if (stateChanged.status && silentUpdate) {
+          statusEl.style.animation = 'flash 1s ease-in-out';
+          setTimeout(() => statusEl.style.animation = '', 1000);
+        }
+        
+        // Priority badge with click to change
+        const priorityIcons = {
+          'Highest': '🔴',
+          'High': '🟠',
+          'Medium': '🟡',
+          'Low': '🟢',
+          'Lowest': '🔵'
+        };
+        const priorityIcon = priorityIcons[jiraIssue.priority?.name] || '⚪';
+        const priorityEl = document.getElementById('jiraCardPriority');
+        priorityEl.textContent = `${priorityIcon} ${jiraIssue.priority?.name || 'Medium'}`;
+        
+        // Highlight if changed
+        if (stateChanged.priority && silentUpdate) {
+          priorityEl.style.animation = 'flash 1s ease-in-out';
+          setTimeout(() => priorityEl.style.animation = '', 1000);
+        }
+        
+        // Assignee
+        if (jiraIssue.assignee) {
+          document.getElementById('jiraCardAssignee').textContent = `👤 ${jiraIssue.assignee.display_name}`;
+          document.getElementById('jiraCardAssignee').style.display = 'block';
+        } else {
+          document.getElementById('jiraCardAssignee').textContent = '👤 Unassigned';
+          document.getElementById('jiraCardAssignee').style.display = 'block';
+        }
+        
+        // Metrics (comments, attachments)
+        const metrics = [];
+        if (jiraIssue.comments) metrics.push(`💬 ${jiraIssue.comments}`);
+        if (jiraIssue.attachments) metrics.push(`📎 ${jiraIssue.attachments}`);
+        if (metrics.length > 0) {
+          document.getElementById('jiraCardMetrics').textContent = metrics.join(' • ');
+          document.getElementById('jiraCardMetrics').style.display = 'block';
+        } else {
+          document.getElementById('jiraCardMetrics').style.display = 'none';
+        }
+        
+        // Description
+        const description = jiraIssue.description || 'No description provided.';
+        document.getElementById('jiraCardDescription').textContent = description.length > 300 
+          ? description.substring(0, 300) + '...' 
+          : description;
+        
+        // Activity feed (simulated - would need real JIRA changelog API)
+        updateActivityFeed(jiraIssue, stateChanged);
+        
+        // Labels
+        if (jiraIssue.labels && jiraIssue.labels.length > 0) {
+          document.getElementById('jiraCardLabels').style.display = 'block';
+          document.getElementById('jiraCardLabelsContent').innerHTML = jiraIssue.labels.map(label => 
+            `<span style="padding: 4px 10px; background: rgba(255,255,255,0.25); color: white; border-radius: 4px; font-size: 11px; font-weight: 600;">${label}</span>`
+          ).join('');
+        } else {
+          document.getElementById('jiraCardLabels').style.display = 'none';
+        }
+        
+        // Last updated
+        const now = new Date();
+        document.getElementById('jiraCardLastUpdated').textContent = `Updated ${now.toLocaleTimeString()}`;
+        document.getElementById('jiraCardSyncStatus').textContent = silentUpdate ? 'Auto-synced' : 'Synced';
+        
+        // Show notification if changes detected
+        if (stateChanged.any && silentUpdate) {
+          showNotification(`🔔 JIRA updated: ${jiraIssue.key}`, 'info', 3000);
+          
+          // Broadcast to other views
+          broadcastJiraUpdate(jiraIssue);
+        }
+        
+        console.log('✅ Live JIRA card updated:', jiraIssue.key, stateChanged);
+        
+      } catch (error) {
+        console.error('❌ Failed to update live JIRA card:', error);
+        document.getElementById('jiraCardSyncStatus').textContent = 'Sync failed';
+        // Don't hide the card on error
+      }
+    }
+    
+    // Detect changes between old and new state
+    function detectChanges(oldState, newState) {
+      if (!oldState) return { any: false };
+      
+      const changes = {
+        any: false,
+        status: false,
+        priority: false,
+        assignee: false,
+        description: false
+      };
+      
+      if (oldState.status?.name !== newState.status?.name) {
+        changes.status = true;
+        changes.any = true;
+      }
+      
+      if (oldState.priority?.name !== newState.priority?.name) {
+        changes.priority = true;
+        changes.any = true;
+      }
+      
+      if (oldState.assignee?.account_id !== newState.assignee?.account_id) {
+        changes.assignee = true;
+        changes.any = true;
+      }
+      
+      if (oldState.description !== newState.description) {
+        changes.description = true;
+        changes.any = true;
+      }
+      
+      return changes;
+    }
+    
+    // Update activity feed
+    function updateActivityFeed(jiraIssue, changes) {
+      const activityEl = document.getElementById('jiraCardActivity');
+      const activities = [];
+      
+      // Show detected changes
+      if (changes.status) {
+        activities.push({
+          time: 'Just now',
+          icon: '🔄',
+          text: `Status changed to ${jiraIssue.status?.name}`,
+          highlight: true
+        });
+      }
+      
+      if (changes.priority) {
+        activities.push({
+          time: 'Just now',
+          icon: '⚡',
+          text: `Priority changed to ${jiraIssue.priority?.name}`,
+          highlight: true
+        });
+      }
+      
+      // Show update time
+      if (jiraIssue.updated_at) {
+        const updated = new Date(jiraIssue.updated_at);
+        const timeAgo = getTimeAgo(updated);
+        activities.push({
+          time: timeAgo,
+          icon: '📝',
+          text: 'Issue updated'
+        });
+      }
+      
+      // Show creation time
+      if (jiraIssue.created_at) {
+        const created = new Date(jiraIssue.created_at);
+        const timeAgo = getTimeAgo(created);
+        activities.push({
+          time: timeAgo,
+          icon: '🆕',
+          text: 'Issue created'
+        });
+      }
+      
+      if (activities.length === 0) {
+        activityEl.innerHTML = '<div style="font-size: 12px; color: rgba(255,255,255,0.6); font-style: italic;">No recent activity</div>';
+      } else {
+        activityEl.innerHTML = activities.map(activity => `
+          <div style="padding: 8px; margin-bottom: 6px; background: ${activity.highlight ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)'}; border-radius: 6px; display: flex; align-items: start; gap: 8px;">
+            <span style="font-size: 14px;">${activity.icon}</span>
+            <div style="flex: 1;">
+              <div style="font-size: 12px; color: rgba(255,255,255,0.95); margin-bottom: 2px;">${activity.text}</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.6);">${activity.time}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    // Helper to calculate time ago
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      
+      if (seconds < 60) return 'Just now';
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+      if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+      return date.toLocaleDateString();
+    }
+    
+    // Broadcast JIRA updates to other views
+    function broadcastJiraUpdate(jiraIssue) {
+      // Update task in global tasks array
+      const taskIndex = tasks.findIndex(t => t.externalKey === jiraIssue.key);
+      if (taskIndex !== -1) {
+        // Update task data
+        tasks[taskIndex] = {
+          ...tasks[taskIndex],
+          title: jiraIssue.summary,
+          description: jiraIssue.description,
+          priority: mapJiraPriorityToTask(jiraIssue.priority?.name),
+          status: jiraIssue.status?.name === 'Done' ? 'completed' : 'pending'
+        };
+        
+        // Refresh task list if visible
+        if (currentView === 'tasks') {
+          loadTasks();
+        }
+      }
+    }
+    
+    // Map JIRA priority to task priority
+    function mapJiraPriorityToTask(jiraPriority) {
+      if (!jiraPriority) return 'medium';
+      const priority = jiraPriority.toLowerCase();
+      if (priority.includes('highest') || priority.includes('critical')) return 'urgent';
+      if (priority.includes('high')) return 'high';
+      if (priority.includes('low')) return 'low';
+      return 'medium';
+    }
+    
+    // Refresh JIRA task card
+    async function refreshJiraTaskCard() {
+      if (!currentTaskChat) return;
+      
+      showNotification('Syncing with JIRA...', 'info', 2000);
+      await updateLiveJiraCard(currentTaskChat, false); // Not silent
+      showNotification('✅ Synced with JIRA', 'success');
+    }
+    
+    // Toggle card expanded/collapsed
+    function toggleCardExpanded() {
+      cardExpanded = !cardExpanded;
+      const expandedContent = document.getElementById('jiraCardExpanded');
+      const expandBtn = document.getElementById('jiraCardExpandBtn');
+      
+      if (cardExpanded) {
+        expandedContent.style.display = 'block';
+        expandBtn.textContent = '⬇️';
+      } else {
+        expandedContent.style.display = 'none';
+        expandBtn.textContent = '➡️';
+      }
+    }
+    
+    // Show status picker
+    function showStatusPicker() {
+      if (!currentTaskChat || !currentTaskChat.externalKey) return;
+      
+      const statuses = ['To Do', 'In Progress', 'In Review', 'Done'];
+      const currentStatus = currentTaskChat.jiraData?.status?.name || 'Unknown';
+      
+      // Create inline picker
+      const statusEl = document.getElementById('jiraCardStatus');
+      const originalContent = statusEl.innerHTML;
+      
+      statusEl.innerHTML = `
+        <select onchange="changeStatus(this.value); this.parentElement.innerHTML = '${originalContent.replace(/'/g, "\\'")}'" 
+                style="background: rgba(255,255,255,0.3); color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">
+          ${statuses.map(status => `
+            <option value="${status}" ${status === currentStatus ? 'selected' : ''}>${status}</option>
+          `).join('')}
+        </select>
+      `;
+      
+      statusEl.querySelector('select').focus();
+    }
+    
+    // Change status
+    async function changeStatus(newStatus) {
+      if (!currentTaskChat || !currentTaskChat.externalKey) return;
+      
+      try {
+        const issueKey = currentTaskChat.externalKey;
+        showNotification(`Changing status to ${newStatus}...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `transition ${issueKey} to ${newStatus}`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ Status updated to ${newStatus}`, 'success');
+          await updateLiveJiraCard(currentTaskChat, false);
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Show priority picker
+    function showPriorityPicker() {
+      if (!currentTaskChat || !currentTaskChat.externalKey) return;
+      
+      const priorities = ['Highest', 'High', 'Medium', 'Low', 'Lowest'];
+      const currentPriority = currentTaskChat.jiraData?.priority?.name || 'Medium';
+      
+      // Create inline picker
+      const priorityEl = document.getElementById('jiraCardPriority');
+      const originalContent = priorityEl.innerHTML;
+      
+      priorityEl.innerHTML = `
+        <select onchange="changePriority(this.value); this.parentElement.innerHTML = '${originalContent.replace(/'/g, "\\'")}'" 
+                style="background: rgba(255,255,255,0.3); color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">
+          ${priorities.map(priority => `
+            <option value="${priority}" ${priority === currentPriority ? 'selected' : ''}>${priority}</option>
+          `).join('')}
+        </select>
+      `;
+      
+      priorityEl.querySelector('select').focus();
+    }
+    
+    // Change priority
+    async function changePriority(newPriority) {
+      if (!currentTaskChat || !currentTaskChat.externalKey) return;
+      
+      try {
+        const issueKey = currentTaskChat.externalKey;
+        showNotification(`Changing priority to ${newPriority}...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `update ${issueKey} set priority to ${newPriority}`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ Priority updated to ${newPriority}`, 'success');
+          await updateLiveJiraCard(currentTaskChat, false);
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Add quick comment
+    async function addQuickComment() {
+      if (!currentTaskChat || !currentTaskChat.externalKey) return;
+      
+      const input = document.getElementById('jiraCardQuickComment');
+      const comment = input.value.trim();
+      
+      if (!comment) {
+        showNotification('Please enter a comment', 'error');
+        return;
+      }
+      
+      try {
+        const issueKey = currentTaskChat.externalKey;
+        showNotification(`Adding comment...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `comment on ${issueKey} "${comment.replace(/"/g, '\\"')}"`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ Comment added`, 'success');
+          input.value = '';
+          
+          // Refresh card to show updated comment count
+          await updateLiveJiraCard(currentTaskChat, true);
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Edit description
+    function editDescription() {
+      if (!currentTaskChat || !currentTaskChat.jiraData) return;
+      
+      const currentDesc = currentTaskChat.jiraData.description || '';
+      const descEl = document.getElementById('jiraCardDescription');
+      
+      // Show textarea
+      descEl.innerHTML = `
+        <textarea id="descEditArea" 
+                  style="width: 100%; min-height: 100px; padding: 8px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; color: white; font-size: 13px; font-family: inherit; resize: vertical;"
+                  placeholder="Enter description...">${currentDesc}</textarea>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <button onclick="saveDescription()" style="padding: 6px 12px; background: rgba(255,255,255,0.9); color: #667eea; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;">Save</button>
+          <button onclick="updateLiveJiraCard(currentTaskChat, false)" style="padding: 6px 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;">Cancel</button>
+        </div>
+      `;
+      
+      document.getElementById('descEditArea').focus();
+    }
+    
+    // Save description
+    async function saveDescription() {
+      if (!currentTaskChat || !currentTaskChat.externalKey) return;
+      
+      const textarea = document.getElementById('descEditArea');
+      const newDesc = textarea.value.trim();
+      
+      if (!newDesc) {
+        showNotification('Description cannot be empty', 'error');
+        return;
+      }
+      
+      try {
+        const issueKey = currentTaskChat.externalKey;
+        showNotification(`Updating description...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `update ${issueKey} set description to "${newDesc.replace(/"/g, '\\"')}"`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ Description updated`, 'success');
+          await updateLiveJiraCard(currentTaskChat, false);
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Quick JIRA action from live card
+    async function quickJiraAction(targetStatus) {
+      if (!currentTaskChat || !currentTaskChat.externalKey) return;
+      
+      try {
+        const issueKey = currentTaskChat.externalKey;
+        showNotification(`Moving ${issueKey} to ${targetStatus}...`, 'info', 2000);
+        
+        const result = await window.electronAPI.jira.executeCommand({
+          command: `transition ${issueKey} to ${targetStatus}`
+        });
+        
+        if (result.success) {
+          showNotification(`✅ ${issueKey} moved to ${targetStatus}`, 'success');
+          
+          // Update the live card
+          await updateLiveJiraCard(currentTaskChat);
+          
+          // Also refresh the main task list
+          if (currentView === 'tasks') {
+            await loadTasks();
+          }
+        } else {
+          throw new Error(result.error || 'Failed to transition issue');
+        }
+      } catch (error) {
+        console.error('❌ Quick action failed:', error);
+        showNotification(`Failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Open JIRA card full editor
+    function openJiraCardEditor() {
+      if (!currentTaskChat || !currentTaskChat.jiraData) return;
+      
+      // Close task chat modal first
+      closeTaskChat();
+      
+      // Open the full JIRA editor
+      openJIRAIssueEditor(currentTaskChat.externalKey, currentTaskChat.jiraData);
+    }
+    
+    // Open JIRA in browser from live card
+    function openJiraInBrowser() {
+      if (!currentTaskChat || !currentTaskChat.externalUrl) return;
+      
+      window.electronAPI.shell.openExternal(currentTaskChat.externalUrl);
+    }
+    
+    // Auto-refresh live card every 30 seconds when task chat is open
+    let jiraCardRefreshInterval = null;
+    
+    function startJiraCardAutoRefresh() {
+      // Clear any existing interval
+      if (jiraCardRefreshInterval) {
+        clearInterval(jiraCardRefreshInterval);
+      }
+      
+      // Start new interval - refresh every 30 seconds
+      jiraCardRefreshInterval = setInterval(async () => {
+        if (currentTaskChat && currentTaskChat.externalKey) {
+          console.log('🔄 Auto-refreshing JIRA card (silent)...');
+          await updateLiveJiraCard(currentTaskChat, true); // Silent update
+        }
+      }, 30000); // 30 seconds
+    }
+    
+    function stopJiraCardAutoRefresh() {
+      if (jiraCardRefreshInterval) {
+        clearInterval(jiraCardRefreshInterval);
+        jiraCardRefreshInterval = null;
+      }
     }
     
     // JIRA Authentication
@@ -4304,4 +5373,5 @@ See GITHUB_APP_AUTH_SETUP.md for detailed instructions.`;
   </script>
 
 </body>
+</html>
 </html>

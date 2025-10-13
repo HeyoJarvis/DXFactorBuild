@@ -23,7 +23,7 @@ class CodeQueryEngine {
       model: options.model || 'claude-3-5-sonnet-20241022',
       maxTokens: options.maxTokens || 4096,
       temperature: options.temperature || 0.3,
-      searchThreshold: options.searchThreshold || 0.5,
+      searchThreshold: options.searchThreshold || 0.20,  // Lowered from 0.5 to 0.20 based on actual similarity scores
       searchLimit: options.searchLimit || 10,
       logLevel: options.logLevel || 'info',
       ...options

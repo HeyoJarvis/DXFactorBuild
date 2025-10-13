@@ -376,13 +376,54 @@ class AuthService {
         this.currentUser = dbUser;
       }
       
+      // 🔥 CLEAR ALL INTEGRATION TOKENS EXCEPT SLACK ON EVERY LOGIN (for testing)
+      // This forces fresh authentication for Microsoft, JIRA, Google, etc.
+      // BUT: Preserve role if ROLE_OVERRIDE is set (dev mode)
+      console.log('🧹 Clearing all integration tokens (except Slack) for fresh login...');
+      const hasRoleOverride = process.env.ROLE_OVERRIDE;
+      
+      try {
+        const updateData = {
+          integration_settings: {}  // Always clear integration settings
+        };
+        
+        // Only clear user_role if NOT using role override
+        if (!hasRoleOverride) {
+          updateData.user_role = null;
+          console.log('🔄 Also clearing user_role (no ROLE_OVERRIDE set)');
+        } else {
+          console.log(`🎭 Keeping user_role (ROLE_OVERRIDE=${hasRoleOverride} in use)`);
+        }
+        
+        const { error: clearError } = await this.supabase
+          .from('users')
+          .update(updateData)
+          .eq('id', user.id);
+        
+        if (clearError) {
+          this.logger.warn('Failed to clear integration tokens', { error: clearError.message });
+        } else {
+          console.log('✅ Integration tokens cleared - fresh authentication required');
+          // Update current user to reflect cleared settings
+          if (this.currentUser) {
+            this.currentUser.integration_settings = {};
+            if (!hasRoleOverride) {
+              this.currentUser.user_role = null;
+            }
+          }
+        }
+      } catch (clearTokensError) {
+        this.logger.warn('Error clearing integration tokens', { error: clearTokensError.message });
+      }
+      
       // Save session locally
       this.saveSession(session, this.currentUser);
       
       this.logger.info('Authentication successful', {
         user_id: this.currentUser.id,
         email: this.currentUser.email,
-        slack_user_id: this.currentUser.slack_user_id
+        slack_user_id: this.currentUser.slack_user_id,
+        fresh_login: true
       });
       
     } catch (error) {

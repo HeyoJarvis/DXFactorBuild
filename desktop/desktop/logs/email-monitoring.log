@@ -1,0 +1,1 @@
+{"autoCreateTasks":true,"autoMarkAsRead":false,"confidenceThreshold":0.65,"level":"info","maxEmailsPerPoll":20,"message":"Email Monitoring Service initialized","pollInterval":300000,"service":"email-monitoring","timestamp":"2025-10-13T01:34:59.524Z"}

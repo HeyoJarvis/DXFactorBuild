@@ -84,6 +84,11 @@ let microsoftOAuthHandler; // Microsoft OAuth handler
 let microsoftAutomation; // Microsoft workflow automation
 let googleOAuthHandler; // Google OAuth handler
 let jiraOAuthHandler; // JIRA OAuth handler
+let teamsTaskDetector; // Teams task detector (AI-powered)
+let emailTaskDetector; // Email task detector (AI-powered)
+let teamsMonitoring; // Teams monitoring service (auto-task creation)
+let emailMonitoring; // Email monitoring service (auto-task creation)
+let jiraCommandParser; // JIRA command parser (natural language)
 let engineeringIntelligence; // Engineering intelligence service
 let codeIndexer; // Code repository indexer for semantic search
 let currentUser = null; // Currently authenticated user
@@ -831,6 +836,211 @@ function setupMicrosoftIPCHandlers() {
       };
     }
   });
+
+  // Microsoft test handler for Teams & Outlook
+  ipcMain.handle('microsoft:test', async (event, testData) => {
+    try {
+      if (!microsoftOAuthHandler || !microsoftOAuthHandler.graphService) {
+        throw new Error('Microsoft not authenticated. Click the Microsoft button to authenticate first.');
+      }
+
+      const graphService = microsoftOAuthHandler.getGraphService();
+      const { action, teamId, channelId, chatId } = testData;
+
+      console.log(`🧪 Testing Microsoft: ${action}`);
+
+      switch (action) {
+        case 'list_teams':
+          const teams = await graphService.getUserTeams();
+          console.log(`✅ Found ${teams.length} teams`);
+          return { success: true, teams };
+
+        case 'list_channels':
+          if (!teamId) throw new Error('teamId required');
+          const channels = await graphService.getTeamChannels(teamId);
+          console.log(`✅ Found ${channels.length} channels`);
+          return { success: true, channels };
+
+        case 'read_channel_messages':
+          if (!teamId || !channelId) throw new Error('teamId and channelId required');
+          const channelMessages = await graphService.getTeamChannelMessages(teamId, channelId, { maxResults: 20 });
+          console.log(`✅ Found ${channelMessages.length} messages`);
+          return { success: true, messages: channelMessages };
+
+        case 'list_chats':
+          const chats = await graphService.getUserChats();
+          console.log(`✅ Found ${chats.length} chats`);
+          return { success: true, chats };
+
+        case 'read_chat_messages':
+          if (!chatId) throw new Error('chatId required');
+          const chatMessages = await graphService.getTeamChatMessages(chatId, { maxResults: 20 });
+          console.log(`✅ Found ${chatMessages.length} messages`);
+          return { success: true, messages: chatMessages };
+
+        case 'read_emails':
+          const emails = await graphService.getUnreadEmails('inbox', 10);
+          console.log(`✅ Found ${emails.length} unread emails`);
+          return { success: true, emails };
+
+        case 'check_scopes':
+          return { 
+            success: true, 
+            message: 'Scopes configured successfully',
+            configuredScopes: graphService.options.scopes
+          };
+
+        default:
+          throw new Error(`Unknown test action: ${action}`);
+      }
+    } catch (error) {
+      console.error(`❌ Microsoft test failed (${testData.action}):`, error.message);
+      return {
+        success: false,
+        error: error.message,
+        action: testData.action
+      };
+    }
+  });
+
+  // Microsoft health check
+  ipcMain.handle('microsoft:healthCheck', async () => {
+    try {
+      if (!microsoftOAuthHandler || !microsoftOAuthHandler.graphService) {
+        return {
+          status: 'not_authenticated',
+          message: 'Microsoft not authenticated'
+        };
+      }
+
+      const graphService = microsoftOAuthHandler.getGraphService();
+      const profile = await graphService.getUserProfile();
+      
+      return {
+        status: 'healthy',
+        authenticated: true,
+        user: profile.user,
+        scopes: graphService.options.scopes.length
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        error: error.message
+      };
+    }
+  });
+  
+  // Microsoft monitoring controls
+  ipcMain.handle('microsoft:startTeamsMonitoring', async () => {
+    try {
+      if (!currentUser) {
+        throw new Error('No user logged in');
+      }
+      
+      if (!teamsMonitoring) {
+        throw new Error('Teams monitoring not initialized. Authenticate with Microsoft first.');
+      }
+      
+      await teamsMonitoring.startMonitoring(currentUser.id);
+      
+      return {
+        success: true,
+        message: 'Teams monitoring started',
+        stats: teamsMonitoring.getStats()
+      };
+    } catch (error) {
+      console.error('❌ Failed to start Teams monitoring:', error.message);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+  
+  ipcMain.handle('microsoft:stopTeamsMonitoring', async () => {
+    try {
+      if (!teamsMonitoring) {
+        throw new Error('Teams monitoring not initialized');
+      }
+      
+      teamsMonitoring.stopMonitoring();
+      
+      return {
+        success: true,
+        message: 'Teams monitoring stopped',
+        stats: teamsMonitoring.getStats()
+      };
+    } catch (error) {
+      console.error('❌ Failed to stop Teams monitoring:', error.message);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+  
+  ipcMain.handle('microsoft:startEmailMonitoring', async () => {
+    try {
+      if (!currentUser) {
+        throw new Error('No user logged in');
+      }
+      
+      if (!emailMonitoring) {
+        throw new Error('Email monitoring not initialized. Authenticate with Microsoft first.');
+      }
+      
+      await emailMonitoring.startMonitoring(currentUser.id);
+      
+      return {
+        success: true,
+        message: 'Email monitoring started',
+        stats: emailMonitoring.getStats()
+      };
+    } catch (error) {
+      console.error('❌ Failed to start email monitoring:', error.message);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+  
+  ipcMain.handle('microsoft:stopEmailMonitoring', async () => {
+    try {
+      if (!emailMonitoring) {
+        throw new Error('Email monitoring not initialized');
+      }
+      
+      emailMonitoring.stopMonitoring();
+      
+      return {
+        success: true,
+        message: 'Email monitoring stopped',
+        stats: emailMonitoring.getStats()
+      };
+    } catch (error) {
+      console.error('❌ Failed to stop email monitoring:', error.message);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+  
+  ipcMain.handle('microsoft:getMonitoringStats', async () => {
+    try {
+      return {
+        success: true,
+        teams: teamsMonitoring ? teamsMonitoring.getStats() : null,
+        email: emailMonitoring ? emailMonitoring.getStats() : null
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
   
   console.log('✅ Microsoft 365 IPC handlers registered');
 }
@@ -978,6 +1188,18 @@ function setupGoogleIPCHandlers() {
   console.log('✅ Google Workspace IPC handlers registered');
 }
 
+// ===== SHELL OPERATIONS =====
+ipcMain.handle('shell:openExternal', async (event, url) => {
+  try {
+    const { shell } = require('electron');
+    await shell.openExternal(url);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to open external URL:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 // ===== JIRA IPC HANDLERS =====
 // Always register handlers, check initialization inside
 ipcMain.handle('jira:authenticate', async () => {
@@ -1115,7 +1337,11 @@ ipcMain.handle('jira:getMyIssues', async (event, options = {}) => {
 
     // Initialize JIRA service with stored tokens
     const JIRAService = require('../core/integrations/jira-service');
-    const jiraService = new JIRAService();
+    const jiraService = new JIRAService({
+      clientId: process.env.JIRA_CLIENT_ID,
+      clientSecret: process.env.JIRA_CLIENT_SECRET,
+      redirectUri: process.env.JIRA_REDIRECT_URI
+    });
     jiraService.accessToken = jiraTokens.access_token;
     jiraService.refreshToken = jiraTokens.refresh_token;
     jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
@@ -1175,6 +1401,183 @@ ipcMain.handle('jira:checkConnection', async () => {
   }
 });
 
+// Execute JIRA command (create, update, comment, transition, delete) - DEVELOPER ONLY
+ipcMain.handle('jira:executeCommand', async (event, commandData) => {
+  try {
+    // Check if user is developer
+    const effectiveRole = getEffectiveRole(currentUser);
+    if (!currentUser || (effectiveRole !== 'developer' && effectiveRole !== 'admin')) {
+      return {
+        success: false,
+        error: 'JIRA write operations are available to developers only'
+      };
+    }
+    
+    if (!jiraCommandParser) {
+      return {
+        success: false,
+        error: 'JIRA Command Parser not initialized'
+      };
+    }
+    
+    // Support both 'command' and 'query' for backwards compatibility
+    const commandText = commandData.command || commandData.query;
+    
+    if (!commandText) {
+      return {
+        success: false,
+        error: 'No command provided. Please provide a command or query.'
+      };
+    }
+    
+    console.log('🎯 Executing JIRA command:', commandText);
+    
+    // Parse the natural language command
+    const parsedCommand = await jiraCommandParser.parse(commandText, {
+      userName: currentUser?.name,
+      defaultProject: commandData.defaultProject || null
+    });
+    
+    console.log('📋 Parsed command:', parsedCommand);
+    
+    // Check if needs clarification
+    if (parsedCommand.needsClarification) {
+      return {
+        success: false,
+        needsClarification: true,
+        clarificationNeeded: parsedCommand.clarificationNeeded,
+        parsed: parsedCommand,
+        message: `I need more information: ${parsedCommand.clarificationNeeded}`
+      };
+    }
+    
+    // Get user's JIRA tokens
+    const { data: userData, error: userError } = await dbAdapter.supabase
+      .from('users')
+      .select('integration_settings')
+      .eq('id', currentUser.id)
+      .single();
+    
+    if (userError || !userData) {
+      return {
+        success: false,
+        error: 'Failed to get user data'
+      };
+    }
+    
+    const jiraTokens = userData.integration_settings?.jira;
+    
+    if (!jiraTokens || !jiraTokens.access_token) {
+      return {
+        success: false,
+        error: 'JIRA not connected. Please authenticate with JIRA first.'
+      };
+    }
+    
+    // Initialize JIRA service with stored tokens
+    const JIRAService = require('../core/integrations/jira-service');
+    const jiraService = new JIRAService({
+      clientId: process.env.JIRA_CLIENT_ID,
+      clientSecret: process.env.JIRA_CLIENT_SECRET,
+      redirectUri: process.env.JIRA_REDIRECT_URI
+    });
+    jiraService.accessToken = jiraTokens.access_token;
+    jiraService.refreshToken = jiraTokens.refresh_token;
+    jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
+    jiraService.cloudId = jiraTokens.cloud_id;
+    jiraService.siteUrl = jiraTokens.site_url;
+    
+    // Execute the parsed command
+    let result;
+    
+    switch (parsedCommand.action) {
+      case 'create':
+        if (!parsedCommand.projectKey) {
+          return {
+            success: false,
+            error: 'Project key is required for creating issues'
+          };
+        }
+        result = await jiraService.createIssue(parsedCommand.projectKey, parsedCommand.data);
+        break;
+        
+      case 'update':
+        if (!parsedCommand.issueKey) {
+          return {
+            success: false,
+            error: 'Issue key is required for updates'
+          };
+        }
+        result = await jiraService.updateIssue(parsedCommand.issueKey, parsedCommand.data);
+        break;
+        
+      case 'comment':
+        if (!parsedCommand.issueKey) {
+          return {
+            success: false,
+            error: 'Issue key is required for comments'
+          };
+        }
+        if (!parsedCommand.data.commentText) {
+          return {
+            success: false,
+            error: 'Comment text is required'
+          };
+        }
+        result = await jiraService.addComment(parsedCommand.issueKey, parsedCommand.data.commentText);
+        break;
+        
+      case 'transition':
+        if (!parsedCommand.issueKey) {
+          return {
+            success: false,
+            error: 'Issue key is required for status transitions'
+          };
+        }
+        if (!parsedCommand.data.status) {
+          return {
+            success: false,
+            error: 'Target status is required'
+          };
+        }
+        result = await jiraService.transitionIssue(parsedCommand.issueKey, parsedCommand.data.status);
+        break;
+        
+      case 'delete':
+        if (!parsedCommand.issueKey) {
+          return {
+            success: false,
+            error: 'Issue key is required for deletion'
+          };
+        }
+        result = await jiraService.deleteIssue(parsedCommand.issueKey);
+        break;
+        
+      default:
+        return {
+          success: false,
+          error: `Unknown action: ${parsedCommand.action}`
+        };
+    }
+    
+    console.log('✅ JIRA command executed successfully:', result);
+    
+    return {
+      success: true,
+      action: parsedCommand.action,
+      result: result,
+      parsed: parsedCommand
+    };
+    
+  } catch (error) {
+    console.error('❌ JIRA command execution failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
 // Sync JIRA issues and create/update tasks
 ipcMain.handle('jira:syncTasks', async (event, options = {}) => {
   try {
@@ -1225,7 +1628,11 @@ ipcMain.handle('jira:syncTasks', async (event, options = {}) => {
 
     // Initialize JIRA service with stored tokens
     const JIRAService = require('../core/integrations/jira-service');
-    const jiraService = new JIRAService();
+    const jiraService = new JIRAService({
+      clientId: process.env.JIRA_CLIENT_ID,
+      clientSecret: process.env.JIRA_CLIENT_SECRET,
+      redirectUri: process.env.JIRA_REDIRECT_URI
+    });
     jiraService.accessToken = jiraTokens.access_token;
     jiraService.refreshToken = jiraTokens.refresh_token;
     jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;
@@ -1433,6 +1840,121 @@ function initializeServices() {
     jiraOAuthHandler = null;
   }
   
+  // Initialize Teams and Email Task Detectors (requires Microsoft integration)
+  if (microsoftOAuthHandler) {
+    try {
+      const TeamsTaskDetector = require('../core/intelligence/teams-task-detector');
+      teamsTaskDetector = new TeamsTaskDetector({
+        confidenceThreshold: 0.6,
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ Teams Task Detector initialized (AI-powered)');
+    } catch (error) {
+      console.warn('⚠️ Teams Task Detector initialization failed:', error.message);
+      teamsTaskDetector = null;
+    }
+    
+    try {
+      const EmailTaskDetector = require('../core/intelligence/email-task-detector');
+      emailTaskDetector = new EmailTaskDetector({
+        confidenceThreshold: 0.65,
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ Email Task Detector initialized (AI-powered)');
+    } catch (error) {
+      console.warn('⚠️ Email Task Detector initialization failed:', error.message);
+      emailTaskDetector = null;
+    }
+    
+    // Initialize monitoring services (for auto-task creation)
+    try {
+      const TeamsMonitoringService = require('../core/monitoring/teams-monitoring-service');
+      const EmailMonitoringService = require('../core/monitoring/email-monitoring-service');
+      
+      // Teams monitoring (will be started after Microsoft auth)
+      if (teamsTaskDetector && microsoftOAuthHandler?.graphService) {
+        teamsMonitoring = new TeamsMonitoringService(
+          microsoftOAuthHandler.graphService,
+          teamsTaskDetector,
+          dbAdapter,
+          {
+            pollInterval: 3 * 60 * 1000, // 3 minutes
+            confidenceThreshold: 0.6,
+            autoCreateTasks: true
+          }
+        );
+        
+        // Listen for task creation events
+        teamsMonitoring.on('task:created', ({ task }) => {
+          console.log('📋 Task auto-created from Teams:', task.title);
+          if (mainWindow) {
+            mainWindow.webContents.send('task:created', task);
+            mainWindow.webContents.send('notification', {
+              type: 'task_created',
+              message: `New task from Teams: ${task.title}`,
+              source: 'teams'
+            });
+          }
+        });
+        
+        console.log('✅ Teams Monitoring Service initialized');
+      }
+      
+      // Email monitoring (will be started after Microsoft auth)
+      if (emailTaskDetector && microsoftOAuthHandler?.graphService) {
+        emailMonitoring = new EmailMonitoringService(
+          microsoftOAuthHandler.graphService,
+          emailTaskDetector,
+          dbAdapter,
+          {
+            pollInterval: 5 * 60 * 1000, // 5 minutes
+            confidenceThreshold: 0.65,
+            autoCreateTasks: true,
+            autoMarkAsRead: false
+          }
+        );
+        
+        // Listen for task creation events
+        emailMonitoring.on('task:created', ({ task, email }) => {
+          console.log('📧 Task auto-created from email:', task.title);
+          if (mainWindow) {
+            mainWindow.webContents.send('task:created', task);
+            mainWindow.webContents.send('notification', {
+              type: 'task_created',
+              message: `New task from email: ${task.title}`,
+              source: 'email',
+              from: email.from?.emailAddress?.address
+            });
+          }
+        });
+        
+        console.log('✅ Email Monitoring Service initialized');
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ Monitoring services initialization failed:', error.message);
+    }
+  } else {
+    console.log('ℹ️ Teams/Email task detection disabled (Microsoft integration required)');
+  }
+  
+  // Initialize JIRA Command Parser (for developer chat interface)
+  if (jiraOAuthHandler) {
+    try {
+      const JIRACommandParser = require('../core/intelligence/jira-command-parser');
+      jiraCommandParser = new JIRACommandParser({
+        logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
+      });
+      console.log('✅ JIRA Command Parser initialized (natural language)');
+    } catch (error) {
+      console.warn('⚠️ JIRA Command Parser initialization failed:', error.message);
+      jiraCommandParser = null;
+    }
+  } else {
+    console.log('ℹ️ JIRA Command Parser disabled (JIRA integration required)');
+    jiraCommandParser = null;
+  }
+  
   // Initialize Engineering Intelligence (GitHub App ONLY)
   const hasGitHubApp = process.env.GITHUB_APP_ID && 
                        process.env.GITHUB_APP_INSTALLATION_ID && 
@@ -1637,19 +2159,9 @@ function initializeServices() {
   
   // Helper function to trigger JIRA sync
   const triggerJIRASync = async () => {
+    // Check if user is authenticated
     if (!currentUser) {
-      const { data: userData } = await dbAdapter.supabase
-        .from('users')
-        .select('*')
-        .eq('id', '9f31e571-aa0f-4c88-8f57-5a4b2dd4f6a2') // Desktop user UUID
-        .single();
-      
-      if (userData) {
-        currentUser = userData;
-      }
-    }
-    
-    if (!currentUser) {
+      console.log('⚠️ JIRA sync skipped: No user authenticated');
       return { success: false, error: 'No user authenticated' };
     }
     
@@ -1671,7 +2183,11 @@ function initializeServices() {
     }
 
     const JIRAService = require('../core/integrations/jira-service');
-    const jiraService = new JIRAService();
+    const jiraService = new JIRAService({
+      clientId: process.env.JIRA_CLIENT_ID,
+      clientSecret: process.env.JIRA_CLIENT_SECRET,
+      redirectUri: process.env.JIRA_REDIRECT_URI
+    });
     jiraService.accessToken = jiraTokens.access_token;
     jiraService.refreshToken = jiraTokens.refresh_token;
     jiraService.tokenExpiry = jiraTokens.token_expiry ? new Date(jiraTokens.token_expiry).getTime() : null;

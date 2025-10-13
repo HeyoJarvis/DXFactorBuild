@@ -800,6 +800,388 @@ class JIRAService extends EventEmitter {
       };
     }
   }
+
+  /**
+   * ========================================
+   * JIRA WRITE OPERATIONS (Developer Features)
+   * ========================================
+   */
+
+  /**
+   * Create a new JIRA issue
+   * @param {string} projectKey - Project key (e.g., 'PROJ')
+   * @param {Object} issueData - Issue data
+   * @param {string} issueData.summary - Issue title/summary (required)
+   * @param {string} issueData.description - Issue description
+   * @param {string} issueData.issueType - Issue type (e.g., 'Bug', 'Task', 'Story')
+   * @param {string} issueData.priority - Priority (e.g., 'High', 'Medium', 'Low')
+   * @param {string} issueData.assignee - Assignee account ID
+   * @param {Array<string>} issueData.labels - Array of labels
+   * @returns {Promise<Object>} Created issue details
+   */
+  async createIssue(projectKey, issueData) {
+    try {
+      this.logger.info('Creating JIRA issue', {
+        projectKey,
+        summary: issueData.summary
+      });
+
+      // Build issue payload
+      const payload = {
+        fields: {
+          project: {
+            key: projectKey
+          },
+          summary: issueData.summary,
+          issuetype: {
+            name: issueData.issueType || 'Task'
+          }
+        }
+      };
+
+      // Add optional fields
+      if (issueData.description) {
+        payload.fields.description = {
+          type: 'doc',
+          version: 1,
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: issueData.description
+                }
+              ]
+            }
+          ]
+        };
+      }
+
+      if (issueData.priority) {
+        payload.fields.priority = {
+          name: issueData.priority
+        };
+      }
+
+      if (issueData.assignee) {
+        payload.fields.assignee = {
+          accountId: issueData.assignee
+        };
+      }
+
+      if (issueData.labels && issueData.labels.length > 0) {
+        payload.fields.labels = issueData.labels;
+      }
+
+      const response = await this._makeRequest('/rest/api/3/issue', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      this.logger.info('JIRA issue created', {
+        issueKey: response.key,
+        issueId: response.id
+      });
+
+      this.emit('issue_created', {
+        issueKey: response.key,
+        issueId: response.id,
+        projectKey
+      });
+
+      return {
+        success: true,
+        issue_key: response.key,
+        issue_id: response.id,
+        url: `${this.siteUrl}/browse/${response.key}`
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to create JIRA issue', {
+        projectKey,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing JIRA issue
+   * @param {string} issueKey - Issue key (e.g., 'PROJ-123')
+   * @param {Object} updateData - Fields to update
+   * @param {string} updateData.summary - New summary
+   * @param {string} updateData.description - New description
+   * @param {string} updateData.priority - New priority
+   * @param {string} updateData.assignee - New assignee account ID
+   * @param {Array<string>} updateData.labels - New labels
+   * @returns {Promise<Object>} Update result
+   */
+  async updateIssue(issueKey, updateData) {
+    try {
+      this.logger.info('Updating JIRA issue', {
+        issueKey,
+        fields: Object.keys(updateData)
+      });
+
+      const payload = {
+        fields: {}
+      };
+
+      // Add fields to update
+      if (updateData.summary) {
+        payload.fields.summary = updateData.summary;
+      }
+
+      if (updateData.description) {
+        payload.fields.description = {
+          type: 'doc',
+          version: 1,
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: updateData.description
+                }
+              ]
+            }
+          ]
+        };
+      }
+
+      if (updateData.priority) {
+        payload.fields.priority = {
+          name: updateData.priority
+        };
+      }
+
+      if (updateData.assignee) {
+        payload.fields.assignee = {
+          accountId: updateData.assignee
+        };
+      }
+
+      if (updateData.labels) {
+        payload.fields.labels = updateData.labels;
+      }
+
+      await this._makeRequest(`/rest/api/3/issue/${issueKey}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+
+      this.logger.info('JIRA issue updated', { issueKey });
+
+      this.emit('issue_updated', {
+        issueKey,
+        updatedFields: Object.keys(updateData)
+      });
+
+      return {
+        success: true,
+        issue_key: issueKey,
+        url: `${this.siteUrl}/browse/${issueKey}`
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to update JIRA issue', {
+        issueKey,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Add a comment to a JIRA issue
+   * @param {string} issueKey - Issue key (e.g., 'PROJ-123')
+   * @param {string} commentBody - Comment text
+   * @returns {Promise<Object>} Created comment details
+   */
+  async addComment(issueKey, commentBody) {
+    try {
+      this.logger.info('Adding comment to JIRA issue', {
+        issueKey,
+        commentLength: commentBody.length
+      });
+
+      const payload = {
+        body: {
+          type: 'doc',
+          version: 1,
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: commentBody
+                }
+              ]
+            }
+          ]
+        }
+      };
+
+      const response = await this._makeRequest(`/rest/api/3/issue/${issueKey}/comment`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      this.logger.info('Comment added to JIRA issue', {
+        issueKey,
+        commentId: response.id
+      });
+
+      this.emit('comment_added', {
+        issueKey,
+        commentId: response.id
+      });
+
+      return {
+        success: true,
+        comment_id: response.id,
+        issue_key: issueKey,
+        url: `${this.siteUrl}/browse/${issueKey}`
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to add comment to JIRA issue', {
+        issueKey,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Transition a JIRA issue (change status)
+   * @param {string} issueKey - Issue key (e.g., 'PROJ-123')
+   * @param {string} transitionName - Transition name (e.g., 'In Progress', 'Done')
+   * @returns {Promise<Object>} Transition result
+   */
+  async transitionIssue(issueKey, transitionName) {
+    try {
+      this.logger.info('Transitioning JIRA issue', {
+        issueKey,
+        transitionName
+      });
+
+      // Get available transitions for this issue
+      const transitions = await this._makeRequest(`/rest/api/3/issue/${issueKey}/transitions`);
+
+      // Find matching transition
+      const transition = transitions.transitions.find(t => 
+        t.name.toLowerCase() === transitionName.toLowerCase()
+      );
+
+      if (!transition) {
+        throw new Error(`Transition '${transitionName}' not available for issue ${issueKey}`);
+      }
+
+      // Execute transition
+      await this._makeRequest(`/rest/api/3/issue/${issueKey}/transitions`, {
+        method: 'POST',
+        body: JSON.stringify({
+          transition: {
+            id: transition.id
+          }
+        })
+      });
+
+      this.logger.info('JIRA issue transitioned', {
+        issueKey,
+        transitionName,
+        transitionId: transition.id
+      });
+
+      this.emit('issue_transitioned', {
+        issueKey,
+        transitionName
+      });
+
+      return {
+        success: true,
+        issue_key: issueKey,
+        new_status: transitionName,
+        url: `${this.siteUrl}/browse/${issueKey}`
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to transition JIRA issue', {
+        issueKey,
+        transitionName,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a JIRA issue
+   * @param {string} issueKey - Issue key (e.g., 'PROJ-123')
+   * @returns {Promise<Object>} Deletion result
+   */
+  async deleteIssue(issueKey) {
+    try {
+      this.logger.info('Deleting JIRA issue', { issueKey });
+
+      await this._makeRequest(`/rest/api/3/issue/${issueKey}`, {
+        method: 'DELETE'
+      });
+
+      this.logger.info('JIRA issue deleted', { issueKey });
+
+      this.emit('issue_deleted', { issueKey });
+
+      return {
+        success: true,
+        issue_key: issueKey
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to delete JIRA issue', {
+        issueKey,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get available transitions for an issue
+   * @param {string} issueKey - Issue key
+   * @returns {Promise<Array>} Available transitions
+   */
+  async getAvailableTransitions(issueKey) {
+    try {
+      this.logger.info('Fetching available transitions', { issueKey });
+
+      const response = await this._makeRequest(`/rest/api/3/issue/${issueKey}/transitions`);
+
+      const transitions = response.transitions.map(t => ({
+        id: t.id,
+        name: t.name,
+        to_status: t.to?.name
+      }));
+
+      this.logger.info('Transitions retrieved', {
+        issueKey,
+        transitionCount: transitions.length
+      });
+
+      return transitions;
+
+    } catch (error) {
+      this.logger.error('Failed to fetch transitions', {
+        issueKey,
+        error: error.message
+      });
+      throw error;
+    }
+  }
 }
 
 module.exports = JIRAService;

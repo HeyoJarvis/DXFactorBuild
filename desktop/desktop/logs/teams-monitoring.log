@@ -1,0 +1,1 @@
+{"autoCreateTasks":true,"confidenceThreshold":0.6,"includeChannels":true,"includeChats":true,"level":"info","maxMessagesPerPoll":50,"message":"Teams Monitoring Service initialized","pollInterval":180000,"service":"teams-monitoring","timestamp":"2025-10-13T01:34:59.523Z"}

@@ -116,3 +116,526 @@
 {"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:09:20.492Z"}
 {"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:09:35.823Z"}
 {"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:11:25.287Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:19:12.278Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:19:21.333Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-12T21:19:42.393Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-12T21:19:42.393Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:20:00.271Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:23:04.427Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:23:23.469Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:23:26.562Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T21:23:26.562Z"}
+{"level":"info","message":"Issues retrieved","returned":0,"service":"jira-service","timestamp":"2025-10-12T21:23:27.309Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:23:31.632Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T21:23:31.633Z"}
+{"level":"info","message":"Issues retrieved","returned":0,"service":"jira-service","timestamp":"2025-10-12T21:23:32.155Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:23:34.707Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T21:23:34.707Z"}
+{"level":"info","message":"Issues retrieved","returned":0,"service":"jira-service","timestamp":"2025-10-12T21:23:35.213Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:26:48.819Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:29:06.591Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T21:29:06.591Z"}
+{"level":"info","message":"Issues retrieved","returned":0,"service":"jira-service","timestamp":"2025-10-12T21:29:07.281Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:31:35.242Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T21:31:49.772Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:05:52.912Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-12T22:06:39.530Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-12T22:06:39.530Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:07:32.749Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:08:14.726Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:08:27.694Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:08:29.530Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:08:29.530Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:08:29.530Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:08:29.710Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:08:29.710Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:08:29.710Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:08:29.710Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:08:30.661Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:08:30.661Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:08:30.661Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:08:30.750Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:08:30.750Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:08:30.750Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:08:30.750Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:08:36.419Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:08:36.419Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:08:36.419Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:08:36.507Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:08:36.507Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:08:36.507Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:08:36.507Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:08:45.038Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:08:45.038Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:08:45.038Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:08:45.152Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:08:45.152Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:08:45.152Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:08:45.153Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:11:10.488Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-12T22:11:12.975Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-12T22:11:12.975Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:13:26.794Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:13:31.031Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:13:31.031Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:13:31.032Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:13:31.194Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:13:31.194Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:13:31.194Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:13:31.194Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:17:00.907Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:17:02.690Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:17:02.690Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:17:02.690Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:17:02.839Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:17:02.839Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:17:02.839Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:17:02.839Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:17:43.717Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:17:45.583Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:17:45.583Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:17:45.583Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:17:45.700Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:17:45.700Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:17:45.700Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:17:45.700Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:17:51.916Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:18:48.391Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:18:53.787Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:18:53.787Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:18:53.787Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:18:53.938Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:18:53.938Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:18:53.938Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:18:53.938Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:18:57.704Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:18:57.704Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:18:57.704Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:18:57.795Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:18:57.795Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:18:57.795Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:18:57.795Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:18:58.459Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:18:58.459Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:18:58.459Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:18:58.554Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:18:58.554Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:18:58.554Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:18:58.554Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:19:03.743Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:19:03.743Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:19:03.743Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:19:03.835Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:19:03.835Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:19:03.836Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:19:03.836Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:19:17.234Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:19:36.708Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:19:38.567Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:19:38.567Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:19:38.568Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:19:38.689Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:19:38.689Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:19:38.689Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:19:38.689Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:19:58.071Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:19:58.071Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:19:58.071Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:19:58.165Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:19:58.166Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:19:58.166Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:19:58.166Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:20:51.282Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:20:53.562Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:20:53.563Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:20:53.563Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:20:53.716Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:20:53.716Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:20:53.716Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:20:53.716Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:21:00.156Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:21:37.947Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:21:39.925Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:21:39.925Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:21:39.926Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:21:40.062Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:21:40.062Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:21:40.062Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:21:40.062Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:21:42.080Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:21:42.080Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:21:42.080Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:21:42.173Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:21:42.173Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:21:42.173Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:21:42.173Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:21:42.655Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:21:42.655Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:21:42.655Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:21:42.742Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:21:42.742Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:21:42.742Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:21:42.742Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:21:51.560Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:21:51.560Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:21:51.560Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:21:51.650Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:21:51.650Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:21:51.650Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:21:51.650Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:22:05.526Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:22:05.526Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:22:05.526Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:22:05.619Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:22:05.619Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:22:05.620Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:22:05.620Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:22:34.575Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:22:34.576Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:22:34.576Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:22:34.730Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:22:34.730Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:22:34.730Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:22:34.731Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:35:01.948Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:35:01.948Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:35:01.948Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:35:02.112Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:35:02.112Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:35:02.112Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:35:02.113Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:35:02.369Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:35:02.369Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:35:02.369Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:35:02.460Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:35:02.460Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:35:02.460Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:35:02.460Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:35:37.670Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:35:37.670Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:35:37.670Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:35:37.797Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:35:37.798Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:35:37.798Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:35:37.798Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:36:04.626Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:36:06.875Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:36:06.875Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:36:06.875Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:36:06.973Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:36:06.973Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:36:06.973Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:36:06.973Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:36:07.562Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:36:07.562Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:36:07.562Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:36:07.657Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:36:07.657Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:36:07.657Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:36:07.657Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:36:07.757Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:36:07.757Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:36:07.757Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:36:07.874Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:36:07.875Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:36:07.875Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:36:07.875Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:36:08.335Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:36:08.335Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:36:08.335Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:36:08.451Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:36:08.451Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:36:08.451Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:36:08.451Z"}
+{"clientId":"not set","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:36:38.682Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:36:38.682Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:36:38.683Z"}
+{"error":"{\"error\":\"invalid_request\",\"error_description\":\"client_id may not be blank\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":400,"timestamp":"2025-10-12T22:36:38.795Z"}
+{"error":"Token refresh failed: 400","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:36:38.795Z"}
+{"error":"Token refresh failed: 400","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:36:38.795Z"}
+{"clientId":"not set","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:38:24.263Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:38:24.263Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:38:24.263Z"}
+{"error":"{\"error\":\"invalid_request\",\"error_description\":\"client_id may not be blank\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":400,"timestamp":"2025-10-12T22:38:24.502Z"}
+{"error":"Token refresh failed: 400","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:38:24.502Z"}
+{"error":"Token refresh failed: 400","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:38:24.502Z"}
+{"clientId":"not set","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:38:24.503Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:38:24.503Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:38:24.503Z"}
+{"error":"{\"error\":\"invalid_request\",\"error_description\":\"client_id may not be blank\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":400,"timestamp":"2025-10-12T22:38:24.586Z"}
+{"error":"Token refresh failed: 400","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:38:24.586Z"}
+{"error":"Token refresh failed: 400","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:38:24.586Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:39:39.879Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:39:42.376Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:39:42.377Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:39:42.377Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:39:42.536Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:39:42.536Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:39:42.536Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:39:42.536Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:42:13.734Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:42:16.244Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:42:16.244Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:42:16.245Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:42:16.408Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:42:16.408Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:42:16.409Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:42:16.409Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:51:56.738Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:51:58.540Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:51:58.541Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:51:58.541Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:51:58.689Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:51:58.689Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:51:58.690Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:51:58.690Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:53:00.594Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:53:06.059Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:53:06.059Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:53:06.059Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:53:06.167Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:53:06.167Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:53:06.167Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:53:06.167Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:53:14.323Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-12T22:53:16.015Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-12T22:53:16.015Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"jira-service","timestamp":"2025-10-12T22:53:26.717Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","count":2,"level":"info","message":"Accessible resources retrieved","service":"jira-service","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-12T22:53:27.158Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","expiresIn":3600,"level":"info","message":"Successfully authenticated with JIRA","service":"jira-service","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-12T22:53:27.159Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:55:39.632Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:55:47.147Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:55:48.934Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:55:48.934Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:55:48.935Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:55:49.105Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:55:49.105Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:55:49.105Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:55:49.105Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:56:27.714Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:56:29.561Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:56:29.561Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:56:29.561Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:56:29.674Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:56:29.674Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:56:29.674Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:56:29.674Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:56:30.590Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:56:30.590Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:56:30.590Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:56:30.684Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:56:30.684Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:56:30.684Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:56:30.684Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:56:34.611Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:56:34.611Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:56:34.612Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:56:34.698Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:56:34.698Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:56:34.698Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:56:34.698Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:56:39.924Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:56:39.924Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:56:39.924Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:56:40.016Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:56:40.016Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:56:40.016Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:56:40.016Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:56:48.140Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T22:56:48.140Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-12T22:56:48.140Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-12T22:56:48.228Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-12T22:56:48.228Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-12T22:56:48.228Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-12T22:56:48.228Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T22:58:51.924Z"}
+{"challengeLength":43,"level":"debug","message":"PKCE generated","service":"jira-service","timestamp":"2025-10-12T22:58:53.668Z","verifierLength":43}
+{"level":"info","message":"Authorization URL generated","redirectUri":"http://localhost:8890/auth/jira/callback","scopes":["read:jira-work","write:jira-work","read:jira-user","offline_access"],"service":"jira-service","timestamp":"2025-10-12T22:58:53.668Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"jira-service","timestamp":"2025-10-12T23:00:10.690Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","count":2,"level":"info","message":"Accessible resources retrieved","service":"jira-service","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-12T23:00:11.135Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","expiresIn":3600,"level":"info","message":"Successfully authenticated with JIRA","service":"jira-service","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-12T23:00:11.136Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:00:12.967Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:00:12.967Z"}
+{"level":"info","message":"Issues retrieved","returned":5,"service":"jira-service","timestamp":"2025-10-12T23:00:13.603Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:00:14.166Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:00:14.166Z"}
+{"level":"info","message":"Issues retrieved","returned":5,"service":"jira-service","timestamp":"2025-10-12T23:00:14.706Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:00:16.618Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:00:16.618Z"}
+{"level":"info","message":"Issues retrieved","returned":5,"service":"jira-service","timestamp":"2025-10-12T23:00:17.367Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:03:35.874Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:03:35.874Z"}
+{"level":"info","message":"Issues retrieved","returned":5,"service":"jira-service","timestamp":"2025-10-12T23:03:36.483Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:04:03.879Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:04:03.879Z"}
+{"level":"info","message":"Issues retrieved","returned":5,"service":"jira-service","timestamp":"2025-10-12T23:04:04.533Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:04:43.984Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:04:43.984Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:04:44.572Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:06:48.145Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:06:48.145Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:06:48.606Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:08:23.983Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:10:18.527Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:10:29.715Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:10:29.716Z"}
+{"level":"info","message":"Issues retrieved","returned":5,"service":"jira-service","timestamp":"2025-10-12T23:10:30.279Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:10:43.959Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:10:43.959Z"}
+{"level":"info","message":"Issues retrieved","returned":5,"service":"jira-service","timestamp":"2025-10-12T23:10:44.546Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:11:24.318Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:11:24.318Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:11:24.927Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:11:53.839Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:11:53.839Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:11:54.537Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:24:46.347Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:24:56.501Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:24:56.501Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:24:57.065Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:25:27.547Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:25:27.547Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:25:28.149Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:25:33.948Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:25:33.948Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:25:34.558Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:25:34.602Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:25:34.602Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:25:34.997Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:25:36.892Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:25:36.892Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:25:37.494Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:30:55.329Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:31:33.122Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:36:46.903Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:36:51.770Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:36:51.771Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:36:52.536Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:36:56.495Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:36:56.495Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:36:56.919Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:41:10.148Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:41:15.946Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:41:15.946Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:41:16.704Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:41:18.885Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:41:18.885Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:41:19.537Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:45:01.205Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:45:04.355Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:45:04.356Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:45:05.089Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:48:44.042Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:48:45.852Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:48:45.852Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:48:46.338Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:48:55.372Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:48:55.372Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:48:55.817Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:48:58.770Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:48:58.770Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:48:59.180Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:49:29.456Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:49:29.457Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:49:30.152Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:50:41.681Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:50:45.262Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:50:45.262Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:50:45.738Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:51:57.012Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:52:04.190Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:52:04.190Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:52:04.751Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:52:08.061Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:52:08.061Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:52:08.676Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:52:12.303Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:52:12.303Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:52:12.745Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:52:23.660Z"}
+{"commentLength":3,"issueKey":"SCRUM-35","level":"info","message":"Adding comment to JIRA issue","service":"jira-service","timestamp":"2025-10-12T23:52:23.660Z"}
+{"commentId":"10000","issueKey":"SCRUM-35","level":"info","message":"Comment added to JIRA issue","service":"jira-service","timestamp":"2025-10-12T23:52:24.186Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:52:24.277Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:52:24.277Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:52:24.876Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-12T23:52:42.911Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-12T23:52:42.911Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-12T23:52:43.539Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T00:00:25.378Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:01:14.715Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:01:22.555Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:01:22.555Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:01:22.555Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-13T01:01:23.092Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-13T01:01:24.179Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:01:32.515Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:01:32.515Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:01:32.515Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-13T01:01:32.731Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-13T01:01:33.322Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:03:06.522Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:03:06.522Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:03:06.522Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-13T01:03:06.790Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-13T01:03:07.402Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:03:21.226Z"}
+{"fields":["description"],"issueKey":"SCRUM-35","level":"info","message":"Updating JIRA issue","service":"jira-service","timestamp":"2025-10-13T01:03:21.226Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:03:21.226Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-13T01:03:21.385Z"}
+{"issueKey":"SCRUM-35","level":"info","message":"JIRA issue updated","service":"jira-service","timestamp":"2025-10-13T01:03:22.001Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:03:22.108Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:03:22.109Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:03:22.109Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-13T01:03:22.232Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-13T01:03:22.624Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:06:19.032Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:08:25.107Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:08:25.107Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:08:25.107Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-13T01:08:25.311Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-13T01:08:26.039Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:08:39.777Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:08:39.777Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:08:39.778Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-13T01:08:39.902Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-13T01:08:40.512Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:09:14.045Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:12:43.313Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:18:54.127Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:20:58.283Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:34:59.522Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:35:33.371Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:35:33.372Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:35:33.372Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-13T01:35:33.590Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-13T01:35:33.590Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-13T01:35:33.590Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-13T01:35:33.590Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:36:03.827Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:36:03.827Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:36:03.827Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-13T01:36:03.978Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-13T01:36:03.978Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-13T01:36:03.978Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-13T01:36:03.978Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:36:33.919Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:36:33.919Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:36:33.919Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-13T01:36:34.059Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-13T01:36:34.060Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-13T01:36:34.060Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-13T01:36:34.060Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:37:03.821Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:37:03.821Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:37:03.821Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-13T01:37:04.000Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-13T01:37:04.000Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-13T01:37:04.000Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-13T01:37:04.000Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-13T01:37:33.929Z"}
+{"jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"info","maxResults":100,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-13T01:37:33.929Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-13T01:37:33.929Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-13T01:37:34.069Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-13T01:37:34.069Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-13T01:37:34.069Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status != Done ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-13T01:37:34.069Z"}
