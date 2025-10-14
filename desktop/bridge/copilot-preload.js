@@ -21,13 +21,29 @@ contextBridge.exposeInMainWorld('electronAPI', {
   toggleAlwaysOnTop: () => ipcRenderer.invoke('copilot:toggleAlwaysOnTop'),
   
   // Top bar controls
-  toggleTopBar: () => ipcRenderer.invoke('topbar:toggle'),
-  expandTopBar: () => ipcRenderer.invoke('topbar:expand'),
-  collapseTopBar: () => ipcRenderer.invoke('topbar:collapse'),
-  repositionTopBar: () => ipcRenderer.invoke('topbar:reposition'),
-  resetPosition: () => ipcRenderer.invoke('topbar:resetPosition'),
-  getPosition: () => ipcRenderer.invoke('topbar:getPosition'),
+  topbar: {
+    toggle: () => ipcRenderer.invoke('topbar:toggle'),
+    expand: () => ipcRenderer.invoke('topbar:expand'),
+    collapse: () => ipcRenderer.invoke('topbar:collapse'),
+    reposition: () => ipcRenderer.invoke('topbar:reposition'),
+    resetPosition: () => ipcRenderer.invoke('topbar:resetPosition'),
+    getPosition: () => ipcRenderer.invoke('topbar:getPosition'),
+    startDrag: () => ipcRenderer.invoke('topbar:startDrag'),
+    endDrag: () => ipcRenderer.invoke('topbar:endDrag')
+  },
   setOpacity: (opacity) => ipcRenderer.invoke('overlay:opacity', opacity),
+  
+  // Arc Reactor Menu
+  menu: {
+    open: () => ipcRenderer.invoke('menu:open'),
+    close: () => ipcRenderer.invoke('menu:close'),
+    openItem: (item) => ipcRenderer.invoke('menu:openItem', item)
+  },
+  
+  // Message listener for IPC events
+  onMessage: (channel, callback) => {
+    ipcRenderer.on(channel, (event, ...args) => callback(...args));
+  },
   
   // Drag handling
   startDrag: () => ipcRenderer.invoke('copilot:startDrag'),
@@ -176,7 +192,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     toggle: (taskId, currentStatus) => ipcRenderer.invoke('tasks:toggle', taskId, currentStatus),
     getStats: () => ipcRenderer.invoke('tasks:getStats'),
     getChatHistory: (taskId) => ipcRenderer.invoke('tasks:getChatHistory', taskId),
-    getSlackUserInfo: (slackUserId) => ipcRenderer.invoke('tasks:getSlackUserInfo', slackUserId)
+    getSlackUserInfo: (slackUserId) => ipcRenderer.invoke('tasks:getSlackUserInfo', slackUserId),
+    openChatWindow: (options) => ipcRenderer.invoke('tasks:openChatWindow', options)
   },
   
 

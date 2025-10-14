@@ -102,8 +102,9 @@ let isManuallyPositioned = false; // Track if user has manually moved the bar
 let activeHighlights = []; // Store active highlight data
 let userDefinedSize = null; // Track user's custom window size
 let isUserResizing = false; // Track if user is actively resizing
-let expandedSize = { width: 451, height: 397 }; // Remember expanded dimensions
+let expandedSize = { width: 656, height: 900 }; // Remember expanded dimensions - proper app size
 let isQuittingApp = false; // Track real quit vs window hide
+const orbSize = 80; // Arc Reactor orb size (collapsed state)
 
 function createWindow() {
   // Create the browser window as a top bar overlay
@@ -111,14 +112,13 @@ function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth } = primaryDisplay.bounds;
   
-  // Start in collapsed state - clean header bar
-  const barWidth = Math.min(800, screenWidth * 0.6); // Responsive width for header
-  const barHeight = 48; // Collapsed header height
-  const xPosition = Math.floor((screenWidth - barWidth) / 2); // Center horizontally
+  // Start in collapsed state - just the Arc Reactor orb
+  const orbSize = 80; // Small circular window for Arc Reactor
+  const xPosition = Math.floor((screenWidth - orbSize) / 2); // Center horizontally
   
   mainWindow = new BrowserWindow({
-    width: barWidth, // Narrower, more discreet width
-    height: barHeight, // Taller bar
+    width: orbSize, // Circular orb
+    height: orbSize, // Circular orb
     x: xPosition, // Centered position
     y: 10, // Small margin from top
     webPreferences: {
@@ -131,7 +131,8 @@ function createWindow() {
     transparent: true,
     alwaysOnTop: true,
     skipTaskbar: true,
-    resizable: true, // Allow resizing for better UX
+    resizable: false, // Orb should maintain size
+    movable: true, // Allow moving
     movable: true, // Enable dragging
     minimizable: false,
     maximizable: false,
@@ -447,8 +448,9 @@ function positionOverlayOnCurrentScreen() {
   
   // Calculate bar dimensions and position
   // Use user-defined size if available, otherwise use optimized defaults
-  const barWidth = userDefinedSize?.width || (isExpanded ? expandedSize.width : Math.min(800, screenWidth * 0.5));
-  const barHeight = userDefinedSize?.height || (isExpanded ? expandedSize.height : 48);
+  const orbSize = 80; // Collapsed = Arc Reactor orb only
+  const barWidth = userDefinedSize?.width || (isExpanded ? expandedSize.width : orbSize);
+  const barHeight = userDefinedSize?.height || (isExpanded ? expandedSize.height : orbSize);
   const xPosition = screenX + Math.floor((screenWidth - barWidth) / 2); // Center horizontally
   const yPosition = screenY + 10; // Small margin from top
   
@@ -687,6 +689,102 @@ function toggleTopBarExpansion() {
   } else {
     expandTopBar();
   }
+}
+
+// Setup Arc Reactor Menu IPC handlers
+function setupArcReactorMenuHandlers() {
+  // Handle drag start
+  ipcMain.handle('topbar:startDrag', () => {
+    if (mainWindow) {
+      // Make window draggable
+      console.log('🎯 Arc Reactor drag mode enabled');
+    }
+  });
+
+  // Handle drag end  
+  ipcMain.handle('topbar:endDrag', () => {
+    if (mainWindow) {
+      console.log('🎯 Arc Reactor drag mode disabled');
+    }
+  });
+
+  // Handle menu open - expand window to show menu
+  ipcMain.handle('menu:open', () => {
+    if (mainWindow) {
+      const menuSize = {
+        width: 500,
+        height: 400
+      };
+      
+      // Get current position
+      const [x, y] = mainWindow.getPosition();
+      
+      // Center the expanded window around the orb position
+      const newX = x - Math.floor((menuSize.width - orbSize) / 2);
+      const newY = y - Math.floor((menuSize.height - orbSize) / 2);
+      
+      mainWindow.setSize(menuSize.width, menuSize.height, true);
+      mainWindow.setPosition(newX, newY, true);
+      
+      console.log('🎯 Menu window expanded to', menuSize);
+      return { success: true };
+    }
+  });
+
+  // Handle menu close - collapse back to orb
+  ipcMain.handle('menu:close', () => {
+    if (mainWindow) {
+      // Get current position
+      const [x, y] = mainWindow.getPosition();
+      const currentSize = mainWindow.getSize();
+      
+      // Calculate new position to keep orb centered
+      const newX = x + Math.floor((currentSize[0] - orbSize) / 2);
+      const newY = y + Math.floor((currentSize[1] - orbSize) / 2);
+      
+      mainWindow.setSize(orbSize, orbSize, true);
+      mainWindow.setPosition(newX, newY, true);
+      
+      console.log('🎯 Menu window collapsed to orb');
+      return { success: true };
+    }
+  });
+
+  // Handle menu item selection - open in new window
+  ipcMain.handle('menu:openItem', async (event, item) => {
+    console.log(`📋 Opening menu item: ${item}`);
+    
+    const { BrowserWindow } = require('electron');
+    const path = require('path');
+    
+    // Create new window for the selected item
+    const itemWindow = new BrowserWindow({
+      width: 656,
+      height: 900,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        enableRemoteModule: false,
+        preload: path.join(__dirname, 'bridge/copilot-preload.js')
+      },
+      frame: false,
+      transparent: false,
+      alwaysOnTop: false,
+      backgroundColor: '#fafafa',
+      show: false
+    });
+
+    // Load the unified.html but with a query param to show specific tab
+    itemWindow.loadFile(path.join(__dirname, 'renderer/unified.html'));
+    
+    // Once loaded, switch to the appropriate tab
+    itemWindow.webContents.once('did-finish-load', () => {
+      itemWindow.webContents.send('switch-to-tab', item);
+      itemWindow.show();
+    });
+
+    return { success: true, item };
+  });
 }
 
 // Setup Microsoft 365 IPC handlers
@@ -2042,6 +2140,9 @@ function initializeServices() {
   // Setup Slack workflow detection integration
   setupWorkflowDetection();
   
+  // Setup Arc Reactor Menu handlers
+  setupArcReactorMenuHandlers();
+  
   // Setup Microsoft 365 IPC handlers
   setupMicrosoftIPCHandlers();
   
@@ -3202,6 +3303,20 @@ CORRECT RESPONSE: "[SCHEDULE_MEETING_${automationService.toUpperCase()}: attende
 
 The system will automatically execute the meeting creation and update your response with confirmation.` : ''}
 
+ACTION ITEM EXTRACTION:
+⚠️ CRITICAL: Only generate action items ONCE. If the conversation history shows "✅ Action Items Created", DO NOT generate them again.
+
+When appropriate (first time only, task needs breakdown):
+1. Break task into specific action items
+2. Use format: [ACTION_ITEM: title=Brief description, priority=high, description=Details]
+3. Priority: urgent, high, medium, or low
+4. Items auto-create as sub-tasks
+
+ONLY generate action items if:
+- No "Action Items Created" text appears in conversation history above
+- Task needs breakdown into steps
+- User is asking for help getting started
+
 Be concise, practical, and focused on helping complete this specific task.`;
 
       // Build conversation history for Claude
@@ -4315,6 +4430,58 @@ function registerAllIPCHandlers() {
       return result;
     } catch (error) {
       console.error('Failed to delete task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Open task chat in new window
+  ipcMain.handle('tasks:openChatWindow', async (event, options) => {
+    try {
+      const { taskId, title, width, height } = options;
+      
+      console.log('🪟 Opening task chat window:', { taskId, title, width, height });
+      
+      // Create a new BrowserWindow for the task chat with larger default size
+      const taskChatWindow = new BrowserWindow({
+        width: width || 1000,
+        height: height || 700,
+        minWidth: 800,
+        minHeight: 600,
+        show: false,
+        title: title || 'Task Chat',
+        titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+        backgroundColor: '#ffffff',
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true,
+          enableRemoteModule: false,
+          preload: path.join(__dirname, 'bridge/copilot-preload.js')
+        }
+      });
+
+      // Load the task chat interface with task ID as a query parameter
+      taskChatWindow.loadFile(
+        path.join(__dirname, 'renderer/task-chat.html'),
+        { query: { taskId, title } }
+      );
+
+      // Show window when ready
+      taskChatWindow.once('ready-to-show', () => {
+        taskChatWindow.show();
+        
+        if (process.env.NODE_ENV === 'development') {
+          taskChatWindow.webContents.openDevTools();
+        }
+      });
+
+      // Handle window closed
+      taskChatWindow.on('closed', () => {
+        console.log('🪟 Task chat window closed for task:', taskId);
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to open task chat window:', error);
       return { success: false, error: error.message };
     }
   });
