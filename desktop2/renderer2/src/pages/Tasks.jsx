@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTasks } from '../hooks/useTasks';
 import TaskInput from '../components/Tasks/TaskInput';
 import TaskList from '../components/Tasks/TaskList';
+import ActionList from '../components/Tasks/ActionList';
 import TaskChat from '../components/Tasks/TaskChat';
 import './Tasks.css';
 
@@ -17,6 +18,7 @@ export default function Tasks() {
   } = useTasks();
   
   const [chatTask, setChatTask] = useState(null);
+  const [viewMode, setViewMode] = useState('action'); // 'action' or 'list'
 
   const handleAddTask = async (taskData) => {
     try {
@@ -66,31 +68,60 @@ export default function Tasks() {
           <span>My Tasks</span>
         </div>
         
-        <div className="task-stats">
-          <div className="stat-item">
-            <div className="stat-dot todo"></div>
-            <span>{stats.todo} To Do</span>
+        <div className="header-controls">
+          <div className="view-toggle">
+            <button 
+              className={`toggle-btn ${viewMode === 'action' ? 'active' : ''}`}
+              onClick={() => setViewMode('action')}
+              title="Action Items View"
+            >
+              📊 Action Items
+            </button>
+            <button 
+              className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              title="List View"
+            >
+              📋 List View
+            </button>
           </div>
-          <div className="stat-item">
-            <div className="stat-dot in-progress"></div>
-            <span>{stats.inProgress} In Progress</span>
-          </div>
-          <div className="stat-item">
-            <div className="stat-dot completed"></div>
-            <span>{stats.completed} Done</span>
+          
+          <div className="task-stats">
+            <div className="stat-item">
+              <div className="stat-dot todo"></div>
+              <span>{stats.todo} To Do</span>
+            </div>
+            <div className="stat-item">
+              <div className="stat-dot in-progress"></div>
+              <span>{stats.inProgress} In Progress</span>
+            </div>
+            <div className="stat-item">
+              <div className="stat-dot completed"></div>
+              <span>{stats.completed} Done</span>
+            </div>
           </div>
         </div>
       </div>
 
       <TaskInput onAdd={handleAddTask} />
       
-      <TaskList
-        tasks={tasks}
-        onToggle={handleToggleTask}
-        onDelete={handleDeleteTask}
-        onUpdate={handleUpdateTask}
-        onChat={setChatTask}
-      />
+      {viewMode === 'action' ? (
+        <ActionList
+          tasks={tasks}
+          onToggle={handleToggleTask}
+          onDelete={handleDeleteTask}
+          onUpdate={handleUpdateTask}
+          onChat={setChatTask}
+        />
+      ) : (
+        <TaskList
+          tasks={tasks}
+          onToggle={handleToggleTask}
+          onDelete={handleDeleteTask}
+          onUpdate={handleUpdateTask}
+          onChat={setChatTask}
+        />
+      )}
       
       {/* Task Chat Modal */}
       {chatTask && (

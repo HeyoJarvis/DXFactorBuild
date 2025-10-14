@@ -54,7 +54,7 @@
 
 body {
   font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #1c1c1e; /* Use solid color instead of transparent to avoid grey spaces */
+  background: transparent; /* Transparent for Arc Reactor orb */
   color: var(--color-text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -68,6 +68,7 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  pointer-events: none; /* Let clicks pass through transparent areas */
 }
 
 .app {
@@ -75,6 +76,13 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: #1c1c1e; /* Solid background for expanded mode */
+  pointer-events: auto !important; /* Force enable for expanded mode */
+}
+
+.app-collapsed {
+  background: transparent !important; /* Fully transparent for Arc Reactor orb */
+  pointer-events: none !important; /* Let clicks pass through in collapsed mode */
 }
 
 .app-content {
@@ -82,6 +90,7 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  pointer-events: auto !important; /* Ensure content is clickable */
 }
 
 /* Scrollbar Styles */

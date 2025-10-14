@@ -37,7 +37,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // System APIs
   system: {
     getStatus: () => ipcRenderer.invoke('system:getStatus'),
-    getAppInfo: () => ipcRenderer.invoke('system:getAppInfo')
+    getAppInfo: () => ipcRenderer.invoke('system:getAppInfo'),
+    setRole: (role) => ipcRenderer.invoke('system:setRole', role),
+    getRole: () => ipcRenderer.invoke('system:getRole')
+  },
+
+  // Arc Reactor APIs
+  arcReactor: {
+    getMenuItems: (role) => ipcRenderer.invoke('arcReactor:getMenuItems', role)
   },
 
   // Window APIs
@@ -46,7 +53,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     hideMain: () => ipcRenderer.invoke('window:hideMain'),
     toggleCopilot: () => ipcRenderer.invoke('window:toggleCopilot'),
     expandCopilot: () => ipcRenderer.invoke('window:expandCopilot'),
-    collapseCopilot: () => ipcRenderer.invoke('window:collapseCopilot')
+    collapseCopilot: () => ipcRenderer.invoke('window:collapseCopilot'),
+    setMouseForward: (shouldForward) => ipcRenderer.invoke('window:setMouseForward', shouldForward),
+    moveWindow: (x, y) => ipcRenderer.invoke('window:moveWindow', x, y),
+    resizeForMenu: (isOpen) => ipcRenderer.invoke('window:resizeForMenu', isOpen)
   }
 });
 

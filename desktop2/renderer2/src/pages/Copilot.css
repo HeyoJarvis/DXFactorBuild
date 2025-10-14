@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 1020%;
   background: var(--color-bg);
+  pointer-events: auto !important; /* Ensure page is clickable */
 }
 
 .copilot-content {

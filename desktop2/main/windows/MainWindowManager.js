@@ -44,35 +44,43 @@ class MainWindowManager {
     console.log('📦 Stored bounds:', storedBounds);
     console.log('📏 Default header size:', this.defaults);
 
-    // Always start in header mode - ignore stored height and width from storage
-    // Create window with explicit visibility settings - always start in header mode
+    // Start with a small window size for Arc Reactor orb only
+    // Will expand when menu opens or to 656x900 for full UI
+    const startWidth = 220;  // Small width for Arc Reactor (fits glow)
+    const startHeight = 220; // Small height for Arc Reactor (fits glow)
+    
+    // Position in bottom-left corner
+    const { screen } = require('electron');
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    
     this.window = new BrowserWindow({
-      width: this.defaults.width,
-      height: this.defaults.height,
-      x: storedBounds.x || 100,
-      y: storedBounds.y || 100,
-      minWidth: this.defaults.minWidth,
-      minHeight: this.defaults.minHeight,
-      maxHeight: this.defaults.maxHeight,
+      width: startWidth,
+      height: startHeight,
+      x: 20, // Small margin from left edge
+      y: screenHeight - startHeight - 20, // Bottom of screen with margin
       show: false, // Will show manually in ready-to-show
       frame: false, // Frameless window - no titlebar
-      transparent: false, // Not transparent
-      backgroundColor: '#1c1c1e',
-      resizable: false, // Don't allow resizing - keep it slim
-      alwaysOnTop: true, // Keep header on top
+      transparent: true, // TRANSPARENT for Arc Reactor orb
+      backgroundColor: '#00000000', // Fully transparent background
+      resizable: true, // Allow resizing for expansion
+      alwaysOnTop: false, // DON'T keep on top - allows clicking other windows
       skipTaskbar: false, // Show in taskbar
+      hasShadow: false, // No shadow for transparent window
+      enableLargerThanScreen: true, // Allow full screen coverage
+      focusable: true, // Allow window to receive focus
+      acceptFirstMouse: true, // Accept clicks even when not focused
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
         enableRemoteModule: false,
         preload: path.join(__dirname, '../../bridge/preload.js')
-      },
-      // Will set these AFTER window is shown
-      // alwaysOnTop: true,
-      // skipTaskbar: false,
-      // visibleOnAllWorkspaces: true,
-      // fullscreenable: false
+      }
     });
+    
+    // CRITICAL: Set window to ignore mouse events on transparent areas
+    // Start with mouse events ENABLED so we don't block everything
+    this.window.setIgnoreMouseEvents(false);
     
     console.log('🪟 Window created with config:', {
       width: this.window.getBounds().width,
@@ -91,43 +99,23 @@ class MainWindowManager {
     // Show when ready
     this.window.once('ready-to-show', () => {
       console.log('🎬 Window ready-to-show event fired');
+      console.log('🌟 Starting in full-screen transparent mode for Arc Reactor');
       
-      // FORCE the window to header size before showing
+      // Keep full screen for Arc Reactor orb
       const currentBounds = this.window.getBounds();
-      console.log('📐 Current bounds before force resize:', currentBounds);
-      console.log('📏 Trying to set to:', { width: this.defaults.width, height: this.defaults.height });
+      console.log('📐 Current bounds:', currentBounds);
       
-      this.window.setBounds({
-        x: currentBounds.x,
-        y: currentBounds.y,
-        width: this.defaults.width,
-        height: this.defaults.height
-      });
+      // Don't resize - keep it full screen and transparent for Arc Reactor
+      // OLD CODE REMOVED - no longer forcing header size
       
-      // Double check the size was actually set
-      const afterBounds = this.window.getBounds();
-      console.log('📐 Bounds after force resize:', afterBounds);
-      
-      if (afterBounds.height !== this.defaults.height) {
-        console.error('⚠️ WARNING: Height did not set correctly!');
-        console.error(`   Expected: ${this.defaults.height}, Got: ${afterBounds.height}`);
-        
-        // Try again with setSize
-        this.window.setSize(this.defaults.width, this.defaults.height);
-        const thirdTry = this.window.getBounds();
-        console.log('📐 Bounds after setSize:', thirdTry);
-      }
-      
-      this.window.show();
       console.log('👁️ Window.show() called');
+      this.window.show();
       
       // Setup maximum visibility (copied from working desktop app)
       this.setupMaximumVisibility();
       
-      // Force focus and bring to front
+      // Focus window so it's clickable
       this.window.focus();
-      this.window.moveTop();
-      this.window.setAlwaysOnTop(true, 'screen-saver');
       
       // On macOS, also activate the app
       if (process.platform === 'darwin') {
@@ -143,10 +131,11 @@ class MainWindowManager {
       
       console.log('🚀 HeyJarvis overlay ready and visible');
       
-      // Dev tools can be opened manually with Cmd+Option+I if needed
-      // if (isDev) {
-      //   this.window.webContents.openDevTools();
-      // }
+      // Open DevTools in development mode for debugging
+      if (isDev) {
+        this.window.webContents.openDevTools({ mode: 'detach' });
+        console.log('🔧 DevTools opened in detached mode');
+      }
     });
 
     // Handle window events
@@ -401,73 +390,88 @@ class MainWindowManager {
   expandToFullChat() {
     if (!this.window || this.window.isDestroyed()) return;
     
-    console.log('🔄 Expanding window to full chat interface...');
+    console.log('🔄 Expanding window to full UI...');
     
-    // Get current position to maintain it
-    const currentBounds = this.window.getBounds();
+    // Arc Reactor expanded size
+    const expandedWidth = 656;
+    const expandedHeight = 900;
     
-    // Update window properties for full chat
+    // Get screen dimensions to center the window
+    const { screen } = require('electron');
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    
+    // Center the expanded window
+    const x = Math.floor((screenWidth - expandedWidth) / 2);
+    const y = Math.floor((screenHeight - expandedHeight) / 2);
+    
+    // Update window properties for expanded mode
     this.window.setResizable(true);
     this.window.setMaximumSize(0, 0); // Remove size restrictions
     
-    // Expand to full chat size, keeping current X position
+    // Expand to Arc Reactor full size, centered
     this.window.setBounds({
-      x: currentBounds.x,
-      y: currentBounds.y,
-      width: this.fullChatDefaults.width,
-      height: this.fullChatDefaults.height
+      x: x,
+      y: y,
+      width: expandedWidth,
+      height: expandedHeight
     });
     
     // Update minimum size constraints
-    this.window.setMinimumSize(
-      this.fullChatDefaults.minWidth, 
-      this.fullChatDefaults.minHeight
-    );
+    this.window.setMinimumSize(656, 900);
     
-    console.log('✅ Window expanded to full chat interface');
-    this.logger.info('Window expanded to full chat interface');
+    // Make background opaque for expanded mode
+    this.window.setBackgroundColor('#1c1c1e');
+    
+    console.log(`✅ Window expanded to ${expandedWidth}x${expandedHeight} at (${x}, ${y})`);
+    this.logger.info('Window expanded to full UI');
   }
 
   /**
-   * Collapse window back to slim header
+   * Collapse window back to Arc Reactor orb only
    */
   collapseToHeader() {
     if (!this.window || this.window.isDestroyed()) return;
     
-    console.log('🔄 Collapsing window to slim header...');
-    console.log('📏 Target size:', { width: this.defaults.width, height: this.defaults.height });
+    console.log('🔄 Collapsing window to Arc Reactor orb...');
     
-    // Get current position to maintain it
-    const currentBounds = this.window.getBounds();
-    console.log('📐 Current bounds:', currentBounds);
+    // Arc Reactor orb size (slightly bigger to not cut off glow)
+    const orbWidth = 220;
+    const orbHeight = 220;
     
-    // Update size constraints FIRST
-    this.window.setMinimumSize(this.defaults.minWidth, this.defaults.minHeight);
-    this.window.setMaximumSize(0, this.defaults.maxHeight);
+    // Position in bottom-left corner
+    const { screen } = require('electron');
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    
+    const x = 20;
+    const y = screenHeight - orbHeight - 20;
+    
+    console.log('📏 Target size:', { width: orbWidth, height: orbHeight });
+    console.log('📐 Target position:', { x, y });
+    
+    // Update size constraints
+    this.window.setMinimumSize(orbWidth, orbHeight);
+    this.window.setMaximumSize(orbWidth, orbHeight);
     this.window.setResizable(false);
     
-    // Then collapse to header size, keeping current X position
+    // Collapse to orb size in bottom-left
     this.window.setBounds({
-      x: currentBounds.x,
-      y: currentBounds.y,
-      width: this.defaults.width,
-      height: this.defaults.height
+      x: x,
+      y: y,
+      width: orbWidth,
+      height: orbHeight
     });
+    
+    // Make background transparent for collapsed mode
+    this.window.setBackgroundColor('#00000000');
     
     // Verify the size was set
     const afterBounds = this.window.getBounds();
     console.log('📐 After collapse bounds:', afterBounds);
     
-    if (afterBounds.height !== this.defaults.height) {
-      console.error('⚠️ COLLAPSE FAILED: Height is', afterBounds.height, 'but should be', this.defaults.height);
-      // Try with setSize
-      this.window.setSize(this.defaults.width, this.defaults.height);
-      const finalBounds = this.window.getBounds();
-      console.log('📐 After setSize:', finalBounds);
-    }
-    
-    console.log('✅ Window collapsed to slim header');
-    this.logger.info('Window collapsed to slim header');
+    console.log('✅ Window collapsed to Arc Reactor orb');
+    this.logger.info('Window collapsed to Arc Reactor orb');
   }
 
   /**

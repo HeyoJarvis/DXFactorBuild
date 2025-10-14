@@ -1,0 +1,25 @@
+/* Arc Reactor Container Styles */
+
+.arc-reactor-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Container doesn't block clicks */
+  z-index: 10000;
+}
+
+/* Only Arc Reactor elements should receive pointer events */
+.arc-reactor-container .arc-reactor-orb,
+.arc-reactor-container .radial-menu,
+.arc-reactor-container .role-toggle {
+  pointer-events: auto !important; /* These can be clicked */
+}
+
+/* Ensure all sub-components are not draggable for window */
+.arc-reactor-container,
+.arc-reactor-container * {
+  -webkit-app-region: no-drag;
+}
+

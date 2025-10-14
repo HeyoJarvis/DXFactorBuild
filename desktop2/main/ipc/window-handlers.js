@@ -5,6 +5,8 @@
 
 const { ipcMain } = require('electron');
 
+let mouseEventsIgnored = true; // Track current state
+
 function registerWindowHandlers(windows, logger) {
   /**
    * Show main window
@@ -73,6 +75,91 @@ function registerWindowHandlers(windows, logger) {
       return { success: true };
     } catch (error) {
       logger.error('Window collapseCopilot error:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
+   * Set mouse event forwarding (for transparent window)
+   */
+  ipcMain.handle('window:setMouseForward', async (event, shouldForward) => {
+    try {
+      const mainWindow = windows.main?.getWindow();
+      if (!mainWindow) {
+        return { success: false, error: 'Main window not found' };
+      }
+
+      if (shouldForward !== mouseEventsIgnored) {
+        mouseEventsIgnored = shouldForward;
+        mainWindow.setIgnoreMouseEvents(shouldForward, { forward: true });
+        logger.debug('Mouse event forwarding:', { shouldForward });
+      }
+
+      return { success: true };
+    } catch (error) {
+      logger.error('Failed to set mouse forwarding:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
+   * Move window to specific position
+   */
+  ipcMain.handle('window:moveWindow', async (event, x, y) => {
+    try {
+      const mainWindow = windows.main?.getWindow();
+      if (!mainWindow) {
+        return { success: false, error: 'Main window not found' };
+      }
+
+      const currentBounds = mainWindow.getBounds();
+      mainWindow.setBounds({
+        x: Math.round(x),
+        y: Math.round(y),
+        width: currentBounds.width,
+        height: currentBounds.height
+      });
+
+      return { success: true };
+    } catch (error) {
+      logger.error('Failed to move window:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
+   * Resize window for menu open/close
+   */
+  ipcMain.handle('window:resizeForMenu', async (event, isOpen) => {
+    try {
+      const mainWindow = windows.main?.getWindow();
+      if (!mainWindow) {
+        return { success: false, error: 'Main window not found' };
+      }
+
+      const currentBounds = mainWindow.getBounds();
+      
+      if (isOpen) {
+        // Expand to show menu (wider)
+        mainWindow.setBounds({
+          x: currentBounds.x,
+          y: currentBounds.y,
+          width: 380, // Wide enough for orb + menu
+          height: 280 // Tall enough for menu items
+        });
+      } else {
+        // Collapse to just orb (slightly bigger to not cut off glow)
+        mainWindow.setBounds({
+          x: currentBounds.x,
+          y: currentBounds.y,
+          width: 220,
+          height: 220
+        });
+      }
+
+      return { success: true };
+    } catch (error) {
+      logger.error('Failed to resize window:', error);
       return { success: false, error: error.message };
     }
   });

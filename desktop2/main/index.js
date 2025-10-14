@@ -5,7 +5,7 @@
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '..', '.env') });
 
-const { app } = require('electron');
+const { app, globalShortcut } = require('electron');
 const path = require('path');
 const winston = require('winston');
 
@@ -25,6 +25,7 @@ const registerTaskHandlers = require('./ipc/task-handlers');
 const registerTaskChatHandlers = require('./ipc/task-chat-handlers');
 const registerSystemHandlers = require('./ipc/system-handlers');
 const registerWindowHandlers = require('./ipc/window-handlers');
+const registerArcReactorHandlers = require('./ipc/arc-reactor-handlers');
 
 // Setup logger
 const logger = winston.createLogger({
@@ -131,6 +132,7 @@ function setupIPC() {
   registerTaskChatHandlers(appState.services, logger);
   registerSystemHandlers(appState.services, logger);
   registerWindowHandlers(appState.windows, logger);
+  registerArcReactorHandlers(appState.services, logger);
 
   logger.info('IPC handlers registered');
 }
@@ -156,10 +158,38 @@ function createWindows() {
 }
 
 /**
+ * Setup emergency escape shortcuts
+ */
+function setupEmergencyShortcuts() {
+  // Command+Q / Ctrl+Q - Quit app
+  globalShortcut.register('CommandOrControl+Q', () => {
+    logger.info('🚨 Emergency quit triggered (Cmd/Ctrl+Q)');
+    app.quit();
+  });
+
+  // Command+Escape / Ctrl+Escape - Force quit
+  globalShortcut.register('CommandOrControl+Escape', () => {
+    logger.info('🚨 Emergency force quit triggered (Cmd/Ctrl+Escape)');
+    app.quit();
+  });
+
+  // Command+Shift+Q - Also quit (standard macOS)
+  globalShortcut.register('CommandOrControl+Shift+Q', () => {
+    logger.info('🚨 Emergency quit triggered (Cmd/Ctrl+Shift+Q)');
+    app.quit();
+  });
+
+  logger.info('🛡️ Emergency shortcuts registered (Cmd+Q, Cmd+Escape, Cmd+Shift+Q)');
+}
+
+/**
  * Application ready handler
  */
 app.whenReady().then(async () => {
   logger.info('🚀 HeyJarvis Desktop v2 starting...');
+
+  // Setup emergency shortcuts FIRST
+  setupEmergencyShortcuts();
 
   // Initialize services
   await initializeServices();

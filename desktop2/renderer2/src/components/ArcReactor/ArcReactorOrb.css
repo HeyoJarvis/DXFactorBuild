@@ -1,0 +1,252 @@
+/* Arc Reactor Orb Styles */
+
+.arc-reactor-orb {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  z-index: 10000;
+  cursor: grab;
+  user-select: none;
+  transition: none;
+  pointer-events: auto !important; /* Ensure orb receives clicks */
+}
+
+.arc-reactor-orb.dragging {
+  cursor: grabbing;
+}
+
+/* Outer glow ring */
+.orb-glow-ring {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--orb-glow) 0%,
+    transparent 70%
+  );
+  opacity: 0.8;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Main orb container */
+.orb-main {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.2),
+    var(--orb-color) 40%,
+    #000 100%
+  );
+  box-shadow: 
+    0 0 20px var(--orb-glow),
+    0 0 40px var(--orb-glow),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Rotating rings */
+.orb-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--orb-color);
+  opacity: 0.6;
+}
+
+.orb-ring-1 {
+  width: 70%;
+  height: 70%;
+  animation: rotate-ring-1 10s linear infinite;
+}
+
+.orb-ring-2 {
+  width: 55%;
+  height: 55%;
+  animation: rotate-ring-2 15s linear infinite reverse;
+}
+
+.orb-ring-3 {
+  width: 40%;
+  height: 40%;
+  animation: rotate-ring-3 12s linear infinite;
+}
+
+/* Core */
+.orb-core {
+  position: relative;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: var(--orb-color);
+  box-shadow: 
+    0 0 15px var(--orb-color),
+    0 0 30px var(--orb-color),
+    inset 0 0 10px rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse-core 1.5s ease-in-out infinite;
+}
+
+.orb-core-inner {
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 10px white;
+}
+
+/* Energy particles */
+.orb-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--orb-color);
+  box-shadow: 0 0 4px var(--orb-color);
+  opacity: 0;
+  animation: particle-float 3s ease-in-out infinite;
+}
+
+.orb-particle-1 {
+  top: 20%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.orb-particle-2 {
+  top: 20%;
+  right: 20%;
+  animation-delay: 0.75s;
+}
+
+.orb-particle-3 {
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 1.5s;
+}
+
+.orb-particle-4 {
+  bottom: 20%;
+  right: 20%;
+  animation-delay: 2.25s;
+}
+
+/* Role indicator badge */
+.orb-role-indicator {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--orb-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-core {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 0 15px var(--orb-color),
+      0 0 30px var(--orb-color),
+      inset 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 
+      0 0 20px var(--orb-color),
+      0 0 40px var(--orb-color),
+      inset 0 0 15px rgba(255, 255, 255, 0.7);
+  }
+}
+
+@keyframes rotate-ring-1 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-ring-2 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-ring-3 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(10px, -20px);
+    opacity: 0;
+  }
+}
+
+/* Menu open state */
+.arc-reactor-orb.menu-open .orb-glow-ring {
+  animation: pulse-glow-active 1s ease-in-out infinite;
+}
+
+@keyframes pulse-glow-active {
+  0%, 100% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+/* Role-specific styling */
+.arc-reactor-orb[data-role="sales"] {
+  --orb-color: #00ff88;
+  --orb-glow: rgba(0, 255, 136, 0.6);
+}
+
+.arc-reactor-orb[data-role="developer"] {
+  --orb-color: #00d9ff;
+  --orb-glow: rgba(0, 217, 255, 0.6);
+}
+
+
+
+
+

@@ -1,0 +1,103 @@
+/* Role Toggle Styles */
+
+.role-toggle {
+  position: fixed;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeSlideIn 0.3s ease forwards;
+  -webkit-app-region: no-drag;
+}
+
+.role-toggle-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-left: 4px;
+}
+
+.role-toggle-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.role-toggle-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 150px;
+}
+
+.role-toggle-button:hover {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateX(5px);
+}
+
+.role-toggle-button.active {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: currentColor;
+}
+
+.role-toggle-button.active:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.role-toggle-button[data-role="developer"].active {
+  color: #00d9ff;
+  border-color: #00d9ff;
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+}
+
+.role-toggle-button[data-role="sales"].active {
+  color: #00ff88;
+  border-color: #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.role-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-label {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.role-toggle-button:not(.active) .role-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.role-toggle-button.active .role-label {
+  color: inherit;
+}
+
+/* Fade slide in animation */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
