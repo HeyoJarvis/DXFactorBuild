@@ -47,36 +47,75 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
     const newState = !isMenuOpen;
     console.log('🔄 Menu toggle:', newState ? 'OPEN' : 'CLOSE');
     
+    // CRITICAL: Disable mouse forwarding BEFORE opening menu
+    if (newState && window.electronAPI?.window?.setMouseForward) {
+      await window.electronAPI.window.setMouseForward(false);
+      console.log('🖱️ DISABLED mouse forwarding for menu');
+    }
+    
     // Resize window to accommodate menu
     if (window.electronAPI?.window?.resizeForMenu) {
       await window.electronAPI.window.resizeForMenu(newState);
     }
     
     setIsMenuOpen(newState);
+    
+    // CRITICAL: Only re-enable forwarding in collapsed mode after menu closes
+    if (!newState && isCollapsed && window.electronAPI?.window?.setMouseForward) {
+      // Small delay to ensure menu click completes first
+      setTimeout(async () => {
+        await window.electronAPI.window.setMouseForward(true);
+        console.log('🖱️ Re-enabled mouse forwarding after menu close');
+      }, 100);
+    }
   };
 
   const handleMenuItemClick = async (itemId) => {
     if (!itemId) {
       setIsMenuOpen(false);
+      
+      // Re-enable mouse forwarding only in collapsed mode
+      if (isCollapsed && window.electronAPI?.window?.setMouseForward) {
+        setTimeout(() => {
+          window.electronAPI.window.setMouseForward(true);
+          console.log('🖱️ Menu closed without selection - re-enabled forwarding');
+        }, 100);
+      }
       return;
     }
 
     console.log(`🎯 Menu item clicked: ${itemId}`);
+    
     setIsMenuOpen(false);
     
-    // If collapsed, expand window first
-    if (isCollapsed) {
-      if (window.electronAPI?.window?.expandCopilot) {
-        await window.electronAPI.window.expandCopilot();
-      }
-      
-      // Wait for expansion
-      await new Promise(resolve => setTimeout(resolve, 300));
+    // Map itemId to route
+    const routeMap = {
+      'chat': '/copilot',
+      'mission-control': '/mission-control',
+      'tasks': '/tasks',
+      'architecture': '/architecture',
+      'code': '/indexer',
+      'indexer': '/indexer',
+      'github': '/copilot',
+      'crm': '/copilot',
+      'deals': '/tasks',
+      'settings': '/settings'
+    };
+    
+    const route = routeMap[itemId] || '/tasks';
+    
+    // Open secondary window with the route
+    if (window.electronAPI?.window?.openSecondary) {
+      console.log(`🪟 Opening secondary window: ${route}`);
+      await window.electronAPI.window.openSecondary(route);
     }
     
-    // Navigate to the selected item
-    if (onNavigate) {
-      onNavigate(itemId);
+    // Keep mouse forwarding enabled so orb stays clickable
+    if (window.electronAPI?.window?.setMouseForward) {
+      setTimeout(() => {
+        window.electronAPI.window.setMouseForward(true);
+        console.log('🖱️ Re-enabled mouse forwarding (orb window stays active)');
+      }, 100);
     }
   };
 

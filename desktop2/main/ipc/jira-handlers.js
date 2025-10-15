@@ -1,0 +1,373 @@
+/**
+ * JIRA IPC Handlers
+ * Handles all JIRA-related IPC communication
+ */
+
+const { ipcMain, shell } = require('electron');
+const JIRAService = require('../services/JIRAService');
+const JIRAOAuthHandler = require('../../../oauth/jira-oauth-handler');
+
+let jiraOAuthHandler = null;
+let jiraService = null;
+
+function registerJIRAHandlers(services, logger) {
+  // Initialize JIRA OAuth handler
+  jiraOAuthHandler = new JIRAOAuthHandler({
+    clientId: process.env.JIRA_CLIENT_ID,
+    clientSecret: process.env.JIRA_CLIENT_SECRET,
+    redirectUri: process.env.JIRA_REDIRECT_URI || 'http://localhost:8890/auth/jira/callback',
+    logger
+  });
+
+  // Initialize JIRA service
+  jiraService = new JIRAService({
+    logger,
+    supabaseAdapter: services.dbAdapter
+  });
+
+  /**
+   * Check if JIRA is connected
+   */
+  ipcMain.handle('jira:checkConnection', async (event) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        return {
+          success: false,
+          connected: false,
+          error: 'User not authenticated'
+        };
+      }
+
+      // Try to initialize JIRA service
+      const result = await jiraService.initialize(userId);
+
+      return {
+        success: true,
+        connected: result.connected,
+        siteUrl: result.siteUrl,
+        cloudId: result.cloudId
+      };
+
+    } catch (error) {
+      logger.error('JIRA connection check error:', error);
+      return {
+        success: false,
+        connected: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Authenticate with JIRA (OAuth flow)
+   */
+  ipcMain.handle('jira:authenticate', async (event) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      logger.info('Starting JIRA OAuth flow', { userId });
+
+      // Start OAuth flow and wait for callback
+      const authResult = await jiraOAuthHandler.startAuthFlow();
+
+      // authResult contains: access_token, refresh_token, expires_in, cloud_id, site_url
+      if (!authResult || !authResult.access_token) {
+        throw new Error('Failed to get access token');
+      }
+
+      // Save tokens to Supabase
+      const { data: currentUser } = await services.dbAdapter.supabase
+        .from('users')
+        .select('integration_settings')
+        .eq('id', userId)
+        .single();
+
+      const integrationSettings = currentUser?.integration_settings || {};
+      integrationSettings.jira = {
+        access_token: authResult.access_token,
+        refresh_token: authResult.refresh_token,
+        token_expiry: new Date(Date.now() + (authResult.expires_in * 1000)).toISOString(),
+        cloud_id: authResult.cloud_id,
+        site_url: authResult.site_url
+      };
+
+      const { error: updateError } = await services.dbAdapter.supabase
+        .from('users')
+        .update({ integration_settings: integrationSettings })
+        .eq('id', userId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Initialize JIRA service
+      await jiraService.initialize(userId);
+
+      // Start auto-sync
+      jiraService.startAutoSync(userId, 10);
+
+      logger.info('JIRA authenticated successfully', {
+        userId,
+        siteUrl: authResult.site_url
+      });
+
+      return {
+        success: true,
+        connected: true,
+        siteUrl: authResult.site_url,
+        cloudId: authResult.cloud_id
+      };
+
+    } catch (error) {
+      logger.error('JIRA authentication error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Disconnect JIRA
+   */
+  ipcMain.handle('jira:disconnect', async (event) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Remove JIRA tokens from Supabase
+      const { data: currentUser } = await services.dbAdapter.supabase
+        .from('users')
+        .select('integration_settings')
+        .eq('id', userId)
+        .single();
+
+      const integrationSettings = currentUser?.integration_settings || {};
+      delete integrationSettings.jira;
+
+      await services.dbAdapter.supabase
+        .from('users')
+        .update({ integration_settings: integrationSettings })
+        .eq('id', userId);
+
+      // Stop auto-sync
+      jiraService.stopAutoSync();
+
+      logger.info('JIRA disconnected', { userId });
+
+      return {
+        success: true
+      };
+
+    } catch (error) {
+      logger.error('JIRA disconnect error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Get user's JIRA issues
+   */
+  ipcMain.handle('jira:getMyIssues', async (event, options = {}) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.getMyIssues(options);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA issues fetched', { count: result.issues.length });
+
+      return {
+        success: true,
+        issues: result.issues,
+        total: result.total
+      };
+
+    } catch (error) {
+      logger.error('JIRA getMyIssues error:', error);
+      return {
+        success: false,
+        error: error.message,
+        issues: []
+      };
+    }
+  });
+
+  /**
+   * Sync JIRA tasks to Supabase
+   */
+  ipcMain.handle('jira:syncTasks', async (event) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.syncTasks(userId);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA tasks synced', {
+        created: result.tasksCreated,
+        updated: result.tasksUpdated
+      });
+
+      return {
+        success: true,
+        tasksCreated: result.tasksCreated,
+        tasksUpdated: result.tasksUpdated,
+        totalIssues: result.totalIssues
+      };
+
+    } catch (error) {
+      logger.error('JIRA sync error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Update JIRA issue
+   */
+  ipcMain.handle('jira:updateIssue', async (event, issueKey, updateData) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.updateIssue(issueKey, updateData);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA issue updated', { issueKey });
+
+      return {
+        success: true
+      };
+
+    } catch (error) {
+      logger.error('JIRA update issue error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Transition JIRA issue (change status)
+   */
+  ipcMain.handle('jira:transitionIssue', async (event, issueKey, transitionName) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.transitionIssue(issueKey, transitionName);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA issue transitioned', { issueKey, transitionName });
+
+      return {
+        success: true
+      };
+
+    } catch (error) {
+      logger.error('JIRA transition issue error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Get JIRA health status
+   */
+  ipcMain.handle('jira:healthCheck', async (event) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        return {
+          status: 'disconnected',
+          jira: 'user not authenticated'
+        };
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const health = await jiraService.healthCheck();
+
+      return health;
+
+    } catch (error) {
+      logger.error('JIRA health check error:', error);
+      return {
+        status: 'unhealthy',
+        error: error.message
+      };
+    }
+  });
+
+  logger.info('JIRA handlers registered');
+}
+
+module.exports = registerJIRAHandlers;
+

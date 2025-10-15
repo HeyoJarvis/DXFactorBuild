@@ -60,7 +60,6 @@ class MainWindowManager {
       x: 20, // Small margin from left edge
       y: screenHeight - startHeight - 20, // Bottom of screen with margin
       show: false, // Will show manually in ready-to-show
-      frame: false, // Frameless window - no titlebar
       transparent: true, // TRANSPARENT for Arc Reactor orb
       backgroundColor: '#00000000', // Fully transparent background
       resizable: true, // Allow resizing for expansion
@@ -70,6 +69,7 @@ class MainWindowManager {
       enableLargerThanScreen: true, // Allow full screen coverage
       focusable: true, // Allow window to receive focus
       acceptFirstMouse: true, // Accept clicks even when not focused
+      frame: false, // Frameless window - removes ALL window chrome including traffic lights
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,

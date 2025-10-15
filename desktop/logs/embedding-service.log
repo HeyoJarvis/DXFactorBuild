@@ -573,3 +573,9 @@
 {"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-14T17:57:26.561Z"}
 {"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-14T19:01:02.298Z"}
 {"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-14T19:01:02.299Z"}
+{"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T04:03:13.938Z"}
+{"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T04:03:13.938Z"}
+{"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T16:02:39.248Z"}
+{"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T16:02:39.249Z"}
+{"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T16:15:14.604Z"}
+{"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T16:15:14.605Z"}

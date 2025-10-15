@@ -42,6 +42,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getRole: () => ipcRenderer.invoke('system:getRole')
   },
 
+  // Auth APIs
+  auth: {
+    signInWithSlack: () => ipcRenderer.invoke('auth:signInWithSlack'),
+    signInWithTeams: () => ipcRenderer.invoke('auth:signInWithTeams'),
+    signOut: () => ipcRenderer.invoke('auth:signOut'),
+    getSession: () => ipcRenderer.invoke('auth:getSession'),
+    getCurrentUser: () => ipcRenderer.invoke('auth:getCurrentUser'),
+    onAuthStateChange: (callback) => {
+      ipcRenderer.on('auth:stateChanged', (event, data) => callback(data));
+      return () => ipcRenderer.removeListener('auth:stateChanged', callback);
+    }
+  },
+
   // Arc Reactor APIs
   arcReactor: {
     getMenuItems: (role) => ipcRenderer.invoke('arcReactor:getMenuItems', role)
@@ -54,9 +67,31 @@ contextBridge.exposeInMainWorld('electronAPI', {
     toggleCopilot: () => ipcRenderer.invoke('window:toggleCopilot'),
     expandCopilot: () => ipcRenderer.invoke('window:expandCopilot'),
     collapseCopilot: () => ipcRenderer.invoke('window:collapseCopilot'),
+    openSecondary: (route) => ipcRenderer.invoke('window:openSecondary', route),
+    navigateSecondary: (route) => ipcRenderer.invoke('window:navigateSecondary', route),
     setMouseForward: (shouldForward) => ipcRenderer.invoke('window:setMouseForward', shouldForward),
     moveWindow: (x, y) => ipcRenderer.invoke('window:moveWindow', x, y),
     resizeForMenu: (isOpen) => ipcRenderer.invoke('window:resizeForMenu', isOpen)
+  },
+
+  // Code Indexer APIs
+  codeIndexer: {
+    query: (params) => ipcRenderer.invoke('codeIndexer:query', params),
+    listRepositories: (params) => ipcRenderer.invoke('codeIndexer:listRepositories', params),
+    getStatus: () => ipcRenderer.invoke('codeIndexer:getStatus'),
+    checkAvailability: () => ipcRenderer.invoke('codeIndexer:checkAvailability')
+  },
+
+  // JIRA APIs
+  jira: {
+    checkConnection: () => ipcRenderer.invoke('jira:checkConnection'),
+    authenticate: () => ipcRenderer.invoke('jira:authenticate'),
+    disconnect: () => ipcRenderer.invoke('jira:disconnect'),
+    getMyIssues: (options) => ipcRenderer.invoke('jira:getMyIssues', options),
+    syncTasks: () => ipcRenderer.invoke('jira:syncTasks'),
+    updateIssue: (issueKey, updateData) => ipcRenderer.invoke('jira:updateIssue', issueKey, updateData),
+    transitionIssue: (issueKey, transitionName) => ipcRenderer.invoke('jira:transitionIssue', issueKey, transitionName),
+    healthCheck: () => ipcRenderer.invoke('jira:healthCheck')
   }
 });
 

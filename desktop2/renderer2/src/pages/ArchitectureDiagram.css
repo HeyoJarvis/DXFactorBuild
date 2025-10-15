@@ -1,0 +1,252 @@
+/* Architecture Diagram Page */
+.architecture-diagram-page {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', sans-serif;
+  background: #fafafa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.architecture-header {
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.header-content {
+  max-width: 100%;
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  -webkit-app-region: no-drag;
+}
+
+.header-content button,
+.header-content input {
+  -webkit-app-region: no-drag;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.diagram-name-input {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  letter-spacing: -0.02em;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+}
+
+.diagram-name-input:focus {
+  background: rgba(0, 122, 255, 0.05);
+  padding: 4px 8px;
+  margin: -4px -8px;
+  border-radius: 4px;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: #86868b;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: white;
+  color: #525252;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.header-btn:hover {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.header-btn svg {
+  flex-shrink: 0;
+}
+
+.header-btn-primary {
+  background: #007aff;
+  color: white;
+  border-color: #007aff;
+}
+
+.header-btn-primary:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.node-count {
+  font-size: 12px;
+  color: #86868b;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.minimize-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  color: #86868b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.minimize-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1d1d1f;
+}
+
+/* Main Content - Three Panel Layout */
+.architecture-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  gap: 0;
+  overflow: hidden;
+}
+
+.left-panel {
+  background: white;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.center-panel {
+  background: #fafafa;
+  overflow: hidden;
+  position: relative;
+}
+
+.right-panel {
+  background: white;
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Empty State */
+.canvas-empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+  text-align: center;
+}
+
+.empty-icon {
+  color: #d1d5db;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  color: #86868b;
+  margin: 0;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .architecture-content {
+    grid-template-columns: 260px 1fr 300px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .architecture-content {
+    grid-template-columns: 240px 1fr 280px;
+  }
+  
+  .header-actions {
+    gap: 6px;
+  }
+  
+  .header-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .architecture-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+  
+  .left-panel,
+  .right-panel {
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+}
+

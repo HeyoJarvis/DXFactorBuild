@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Copilot from './pages/Copilot';
 import Tasks from './pages/Tasks';
+import TasksDeveloper from './pages/TasksDeveloper';
+import ArchitectureDiagram from './pages/ArchitectureDiagram';
+import Indexer from './pages/Indexer';
+import MissionControl from './pages/MissionControl';
+import Settings from './pages/Settings';
+import Login from './pages/Login';
 import Navigation from './components/common/Navigation';
 import ArcReactor from './components/ArcReactor/ArcReactor';
 
@@ -10,19 +16,103 @@ function App() {
   const [isCollapsed, setIsCollapsed] = useState(true); // Start collapsed (Arc Reactor only)
   const [systemStatus, setSystemStatus] = useState(null);
   const [initialChatMessage, setInitialChatMessage] = useState(null);
+  
+  // Auth state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [userRole, setUserRole] = useState('sales'); // Default to sales
 
   useEffect(() => {
     initializeApp();
+    checkAuthStatus();
+    loadUserRole();
   }, []);
 
-  // Force mouse forwarding state based on collapsed state
+  // Load user role from localStorage
+  function loadUserRole() {
+    const savedRole = localStorage.getItem('heyjarvis-role');
+    if (savedRole && (savedRole === 'developer' || savedRole === 'sales')) {
+      setUserRole(savedRole);
+    } else {
+      setUserRole('sales');
+      localStorage.setItem('heyjarvis-role', 'sales');
+    }
+  }
+
+  // Listen for role changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      loadUserRole();
+    };
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Poll for role changes (since storage event doesn't fire in same window)
+    const interval = setInterval(loadUserRole, 500);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Force mouse forwarding state based on auth and collapsed state
   useEffect(() => {
     if (window.electronAPI?.window?.setMouseForward) {
-      const shouldForward = isCollapsed; // Only forward in collapsed mode
+      // NEVER forward on login page - must be fully interactive
+      if (!authLoading && !isAuthenticated) {
+        window.electronAPI.window.setMouseForward(false);
+        console.log(`🖱️ Mouse forwarding DISABLED (login page)`);
+        return;
+      }
+      
+      // Only forward in collapsed mode when authenticated
+      const shouldForward = isCollapsed;
       window.electronAPI.window.setMouseForward(shouldForward);
       console.log(`🖱️ Mouse forwarding ${shouldForward ? 'ENABLED' : 'DISABLED'} (${isCollapsed ? 'collapsed' : 'expanded'} mode)`);
     }
-  }, [isCollapsed]);
+  }, [isCollapsed, isAuthenticated, authLoading]);
+
+  async function checkAuthStatus() {
+    try {
+      console.log('🔐 Checking auth status...');
+      if (window.electronAPI?.auth) {
+        const result = await window.electronAPI.auth.getSession();
+        
+        if (result.success && result.session) {
+          console.log('✅ User is authenticated:', result.session.user);
+          setIsAuthenticated(true);
+          setCurrentUser(result.session.user);
+        } else {
+          console.log('⚠️ No active session found');
+          setIsAuthenticated(false);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Auth check failed:', error);
+      setIsAuthenticated(false);
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  function handleLoginSuccess(user, session) {
+    console.log('✅ Login successful!', user);
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+  }
+
+  async function handleLogout() {
+    try {
+      if (window.electronAPI?.auth) {
+        await window.electronAPI.auth.signOut();
+      }
+      setIsAuthenticated(false);
+      setCurrentUser(null);
+    } catch (error) {
+      console.error('❌ Logout failed:', error);
+    }
+  }
 
   async function initializeApp() {
     try {
@@ -74,41 +164,82 @@ function App() {
   const handleArcReactorNavigate = async (itemId) => {
     console.log(`🧭 Navigating from Arc Reactor to: ${itemId}`);
     
-    // CRITICAL: Disable mouse forwarding IMMEDIATELY
-    if (window.electronAPI?.window?.setMouseForward) {
-      await window.electronAPI.window.setMouseForward(false);
-      console.log('🖱️ FORCE DISABLED mouse forwarding before expand');
-    }
-    
-    // Expand window first
-    if (window.electronAPI && isCollapsed) {
-      try {
-        await window.electronAPI.window.expandCopilot();
-        console.log('✅ Window expanded');
-      } catch (error) {
-        console.error('❌ Failed to expand window:', error);
-      }
-    }
-    
-    // Ensure we're expanded in UI
-    setIsCollapsed(false);
-    
     // Navigate based on item ID
     const routeMap = {
       'chat': '/copilot',
+      'mission-control': '/mission-control',
       'tasks': '/tasks',
-      'code': '/copilot', // Could be a new route
-      'github': '/copilot', // Could be a new route
-      'crm': '/copilot', // Could be a new route
-      'deals': '/tasks' // Could be a new route
+      'architecture': '/architecture',
+      'indexer': '/indexer',
+      'code': '/indexer', // Map code to indexer
+      'settings': '/settings',
+      'github': '/copilot',
+      'crm': '/copilot',
+      'deals': '/tasks'
     };
     
     const targetRoute = routeMap[itemId] || '/copilot';
-    navigate(targetRoute);
+    
+    // Open in secondary window
+    if (window.electronAPI?.window?.openSecondary) {
+      try {
+        await window.electronAPI.window.openSecondary(targetRoute);
+        console.log(`✅ Opened secondary window: ${targetRoute}`);
+      } catch (error) {
+        console.error('❌ Failed to open secondary window:', error);
+      }
+    } else {
+      console.warn('⚠️ Secondary window API not available, using legacy navigation');
+      
+      // Legacy fallback
+      // CRITICAL: Disable mouse forwarding IMMEDIATELY
+      if (window.electronAPI?.window?.setMouseForward) {
+        await window.electronAPI.window.setMouseForward(false);
+        console.log('🖱️ FORCE DISABLED mouse forwarding before expand');
+      }
+      
+      // Expand window first
+      if (window.electronAPI && isCollapsed) {
+        try {
+          await window.electronAPI.window.expandCopilot();
+          console.log('✅ Window expanded');
+        } catch (error) {
+          console.error('❌ Failed to expand window:', error);
+        }
+      }
+      
+      // Ensure we're expanded in UI
+      setIsCollapsed(false);
+      navigate(targetRoute);
+    }
   };
 
-  // If collapsed, show only Arc Reactor
-  if (isCollapsed) {
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="app" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🤖</div>
+          <div style={{ fontSize: '16px', color: '#6b7280' }}>Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login if not authenticated (wrapped in app container with pointer-events enabled)
+  if (!isAuthenticated) {
+    return (
+      <div className="app app-login">
+        <Login onLoginSuccess={handleLoginSuccess} />
+      </div>
+    );
+  }
+
+  // Check if we're in the orb window or secondary window based on hash
+  const isOrbWindow = !window.location.hash || window.location.hash === '#/';
+  
+  // If this is the orb window, show only Arc Reactor
+  if (isOrbWindow) {
     return (
       <div className="app app-collapsed">
         <ArcReactor
@@ -119,22 +250,44 @@ function App() {
     );
   }
 
+  // Check if we're on pages without navigation
+  const isTasksPage = window.location.hash === '#/tasks';
+  const isArchitecturePage = window.location.hash === '#/architecture';
+  const isIndexerPage = window.location.hash === '#/indexer';
+  const isMissionControlPage = window.location.hash === '#/mission-control';
+  const isSettingsPage = window.location.hash === '#/settings';
+  const hideNavigation = isTasksPage || isArchitecturePage || isIndexerPage || isMissionControlPage || isSettingsPage;
+  
+  // If this is the secondary window, show the main UI (no orb)
   return (
-    <div className="app">
-      <Navigation onMinimize={handleMinimizeToHeader} />
+    <div className="app app-secondary">
+      {!hideNavigation && (
+        <Navigation 
+          user={currentUser}
+          onLogout={handleLogout}
+          onMinimize={() => {
+            // Close this window instead of minimizing
+            if (window.electronAPI?.window) {
+              window.close();
+            }
+          }} 
+        />
+      )}
       <div className="app-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/copilot" replace />} />
-          <Route path="/copilot" element={<Copilot systemStatus={systemStatus} initialMessage={initialChatMessage} />} />
-          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/" element={<Navigate to="/tasks" replace />} />
+          <Route path="/copilot" element={<Copilot systemStatus={systemStatus} initialMessage={initialChatMessage} user={currentUser} />} />
+          <Route path="/tasks" element={
+            userRole === 'developer' 
+              ? <TasksDeveloper user={currentUser} />
+              : <Tasks user={currentUser} />
+          } />
+          <Route path="/architecture" element={<ArchitectureDiagram user={currentUser} />} />
+          <Route path="/indexer" element={<Indexer user={currentUser} />} />
+          <Route path="/mission-control" element={<MissionControl user={currentUser} />} />
+          <Route path="/settings" element={<Settings user={currentUser} />} />
         </Routes>
       </div>
-      
-      {/* Arc Reactor is always present, even when expanded */}
-      <ArcReactor
-        isCollapsed={false}
-        onNavigate={handleArcReactorNavigate}
-      />
     </div>
   );
 }

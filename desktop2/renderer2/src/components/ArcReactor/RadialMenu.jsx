@@ -14,12 +14,13 @@ function RadialMenu({ isOpen, orbPosition, onItemClick, currentRole = 'developer
   const menuItemsByRole = {
     developer: [
       { id: 'tasks', label: 'Tasks' },
-      { id: 'chat', label: 'Chat' },
+      { id: 'architecture', label: 'Architecture' },
+      { id: 'mission-control', label: 'Mission Control' },
       { id: 'code', label: 'Indexer' }
     ],
     sales: [
       { id: 'tasks', label: 'Tasks' },
-      { id: 'chat', label: 'Chat' },
+      { id: 'mission-control', label: 'Mission Control' },
       { id: 'code', label: 'Indexer' },
       { id: 'settings', label: 'Settings' }
     ]
@@ -56,6 +57,15 @@ function RadialMenu({ isOpen, orbPosition, onItemClick, currentRole = 'developer
     flexDirection: 'column',
     gap: '6px'
   };
+
+  // Disable window-level mouse forwarding when menu opens
+  useEffect(() => {
+    if (isOpen && window.electronAPI?.window?.setMouseForward) {
+      console.log('🔓 Menu opened - FORCE DISABLING mouse forwarding');
+      window.electronAPI.window.setMouseForward(false);
+    }
+    // Don't re-enable here - let the parent handle that when menu closes
+  }, [isOpen]);
 
   // Close menu on escape
   useEffect(() => {

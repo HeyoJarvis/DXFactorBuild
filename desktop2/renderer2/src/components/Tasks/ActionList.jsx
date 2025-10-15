@@ -17,24 +17,18 @@ export default function ActionList({ tasks, onToggle, onDelete, onUpdate, onChat
   }
 
   return (
-    <div className="action-list">
-      <div className="action-list-header">
-        <h2 className="action-list-title">Action Items:</h2>
-        <div className="action-list-count">{tasks.length} items</div>
-      </div>
-      
-      <div className="action-list-items">
-        {tasks.map(task => (
-          <ActionItem
-            key={task.id}
-            task={task}
-            onToggle={onToggle}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-            onChat={onChat}
-          />
-        ))}
-      </div>
+    <div className="action-list-items">
+      {tasks.map((task, index) => (
+        <ActionItem
+          key={task.id}
+          task={task}
+          index={index}
+          onToggle={onToggle}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+          onChat={onChat}
+        />
+      ))}
     </div>
   );
 }

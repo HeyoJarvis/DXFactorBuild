@@ -11,21 +11,26 @@ const winston = require('winston');
 
 // Import managers
 const MainWindowManager = require('./windows/MainWindowManager');
+const SecondaryWindowManager = require('./windows/SecondaryWindowManager');
 const CopilotOverlayManager = require('./windows/CopilotOverlayManager');
 const TrayManager = require('./windows/TrayManager');
 
 // Import services
+const AuthService = require('./services/AuthService');
 const SlackService = require('./services/SlackService');
 const CRMService = require('./services/CRMService');
 const AIService = require('./services/AIService');
 
 // Import IPC handlers
+const registerAuthHandlers = require('./ipc/auth-handlers');
 const registerChatHandlers = require('./ipc/chat-handlers');
 const registerTaskHandlers = require('./ipc/task-handlers');
 const registerTaskChatHandlers = require('./ipc/task-chat-handlers');
 const registerSystemHandlers = require('./ipc/system-handlers');
 const registerWindowHandlers = require('./ipc/window-handlers');
 const registerArcReactorHandlers = require('./ipc/arc-reactor-handlers');
+const registerJIRAHandlers = require('./ipc/jira-handlers');
+const CodeIndexerHandlers = require('./ipc/code-indexer-handlers');
 
 // Setup logger
 const logger = winston.createLogger({
@@ -70,6 +75,9 @@ async function initializeServices() {
     // Load Supabase adapter
     const SupabaseAdapter = require('./services/SupabaseAdapter');
     appState.services.dbAdapter = new SupabaseAdapter({ useServiceRole: true });
+
+    // Initialize auth service
+    appState.services.auth = new AuthService({ logger });
 
     // Initialize services
     appState.services.slack = new SlackService({ logger });
@@ -127,12 +135,18 @@ async function initializeServices() {
 function setupIPC() {
   logger.info('Setting up IPC handlers...');
 
+  registerAuthHandlers(appState.services, logger);
   registerChatHandlers(appState.services, logger);
   registerTaskHandlers(appState.services, logger);
   registerTaskChatHandlers(appState.services, logger);
   registerSystemHandlers(appState.services, logger);
   registerWindowHandlers(appState.windows, logger);
   registerArcReactorHandlers(appState.services, logger);
+  registerJIRAHandlers(appState.services, logger);
+  
+  // Setup code indexer handlers
+  const codeIndexerHandlers = new CodeIndexerHandlers(logger);
+  codeIndexerHandlers.setup();
 
   logger.info('IPC handlers registered');
 }
@@ -143,9 +157,13 @@ function setupIPC() {
 function createWindows() {
   logger.info('Creating windows...');
 
-  // Create main window manager
+  // Create main window manager (Arc Reactor orb only)
   appState.windows.main = new MainWindowManager({ logger });
   appState.windows.main.create();
+
+  // Create secondary window manager (for Tasks/Copilot UI)
+  appState.windows.secondary = new SecondaryWindowManager(logger);
+  // Don't create yet - will be created on demand when user clicks menu
 
   // Create copilot overlay manager
   appState.windows.copilot = new CopilotOverlayManager({ logger });

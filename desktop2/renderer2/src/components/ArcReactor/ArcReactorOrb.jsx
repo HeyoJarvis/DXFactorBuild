@@ -37,10 +37,11 @@ function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', on
   };
 
   const handleMouseLeave = () => {
-    // Only re-enable mouse forwarding in collapsed mode
-    // In expanded mode, we never want mouse forwarding
-    if (isCollapsed && !isDragging && window.electronAPI?.window?.setMouseForward) {
+    // NEVER re-enable mouse forwarding when menu is open
+    // Only re-enable in collapsed mode when menu is closed
+    if (isCollapsed && !isDragging && !isMenuOpen && window.electronAPI?.window?.setMouseForward) {
       window.electronAPI.window.setMouseForward(true);
+      console.log('🖱️ Mouse left orb - re-enabled forwarding (menu closed)');
     }
   };
 

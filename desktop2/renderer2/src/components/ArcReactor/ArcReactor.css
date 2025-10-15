@@ -7,7 +7,7 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none; /* Container doesn't block clicks */
-  z-index: 10000;
+  z-index: 10000; /* Always on top of main UI panel */
 }
 
 /* Only Arc Reactor elements should receive pointer events */

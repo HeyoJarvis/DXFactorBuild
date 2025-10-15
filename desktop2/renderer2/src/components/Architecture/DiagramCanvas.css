@@ -1,0 +1,290 @@
+.diagram-canvas {
+  width: 100%;
+  height: 100%;
+  background: #fafafa;
+}
+
+/* Custom Node Styles */
+.custom-node {
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid;
+  background: white;
+  min-width: 160px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.custom-node:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.node-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.node-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+}
+
+.node-description {
+  font-size: 11px;
+  color: #86868b;
+  line-height: 1.4;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Frontend Node */
+.frontend-node {
+  border-color: #3b82f6;
+}
+
+.frontend-node .node-icon {
+  background: #3b82f6;
+}
+
+.frontend-node .node-label {
+  color: #1e40af;
+}
+
+/* Backend Node */
+.backend-node {
+  border-color: #10b981;
+}
+
+.backend-node .node-icon {
+  background: #10b981;
+}
+
+.backend-node .node-label {
+  color: #065f46;
+}
+
+/* Database Node */
+.database-node {
+  border-color: #f59e0b;
+}
+
+.database-node .node-icon {
+  background: #f59e0b;
+}
+
+.database-node .node-label {
+  color: #92400e;
+}
+
+/* Infrastructure Node */
+.infrastructure-node {
+  border-color: #8b5cf6;
+}
+
+.infrastructure-node .node-icon {
+  background: #8b5cf6;
+}
+
+.infrastructure-node .node-label {
+  color: #5b21b6;
+}
+
+/* React Flow Overrides */
+.react-flow__node {
+  cursor: grab;
+}
+
+.react-flow__node:active {
+  cursor: grabbing;
+}
+
+.react-flow__node.selected .custom-node {
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__edge.animated path {
+  stroke-dasharray: 5;
+  animation: dashdraw 0.5s linear infinite;
+}
+
+@keyframes dashdraw {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+.react-flow__controls {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.react-flow__controls-button {
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: background 0.15s ease;
+}
+
+.react-flow__controls-button:hover {
+  background: rgba(0, 122, 255, 0.05);
+}
+
+.react-flow__controls-button svg {
+  fill: #525252;
+}
+
+.react-flow__minimap {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Group/Container Node */
+.group-node {
+  min-width: 400px;
+  min-height: 300px;
+  border: 2px dashed;
+  border-radius: 12px;
+  background: white;
+  padding: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.group-header {
+  padding: 10px 16px;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.group-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.group-badge {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.group-description {
+  padding: 12px 16px;
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Service/Pod Node (Smaller) */
+.service-node {
+  min-width: 100px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 2px solid #6366f1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+  transition: all 0.2s ease;
+}
+
+.service-node:hover {
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+  transform: translateY(-2px);
+}
+
+.service-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #6366f1;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.service-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1d1d1f;
+  text-align: center;
+}
+
+.service-replicas {
+  font-size: 10px;
+  color: #6366f1;
+  font-weight: 600;
+}
+
+/* Load Balancer Node */
+.loadbalancer-node {
+  border-color: #ec4899;
+  min-width: 180px;
+}
+
+.loadbalancer-node .node-icon {
+  background: #ec4899;
+}
+
+.loadbalancer-node .node-label {
+  color: #9f1239;
+}
+
+/* React Flow Group Node Support */
+.react-flow__node.selectable:focus,
+.react-flow__node.selectable:focus-visible {
+  outline: none;
+}
+
+.react-flow__node-group {
+  z-index: -1;
+}
+
+/* Make group nodes always behind regular nodes */
+.react-flow__node[data-type="group"] {
+  z-index: 0;
+}
+
+.react-flow__node:not([data-type="group"]) {
+  z-index: 1;
+}
+

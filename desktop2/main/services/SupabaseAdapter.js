@@ -717,6 +717,88 @@ class DesktopSupabaseAdapter {
   }
 
   /**
+   * Get task by external ID (e.g., JIRA issue ID)
+   */
+  async getTaskByExternalId(externalId) {
+    try {
+      const { data, error } = await this.supabase
+        .from('conversation_sessions')
+        .select('*')
+        .eq('workflow_type', 'task')
+        .contains('workflow_metadata', { externalId: externalId });
+
+      if (error && error.code !== 'PGRST116') { // Ignore "not found" error
+        throw error;
+      }
+
+      // Return first match (should only be one)
+      const task = data && data.length > 0 ? data[0] : null;
+      
+      if (task) {
+        if (this.logger.info) {
+          this.logger.info('Task found by external ID', { 
+            external_id: externalId,
+            task_id: task.id 
+          });
+        }
+      }
+
+      return task;
+    } catch (error) {
+      if (this.logger.error) {
+        this.logger.error('Failed to get task by external ID', { 
+          external_id: externalId,
+          error: error.message 
+        });
+      }
+      return null;
+    }
+  }
+
+  /**
+   * Get chat history for a specific task
+   */
+  async getTaskChatHistory(taskId) {
+    try {
+      if (this.logger.info) {
+        this.logger.info('Fetching task chat history', { task_id: taskId });
+      }
+
+      const { data, error } = await this.supabase
+        .from('conversation_messages')
+        .select('*')
+        .eq('metadata->>task_id', taskId)
+        .eq('metadata->>message_type', 'task_chat')
+        .order('timestamp', { ascending: true });
+
+      if (error) throw error;
+
+      const messages = (data || []).map(msg => ({
+        role: msg.role,
+        content: msg.message_text,
+        timestamp: msg.timestamp
+      }));
+
+      if (this.logger.info) {
+        this.logger.info('Task chat history loaded', { 
+          task_id: taskId,
+          message_count: messages.length 
+        });
+      }
+
+      return { success: true, messages };
+    } catch (error) {
+      if (this.logger.error) {
+        this.logger.error('Failed to get task chat history', { 
+          task_id: taskId,
+          error: error.message 
+        });
+      }
+      return { success: false, error: error.message, messages: [] };
+    }
+  }
+
+  /**
    * Get task statistics
    */
   async getTaskStats(userId) {

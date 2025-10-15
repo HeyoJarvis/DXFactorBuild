@@ -52,12 +52,52 @@ function registerWindowHandlers(windows, logger) {
   });
 
   /**
-   * Expand copilot
+   * Open secondary window (Tasks/Copilot UI)
+   */
+  ipcMain.handle('window:openSecondary', async (event, route = '/tasks') => {
+    try {
+      if (!windows.secondary) {
+        logger.error('Secondary window manager not initialized');
+        return { success: false, error: 'Secondary window not available' };
+      }
+
+      // Create or show the secondary window
+      windows.secondary.create(route);
+      logger.info('Secondary window opened', { route });
+      
+      return { success: true };
+    } catch (error) {
+      logger.error('Window openSecondary error:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
+   * Navigate secondary window
+   */
+  ipcMain.handle('window:navigateSecondary', async (event, route) => {
+    try {
+      if (!windows.secondary) {
+        return { success: false, error: 'Secondary window not available' };
+      }
+
+      windows.secondary.navigate(route);
+      return { success: true };
+    } catch (error) {
+      logger.error('Window navigateSecondary error:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
+   * Expand copilot (legacy - now opens secondary window)
    */
   ipcMain.handle('window:expandCopilot', async () => {
     try {
-      // Expand main window to full chat interface
-      windows.main?.expandToFullChat();
+      // Open secondary window instead of expanding main
+      if (windows.secondary) {
+        windows.secondary.create('/copilot');
+      }
       return { success: true };
     } catch (error) {
       logger.error('Window expandCopilot error:', error);

@@ -11,13 +11,21 @@ const SupabaseAdapter = require('../services/SupabaseAdapter');
 const dbAdapter = new SupabaseAdapter({ useServiceRole: true });
 
 function registerTaskHandlers(services, logger) {
-  const userId = 'desktop-user'; // TODO: Get actual user ID
-
   /**
    * Create a new task in Supabase
    */
   ipcMain.handle('tasks:create', async (event, taskData) => {
     try {
+      // Get current user ID from auth service
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        return {
+          success: false,
+          error: 'User not authenticated'
+        };
+      }
+      
       const result = await dbAdapter.createTask(userId, taskData);
       
       if (!result.success) {
@@ -48,9 +56,23 @@ function registerTaskHandlers(services, logger) {
   /**
    * Get all tasks from Supabase
    */
-  ipcMain.handle('tasks:getAll', async () => {
+  ipcMain.handle('tasks:getAll', async (event, filters = {}) => {
     try {
-      const result = await dbAdapter.getUserTasks(userId, { includeCompleted: false });
+      // Get current user ID from auth service
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        return {
+          success: false,
+          error: 'User not authenticated',
+          tasks: []
+        };
+      }
+      
+      const result = await dbAdapter.getUserTasks(userId, { 
+        includeCompleted: false,
+        ...filters
+      });
 
       if (!result.success) {
         throw new Error(result.error);

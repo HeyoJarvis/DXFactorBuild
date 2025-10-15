@@ -1,0 +1,169 @@
+/* Login Page */
+.login-page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow: hidden;
+  pointer-events: auto !important; /* Critical: Enable all clicks on login page */
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 420px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto !important; /* Ensure container is clickable */
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  font-size: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.login-container h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #171717;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #737373;
+  font-weight: 400;
+}
+
+.sign-in-section {
+  margin-top: 40px;
+}
+
+.slack-button,
+.teams-button {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto !important; /* Critical: Buttons must be clickable */
+}
+
+.slack-button {
+  background: #4A154B;
+  color: white;
+  box-shadow: 0 4px 12px rgba(74, 21, 75, 0.3);
+}
+
+.slack-button:hover:not(:disabled) {
+  background: #611f69;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(74, 21, 75, 0.4);
+}
+
+.teams-button {
+  background: #505AC9;
+  color: white;
+  box-shadow: 0 4px 12px rgba(80, 90, 201, 0.3);
+}
+
+.teams-button:hover:not(:disabled) {
+  background: #404AB3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(80, 90, 201, 0.4);
+}
+
+.slack-button:disabled,
+.teams-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.slack-button:active:not(:disabled),
+.teams-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: #a3a3a3;
+  font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e5e5;
+}
+
+.divider span {
+  padding: 0 16px;
+}
+
+.error-message {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 14px;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.footer-text {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 12px;
+  color: #a3a3a3;
+  line-height: 1.5;
+}
+

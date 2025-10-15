@@ -1,63 +1,8 @@
 /* Action List Container */
-
-.action-list {
-  flex: 1;
+.action-list-items {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-}
-
-.action-list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 24px 32px 16px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.action-list-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
-  letter-spacing: -0.02em;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-}
-
-.action-list-count {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.action-list-items {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px 32px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-}
-
-.action-list-items::-webkit-scrollbar {
-  width: 8px;
-}
-
-.action-list-items::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.action-list-items::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
-.action-list-items::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  gap: 16px;
 }
 
 /* Empty State */
@@ -66,56 +11,25 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 32px;
+  padding: 80px 20px;
   text-align: center;
 }
 
-.action-empty-state .empty-icon {
+.empty-icon {
   font-size: 64px;
   margin-bottom: 16px;
-  opacity: 0.6;
-  animation: float 3s ease-in-out infinite;
+  opacity: 0.4;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.action-empty-state .empty-title {
+.empty-title {
   font-size: 20px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  color: #171717;
   margin-bottom: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
 }
 
-.action-empty-state .empty-subtitle {
+.empty-subtitle {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #737373;
   max-width: 320px;
 }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .action-list-header {
-    padding: 20px 20px 12px;
-  }
-
-  .action-list-title {
-    font-size: 24px;
-  }
-
-  .action-list-items {
-    padding: 16px 20px;
-  }
-}
-
-
-
-
-

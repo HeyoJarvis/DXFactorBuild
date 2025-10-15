@@ -1,0 +1,3 @@
+{"level":"info","message":"OAuth server started","port":8890,"service":"jira-oauth-handler","timestamp":"2025-10-15T21:49:26.715Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-15T21:49:26.715Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-15T21:49:40.721Z"}
