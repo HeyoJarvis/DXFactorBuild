@@ -244,6 +244,43 @@ class MicrosoftGraphService extends EventEmitter {
    * @param {Object} eventData - Event details
    * @returns {Promise<Object>} Created event
    */
+  /**
+   * Get upcoming calendar events
+   */
+  async getUpcomingEvents(startDateTime, endDateTime, maxResults = 50) {
+    try {
+      await this._ensureAuthenticated();
+
+      const queryParams = {
+        startDateTime,
+        endDateTime,
+        $top: maxResults,
+        $orderby: 'start/dateTime'
+      };
+
+      this.logger.info('Fetching upcoming calendar events', queryParams);
+
+      const response = await this.graphClient
+        .api('/me/calendarView')
+        .query(queryParams)
+        .header('Prefer', 'outlook.timezone="America/Denver"')
+        .get();
+
+      this.logger.info('Calendar events fetched', {
+        count: response.value?.length || 0
+      });
+
+      return response.value || [];
+
+    } catch (error) {
+      this.logger.error('Failed to get calendar events', {
+        error: error.message,
+        stack: error.stack
+      });
+      throw error;
+    }
+  }
+
   async createCalendarEvent(eventData) {
     try {
       await this._ensureAuthenticated();

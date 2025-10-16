@@ -67,7 +67,9 @@ export default function TaskChat({ task, onClose }) {
           description: task.description,
           priority: task.priority,
           status: task.status,
-          created_at: task.created_at
+          created_at: task.created_at,
+          route_to: task.route_to || 'tasks-sales',
+          work_type: task.work_type || 'task'
         }
       });
 

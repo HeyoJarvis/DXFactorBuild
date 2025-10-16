@@ -1,0 +1,93 @@
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-15T23:28:12.836Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-15T23:34:21.276Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-15T23:37:55.106Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-15T23:41:34.353Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-15T23:45:02.107Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-15T23:51:52.767Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-15T23:53:59.478Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:00:34.761Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:01:18.117Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:02:00.172Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:04:05.857Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:10:48.506Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T00:11:19.848Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:11:31.894Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T00:12:18.349Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-16T00:12:38.512Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-16T00:12:38.765Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-16T01:12:37.764Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-16T00:12:38.843Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:14:11.203Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T00:14:24.343Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:14:50.108Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:15:54.423Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:16:37.200Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:17:36.893Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:20:28.125Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T00:20:41.289Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-16T00:20:53.126Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-16T00:20:53.304Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-16T01:20:52.304Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-16T00:20:53.479Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:21:04.147Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:21:57.037Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:23:17.795Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T00:36:08.861Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T01:32:48.297Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T01:34:38.172Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T01:34:45.417Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-16T01:34:58.065Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-16T01:34:58.381Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-16T02:34:57.380Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-16T01:34:58.454Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T01:42:48.039Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-16T01:43:01.481Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-16T01:43:01.634Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-16T02:43:00.634Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-16T01:43:01.718Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T01:43:54.847Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-16T01:43:59.427Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-16T01:43:59.586Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-16T02:43:58.586Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-16T01:43:59.682Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T01:45:54.922Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T01:46:00.912Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-16T01:46:09.605Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-16T01:46:09.756Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-16T02:46:08.756Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-16T01:46:09.868Z"}
+{"event_id":"mqes36dn82r03g0tgpumckb7m8","has_online_meeting":true,"level":"info","meeting_link":"https://meet.google.com/yxo-ckjn-fjg","message":"Calendar event created","service":"google-gmail-service","start":"2025-10-16T02:46:00-06:00","summary":"HIi","timestamp":"2025-10-16T01:46:28.554Z"}
+{"event_id":"ur16mrmiaucugumg1i8ro86om8","has_online_meeting":true,"level":"info","meeting_link":"https://meet.google.com/yzs-rpdv-hmm","message":"Calendar event created","service":"google-gmail-service","start":"2025-10-16T02:46:00-06:00","summary":"HIi","timestamp":"2025-10-16T01:46:29.098Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T01:48:37.398Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T01:48:50.170Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-16T01:49:00.436Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-16T01:49:00.621Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-16T02:48:59.621Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-16T01:49:00.787Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T01:50:35.261Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-16T01:50:43.469Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-16T01:50:55.461Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-16T01:50:55.611Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-16T02:50:54.611Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-16T01:50:55.696Z"}
+{"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T01:50:56.029Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-16T01:50:56.379Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T01:50:58.110Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-16T01:50:58.476Z"}
+{"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T01:51:00.099Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-16T01:51:00.352Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T01:55:41.963Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T01:58:35.210Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:00:11.107Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:12:02.332Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:14:28.082Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:18:03.697Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:25:54.074Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:28:08.488Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:28:36.332Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:30:56.354Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:31:05.590Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:31:22.263Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:31:43.069Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:32:48.084Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:33:08.092Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:34:48.764Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:39:01.225Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:39:37.279Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:40:33.379Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:43:27.168Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:48:14.119Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:48:45.379Z"}
+{"level":"info","message":"Google Gmail Service initialized","redirectUri":"http://localhost:8890/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-16T02:49:16.397Z"}

@@ -61,7 +61,14 @@ function registerTaskHandlers(services, logger) {
       // Get current user ID from auth service
       const userId = services.auth?.currentUser?.id;
       
+      logger.info('Fetching tasks', { 
+        userId,
+        isAuthenticated: !!userId,
+        filters 
+      });
+      
       if (!userId) {
+        logger.warn('Cannot fetch tasks: No authenticated user');
         return {
           success: false,
           error: 'User not authenticated',
@@ -75,10 +82,14 @@ function registerTaskHandlers(services, logger) {
       });
 
       if (!result.success) {
+        logger.error('Failed to fetch tasks', { error: result.error });
         throw new Error(result.error);
       }
 
-      logger.info('Tasks fetched', { count: result.tasks.length });
+      logger.info('Tasks fetched successfully', { 
+        count: result.tasks.length,
+        userId 
+      });
 
       return {
         success: true,

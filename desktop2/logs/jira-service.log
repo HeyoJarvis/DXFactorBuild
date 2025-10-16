@@ -39,3 +39,342 @@
 {"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request error","service":"jira-service","timestamp":"2025-10-15T21:53:09.747Z"}
 {"error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review) ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-15T21:53:09.747Z"}
 {"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T22:03:13.095Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:01:21.922Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:01:49.458Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:01:49.468Z"}
+{"jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review,Testing,Blocked) ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:01:49.468Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-15T23:01:49.469Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:01:49.522Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:01:49.537Z"}
+{"jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review,Testing,Blocked) ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:01:49.537Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-15T23:01:49.537Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-15T23:01:49.715Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-15T23:01:49.815Z"}
+{"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%2CTesting%2CBlocked%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"{\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request failed","service":"jira-service","status":400,"timestamp":"2025-10-15T23:01:50.367Z"}
+{"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%2CTesting%2CBlocked%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request error","service":"jira-service","timestamp":"2025-10-15T23:01:50.367Z"}
+{"error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review,Testing,Blocked) ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-15T23:01:50.367Z"}
+{"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%2CTesting%2CBlocked%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"{\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request failed","service":"jira-service","status":400,"timestamp":"2025-10-15T23:01:50.370Z"}
+{"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%2CTesting%2CBlocked%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request error","service":"jira-service","timestamp":"2025-10-15T23:01:50.370Z"}
+{"error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review,Testing,Blocked) ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-15T23:01:50.370Z"}
+{"jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review) ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:01:56.389Z"}
+{"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"{\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request failed","service":"jira-service","status":400,"timestamp":"2025-10-15T23:01:56.824Z"}
+{"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request error","service":"jira-service","timestamp":"2025-10-15T23:01:56.824Z"}
+{"error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review) ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-15T23:01:56.824Z"}
+{"jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review) ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:02:06.821Z"}
+{"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"{\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request failed","service":"jira-service","status":400,"timestamp":"2025-10-15T23:02:07.230Z"}
+{"endpoint":"/rest/api/3/search/jql?jql=assignee+%3D+currentUser%28%29+AND+status+IN+%28In+Progress%2CTo+Do%2CCode+Review%29+ORDER+BY+priority+DESC%2C+updated+DESC&startAt=0&maxResults=50&fields=summary%2Cstatus%2Cassignee%2Cpriority%2Ccreated%2Cupdated%2Cdescription%2Ccustomfield_10016","error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","level":"error","message":"JIRA API request error","service":"jira-service","timestamp":"2025-10-15T23:02:07.230Z"}
+{"error":"JIRA API error: 400 - {\"errorMessages\":[\"Error in JQL Query: Expecting either a value, list or function but got 'In'. You must surround 'In' in quotation marks to use it as a value. (line 1, character 41)\"],\"errors\":{}}","jql":"assignee = currentUser() AND status IN (In Progress,To Do,Code Review) ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-15T23:02:07.230Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:03:02.976Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:03:20.610Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:03:20.610Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:03:20.634Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:03:20.646Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:03:20.703Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:03:20.704Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:03:21.342Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:03:21.343Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:06:42.509Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:07:41.650Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:07:48.809Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:07:48.809Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:07:48.813Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:07:48.813Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:07:48.815Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:07:48.831Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:07:49.536Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:07:49.537Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:07:51.351Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:07:52.004Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:07:54.111Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:07:54.771Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:07:58.744Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:07:59.172Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:08:00.990Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:08:01.673Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:08:59.715Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:08:59.716Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:08:59.903Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:08:59.904Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:09:00.347Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:09:00.375Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:09.308Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:14.725Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:14.752Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:14.767Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:09:14.767Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:14.771Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:09:14.771Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:09:15.463Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:09:15.464Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:27.844Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:33.654Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:33.656Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:09:33.656Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:33.659Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:09:33.732Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:09:33.732Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:09:34.205Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:09:34.333Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:11:02.989Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:11:09.493Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:11:09.493Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:11:09.499Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:11:09.502Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:11:09.503Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:11:09.528Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:11:10.152Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:11:10.195Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:11:24.822Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:11:25.405Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:11:27.212Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:11:27.780Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:13:00.302Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:13:05.319Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:13:05.420Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:13:05.420Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:13:05.440Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:13:05.446Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:13:05.446Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:13:06.480Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:13:06.480Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:13:08.329Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:13:08.977Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:13:10.624Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:13:11.242Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:15:45.957Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:15:45.958Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:15:46.216Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:15:46.239Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:15:46.650Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:15:46.662Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:15:49.452Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:15:49.826Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:15:51.753Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:15:52.318Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:16:13.656Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:16:13.657Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:16:13.840Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:16:13.840Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:16:14.112Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:16:14.280Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:17:07.576Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:17:07.720Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:17:08.291Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:17:12.300Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:17:12.846Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:17:14.676Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:17:15.223Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:17:42.588Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:17:42.689Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:17:43.229Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:17:50.501Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:17:50.640Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:17:50.889Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:17:55.048Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:17:55.153Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:17:55.588Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:19:01.022Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:19:01.024Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:19:01.146Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:19:01.147Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:19:01.694Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:19:01.706Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:19:04.277Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:19:04.833Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:19:06.816Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:19:07.443Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:19:16.685Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:19:19.848Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:19:19.854Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:19:19.868Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:19:19.869Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:19:19.947Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:19:19.947Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:19:20.518Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:19:20.576Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:21:22.132Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:21:22.133Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:21:22.395Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:21:22.404Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:21:22.819Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:21:22.859Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:23:27.365Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:23:34.350Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:23:34.363Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:23:34.363Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:23:34.369Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:23:34.369Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:23:34.371Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:23:35.010Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:23:35.010Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:23:39.220Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:23:39.221Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:23:39.292Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:23:39.353Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:23:39.836Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:23:39.836Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:25:49.822Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:28:12.834Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:34:21.272Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:37:55.104Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:41:34.351Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:41:41.671Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:41:41.672Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:41:41.673Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:41:41.674Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:41:41.671Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:41:41.673Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:41:42.383Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:41:42.384Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:45:02.103Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:51:52.765Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:52:12.256Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:52:12.257Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:52:12.259Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:52:12.315Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-15T23:52:12.315Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:52:12.435Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:52:12.928Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-15T23:52:12.973Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-15T23:53:59.475Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:00:34.760Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:01:18.116Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:02:00.169Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:04:05.852Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:10:48.504Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:11:31.892Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:14:11.198Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:14:50.105Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:15:54.422Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:16:37.198Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:17:36.889Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:20:28.123Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:21:04.143Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:21:57.034Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:23:17.793Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:26:21.965Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T00:26:21.965Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T00:26:21.966Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:26:21.981Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T00:26:21.981Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T00:26:21.981Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:26:21.987Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:26:22.052Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-16T00:26:22.201Z"}
+{"expiresIn":3600,"level":"info","message":"Access token refreshed","service":"jira-service","timestamp":"2025-10-16T00:26:22.281Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-16T00:26:22.979Z"}
+{"level":"info","message":"Issues retrieved","returned":6,"service":"jira-service","timestamp":"2025-10-16T00:26:22.980Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T00:36:08.858Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:32:48.295Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:34:38.170Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:45:54.921Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:48:37.396Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:50:35.259Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:54:03.646Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:54:03.646Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T01:54:03.646Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T01:54:03.647Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:54:03.654Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:54:03.657Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T01:54:03.657Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T01:54:03.657Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T01:54:03.848Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T01:54:03.848Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T01:54:03.848Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T01:54:03.848Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T01:54:03.857Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T01:54:03.857Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T01:54:03.857Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T01:54:03.857Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:55:41.959Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T01:58:35.208Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:00:11.105Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:12:02.330Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:14:28.081Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:18:03.694Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:25:54.072Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:28:08.486Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:28:36.330Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:30:56.352Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:31:05.588Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:31:22.262Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:31:43.068Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:32:48.081Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:33:08.090Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:34:48.760Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:39:01.223Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:39:37.275Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:40:33.375Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:43:27.164Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:47:49.167Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:47:49.167Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:47:49.167Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:47:49.192Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:47:49.192Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:47:49.192Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:47:49.198Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:47:49.240Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:47:49.404Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:47:49.404Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:47:49.405Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:47:49.405Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:47:49.405Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:47:49.405Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:47:49.405Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:47:49.405Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:48:14.115Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:48:24.052Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:48:24.098Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:48:24.099Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:48:24.099Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:48:24.099Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:48:24.248Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:48:24.248Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:48:24.249Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:48:24.249Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:48:24.651Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:48:24.651Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:48:24.651Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:48:24.772Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:48:24.772Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:48:24.772Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:48:24.772Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:48:29.767Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:48:29.767Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:48:29.767Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:48:29.902Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:48:29.902Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:48:29.902Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:48:29.902Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:48:45.376Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:49:16.393Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:49:32.342Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:49:32.343Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:49:32.343Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:49:32.370Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:49:32.370Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:49:32.370Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:49:32.395Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:49:32.509Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:49:32.540Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:49:32.540Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:49:32.540Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:49:32.540Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:49:32.554Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:49:32.554Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:49:32.554Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:49:32.554Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:54:19.002Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:54:19.002Z"}
+{"jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"info","maxResults":50,"message":"Fetching issues","service":"jira-service","startAt":0,"timestamp":"2025-10-16T02:54:19.003Z"}
+{"level":"info","message":"Refreshing access token","service":"jira-service","timestamp":"2025-10-16T02:54:19.003Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:54:19.177Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:54:19.192Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:54:19.192Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:54:19.192Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:54:19.192Z"}
+{"error":"{\"error\":\"unauthorized_client\",\"error_description\":\"refresh_token is invalid\"}","level":"error","message":"Token refresh failed","service":"jira-service","status":403,"timestamp":"2025-10-16T02:54:19.197Z"}
+{"level":"error","message":"Refresh token is invalid - user needs to re-authenticate","service":"jira-service","timestamp":"2025-10-16T02:54:19.197Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:54:19.197Z"}
+{"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:54:19.197Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:54:19.207Z"}

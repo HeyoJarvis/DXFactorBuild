@@ -67,11 +67,24 @@ class DesktopSupabaseAdapter {
    */
   async createConversationSession(userId, metadata = {}) {
     try {
+      // Extract top-level fields from metadata
+      const {
+        workflow_id,
+        workflow_type,
+        workflow_intent,
+        session_title,
+        ...remainingMetadata
+      } = metadata;
+
       const { data, error } = await this.supabase
         .from('conversation_sessions')
         .insert([{
           user_id: userId,
-          metadata: metadata,
+          workflow_id: workflow_id || null,
+          workflow_type: workflow_type || 'general',
+          workflow_intent: workflow_intent || null,
+          session_title: session_title || null,
+          metadata: remainingMetadata,  // Store remaining metadata
           is_active: true
         }])
         .select()
@@ -80,7 +93,9 @@ class DesktopSupabaseAdapter {
       if (error) throw error;
 
       this.logger.info('Conversation session created', { 
-        session_id: data.id 
+        session_id: data.id,
+        workflow_type: data.workflow_type,
+        workflow_id: data.workflow_id
       });
       
       return { success: true, session: data };
@@ -153,26 +168,56 @@ class DesktopSupabaseAdapter {
    */
   async getOrCreateActiveSession(userId, metadata = {}) {
     try {
-      // Try to get an active session from the last 24 hours
-      const { data: existingSessions, error: fetchError } = await this.supabase
-        .from('conversation_sessions')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .gte('last_activity_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-        .order('last_activity_at', { ascending: false })
-        .limit(1);
+      // If workflow_id is provided, look for that specific session
+      if (metadata.workflow_id) {
+        const { data: specificSession, error: specificError } = await this.supabase
+          .from('conversation_sessions')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('workflow_id', metadata.workflow_id)
+          .eq('workflow_type', metadata.workflow_type || 'general')
+          .order('started_at', { ascending: false })
+          .limit(1);
 
-      if (fetchError) throw fetchError;
+        if (specificError) throw specificError;
 
-      if (existingSessions && existingSessions.length > 0) {
-        this.logger.debug('Using existing active session', { 
-          session_id: existingSessions[0].id 
-        });
-        return { success: true, session: existingSessions[0], isNew: false };
+        if (specificSession && specificSession.length > 0) {
+          this.logger.info('Using existing specific session', { 
+            session_id: specificSession[0].id,
+            workflow_id: metadata.workflow_id,
+            workflow_type: metadata.workflow_type
+          });
+          return { success: true, session: specificSession[0], isNew: false };
+        }
       }
 
-      // No active session, create a new one
+      // For general chat (no workflow_id), try to get an active session from the last 24 hours
+      if (!metadata.workflow_id || metadata.workflow_type === 'general') {
+        const { data: existingSessions, error: fetchError } = await this.supabase
+          .from('conversation_sessions')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .eq('workflow_type', 'general')
+          .gte('last_activity_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .order('last_activity_at', { ascending: false })
+          .limit(1);
+
+        if (fetchError) throw fetchError;
+
+        if (existingSessions && existingSessions.length > 0) {
+          this.logger.info('Using existing active general session', { 
+            session_id: existingSessions[0].id 
+          });
+          return { success: true, session: existingSessions[0], isNew: false };
+        }
+      }
+
+      // No existing session, create a new one
+      this.logger.info('Creating new session', {
+        workflow_id: metadata.workflow_id,
+        workflow_type: metadata.workflow_type
+      });
       return await this.createConversationSession(userId, metadata);
     } catch (error) {
       this.logger.error('Failed to get or create session', { 
@@ -263,6 +308,19 @@ class DesktopSupabaseAdapter {
         .limit(limit);
 
       if (error) throw error;
+
+      // Log first message for debugging
+      if (data && data.length > 0) {
+        this.logger.debug('Sample message from DB', {
+          session_id: sessionId,
+          sample: {
+            role: data[0].role,
+            has_message_text: !!data[0].message_text,
+            has_content: !!data[0].content,
+            text_length: data[0].message_text?.length || data[0].content?.length || 0
+          }
+        });
+      }
 
       return { success: true, messages: data };
     } catch (error) {
@@ -561,7 +619,19 @@ class DesktopSupabaseAdapter {
             parent_session_id: taskData.parentSessionId || null, // Link to chat that spawned this task
             assignor: taskData.assignor || null, // Who assigned/created the task
             assignee: taskData.assignee || null, // Who the task is assigned to
-            mentioned_users: taskData.mentionedUsers || [] // All mentioned users
+            mentioned_users: taskData.mentionedUsers || [], // All mentioned users
+            route_to: taskData.routeTo || 'tasks-sales', // Where to route: 'tasks-sales' or 'mission-control'
+            work_type: taskData.workType || 'task', // Type: 'task', 'calendar', 'outreach'
+            external_id: taskData.externalId || null, // For JIRA/external sync
+            external_key: taskData.externalKey || null,
+            external_url: taskData.externalUrl || null,
+            external_source: taskData.externalSource || null,
+            jira_status: taskData.jira_status || null,
+            jira_issue_type: taskData.jira_issue_type || null,
+            jira_priority: taskData.jira_priority || null,
+            story_points: taskData.story_points || null,
+            sprint: taskData.sprint || null,
+            labels: taskData.labels || []
           },
           is_active: true,
           is_completed: false
@@ -571,7 +641,12 @@ class DesktopSupabaseAdapter {
 
       if (error) throw error;
 
-      this.logger.info('Task created', { task_id: data.id, title: taskData.title });
+      this.logger.info('Task created', { 
+        task_id: data.id, 
+        title: taskData.title,
+        route_to: taskData.routeTo,
+        work_type: taskData.workType
+      });
       return { success: true, task: data };
     } catch (error) {
       this.logger.error('Failed to create task', { error: error.message });
@@ -600,6 +675,11 @@ class DesktopSupabaseAdapter {
         query = query.contains('workflow_metadata', { priority: filters.priority });
       }
 
+      // Filter by route_to (for role-based filtering: 'tasks-sales' vs 'mission-control')
+      if (filters.routeTo) {
+        query = query.contains('workflow_metadata', { route_to: filters.routeTo });
+      }
+
       // Sort by creation time
       query = query.order('started_at', { ascending: false });
 
@@ -624,10 +704,22 @@ class DesktopSupabaseAdapter {
         assignor: session.workflow_metadata?.assignor || null,
         assignee: session.workflow_metadata?.assignee || null,
         mentioned_users: session.workflow_metadata?.mentioned_users || [],
+        route_to: session.workflow_metadata?.route_to || 'tasks-sales',
+        work_type: session.workflow_metadata?.work_type || 'task',
+        external_id: session.workflow_metadata?.external_id || null,
+        external_key: session.workflow_metadata?.external_key || null,
+        external_url: session.workflow_metadata?.external_url || null,
+        external_source: session.workflow_metadata?.external_source || null,
         created_at: session.started_at,
         updated_at: session.last_activity_at,
         completed_at: session.completed_at
       }));
+
+      this.logger.info('Fetched user tasks', {
+        userId,
+        count: tasks.length,
+        routeToFilter: filters.routeTo || 'all'
+      });
 
       return { success: true, tasks };
     } catch (error) {

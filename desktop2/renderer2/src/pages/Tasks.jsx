@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTasks } from '../hooks/useTasks';
+import { useSalesTasks } from '../hooks/useSalesTasks';
 import ActionList from '../components/Tasks/ActionList';
 import TaskChat from '../components/Tasks/TaskChat';
 import './Tasks.css';
@@ -11,7 +11,7 @@ export default function Tasks() {
     updateTask, 
     deleteTask, 
     toggleTask
-  } = useTasks();
+  } = useSalesTasks();
   
   const [chatTask, setChatTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');

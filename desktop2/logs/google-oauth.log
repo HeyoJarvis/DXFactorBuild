@@ -1,0 +1,33 @@
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T00:11:19.848Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T00:11:19.848Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T00:12:18.349Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T00:12:18.349Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-16T00:12:38.843Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T00:14:24.343Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T00:14:24.344Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T00:20:41.288Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T00:20:41.289Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-16T00:20:53.479Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T01:34:45.416Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T01:34:45.417Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-16T01:34:58.455Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-16T01:37:34.067Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T01:42:48.038Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T01:42:48.039Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-16T01:43:01.718Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T01:43:54.847Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T01:43:54.847Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-16T01:43:59.682Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-16T01:44:04.688Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T01:46:00.912Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T01:46:00.912Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-16T01:46:09.868Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-16T01:47:14.002Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T01:48:50.170Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T01:48:50.170Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-16T01:49:00.787Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-16T01:50:02.661Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"google-oauth-handler","timestamp":"2025-10-16T01:50:43.469Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-16T01:50:43.469Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-16T01:50:55.697Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-16T01:52:19.481Z"}

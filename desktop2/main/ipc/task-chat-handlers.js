@@ -10,20 +10,30 @@ const taskSessionIds = {};
 
 function registerTaskChatHandlers(services, logger) {
   const { dbAdapter, ai } = services;
-  const userId = 'desktop-user'; // TODO: Get actual user ID
 
   /**
    * Send message to task-specific AI chat
    */
   ipcMain.handle('tasks:sendChatMessage', async (event, taskId, message, requestContext) => {
     try {
-      logger.info('Task chat message received', { taskId, message: message.substring(0, 50) });
+      // Get current authenticated user ID
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        logger.error('Task chat: No authenticated user');
+        return {
+          success: false,
+          error: 'User not authenticated'
+        };
+      }
+      
+      logger.info('Task chat message received', { taskId, userId, message: message.substring(0, 50) });
       
       const task = requestContext.task;
       
       // Get or create task-specific session
       if (!taskSessionIds[taskId]) {
-        logger.info('Creating new chat session for task', { taskId });
+        logger.info('Creating new chat session for task', { taskId, userId });
         
         const sessionResult = await dbAdapter.getOrCreateActiveSession(userId, {
           workflow_type: 'task_chat',
@@ -31,15 +41,23 @@ function registerTaskChatHandlers(services, logger) {
           task_id: taskId,
           task_title: task.title,
           task_priority: task.priority,
-          task_status: task.status
+          task_status: task.status,
+          route_to: task.route_to || 'tasks-sales',
+          work_type: task.work_type || 'task'
         });
         
         if (sessionResult.success) {
           taskSessionIds[taskId] = sessionResult.session.id;
-          logger.info('Task chat session created', { taskId, sessionId: taskSessionIds[taskId] });
+          logger.info('Task chat session created', { 
+            taskId, 
+            sessionId: taskSessionIds[taskId],
+            routeTo: task.route_to,
+            workType: task.work_type
+          });
           
-          // Set session title
-          await dbAdapter.updateSessionTitle(taskSessionIds[taskId], `Task: ${task.title}`).catch(err =>
+          // Set session title (don't add prefix if already exists)
+          const sessionTitle = task.title.startsWith('Task:') ? task.title : `Task: ${task.title}`;
+          await dbAdapter.updateSessionTitle(taskSessionIds[taskId], sessionTitle).catch(err =>
             logger.warn('Failed to update session title', { error: err.message })
           );
         }
@@ -195,7 +213,104 @@ Be concise, practical, and focused on helping complete this specific task.`;
    */
   ipcMain.handle('tasks:getChatHistory', async (event, taskId) => {
     try {
-      const taskSessionId = taskSessionIds[taskId];
+      // Get current authenticated user ID
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        logger.warn('Task chat history: No authenticated user');
+        return {
+          success: true,
+          messages: []
+        };
+      }
+      
+      // First, verify the task exists and belongs to this user
+      const { data: taskSession, error: taskError } = await dbAdapter.supabase
+        .from('conversation_sessions')
+        .select('id, user_id, workflow_metadata, session_title')
+        .eq('id', taskId)
+        .eq('workflow_type', 'task')
+        .single();
+      
+      if (taskError || !taskSession) {
+        logger.warn('Task not found or access denied', { taskId, userId, error: taskError?.message });
+        return {
+          success: false,
+          error: 'Task not found',
+          messages: []
+        };
+      }
+      
+      // Verify task belongs to user
+      if (taskSession.user_id !== userId) {
+        logger.warn('Task access denied: user mismatch', { taskId, userId, taskUserId: taskSession.user_id });
+        return {
+          success: false,
+          error: 'Access denied',
+          messages: []
+        };
+      }
+      
+      logger.info('Task verified for chat access', { 
+        taskId, 
+        userId,
+        routeTo: taskSession.workflow_metadata?.route_to,
+        workType: taskSession.workflow_metadata?.work_type
+      });
+      
+      // Check in-memory cache first
+      let taskSessionId = taskSessionIds[taskId];
+      
+      // If not in memory, look up in database
+      if (!taskSessionId) {
+        const workflowId = `task_${taskId}`;
+        logger.info('Task session not in cache, looking up in database', { 
+          taskId, 
+          userId,
+          workflowId,
+          lookingFor: {
+            user_id: userId,
+            workflow_type: 'task_chat',
+            workflow_id: workflowId
+          }
+        });
+        
+        // Query database for existing task chat session
+        const { data: sessions, error } = await dbAdapter.supabase
+          .from('conversation_sessions')
+          .select('id, workflow_id, workflow_type, started_at')
+          .eq('user_id', userId)
+          .eq('workflow_type', 'task_chat')
+          .eq('workflow_id', workflowId)
+          .order('started_at', { ascending: false })
+          .limit(1);
+        
+        if (error) {
+          logger.error('Failed to look up task session', { error: error.message });
+        } else if (sessions && sessions.length > 0) {
+          taskSessionId = sessions[0].id;
+          // Cache it for future use
+          taskSessionIds[taskId] = taskSessionId;
+          logger.info('Found task session in database', { 
+            taskId, 
+            sessionId: taskSessionId,
+            workflowId: sessions[0].workflow_id,
+            startedAt: sessions[0].started_at
+          });
+        } else {
+          logger.info('No existing task chat session found', { 
+            taskId,
+            workflowId,
+            note: 'Session will be created when first message is sent'
+          });
+          return {
+            success: true,
+            messages: []
+          };
+        }
+      } else {
+        logger.info('Task session found in cache', { taskId, sessionId: taskSessionId });
+      }
       
       if (!taskSessionId) {
         return {
@@ -207,12 +322,17 @@ Be concise, practical, and focused on helping complete this specific task.`;
       const historyResult = await dbAdapter.getSessionMessages(taskSessionId);
       
       if (historyResult.success) {
+        logger.info('Loaded chat history', { 
+          taskId, 
+          messageCount: historyResult.messages.length,
+          routeTo: taskSession.workflow_metadata?.route_to
+        });
         return {
           success: true,
           messages: historyResult.messages.map(msg => ({
             role: msg.role,
-            content: msg.content,
-            timestamp: msg.created_at
+            content: msg.message_text || msg.content || '',  // Support both field names
+            timestamp: msg.created_at || msg.timestamp
           }))
         };
       }

@@ -30,6 +30,7 @@ const registerSystemHandlers = require('./ipc/system-handlers');
 const registerWindowHandlers = require('./ipc/window-handlers');
 const registerArcReactorHandlers = require('./ipc/arc-reactor-handlers');
 const registerJIRAHandlers = require('./ipc/jira-handlers');
+const registerMissionControlHandlers = require('./ipc/mission-control-handlers');
 const CodeIndexerHandlers = require('./ipc/code-indexer-handlers');
 
 // Setup logger
@@ -96,7 +97,14 @@ async function initializeServices() {
       try {
         logger.info('Auto-creating task from Slack', { title: taskData.title });
         
-        const result = await appState.services.dbAdapter.createTask('desktop-user', taskData);
+        // Get current authenticated user ID
+        const userId = appState.services.auth?.currentUser?.id;
+        if (!userId) {
+          logger.error('Cannot create task: No authenticated user');
+          return;
+        }
+        
+        const result = await appState.services.dbAdapter.createTask(userId, taskData);
         
         if (result.success) {
           logger.info('✅ Task auto-created from Slack', {
@@ -143,6 +151,7 @@ function setupIPC() {
   registerWindowHandlers(appState.windows, logger);
   registerArcReactorHandlers(appState.services, logger);
   registerJIRAHandlers(appState.services, logger);
+  registerMissionControlHandlers(appState.services, logger);
   
   // Setup code indexer handlers
   const codeIndexerHandlers = new CodeIndexerHandlers(logger);

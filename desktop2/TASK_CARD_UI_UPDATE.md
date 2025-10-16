@@ -108,3 +108,4 @@ A cohesive, professional interface that:
 
 The task management interface now feels like a natural extension of Slack with HeyJarvis's intelligent capabilities.
 
+

@@ -92,6 +92,27 @@ contextBridge.exposeInMainWorld('electronAPI', {
     updateIssue: (issueKey, updateData) => ipcRenderer.invoke('jira:updateIssue', issueKey, updateData),
     transitionIssue: (issueKey, transitionName) => ipcRenderer.invoke('jira:transitionIssue', issueKey, transitionName),
     healthCheck: () => ipcRenderer.invoke('jira:healthCheck')
+  },
+
+  // Microsoft 365 APIs
+  microsoft: {
+    checkConnection: () => ipcRenderer.invoke('microsoft:checkConnection'),
+    authenticate: () => ipcRenderer.invoke('microsoft:authenticate'),
+    createEvent: (eventData) => ipcRenderer.invoke('microsoft:createEvent', eventData),
+    sendEmail: (emailData) => ipcRenderer.invoke('microsoft:sendEmail', emailData),
+    getUpcomingEvents: (options) => ipcRenderer.invoke('microsoft:getUpcomingEvents', options),
+    findMeetingTimes: (attendees, durationMinutes, options) => ipcRenderer.invoke('microsoft:findMeetingTimes', attendees, durationMinutes, options),
+    healthCheck: () => ipcRenderer.invoke('microsoft:healthCheck')
+  },
+
+  // Google Workspace APIs
+  google: {
+    checkConnection: () => ipcRenderer.invoke('google:checkConnection'),
+    authenticate: () => ipcRenderer.invoke('google:authenticate'),
+    createEvent: (eventData) => ipcRenderer.invoke('google:createEvent', eventData),
+    sendEmail: (emailData) => ipcRenderer.invoke('google:sendEmail', emailData),
+    getUpcomingEvents: (options) => ipcRenderer.invoke('google:getUpcomingEvents', options),
+    healthCheck: () => ipcRenderer.invoke('google:healthCheck')
   }
 });
 

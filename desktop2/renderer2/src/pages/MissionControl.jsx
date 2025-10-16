@@ -11,84 +11,354 @@ export default function MissionControl() {
   const [showNewMeetingModal, setShowNewMeetingModal] = useState(false);
   const [showNewEmailModal, setShowNewEmailModal] = useState(false);
 
-  // Mock calendar events (would come from Outlook/Google Calendar API)
-  const mockEvents = [
-    {
-      id: 1,
-      title: 'Team Standup',
-      time: '9:00 AM',
-      duration: '30 min',
-      attendees: ['Sarah Chen', 'Mike Johnson', 'Emma Davis'],
+  // Integration state
+  const [microsoftConnected, setMicrosoftConnected] = useState(false);
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [authenticating, setAuthenticating] = useState(null); // 'microsoft' | 'google' | null
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [calendarView, setCalendarView] = useState('daily'); // 'daily' or 'weekly'
+
+  // AI-suggested meetings (detected from action items)
+  // TODO: Implement AI detection from Slack/Teams/JIRA activity
+  const suggestedMeetings = [];
+
+  // Drafted emails
+  // TODO: Implement AI-generated email drafts
+  const draftedEmails = [];
+
+  // Check integration status on mount
+  useEffect(() => {
+    checkIntegrations();
+  }, []);
+
+  // Reload events when calendar view changes
+  useEffect(() => {
+    const reloadEvents = async () => {
+      setLoading(true);
+      if (microsoftConnected) {
+        await loadMicrosoftEvents();
+      }
+      if (googleConnected) {
+        await loadGoogleEvents();
+      }
+      setLoading(false);
+    };
+    
+    // Only reload if we're already connected (not on initial mount)
+    if (microsoftConnected || googleConnected) {
+      reloadEvents();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calendarView]);
+
+  // Check if Microsoft and Google are connected
+  const checkIntegrations = async () => {
+    try {
+      setLoading(true);
+      
+      // Check Microsoft connection
+      if (window.electronAPI?.microsoft) {
+        const msResult = await window.electronAPI.microsoft.checkConnection();
+        setMicrosoftConnected(msResult.connected || false);
+        
+        if (msResult.connected) {
+          await loadMicrosoftEvents();
+        }
+      }
+      
+      // Check Google connection
+      if (window.electronAPI?.google) {
+        const googleResult = await window.electronAPI.google.checkConnection();
+        setGoogleConnected(googleResult.connected || false);
+        
+        if (googleResult.connected) {
+          await loadGoogleEvents();
+        }
+      }
+      
+      // If neither connected, no events to show
+      if (!microsoftConnected && !googleConnected) {
+        setEvents([]);
+      }
+      
+    } catch (error) {
+      console.error('Failed to check integrations:', error);
+      setError('Failed to check integration status');
+      setEvents([]); // Clear events on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Authenticate with Microsoft
+  const handleMicrosoftAuth = async () => {
+    try {
+      setAuthenticating('microsoft');
+      setError(null);
+      
+      const result = await window.electronAPI.microsoft.authenticate();
+      
+      if (result.success) {
+        setMicrosoftConnected(true);
+        await loadMicrosoftEvents();
+      } else {
+        setError(result.error || 'Failed to authenticate with Microsoft');
+      }
+    } catch (error) {
+      console.error('Microsoft authentication error:', error);
+      setError(error.message || 'Failed to authenticate with Microsoft');
+    } finally {
+      setAuthenticating(null);
+    }
+  };
+
+  // Authenticate with Google
+  const handleGoogleAuth = async () => {
+    try {
+      setAuthenticating('google');
+      setError(null);
+      
+      const result = await window.electronAPI.google.authenticate();
+      
+      if (result.success) {
+        setGoogleConnected(true);
+        await loadGoogleEvents();
+      } else {
+        setError(result.error || 'Failed to authenticate with Google');
+      }
+    } catch (error) {
+      console.error('Google authentication error:', error);
+      setError(error.message || 'Failed to authenticate with Google');
+    } finally {
+      setAuthenticating(null);
+    }
+  };
+
+  // Load Microsoft calendar events
+  const loadMicrosoftEvents = async () => {
+    try {
+      // Calculate date range based on view
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endDate = calendarView === 'daily' 
+        ? new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000) // End of today
+        : new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+      
+      const result = await window.electronAPI.microsoft.getUpcomingEvents({
+        startDateTime: startOfDay.toISOString(),
+        endDateTime: endDate.toISOString()
+      });
+      
+      if (result.success && result.events) {
+        // Debug: Log the first event to see the exact format
+        if (result.events.length > 0) {
+          console.log('Microsoft event sample:', JSON.stringify(result.events[0], null, 2));
+        }
+        
+        // Transform Microsoft events to our format
+        const transformedEvents = result.events.map(event => {
+          // Microsoft Graph API now returns times in local timezone (America/Denver)
+          // With Prefer header: { dateTime: "2025-10-16T09:00:00.0000000", timeZone: "America/Denver" }
+          // Parse these as local times (no timezone conversion needed)
+          
+          let startDate, endDate;
+          
+          if (event.start.timeZone === 'UTC') {
+            // If still UTC, append Z to parse correctly
+            startDate = new Date(event.start.dateTime + (event.start.dateTime.endsWith('Z') ? '' : 'Z'));
+            endDate = new Date(event.end.dateTime + (event.end.dateTime.endsWith('Z') ? '' : 'Z'));
+          } else {
+            // For local timezone, parse the datetime directly
+            // Remove trailing zeros and parse
+            const startStr = event.start.dateTime.replace(/\.0+$/, '');
+            const endStr = event.end.dateTime.replace(/\.0+$/, '');
+            startDate = new Date(startStr);
+            endDate = new Date(endStr);
+          }
+          
+          // Format the date and time
+          const eventDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          const eventTime = startDate.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+          });
+          
+          // Check if event is today
+          const today = new Date();
+          const isToday = startDate.toDateString() === today.toDateString();
+          const isTomorrow = startDate.toDateString() === new Date(today.getTime() + 86400000).toDateString();
+          
+          let displayTime = eventTime;
+          if (!isToday) {
+            if (isTomorrow) {
+              displayTime = `Tomorrow, ${eventTime}`;
+            } else {
+              displayTime = `${eventDate}, ${eventTime}`;
+            }
+          }
+          
+          return {
+            id: event.id,
+            title: event.subject,
+            time: displayTime,
+            rawDate: startDate, // Store raw date for sorting
+            duration: calculateDuration(event.start.dateTime, event.end.dateTime),
+            attendees: event.attendees?.map(a => a.emailAddress.name || a.emailAddress.address) || [],
       type: 'meeting',
       status: 'confirmed',
-      location: 'Zoom',
-      color: '#3b82f6'
-    },
-    {
-      id: 2,
-      title: 'Product Review with Client',
-      time: '2:00 PM',
-      duration: '1 hour',
-      attendees: ['Alex Kumar', 'Client Team'],
-      type: 'meeting',
-      status: 'confirmed',
-      location: 'Google Meet',
-      color: '#10b981'
-    },
-    {
-      id: 3,
-      title: 'Follow up: Q4 Planning',
-      time: '4:30 PM',
-      duration: '30 min',
-      attendees: ['Leadership Team'],
-      type: 'suggested',
-      status: 'suggested',
-      location: 'Teams',
-      color: '#f59e0b'
+            location: event.isOnlineMeeting ? 'Teams' : (event.location?.displayName || 'Not specified'),
+            color: '#0078d4',
+            source: 'microsoft',
+            meetingLink: event.onlineMeeting?.joinUrl
+          };
+        });
+        
+        setEvents(prev => [...prev.filter(e => e.source !== 'microsoft'), ...transformedEvents]);
+      }
+    } catch (error) {
+      console.error('Failed to load Microsoft events:', error);
     }
-  ];
+  };
 
-  // Mock AI-suggested meetings (detected from action items)
-  const suggestedMeetings = [
-    {
-      id: 's1',
-      title: 'Discuss Authentication Implementation',
-      reason: 'Detected from PROJ-123 action items',
-      suggestedTime: 'Tomorrow, 10:00 AM',
-      attendees: ['Sarah Chen', 'Backend Team'],
-      priority: 'high'
-    },
-    {
-      id: 's2',
-      title: 'Review Dashboard Analytics',
-      reason: 'Follow-up needed from last week',
-      suggestedTime: 'Friday, 3:00 PM',
-      attendees: ['Alex Kumar', 'Product Team'],
-      priority: 'medium'
+  // Load Google calendar events
+  const loadGoogleEvents = async () => {
+    try {
+      // Calculate date range based on view
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endDate = calendarView === 'daily' 
+        ? new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000) // End of today
+        : new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+      
+      const result = await window.electronAPI.google.getUpcomingEvents({
+        timeMin: startOfDay.toISOString(),
+        timeMax: endDate.toISOString()
+      });
+      
+      if (result.success && result.events) {
+        // Debug: Log the first event to see format
+        if (result.events.length > 0) {
+          console.log('Google event sample:', JSON.stringify(result.events[0], null, 2));
+        }
+        
+        // Transform Google events to our format
+        const transformedEvents = result.events.map(event => {
+          // Google Calendar returns times with timezone info
+          // Parse the datetime correctly
+          const startDate = new Date(event.start.dateTime || event.start.date);
+          const endDate = new Date(event.end.dateTime || event.end.date);
+          
+          // Format the date and time
+          const eventDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          const eventTime = startDate.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+          });
+          
+          // Check if event is today
+          const today = new Date();
+          const isToday = startDate.toDateString() === today.toDateString();
+          const isTomorrow = startDate.toDateString() === new Date(today.getTime() + 86400000).toDateString();
+          
+          let displayTime = eventTime;
+          if (!isToday) {
+            if (isTomorrow) {
+              displayTime = `Tomorrow, ${eventTime}`;
+            } else {
+              displayTime = `${eventDate}, ${eventTime}`;
+            }
+          }
+          
+          return {
+            id: event.id,
+            title: event.summary,
+            time: displayTime,
+            rawDate: startDate,
+            duration: calculateDuration(event.start.dateTime || event.start.date, event.end.dateTime || event.end.date),
+            attendees: event.attendees?.map(a => a.displayName || a.email) || [],
+            type: 'meeting',
+            status: 'confirmed',
+            location: event.hangoutLink ? 'Google Meet' : (event.location || 'Not specified'),
+            color: '#4285f4',
+            source: 'google',
+            meetingLink: event.hangoutLink || event.conferenceData?.entryPoints?.[0]?.uri
+          };
+        });
+        
+        setEvents(prev => [...prev.filter(e => e.source !== 'google'), ...transformedEvents]);
+      }
+    } catch (error) {
+      console.error('Failed to load Google events:', error);
     }
-  ];
+  };
 
-  // Mock drafted emails
-  const draftedEmails = [
-    {
-      id: 'e1',
-      to: 'sarah.chen@company.com',
-      subject: 'Authentication System - Implementation Update',
-      preview: 'Hi Sarah, I wanted to follow up on the authentication system we discussed...',
-      aiGenerated: true,
-      status: 'draft',
-      context: 'Generated from PROJ-123'
-    },
-    {
-      id: 'e2',
-      to: 'client@example.com',
-      subject: 'Product Demo Follow-up',
-      preview: 'Thank you for attending our product demo today. As discussed...',
-      aiGenerated: true,
-      status: 'draft',
-      context: 'Generated from today\'s meeting'
+  // Calculate duration between two times
+  const calculateDuration = (start, end) => {
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+    const diffMs = endTime - startTime;
+    const diffMins = Math.round(diffMs / 60000);
+    
+    if (diffMins < 60) {
+      return `${diffMins} min`;
+    } else {
+      const hours = Math.floor(diffMins / 60);
+      const mins = diffMins % 60;
+      return mins > 0 ? `${hours}h ${mins}m` : `${hours} hour${hours > 1 ? 's' : ''}`;
     }
-  ];
+  };
+
+  // Create new meeting
+  const handleCreateMeeting = async (meetingData) => {
+    try {
+      setError(null);
+      
+      // Parse the datetime-local input (which is in local time without timezone info)
+      // and format as ISO string for the API
+      const startDate = new Date(meetingData.startTime);
+      const endDate = new Date(meetingData.endTime);
+      
+      const eventData = {
+        subject: meetingData.title,
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString(),
+        attendees: meetingData.attendees.split(',').map(email => email.trim()).filter(e => e),
+        isOnlineMeeting: meetingData.includeTeamsLink,
+        body: meetingData.description || '',
+        timeZone: 'America/Denver'
+      };
+      
+      // Use the connected service
+      const result = microsoftConnected 
+        ? await window.electronAPI.microsoft.createEvent(eventData)
+        : await window.electronAPI.google.createEvent(eventData);
+      
+      if (result.success) {
+        // Close modal
+        setShowNewMeetingModal(false);
+        
+        // Reload events
+        if (microsoftConnected) {
+          await loadMicrosoftEvents();
+        }
+        if (googleConnected) {
+          await loadGoogleEvents();
+        }
+        
+        // Show success message
+        alert(`Meeting created successfully!${result.meetingLink ? '\n\nMeeting link: ' + result.meetingLink : ''}`);
+      } else {
+        setError(result.error || 'Failed to create meeting');
+      }
+    } catch (error) {
+      console.error('Failed to create meeting:', error);
+      setError(error.message || 'Failed to create meeting');
+    }
+  };
 
   // Format date for display
   const formatDate = (date) => {
@@ -110,8 +380,21 @@ export default function MissionControl() {
             <div className="mc-header-title-group">
               <h1 className="mc-header-title">MISSION CONTROL</h1>
               <div className="mc-header-subtitle">
+                {microsoftConnected || googleConnected ? (
+                  <>
                 <div className="status-dot active"></div>
-                <span>Synced with Outlook & Google Calendar</span>
+                    <span>
+                      {microsoftConnected && googleConnected ? 'Synced with Outlook & Google Calendar' :
+                       microsoftConnected ? 'Synced with Outlook' :
+                       'Synced with Google Calendar'}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <div className="status-dot" style={{ background: '#86868b' }}></div>
+                    <span>Connect Outlook or Google to sync calendar</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -121,20 +404,26 @@ export default function MissionControl() {
             {/* Outlook Integration */}
             <button 
               className="integration-btn"
-              onClick={() => alert('Outlook integration settings - Coming soon!')}
-              title="Outlook • Connected"
+              onClick={handleMicrosoftAuth}
+              title={microsoftConnected ? "Outlook • Connected" : "Connect to Outlook"}
+              disabled={authenticating === 'microsoft'}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M24 7.875v8.282a2.101 2.101 0 0 1-1.031 1.81l-7.969 4.657a2.094 2.094 0 0 1-2.063.031l-7.968-4.657A2.1 2.1 0 0 1 3.937 16.22V7.875l7.969 4.625a2.094 2.094 0 0 0 2.063 0zm0-2.156L16.032.062a2.093 2.093 0 0 0-2.063 0L6.001 4.719l7.968 4.656a2.094 2.094 0 0 0 2.063 0zM3.937 5.719 11.906.062a2.093 2.093 0 0 1 2.063 0l7.969 4.657v.969l-9.875 5.75a2.094 2.094 0 0 1-2.063 0L3.937 6.688z"/>
               </svg>
-              <div className="status-indicator connected"></div>
+              {authenticating === 'microsoft' ? (
+                <div className="status-indicator authenticating"></div>
+              ) : (
+                <div className={`status-indicator ${microsoftConnected ? 'connected' : 'disconnected'}`}></div>
+              )}
             </button>
 
             {/* Google Suite Integration */}
             <button 
               className="integration-btn"
-              onClick={() => alert('Google Suite integration settings - Coming soon!')}
-              title="Google Suite • Connected"
+              onClick={handleGoogleAuth}
+              title={googleConnected ? "Google Suite • Connected" : "Connect to Google"}
+              disabled={authenticating === 'google'}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -142,7 +431,11 @@ export default function MissionControl() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-              <div className="status-indicator connected"></div>
+              {authenticating === 'google' ? (
+                <div className="status-indicator authenticating"></div>
+              ) : (
+                <div className={`status-indicator ${googleConnected ? 'connected' : 'disconnected'}`}></div>
+              )}
             </button>
 
             <div className="header-divider-vertical"></div>
@@ -209,15 +502,52 @@ export default function MissionControl() {
 
             {/* Calendar Grid */}
             <div className="calendar-grid">
-              {/* Today's Events */}
+              {/* Upcoming Events */}
               <div className="events-section">
                 <div className="section-header">
-                  <h3 className="section-title">Today's Schedule</h3>
-                  <span className="event-count">{mockEvents.length} events</span>
+                  <h3 className="section-title">Upcoming Events</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {/* View Toggle */}
+                    <div className="view-toggle">
+                      <button 
+                        className={`toggle-option ${calendarView === 'daily' ? 'active' : ''}`}
+                        onClick={() => setCalendarView('daily')}
+                      >
+                        Daily
+                      </button>
+                      <button 
+                        className={`toggle-option ${calendarView === 'weekly' ? 'active' : ''}`}
+                        onClick={() => setCalendarView('weekly')}
+                      >
+                        Weekly
+                      </button>
+                    </div>
+                    <span className="event-count">{events.length} events</span>
+                  </div>
                 </div>
                 
+                {error && (
+                  <div style={{ padding: '12px', background: '#fff3cd', borderRadius: '8px', marginBottom: '12px', fontSize: '13px', color: '#856404' }}>
+                    {error}
+                  </div>
+                )}
+                
                 <div className="events-list">
-                  {mockEvents.map(event => (
+                  {loading && (
+                    <div style={{ padding: '20px', textAlign: 'center', color: '#86868b' }}>
+                      Loading calendar events...
+                    </div>
+                  )}
+                  
+                  {!loading && events.length === 0 && (
+                    <div style={{ padding: '20px', textAlign: 'center', color: '#86868b' }}>
+                      {microsoftConnected || googleConnected 
+                        ? 'No upcoming events scheduled'
+                        : 'Connect Microsoft or Google to see your calendar'}
+                    </div>
+                  )}
+                  
+                  {events.map(event => (
                     <div key={event.id} className={`event-card ${event.status}`}>
                       <div className="event-time-bar" style={{ backgroundColor: event.color }}></div>
                       <div className="event-content">
@@ -277,6 +607,12 @@ export default function MissionControl() {
                 </div>
 
                 <div className="suggestions-list">
+                  {suggestedMeetings.length === 0 && (
+                    <div style={{ padding: '20px', textAlign: 'center', color: '#86868b', fontSize: '13px' }}>
+                      AI will suggest meetings based on your Slack, Teams, and JIRA activity
+                    </div>
+                  )}
+                  
                   {suggestedMeetings.map(suggestion => (
                     <div key={suggestion.id} className="suggestion-card">
                       <div className={`priority-indicator ${suggestion.priority}`}></div>
@@ -351,6 +687,18 @@ export default function MissionControl() {
                 </div>
 
                 <div className="inbox-list">
+                  {draftedEmails.length === 0 && (
+                    <div style={{ padding: '40px 20px', textAlign: 'center', color: '#86868b' }}>
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 12px', opacity: 0.3 }}>
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                      </svg>
+                      <p style={{ margin: '0 0 8px', fontSize: '14px' }}>No AI-generated drafts yet</p>
+                      <p style={{ margin: 0, fontSize: '12px', opacity: 0.7 }}>
+                        AI will draft emails based on your tasks and meetings
+                      </p>
+                    </div>
+                  )}
+                  
                   {draftedEmails.map((email, index) => (
                     <div key={email.id} className={`email-row ${index === 0 ? 'selected' : ''}`}>
                       {/* Unread indicator */}
@@ -386,6 +734,8 @@ export default function MissionControl() {
 
               {/* Detail/Reader Zone */}
               <div className="email-reader-zone">
+                {draftedEmails.length > 0 ? (
+                  <>
                 <div className="reader-container">
                   {/* Email Header */}
                   <div className="reader-header">
@@ -465,10 +815,181 @@ export default function MissionControl() {
                     </div>
                   </div>
                 </div>
+                </>
+                ) : (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    height: '100%',
+                    color: '#86868b',
+                    padding: '40px'
+                  }}>
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px', opacity: 0.3 }}>
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <p style={{ margin: '0 0 8px', fontSize: '16px', fontWeight: 600 }}>Select an email to read</p>
+                    <p style={{ margin: 0, fontSize: '13px', opacity: 0.7 }}>
+                      No emails selected
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         )}
+      </div>
+
+      {/* New Meeting Modal */}
+      {showNewMeetingModal && (
+        <NewMeetingModal
+          onClose={() => setShowNewMeetingModal(false)}
+          onCreate={handleCreateMeeting}
+          serviceConnected={microsoftConnected || googleConnected}
+          serviceName={microsoftConnected ? 'Microsoft Teams' : 'Google Meet'}
+        />
+      )}
+    </div>
+  );
+}
+
+// New Meeting Modal Component
+function NewMeetingModal({ onClose, onCreate, serviceConnected, serviceName }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    startTime: '',
+    endTime: '',
+    attendees: '',
+    description: '',
+    includeTeamsLink: true
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onCreate(formData);
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Set default times (1 hour from now, 30 min duration)
+  const getDefaultTimes = () => {
+    const now = new Date();
+    const start = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+    const end = new Date(start.getTime() + 30 * 60 * 1000); // 30 min duration
+    
+    return {
+      startTime: start.toISOString().slice(0, 16),
+      endTime: end.toISOString().slice(0, 16)
+    };
+  };
+
+  // Initialize with default times if not set
+  if (!formData.startTime && !formData.endTime) {
+    const defaults = getDefaultTimes();
+    setFormData({
+      ...formData,
+      ...defaults
+    });
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>New Meeting</h2>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-group">
+            <label>Meeting Title *</label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="e.g., Team Standup"
+              required
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Start Time *</label>
+              <input
+                type="datetime-local"
+                name="startTime"
+                value={formData.startTime}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>End Time *</label>
+              <input
+                type="datetime-local"
+                name="endTime"
+                value={formData.endTime}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Attendees (comma-separated emails)</label>
+            <input
+              type="text"
+              name="attendees"
+              value={formData.attendees}
+              onChange={handleChange}
+              placeholder="sarah@example.com, mike@example.com"
+            />
+            <small style={{ color: '#86868b', fontSize: '11px', marginTop: '4px', display: 'block' }}>
+              Separate multiple email addresses with commas
+            </small>
+          </div>
+
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Add meeting agenda or notes..."
+              rows="3"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                name="includeTeamsLink"
+                checked={formData.includeTeamsLink}
+                onChange={(e) => setFormData({ ...formData, includeTeamsLink: e.target.checked })}
+              />
+              <span>Include {serviceName} link</span>
+            </label>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary">
+              Create Meeting
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

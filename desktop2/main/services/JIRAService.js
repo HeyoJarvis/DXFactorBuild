@@ -157,7 +157,12 @@ class JIRAService extends EventEmitter {
       } = options;
 
       // Build JQL query for user's assigned issues
-      const jql = `assignee = currentUser() AND status IN (${status}) ORDER BY priority DESC, updated DESC`;
+      // Quote each status value to handle spaces in status names
+      const statusList = status
+        .split(',')
+        .map(s => `"${s.trim()}"`)
+        .join(',');
+      const jql = `assignee = currentUser() AND status IN (${statusList}) ORDER BY priority DESC, updated DESC`;
 
       this.logger.info('Fetching JIRA issues', { jql, maxResults });
 

@@ -224,11 +224,11 @@ class GoogleGmailService extends EventEmitter {
         description: eventData.body || eventData.description || '',
         start: {
           dateTime: eventData.startTime,
-          timeZone: eventData.timeZone || 'UTC'
+          timeZone: eventData.timeZone || 'America/Denver'
         },
         end: {
           dateTime: eventData.endTime,
-          timeZone: eventData.timeZone || 'UTC'
+          timeZone: eventData.timeZone || 'America/Denver'
         },
         location: eventData.location,
         attendees: (eventData.attendees || []).map(attendee => {
@@ -280,6 +280,44 @@ class GoogleGmailService extends EventEmitter {
         eventData
       });
 
+      throw error;
+    }
+  }
+
+  /**
+   * Get upcoming calendar events
+   */
+  async getUpcomingEvents(startDateTime, endDateTime, maxResults = 50) {
+    try {
+      await this._ensureAuthenticated();
+
+      this.logger.info('Fetching upcoming calendar events', {
+        startDateTime,
+        endDateTime,
+        maxResults
+      });
+
+      const response = await this.calendar.events.list({
+        calendarId: 'primary',
+        timeMin: startDateTime,
+        timeMax: endDateTime,
+        maxResults: maxResults,
+        singleEvents: true,
+        orderBy: 'startTime',
+        timeZone: 'America/Denver' // Request times in Mountain Time
+      });
+
+      this.logger.info('Calendar events fetched', {
+        count: response.data.items?.length || 0
+      });
+
+      return response.data.items || [];
+
+    } catch (error) {
+      this.logger.error('Failed to get calendar events', {
+        error: error.message,
+        stack: error.stack
+      });
       throw error;
     }
   }

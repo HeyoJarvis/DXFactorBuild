@@ -1,6 +1,5 @@
 .env
 node_modules
-.gitignore
 dxfactor*
 analysis-results/
 __pycache__/
@@ -8,3 +7,15 @@ __pycache__/
 # Desktop logs
 desktop/logs/*.log
 logs/*.log
+
+# Build artifacts (Electron)
+desktop/dist/
+desktop2/dist/
+dist/
+
+# Debug/test scripts
+fix-task-title.js
+debug-task-sessions.js
+check-specific-session.js
+test-task-chat-sync.js
+desktop2/dist/

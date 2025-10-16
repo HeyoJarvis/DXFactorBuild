@@ -117,12 +117,31 @@ class SlackService extends EventEmitter {
       const text = message.text.toLowerCase();
       
       // Simple task detection keywords
-      const taskKeywords = ['task', 'todo', 'can you', 'could you', 'please', 'need to', 'should', 'must'];
+      const taskKeywords = ['task', 'todo', 'can you', 'could you', 'please', 'need to', 'should', 'must', 
+                           'follow up', 'reach out', 'schedule', 'meeting', 'call', 'connect'];
       const hasTaskKeyword = taskKeywords.some(keyword => text.includes(keyword));
       
       if (!hasTaskKeyword) {
         return; // Not a task
       }
+      
+      // Detect calendar/outreach actions
+      const calendarKeywords = ['meeting', 'schedule', 'calendar', 'call', 'sync', 'catch up', 'connect with'];
+      const outreachKeywords = ['follow up', 'reach out', 'email', 'contact', 'send', 'ping'];
+      const isCalendarAction = calendarKeywords.some(keyword => text.includes(keyword));
+      const isOutreachAction = outreachKeywords.some(keyword => text.includes(keyword));
+      
+      // Count mentions to determine routing
+      const mentions = this.extractMentions(message.text);
+      const mentionCount = mentions.length;
+      
+      // ROUTING LOGIC:
+      // Calendar actions with <4 people OR outreach to <5 people → Mission Control
+      // Everything else → Tasks (Sales)
+      const shouldRouteToMissionControl = (
+        (isCalendarAction && mentionCount < 4) ||
+        (isOutreachAction && mentionCount < 5)
+      );
       
       // Extract priority from urgency words
       let priority = 'medium';
@@ -137,14 +156,21 @@ class SlackService extends EventEmitter {
       // Extract task title
       const title = this.extractTaskTitle(message.text);
       
+      // Determine work type
+      let workType = 'task';
+      if (isCalendarAction) workType = 'calendar';
+      else if (isOutreachAction) workType = 'outreach';
+      
       // Create task data
       const taskData = {
         title,
         priority,
         description: message.text,
-        tags: ['slack-auto', message.type],
+        tags: ['slack-auto', message.type, workType],
         assignor: message.user,
-        mentionedUsers: this.extractMentions(message.text)
+        mentionedUsers: mentions,
+        workType: workType,
+        routeTo: shouldRouteToMissionControl ? 'mission-control' : 'tasks-sales'
       };
       
       // Emit event for task creation (main process will handle it)
@@ -153,7 +179,10 @@ class SlackService extends EventEmitter {
       this.logger.info('Task detected from Slack', {
         title,
         priority,
-        type: message.type
+        type: message.type,
+        workType,
+        mentionCount,
+        routeTo: taskData.routeTo
       });
     } catch (error) {
       this.logger.error('Error detecting task:', error);

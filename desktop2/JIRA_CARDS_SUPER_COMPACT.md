@@ -269,3 +269,4 @@ The super-compact design is:
 
 You can now see **2-3x more tasks** on screen, making task management faster and more efficient! 🎉
 
+

@@ -327,8 +327,14 @@ Acceptance Criteria:
       });
       
       if (result.success && result.issues) {
+        // Debug: Log first issue to see structure
+        if (result.issues.length > 0) {
+          console.log('First JIRA issue data:', JSON.stringify(result.issues[0], null, 2));
+        }
+        
         // Transform JIRA issues to action items format
         const transformedItems = result.issues.map(issue => transformJIRAIssue(issue));
+        console.log('First transformed item:', transformedItems[0]);
         setActionItems(transformedItems);
         setSyncStatus(`Loaded ${result.issues.length} issues`);
         
@@ -349,15 +355,26 @@ Acceptance Criteria:
 
   // Transform JIRA issue to action item format
   const transformJIRAIssue = (issue) => {
+    // Debug data
+    console.log(`Issue ${issue.key}:`, {
+      epic: issue.epic,
+      labels: issue.labels,
+      issue_type: issue.issue_type,
+      key: issue.key
+    });
+    
     // Parse user story from description if available
     let userStory = null;
     let acceptanceCriteria = [];
     
-    if (issue.description) {
+    // Ensure description is a string (JIRA can return null or object)
+    const description = typeof issue.description === 'string' ? issue.description : '';
+    
+    if (description) {
       // Try to parse user story format
-      const asAMatch = issue.description.match(/As a\s+(.+?)[\n\r]/i);
-      const whenIMatch = issue.description.match(/(?:When I|I want to)\s+(.+?)[\n\r]/i);
-      const soThatMatch = issue.description.match(/(?:So that|In order to)\s+(.+?)[\n\r]/i);
+      const asAMatch = description.match(/As a\s+(.+?)[\n\r]/i);
+      const whenIMatch = description.match(/(?:When I|I want to)\s+(.+?)[\n\r]/i);
+      const soThatMatch = description.match(/(?:So that|In order to)\s+(.+?)[\n\r]/i);
       
       if (asAMatch || whenIMatch || soThatMatch) {
         userStory = {
@@ -368,7 +385,7 @@ Acceptance Criteria:
       }
 
       // Parse acceptance criteria
-      const acMatch = issue.description.match(/Acceptance Criteria:?\s*\n([\s\S]*?)(?:\n\n|\n[A-Z]|$)/i);
+      const acMatch = description.match(/Acceptance Criteria:?\s*\n([\s\S]*?)(?:\n\n|\n[A-Z]|$)/i);
       if (acMatch) {
         acceptanceCriteria = acMatch[1]
           .split('\n')
@@ -379,7 +396,7 @@ Acceptance Criteria:
 
     return {
       id: issue.key,
-      epicName: issue.epic?.name || issue.labels?.join(', ') || 'Unassigned',
+      epicName: issue.epic?.name || (issue.labels && issue.labels.length > 0 ? issue.labels.join(', ') : null) || (issue.issue_type?.name && issue.issue_type.name !== 'Task' ? issue.issue_type.name : null) || issue.key?.split('-')[0] || 'General',
       title: issue.summary,
       userStory: userStory || {
         asA: 'Developer',
@@ -392,8 +409,8 @@ Acceptance Criteria:
         'Code reviewed',
         'Documentation updated'
       ],
-      description: issue.description || issue.summary,
-      assignees: issue.assignee ? [issue.assignee.name] : ['Unassigned'],
+      description: description || issue.summary,
+      assignees: issue.assignee ? [issue.assignee.display_name || issue.assignee.name || 'Unassigned'] : ['Unassigned'],
       priority: issue.priority?.name || 'Medium',
       status: issue.status?.name || 'To Do',
       confidence: getConfidenceLevel(issue),
@@ -669,11 +686,11 @@ Acceptance Criteria:
                     <div className="header-left-section">
                       <img src="/JIRALOGO.png" alt="JIRA" className="jira-logo-icon" />
                       <div className="title-group">
-                        <div className="epic-and-key">
-                          <h3 className="feature-epic-name">{item.epicName}</h3>
+                        <div className="title-main-row">
                           <span className="feature-jira-key">{item.id}</span>
+                          <h3 className="feature-task-title">{item.title}</h3>
                         </div>
-                        <p className="feature-subtitle">{item.title}</p>
+                        <p className="feature-epic-subtitle">{item.epicName}</p>
                       </div>
                     </div>
                     <div className="header-right-section">
@@ -775,9 +792,9 @@ Acceptance Criteria:
                           <div 
                             key={idx} 
                             className="assignee-avatar"
-                            title={assignee}
+                            title={assignee || 'Unassigned'}
                           >
-                            {assignee.split(' ').map(n => n[0]).join('')}
+                            {(assignee || 'Unassigned').split(' ').map(n => n[0]).join('')}
                           </div>
                         ))}
                       </div>

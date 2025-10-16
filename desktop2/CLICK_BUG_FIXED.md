@@ -98,3 +98,4 @@ The app should still be running. Just click the orb and you should see:
 
 **Bug fixed!** 🎉 Try clicking the orb now - it should work!
 
+

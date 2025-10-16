@@ -1,0 +1,137 @@
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-15T23:28:12.835Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-15T23:34:21.275Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:54:35.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:35:12.497Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-15T23:37:55.106Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:56:50.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:38:17.092Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:43:31.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:38:23.467Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:59:52.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:38:44.174Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:43:03.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:39:31.218Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:57:35.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:39:37.117Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:47:53.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:41:07.369Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:43:17.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:41:22.084Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-15T23:41:34.353Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:59:18.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:41:54.512Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T23:41:54.827Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T23:41:54.827Z","timestamp":"2025-10-15T23:41:54.827Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:41:55.298Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-15T23:45:02.106Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:09:45.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:46:14.122Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T23:46:14.452Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T23:46:14.451Z","timestamp":"2025-10-15T23:46:14.452Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:46:14.614Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:48:04.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:47:01.553Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T23:47:01.912Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T23:47:01.912Z","timestamp":"2025-10-15T23:47:01.912Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:47:02.106Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:00:21.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:48:39.736Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T23:48:40.007Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T23:48:40.007Z","timestamp":"2025-10-15T23:48:40.007Z"}
+{"count":2,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:48:40.313Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:12:36.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:50:07.644Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T23:50:07.963Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T23:50:07.963Z","timestamp":"2025-10-15T23:50:07.963Z"}
+{"count":2,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:50:08.121Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T00:59:39.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:51:01.705Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T23:51:02.401Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T23:51:02.400Z","timestamp":"2025-10-15T23:51:02.401Z"}
+{"count":2,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:51:02.525Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-15T23:51:52.766Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:20:39.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:52:20.567Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:52:20.768Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:52:20.887Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:52:26.394Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:52:26.531Z"}
+{"event_id":"AAMkADdhYjQ5MGZiLTRmMzgtNDczNS04ZWM5LWZjMTY3NzExMDQ0YwBGAAAAAAC9wnZj5DA2TYh4S3vqb26BBwBAjenV_X5tRbUk6hX30pJ0AAAAAAENAABAjenV_X5tRbUk6hX30pJ0AAAFhAleAAA=","has_online_meeting":true,"level":"info","meeting_link":"https://teams.microsoft.com/l/meetup-join/19%3ameeting_YTgwODA3NjUtNDNmZC00NDVjLWI1NjYtYjA0NDhkYTc1ODEw%40thread.v2/0?context=%7b%22Tid%22%3a%228101f735-6d05-4dbf-b9b3-c9b6469b7b3d%22%2c%22Oid%22%3a%22feefa571-46d7-4c95-80e6-402d719133a5%22%7d","message":"Calendar event created","service":"microsoft-graph-service","start":"2025-10-17T00:52:00.0000000","subject":"Meeting with Shail ","timestamp":"2025-10-15T23:52:48.060Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:52:48.060Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:52:48.143Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:52:52.789Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:52:52.924Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:53:00.930Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:53:01.061Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:53:15.806Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:53:15.928Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-15T23:53:59.477Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:00:42.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-15T23:57:18.098Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:57:18.265Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:57:18.519Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:57:23.084Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:57:23.267Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-15T23:57:24.231Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-15T23:57:24.306Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:00:34.761Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:04:25.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T00:01:06.442Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:01:06.702Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:01:06.937Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:01:08.550Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:01:08.699Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:01:18.117Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:02:00.171Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:04:05.855Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:10:48.506Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:34:34.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T00:11:13.690Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:11:14.078Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:11:14.414Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:11:16.480Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:11:16.583Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:11:31.893Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:14:11.201Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:14:50.107Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:15:54.423Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:16:37.199Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:17:36.892Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:20:28.125Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:36:22.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T00:20:39.049Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:20:39.297Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:20:39.499Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:21:04.146Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:50:59.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T00:21:16.191Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:21:16.540Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:21:16.722Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:28:27.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T00:21:23.553Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:21:23.960Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:21:24.126Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:21:57.036Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:51:15.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T00:22:18.789Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:22:19.088Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:22:19.259Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:22:20.615Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:22:20.714Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:22:55.656Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:22:55.812Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:22:56.339Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:22:56.438Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:23:17.794Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T01:40:09.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T00:26:34.219Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:26:34.510Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:26:34.686Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T00:26:50.941Z"}
+{"count":3,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T00:26:51.118Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T00:36:08.860Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T01:32:48.296Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T02:48:24.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T01:33:34.711Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T01:33:35.167Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T01:33:35.478Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T01:34:38.172Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T01:45:54.922Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T01:48:37.397Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T01:50:35.260Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","expiresOn":"2025-10-16T02:54:41.000Z","level":"info","message":"Successfully authenticated with Microsoft","service":"microsoft-graph-service","timestamp":"2025-10-16T01:51:02.964Z"}
+{"$orderby":"start/dateTime","$top":50,"endDateTime":"2025-10-16T06:00:00.000Z","level":"info","message":"Fetching upcoming calendar events","service":"microsoft-graph-service","startDateTime":"2025-10-15T06:00:00.000Z","timestamp":"2025-10-16T01:51:03.284Z"}
+{"count":1,"level":"info","message":"Calendar events fetched","service":"microsoft-graph-service","timestamp":"2025-10-16T01:51:03.437Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T01:55:41.962Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T01:58:35.209Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:00:11.106Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:12:02.332Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:14:28.082Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:18:03.696Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:25:54.073Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:28:08.487Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:28:36.332Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:30:56.354Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:31:05.590Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:31:22.263Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:31:43.069Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:32:48.083Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:33:08.092Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:34:48.763Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:39:01.224Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:39:37.278Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:40:33.378Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:43:27.167Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:48:14.117Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:48:45.378Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T02:49:16.396Z"}

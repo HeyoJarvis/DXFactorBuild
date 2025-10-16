@@ -468,7 +468,7 @@ class JIRAService extends EventEmitter {
       const {
         startAt = 0,
         maxResults = 50,
-        fields = ['summary', 'status', 'assignee', 'priority', 'created', 'updated', 'description', 'customfield_10016'] // customfield_10016 is usually story points
+        fields = ['summary', 'status', 'assignee', 'priority', 'created', 'updated', 'description', 'labels', 'issuetype', 'parent', 'customfield_10016'] // customfield_10016 is usually story points
       } = options;
 
       this.logger.info('Fetching issues', { jql, startAt, maxResults });
@@ -701,6 +701,10 @@ class JIRAService extends EventEmitter {
       labels: fields.labels || [],
       components: (fields.components || []).map(c => c.name),
       sprint: fields.sprint || null,
+      epic: fields.parent ? {
+        key: fields.parent.key,
+        name: fields.parent.fields?.summary || fields.parent.key
+      } : null,
       url: `${this.siteUrl}/browse/${issue.key}`
     };
   }
