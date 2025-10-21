@@ -39,6 +39,17 @@ class GoogleOAuthHandler {
    * Start OAuth flow
    */
   async startAuthFlow() {
+    // If server is already running, stop it first
+    if (this.server) {
+      this.logger.info('Stopping existing OAuth server before starting new flow');
+      await new Promise((resolve) => {
+        this.server.close(() => {
+          this.server = null;
+          resolve();
+        });
+      });
+    }
+
     return new Promise((resolve, reject) => {
       try {
         // Start local server to catch callback
@@ -88,7 +99,7 @@ class GoogleOAuthHandler {
                       <p>Connected as: <strong>${result.account?.email || 'Google User'}</strong></p>
                       <p style="color: #666;">You can close this window and return to HeyJarvis.</p>
                       <script>
-                        setTimeout(() => window.close(), 3000);
+                        setTimeout(() => window.close(), 300);
                       </script>
                     </body>
                   </html>
@@ -152,8 +163,21 @@ class GoogleOAuthHandler {
 
         // Handle server errors
         this.server.on('error', (error) => {
-          this.logger.error('OAuth server error', { error: error.message });
-          reject(error);
+          this.logger.error('OAuth server error', { 
+            error: error.message,
+            code: error.code,
+            port: this.options.port 
+          });
+          
+          // Provide helpful error message for common issues
+          if (error.code === 'EADDRINUSE') {
+            const friendlyError = new Error(
+              `Port ${this.options.port} is already in use. Please close any other applications using this port or restart the app.`
+            );
+            reject(friendlyError);
+          } else {
+            reject(error);
+          }
         });
 
       } catch (error) {

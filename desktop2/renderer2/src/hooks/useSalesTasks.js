@@ -5,26 +5,39 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export function useSalesTasks() {
+export function useSalesTasks(user, assignmentView = 'all') {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   /**
    * Load sales tasks only (route_to: 'tasks-sales')
+   * Filtered by user role and assignment
    */
   const loadTasks = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await window.electronAPI.tasks.getAll({
-        routeTo: 'tasks-sales'
-      });
+      const filters = {
+        routeTo: 'tasks-sales',
+        userRole: user?.user_role || 'sales',
+        slackUserId: user?.slack_user_id
+      };
+
+      // Add assignment view filter if specified
+      if (assignmentView && assignmentView !== 'all') {
+        filters.assignmentView = assignmentView;
+      }
+
+      const response = await window.electronAPI.tasks.getAll(filters);
 
       if (response.success) {
         console.log('📋 Sales tasks loaded:', {
           count: response.tasks?.length || 0,
+          userRole: filters.userRole,
+          slackUserId: filters.slackUserId,
+          assignmentView: assignmentView,
           tasks: response.tasks
         });
         setTasks(response.tasks || []);
@@ -38,7 +51,7 @@ export function useSalesTasks() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user, assignmentView]);
 
   /**
    * Create a new sales task

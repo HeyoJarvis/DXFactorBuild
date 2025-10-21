@@ -15,7 +15,8 @@ function registerJIRAHandlers(services, logger) {
   jiraOAuthHandler = new JIRAOAuthHandler({
     clientId: process.env.JIRA_CLIENT_ID,
     clientSecret: process.env.JIRA_CLIENT_SECRET,
-    redirectUri: process.env.JIRA_REDIRECT_URI || 'http://localhost:8890/auth/jira/callback',
+    redirectUri: process.env.JIRA_REDIRECT_URI || 'http://localhost:8892/auth/jira/callback',
+    port: 8892, // JIRA uses port 8892
     logger
   });
 
@@ -40,14 +41,78 @@ function registerJIRAHandlers(services, logger) {
         };
       }
 
-      // Try to initialize JIRA service
-      const result = await jiraService.initialize(userId);
+      // Check if service is already initialized and ready to use
+      const serviceReady = jiraService?.isInitialized && jiraService?.jiraCore;
 
+      // If service is ready, it's connected! (Fast path)
+      if (serviceReady) {
+        logger.info('JIRA connection check: Service ready in memory');
+        return {
+          success: true,
+          connected: true,
+          source: 'memory'
+        };
+      }
+
+      // Service not ready - check database for stored tokens
+      const { data: userData, error: dbError } = await services.dbAdapter.supabase
+        .from('users')
+        .select('integration_settings')
+        .eq('id', userId)
+        .single();
+
+      if (dbError) {
+        logger.error('Failed to check JIRA connection in DB:', dbError);
+        return {
+          success: false,
+          connected: false,
+          error: dbError.message
+        };
+      }
+
+      const jiraSettings = userData?.integration_settings?.jira;
+      const hasTokens = jiraSettings?.access_token && jiraSettings?.authenticated === true;
+
+      // If we have tokens but service isn't initialized, auto-initialize it!
+      if (hasTokens) {
+        logger.info('JIRA tokens found, auto-initializing service...', { userId });
+        try {
+          const initResult = await jiraService.initialize(userId);
+          if (initResult.success && initResult.connected) {
+            logger.info('✅ JIRA service auto-initialized successfully');
+            // Start auto-sync
+            jiraService.startAutoSync(userId, 10);
+            return {
+              success: true,
+              connected: true,
+              source: 'auto-init',
+              siteUrl: jiraSettings?.site_url,
+              cloudId: jiraSettings?.cloud_id
+            };
+          } else {
+            logger.warn('JIRA auto-initialization failed', initResult);
+            return {
+              success: true,
+              connected: false,
+              error: initResult.error || 'Initialization failed'
+            };
+          }
+        } catch (initError) {
+          logger.error('JIRA auto-initialization error:', initError);
+          return {
+            success: true,
+            connected: false,
+            error: initError.message
+          };
+        }
+      }
+
+      // No tokens = never connected
+      logger.info('JIRA connection check: No tokens found');
       return {
         success: true,
-        connected: result.connected,
-        siteUrl: result.siteUrl,
-        cloudId: result.cloudId
+        connected: false,
+        source: 'no-tokens'
       };
 
     } catch (error) {
@@ -90,11 +155,13 @@ function registerJIRAHandlers(services, logger) {
 
       const integrationSettings = currentUser?.integration_settings || {};
       integrationSettings.jira = {
+        authenticated: true,
         access_token: authResult.access_token,
         refresh_token: authResult.refresh_token,
         token_expiry: new Date(Date.now() + (authResult.expires_in * 1000)).toISOString(),
         cloud_id: authResult.cloud_id,
-        site_url: authResult.site_url
+        site_url: authResult.site_url,
+        connected_at: new Date().toISOString()
       };
 
       const { error: updateError } = await services.dbAdapter.supabase

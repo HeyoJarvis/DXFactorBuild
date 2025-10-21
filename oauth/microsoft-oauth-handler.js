@@ -39,6 +39,38 @@ class MicrosoftOAuthHandler {
    * Start OAuth flow
    */
   async startAuthFlow() {
+    // If server is already running, stop it first
+    if (this.server) {
+      this.logger.info('Stopping existing OAuth server before starting new flow');
+      await new Promise((resolve) => {
+        this.server.close(() => {
+          this.logger.info('Previous OAuth server closed');
+          this.server = null;
+          resolve();
+        });
+      });
+      // Wait for port to be fully released
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    // Check if port is in use by another process
+    const net = require('net');
+    const isPortFree = await new Promise((resolve) => {
+      const tester = net.createServer()
+        .once('error', () => resolve(false))
+        .once('listening', () => {
+          tester.close();
+          resolve(true);
+        })
+        .listen(this.options.port);
+    });
+
+    if (!isPortFree) {
+      const error = new Error(`Port ${this.options.port} is already in use. Please wait a moment and try again.`);
+      this.logger.error('Port check failed', { port: this.options.port });
+      throw error;
+    }
+
     return new Promise((resolve, reject) => {
       try {
         // Start local server to catch callback
@@ -88,7 +120,7 @@ class MicrosoftOAuthHandler {
                       <p>Connected as: <strong>${result.account?.username || 'Microsoft User'}</strong></p>
                       <p style="color: #666;">You can close this window and return to HeyJarvis.</p>
                       <script>
-                        setTimeout(() => window.close(), 3000);
+                        setTimeout(() => window.close(), 300);
                       </script>
                     </body>
                   </html>
@@ -152,8 +184,32 @@ class MicrosoftOAuthHandler {
 
         // Handle server errors
         this.server.on('error', (error) => {
-          this.logger.error('OAuth server error', { error: error.message });
-          reject(error);
+          this.logger.error('OAuth server error', { 
+            error: error.message,
+            code: error.code,
+            port: this.options.port 
+          });
+          
+          // Provide helpful error message for common issues
+          if (error.code === 'EADDRINUSE') {
+            const friendlyError = new Error(
+              `Port ${this.options.port} is already in use. Another OAuth flow may be in progress. Please wait a moment and try again.`
+            );
+            if (this.pendingAuth) {
+              this.pendingAuth.reject(friendlyError);
+              this.pendingAuth = null;
+            }
+            reject(friendlyError);
+          } else {
+            if (this.pendingAuth) {
+              this.pendingAuth.reject(error);
+              this.pendingAuth = null;
+            }
+            reject(error);
+          }
+          
+          // Clean up server reference
+          this.server = null;
         });
 
       } catch (error) {

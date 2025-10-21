@@ -12,7 +12,7 @@
  */
 
 const { authenticate, rateLimit } = require('../middleware/auth');
-const EngineeringIntelligenceService = require('../../core/intelligence/engineering-intelligence-service');
+const CodeIndexer = require('../../core/intelligence/code-indexer');
 const winston = require('winston');
 
 // Initialize logger
@@ -33,21 +33,17 @@ const logger = winston.createLogger({
   defaultMeta: { service: 'engineering-api' }
 });
 
-// Initialize Engineering Intelligence Service (singleton)
-let engineeringService = null;
+// Initialize Code Indexer (singleton) - Uses Claude AI + OpenAI Embeddings + Supabase
+let codeIndexer = null;
 
-function getEngineeringService() {
-  if (!engineeringService) {
-    // Use centralized GitHub token from environment
-    engineeringService = new EngineeringIntelligenceService({
-      githubToken: process.env.GITHUB_TOKEN,
-      repository: {
-        owner: process.env.GITHUB_REPO_OWNER,
-        repo: process.env.GITHUB_REPO_NAME
-      }
+function getCodeIndexer() {
+  if (!codeIndexer) {
+    codeIndexer = new CodeIndexer({
+      logLevel: 'info'
     });
+    logger.info('Code Indexer initialized with Claude AI + OpenAI + Supabase');
   }
-  return engineeringService;
+  return codeIndexer;
 }
 
 /**
@@ -101,13 +97,24 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Apply authentication middleware
-    await new Promise((resolve, reject) => {
-      authenticate(req, res, (err) => {
-        if (err) reject(err);
-        else resolve();
+    // Apply authentication middleware - Skip for local desktop app
+    const isLocalhost = req.headers.origin?.includes('localhost') ||
+                       req.headers.host?.includes('localhost') ||
+                       req.headers.referer?.includes('localhost') ||
+                       !req.headers.authorization;
+
+    if (!isLocalhost) {
+      await new Promise((resolve, reject) => {
+        authenticate(req, res, (err) => {
+          if (err) reject(err);
+          else resolve();
+        });
       });
-    });
+    } else {
+      // For local desktop app, create a mock user
+      req.userId = 'desktop-user';
+      req.user = { id: 'desktop-user', email: 'desktop@local', fallback: true };
+    }
 
     // Apply rate limiting (10 queries per 15 minutes per user)
     await new Promise((resolve, reject) => {
@@ -150,37 +157,43 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Get engineering service (singleton by default)
-    let service = getEngineeringService();
+    // Get code indexer (singleton)
+    const indexer = getCodeIndexer();
 
-    // If override is provided, create a scoped service instance for this request
-    if (overrideOwner && overrideRepo) {
-      service = new EngineeringIntelligenceService({
-        githubToken: process.env.GITHUB_TOKEN,
-        repository: { owner: overrideOwner, repo: overrideRepo }
-      });
-      logger.info('Using repository override for engineering query', {
-        repository: `${overrideOwner}/${overrideRepo}`
+    // Validate repository is provided
+    if (!overrideOwner || !overrideRepo) {
+      return res.status(400).json({
+        error: 'Repository owner and name are required',
+        code: 'MISSING_REPOSITORY'
       });
     }
 
-    // Check if service is available (token configured)
-    if (!process.env.GITHUB_TOKEN) {
-      logger.error('Engineering Intelligence not configured');
+    logger.info('Using Code Indexer to query repository', {
+      repository: `${overrideOwner}/${overrideRepo}`,
+      query: query.substring(0, 100)
+    });
+
+    // Check if service is available (GitHub App or token configured)
+    const hasGithubApp = !!(process.env.GITHUB_APP_ID &&
+                           process.env.GITHUB_APP_INSTALLATION_ID &&
+                           (process.env.GITHUB_APP_PRIVATE_KEY_PATH || process.env.GITHUB_APP_PRIVATE_KEY));
+    const hasToken = !!process.env.GITHUB_TOKEN;
+
+    if (!hasGithubApp && !hasToken) {
+      logger.error('Engineering Intelligence not configured - need GitHub App or token');
       await auditLog(req.userId, req.user?.email, query, false, new Error('Service not configured'));
-      
+
       return res.status(503).json({
-        error: 'Engineering Intelligence is not configured. Please contact your administrator.',
+        error: 'Engineering Intelligence is not configured. Please set up GitHub App credentials or GITHUB_TOKEN.',
         code: 'SERVICE_NOT_CONFIGURED'
       });
     }
 
-    // Execute query
-    const result = await service.queryCodebase(query, {
-      userId: req.userId,
-      userEmail: req.user?.email,
-      userRole: req.user?.context?.role,
-      ...context
+    // Execute query using Code Query Engine (Claude AI)
+    const result = await indexer.query(query, {
+      owner: overrideOwner,
+      repo: overrideRepo,
+      language: context?.language || null
     });
 
     // Audit log success
@@ -191,10 +204,11 @@ module.exports = async (req, res) => {
       success: true,
       query,
       result: {
-        summary: result.summary,
-        businessImpact: result.businessImpact,
-        actionItems: result.actionItems,
-        technicalDetails: result.technicalDetails,
+        answer: result.answer,
+        confidence: result.confidence,
+        sources: result.sources,
+        processingTime: result.processingTime,
+        metadata: result.metadata,
         timestamp: new Date().toISOString()
       }
     });

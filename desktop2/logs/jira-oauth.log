@@ -1,3 +1,56 @@
 {"level":"info","message":"OAuth server started","port":8890,"service":"jira-oauth-handler","timestamp":"2025-10-15T21:49:26.715Z"}
 {"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-15T21:49:26.715Z"}
 {"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-15T21:49:40.721Z"}
+{"level":"info","message":"OAuth server started","port":8890,"service":"jira-oauth-handler","timestamp":"2025-10-16T21:01:22.714Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-16T21:01:22.714Z"}
+{"error":"listen EADDRINUSE: address already in use :::8890","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-16T21:01:33.447Z"}
+{"error":"listen EADDRINUSE: address already in use :::8890","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-16T21:02:02.509Z"}
+{"error":"listen EADDRINUSE: address already in use :::8890","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-16T21:02:06.117Z"}
+{"error":"listen EADDRINUSE: address already in use :::8890","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-17T18:32:57.573Z"}
+{"error":"listen EADDRINUSE: address already in use :::8890","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-18T18:37:54.005Z"}
+{"error":"listen EADDRINUSE: address already in use :::8890","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:27:20.373Z"}
+{"error":"listen EADDRINUSE: address already in use :::8890","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:28:21.043Z"}
+{"level":"info","message":"OAuth server started","port":8891,"service":"jira-oauth-handler","timestamp":"2025-10-19T00:33:28.922Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-19T00:33:28.922Z"}
+{"error":"listen EADDRINUSE: address already in use :::8891","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:33:38.397Z"}
+{"error":"listen EADDRINUSE: address already in use :::8891","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:33:42.172Z"}
+{"level":"info","message":"OAuth server started","port":8891,"service":"jira-oauth-handler","timestamp":"2025-10-19T00:35:27.270Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-19T00:35:27.270Z"}
+{"error":"listen EADDRINUSE: address already in use :::8891","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:35:39.089Z"}
+{"error":"listen EADDRINUSE: address already in use :::8891","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:35:41.662Z"}
+{"error":"listen EADDRINUSE: address already in use :::8891","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:36:36.680Z"}
+{"error":"listen EADDRINUSE: address already in use :::8891","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:36:46.207Z"}
+{"error":"listen EADDRINUSE: address already in use :::8891","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:36:47.362Z"}
+{"level":"info","message":"OAuth server started","port":8891,"service":"jira-oauth-handler","timestamp":"2025-10-19T00:37:28.285Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-19T00:37:28.285Z"}
+{"level":"info","message":"OAuth server started","port":8891,"service":"jira-oauth-handler","timestamp":"2025-10-19T00:38:05.094Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-19T00:38:05.095Z"}
+{"error":"listen EADDRINUSE: address already in use :::8891","level":"error","message":"OAuth server error","service":"jira-oauth-handler","timestamp":"2025-10-19T00:38:34.208Z"}
+{"level":"info","message":"OAuth server started","port":8892,"service":"jira-oauth-handler","timestamp":"2025-10-19T00:38:48.617Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-19T00:38:48.617Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-19T00:38:58.517Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-19T00:39:03.522Z"}
+{"level":"info","message":"OAuth server started","port":8892,"service":"jira-oauth-handler","timestamp":"2025-10-19T00:40:05.027Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-19T00:40:05.027Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-19T00:40:12.189Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-19T00:40:17.195Z"}
+{"level":"info","message":"OAuth server started","port":8892,"service":"jira-oauth-handler","timestamp":"2025-10-19T00:43:27.356Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-19T00:43:27.357Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-19T00:43:38.697Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-19T00:43:43.703Z"}
+{"level":"info","message":"OAuth server started","port":8892,"service":"jira-oauth-handler","timestamp":"2025-10-20T16:05:58.301Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-20T16:05:58.302Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-20T16:06:04.763Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-20T16:06:09.765Z"}
+{"level":"info","message":"OAuth server started","port":8892,"service":"jira-oauth-handler","timestamp":"2025-10-20T18:07:03.992Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-20T18:07:03.992Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-20T18:07:13.475Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-20T18:07:18.478Z"}
+{"level":"info","message":"OAuth server started","port":8892,"service":"jira-oauth-handler","timestamp":"2025-10-21T15:44:38.478Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-21T15:44:38.478Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-21T15:44:46.195Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-21T15:44:51.201Z"}
+{"level":"info","message":"OAuth server started","port":8892,"service":"jira-oauth-handler","timestamp":"2025-10-21T17:19:13.161Z"}
+{"level":"info","message":"Opening authorization URL in browser","service":"jira-oauth-handler","timestamp":"2025-10-21T17:19:13.162Z"}
+{"cloudId":"399752c5-b6d8-40e6-a517-a818b3ffbe61","level":"info","message":"Authentication successful","service":"jira-oauth-handler","siteUrl":"https://heyjarvis-team.atlassian.net","timestamp":"2025-10-21T17:19:22.901Z"}
+{"level":"info","message":"OAuth server stopped","service":"jira-oauth-handler","timestamp":"2025-10-21T17:19:27.906Z"}

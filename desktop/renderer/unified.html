@@ -623,6 +623,111 @@
 
 
     /* Content Area */
+    /* Tab Bar - Floating Pills Design */
+    .tab-bar {
+      display: none; /* Hidden when collapsed */
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 8px 16px;
+      -webkit-app-region: drag;
+      z-index: 100;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.expanded .tab-bar {
+      display: block;
+      animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.collapsed .tab-bar {
+      display: none;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .tab-bar-inner {
+      display: flex;
+      gap: 6px;
+      max-width: 1200px;
+      margin: 0 auto;
+      -webkit-app-region: no-drag;
+    }
+
+    .tab-bar-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: #737373;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .tab-bar-item svg {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-bar-item:hover {
+      background: rgba(0, 0, 0, 0.06);
+      color: #171717;
+      transform: translateY(-1px);
+    }
+
+    .tab-bar-item.active {
+      background: #171717;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .tab-bar-item.active:hover {
+      background: #0a0a0a;
+      transform: translateY(-1px);
+    }
+
+    .tab-bar-item:active {
+      transform: scale(0.96);
+    }
+
+    /* Tab bar appears with slide animation */
+    .tab-bar-item {
+      animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    }
+
+    .tab-bar-item:nth-child(1) { animation-delay: 0.05s; }
+    .tab-bar-item:nth-child(2) { animation-delay: 0.1s; }
+    .tab-bar-item:nth-child(3) { animation-delay: 0.15s; }
+    .tab-bar-item:nth-child(4) { animation-delay: 0.2s; }
+
+    @keyframes fadeInTab {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .copilot-content {
       flex: 1;
       display: flex;
@@ -641,10 +746,22 @@
       flex-direction: column;
       overflow: hidden;
       min-height: 0;
+      animation: fadeInContent 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .tab-content.active {
       display: flex;
+    }
+
+    @keyframes fadeInContent {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Status Bar - Light Theme */
@@ -2855,6 +2972,34 @@
   </div>
 
 
+  <!-- Tab Bar (appears when expanded) -->
+  <div class="tab-bar" id="tabBar">
+    <div class="tab-bar-inner">
+      <button class="tab-bar-item active" data-tab="chat" onclick="switchTab('chat')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>Chat</span>
+      </button>
+      
+      <button class="tab-bar-item" data-tab="tasks" onclick="switchTab('tasks')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span>Tasks</span>
+      </button>
+      
+      <button class="tab-bar-item" data-tab="indexer" onclick="switchTab('indexer')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 1v6m0 6v6m5.2-13.2l-4.3 4.3m0 6l-4.3 4.3m13.2-5.2l-6-0.1m-6 0l-6-0.1m13.2 5.2l-4.3-4.3m0-6l-4.3-4.3"></path>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </div>
+  </div>
+
   <div class="copilot-content">
     <!-- Copilot Tab -->
     <div id="copilotTab" class="tab-content active">
@@ -3435,11 +3580,11 @@
         console.log('🔼 Expanding window from orb mode...');
         expandTopBar();
         
-        // Wait a bit for animation
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Wait for tab bar to appear and animate
+        await new Promise(resolve => setTimeout(resolve, 350));
       }
       
-      // Switch to the appropriate tab
+      // Switch to the appropriate tab (this will update the tab bar)
       switchTab(targetTab);
     }
 
@@ -3455,10 +3600,20 @@
     function switchTab(tab) {
       currentTab = tab;
       
+      console.log('🔄 Switching to tab:', tab);
+      
       // Expand interface when switching tabs
       if (!isExpanded) expandTopBar();
       
-      // Update navigation buttons
+      // Update tab bar items
+      document.querySelectorAll('.tab-bar-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.tab === tab) {
+          item.classList.add('active');
+        }
+      });
+      
+      // Update old navigation buttons (for backwards compatibility)
       document.querySelectorAll('.header-nav-btn').forEach(btn => btn.classList.remove('active'));
       const navMap = { 
         'chat': 'chatNavBtn', 
@@ -3469,8 +3624,11 @@
       const targetBtn = document.getElementById(navMap[tab]);
       if (targetBtn) targetBtn.classList.add('active');
       
-      // Update content
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      // Update content with fade animation
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
       const contentMap = { 
         'chat': 'copilotTab', 
         'copilot': 'copilotTab', 
@@ -3478,8 +3636,14 @@
         'indexer': 'indexerTab'
       };
       const targetContent = document.getElementById(contentMap[tab]);
-      if (targetContent) targetContent.classList.add('active');
+      if (targetContent) {
+        // Small delay for smooth transition
+        setTimeout(() => {
+          targetContent.classList.add('active');
+        }, 50);
+      }
       
+      // Load data if needed
       if (tab === 'tasks') {
         loadTasks();
       } else if (tab === 'indexer') {

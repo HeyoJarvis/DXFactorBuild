@@ -13,6 +13,7 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
     status = task.is_completed ? 'completed' : 'todo',
     priority = task.workflow_metadata?.priority || task.priority || 'medium',
     source = task.external_source || 'slack',
+    work_type = task.workflow_metadata?.work_type || task.work_type || 'task',
     assignee = task.workflow_metadata?.assignee,
     assignedBy = task.workflow_metadata?.assignedBy,
     created_at = task.started_at || task.created_at,
@@ -54,6 +55,33 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
     return labels[status] || 'To Do';
   };
 
+  // Get work type icon and color
+  const getWorkTypeDisplay = () => {
+    const workTypes = {
+      calendar: {
+        icon: '📅',
+        label: 'Calendar',
+        color: '#34C759',
+        bgColor: 'rgba(52, 199, 89, 0.1)'
+      },
+      email: {
+        icon: '📧',
+        label: 'Email',
+        color: '#5AC8FA',
+        bgColor: 'rgba(90, 200, 250, 0.1)'
+      },
+      outreach: {
+        icon: '📤',
+        label: 'Outreach',
+        color: '#AF52DE',
+        bgColor: 'rgba(175, 82, 222, 0.1)'
+      }
+    };
+    return workTypes[work_type] || null;
+  };
+
+  const workTypeDisplay = getWorkTypeDisplay();
+
   // Handle card click - open chat
   const handleCardClick = (e) => {
     // Don't trigger if clicking on checkbox
@@ -80,6 +108,22 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
       <div className={`action-priority-badge priority-${priority}`}>
         {priority.charAt(0).toUpperCase() + priority.slice(1)}
       </div>
+
+      {/* Work Type Badge - Special tasks (Calendar/Email) */}
+      {workTypeDisplay && (
+        <div 
+          className="action-work-type-badge"
+          style={{ 
+            backgroundColor: workTypeDisplay.bgColor,
+            color: workTypeDisplay.color,
+            border: `1px solid ${workTypeDisplay.color}40`
+          }}
+          title={workTypeDisplay.label}
+        >
+          <span className="work-type-icon">{workTypeDisplay.icon}</span>
+          <span className="work-type-label">{workTypeDisplay.label}</span>
+        </div>
+      )}
 
       {/* Header with Slack Logo and Title */}
       <div className="action-item-header">

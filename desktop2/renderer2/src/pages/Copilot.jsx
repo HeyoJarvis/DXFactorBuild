@@ -4,6 +4,7 @@ import StatusBar from '../components/common/StatusBar';
 import ChatContainer from '../components/Chat/ChatContainer';
 import InputBox from '../components/Chat/InputBox';
 import QuickActions from '../components/common/QuickActions';
+import DraggableHeader from '../components/common/DraggableHeader';
 import './Copilot.css';
 
 export default function Copilot({ systemStatus, initialMessage }) {
@@ -36,6 +37,9 @@ export default function Copilot({ systemStatus, initialMessage }) {
 
   return (
     <div className="copilot-page">
+      {/* Draggable Window Controls */}
+      <DraggableHeader title="Copilot" />
+
       <div className="copilot-content">
         <ChatContainer messages={messages} isTyping={isTyping} />
         

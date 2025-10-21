@@ -245,3 +245,5 @@ The cards now perfectly match the wireframe with:
 The design is now **wireframe-accurate** and ready for JIRA integration! 🎯
 
 
+
+

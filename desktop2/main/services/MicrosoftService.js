@@ -69,18 +69,15 @@ class MicrosoftService extends EventEmitter {
       this.oauthHandler.refreshToken = microsoftTokens.refresh_token;
       this.oauthHandler.tokenExpiry = microsoftTokens.token_expiry ? new Date(microsoftTokens.token_expiry).getTime() : null;
 
-      // Initialize Graph service
+      // Initialize Graph service with existing tokens
       this.graphService = new MicrosoftGraphService({
         accessToken: microsoftTokens.access_token,
+        tokenExpiry: microsoftTokens.token_expiry,
         logger: this.logger
       });
 
-      // Listen for token refresh events
-      this.oauthHandler.on('token_refreshed', async (tokens) => {
-        await this.saveTokens(userId, tokens);
-        // Update graph service with new token
-        this.graphService.accessToken = tokens.access_token;
-      });
+      // Note: MicrosoftOAuthHandler doesn't extend EventEmitter, so we don't set up event listeners
+      // Token refresh is handled internally by MSAL (Microsoft Authentication Library)
 
       this.isInitialized = true;
       this.logger.info('Microsoft service initialized successfully', { userId });
@@ -288,6 +285,129 @@ class MicrosoftService extends EventEmitter {
         error: error.message
       });
       
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Get unread emails
+   */
+  async getUnreadEmails(maxResults = 50) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Microsoft not connected');
+      }
+
+      this.logger.info('Fetching unread emails', { maxResults });
+
+      const emails = await this.graphService.getUnreadEmails('inbox', maxResults);
+
+      this.logger.info('Unread emails fetched', { count: emails.length });
+
+      return {
+        success: true,
+        emails
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to fetch unread emails', {
+        error: error.message
+      });
+
+      return {
+        success: false,
+        error: error.message,
+        emails: []
+      };
+    }
+  }
+
+  /**
+   * Get emails from a folder (all emails, not just unread)
+   */
+  async getEmails(folderId = 'inbox', maxResults = 50) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Microsoft not connected');
+      }
+
+      this.logger.info('Fetching all emails', { folderId, maxResults });
+
+      const emails = await this.graphService.getEmails(folderId, maxResults);
+
+      this.logger.info('All emails fetched', { count: emails.length });
+
+      return {
+        success: true,
+        emails
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to fetch emails', {
+        error: error.message
+      });
+
+      return {
+        success: false,
+        error: error.message,
+        emails: []
+      };
+    }
+  }
+
+  /**
+   * Mark email as read
+   */
+  async markEmailAsRead(messageId) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Microsoft not connected');
+      }
+
+      await this.graphService.markEmailAsRead(messageId);
+
+      this.logger.info('Email marked as read', { messageId });
+
+      return {
+        success: true
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to mark email as read', {
+        messageId,
+        error: error.message
+      });
+
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Send an email
+   */
+  async sendEmail(emailData) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Microsoft not connected');
+      }
+
+      const result = await this.graphService.sendEmail(emailData);
+
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      this.logger.error('Failed to send email', {
+        error: error.message
+      });
+
       return {
         success: false,
         error: error.message

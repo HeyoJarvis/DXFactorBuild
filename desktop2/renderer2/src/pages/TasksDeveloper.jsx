@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TaskChat from '../components/Tasks/TaskChat';
+import DraggableHeader from '../components/common/DraggableHeader';
 import './TasksDeveloper_New.css';
 /**
  * Tasks (Developer) - JIRA & GitHub Focused
@@ -570,6 +571,9 @@ Acceptance Criteria:
 
   return (
     <div className="tasks-developer-page">
+      {/* Draggable Window Controls */}
+      <DraggableHeader title="Developer Tasks" />
+
       {/* Modern Clean Header - Draggable */}
       <div className="modern-header" style={{ WebkitAppRegion: 'drag' }}>
         <div className="header-content" style={{ WebkitAppRegion: 'no-drag' }}>

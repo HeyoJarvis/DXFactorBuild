@@ -1,0 +1,987 @@
+/*
+ * HeyJarvis Login Flow - Enterprise Design System
+ * Liquid Glass + Native Translucency
+ */
+
+/* ============================================
+   DESIGN TOKENS
+   ============================================ */
+
+:root {
+  /* Colors - Override global.css dark theme with light theme for login */
+  --color-canvas: #F7F7F8;
+  --color-glass-bg: rgba(255, 255, 255, 0.55);
+  --color-stroke: rgba(0, 0, 0, 0.06);
+  --color-shadow: rgba(16, 24, 40, 0.06);
+  --color-text-primary: #0B0C0E !important;
+  --color-text-secondary: #5A5F6A !important;
+  --color-text-tertiary: #8C919A !important;
+  --color-accent: #2563EB;
+  --color-accent-hover: #1D4ED8;
+  --color-focus-ring: rgba(37, 99, 235, 0.12);
+  --color-hover-bg: #F3F6FF;
+  --color-error: #DC2626;
+  --color-error-bg: rgba(254, 242, 242, 0.8);
+  --color-success: #16A34A;
+
+  /* Spacing (8px grid) */
+  --space-xs: 8px;
+  --space-sm: 14px;
+  --space-md: 20px;
+  --space-lg: 28px;
+  --space-xl: 48px;
+  --space-2xl: 64px;
+
+  /* Radius */
+  --radius-card: 20px;
+  --radius-button: 14px;
+  --radius-input: 12px;
+
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+
+  /* Transitions */
+  --transition-fast: 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-medium: 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-slow: 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ============================================
+   BASE LAYOUT
+   ============================================ */
+
+.login-flow-page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  background: var(--color-canvas);
+  overflow: hidden;
+  position: relative;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #0B0C0E !important;
+  padding: 14px; /* Compact for 666×380 */
+  box-sizing: border-box;
+}
+
+/* Glass Container - Compact for 666×380 window */
+.login-flow-container {
+  background: var(--color-glass-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid var(--color-stroke);
+  border-radius: 16px; /* Slightly smaller radius for compact size */
+  padding: 24px 24px 20px; /* Compact padding for 666×380 */
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 16px 48px var(--color-shadow);
+  animation: fadeInUp var(--transition-fast);
+  position: relative;
+  color: #0B0C0E !important;
+  box-sizing: border-box;
+  /* GPU acceleration for smooth blur */
+  transform: translateZ(0);
+  will-change: backdrop-filter;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Custom scrollbar styling for glass container */
+.login-flow-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.login-flow-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.login-flow-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.login-flow-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+/* Draggable Header Area for window dragging */
+.login-flow-drag-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  -webkit-app-region: drag;
+  cursor: move;
+  z-index: 1000;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+/* Ensure interactive elements in drag area are clickable */
+.login-flow-drag-area button,
+.login-flow-drag-area a,
+.login-flow-drag-area input {
+  -webkit-app-region: no-drag;
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+
+.progress-bar {
+  width: 100%;
+  height: 2px;
+  background: var(--color-stroke);
+  border-radius: 16px;
+  margin-bottom: 12px; /* Compact for 666×380 */
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 16px;
+  transition: width var(--transition-slow);
+  will-change: width;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+.login-flow-title {
+  font-size: 24px; /* Compact for 666×380 */
+  line-height: 30px;
+  font-weight: 600;
+  color: #0B0C0E !important;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.login-flow-subtitle {
+  font-size: 14px;
+  line-height: 20px; /* Compact line height */
+  color: #5A5F6A !important;
+  font-weight: 400;
+  margin: 0 0 14px 0; /* Compact margin */
+}
+
+.login-flow-body {
+  font-size: 15px;
+  line-height: 22px;
+  color: #5A5F6A !important;
+  margin: 0;
+}
+
+.login-flow-caption {
+  font-size: 13px;
+  line-height: 20px;
+  color: #8C919A !important;
+  font-weight: 400;
+}
+
+/* ============================================
+   DIVIDER
+   ============================================ */
+
+.login-flow-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--color-stroke);
+  margin: 14px 0; /* Compact for 666×380 */
+}
+
+.login-flow-divider-text {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: var(--space-xs) 0; /* Reduced from sm */
+  color: #8C919A !important;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.login-flow-divider-text::before,
+.login-flow-divider-text::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-stroke);
+}
+
+.login-flow-divider-text span {
+  padding: 0 var(--space-sm);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.login-flow-button {
+  width: 100%;
+  height: 48px; /* Compact for 666×380 */
+  border: 1px solid var(--color-stroke);
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  font-weight: 500;
+  color: #0B0C0E !important;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  /* Glass effect */
+  background: rgba(255, 255, 255, 0.65);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  /* GPU acceleration */
+  transform: translateZ(0);
+  font-family: var(--font-family);
+}
+
+.login-flow-button:hover:not(:disabled) {
+  border-color: #CBD5E1;
+  background: rgba(255, 255, 255, 0.75);
+  transform: translateY(-1px) translateZ(0);
+  box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.login-flow-button:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 6px var(--color-focus-ring);
+}
+
+.login-flow-button:active:not(:disabled) {
+  transform: scale(0.99) translateZ(0);
+}
+
+.login-flow-button:disabled {
+  background: rgba(229, 231, 235, 0.5);
+  color: #8C919A !important;
+  cursor: not-allowed;
+  border-color: rgba(0, 0, 0, 0.04);
+  backdrop-filter: none;
+}
+
+.login-flow-button-primary {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.login-flow-button-primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.login-flow-button-secondary {
+  background: transparent;
+  color: var(--color-accent);
+  border-color: var(--color-stroke);
+}
+
+.login-flow-button svg {
+  opacity: 0.7;
+  width: 18px; /* Reduced from 20px */
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   BUTTON GROUPS
+   ============================================ */
+
+.login-flow-button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Compact for 666×380 */
+  margin: 16px 0; /* Compact vertical rhythm */
+}
+
+/* ============================================
+   INPUT FIELDS
+   ============================================ */
+
+.login-flow-input {
+  width: 100%;
+  height: 56px;
+  border: 1px solid var(--color-stroke);
+  border-radius: var(--radius-input);
+  padding: 0 var(--space-sm);
+  font-size: 16px;
+  font-weight: 400;
+  color: #0B0C0E !important;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px) saturate(140%);
+  transition: all var(--transition-fast);
+  font-family: var(--font-family);
+}
+
+.login-flow-input:hover {
+  border-color: #CBD5E1;
+}
+
+.login-flow-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 6px var(--color-focus-ring);
+}
+
+.login-flow-input::placeholder {
+  color: #8C919A !important;
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.login-flow-loader {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(37, 99, 235, 0.08),
+    transparent
+  );
+  animation: shimmer 1.2s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.login-flow-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   SKELETON LOADERS
+   ============================================ */
+
+.login-flow-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.08) 50%,
+    rgba(0, 0, 0, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-input);
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.login-flow-skeleton-row {
+  height: 56px;
+  margin-bottom: var(--space-sm);
+}
+
+/* ============================================
+   WORKSPACE LIST
+   ============================================ */
+
+.login-flow-workspace-search {
+  margin-bottom: 12px;
+  height: 48px;
+  font-size: 15px;
+}
+
+.login-flow-workspace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 16px 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for workspace list */
+.login-flow-workspace-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.login-flow-workspace-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 3px;
+}
+
+.login-flow-workspace-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.login-flow-workspace-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.login-flow-workspace-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  min-height: 64px;
+  border: 2px solid var(--color-stroke);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.login-flow-workspace-item:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: #CBD5E1;
+}
+
+.login-flow-workspace-item.selected {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.login-flow-workspace-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.login-flow-workspace-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0B0C0E !important;
+  letter-spacing: -0.2px;
+}
+
+.login-flow-workspace-meta {
+  font-size: 13px;
+  color: #6B7280 !important;
+  font-weight: 400;
+}
+
+/* Workspace Select Button */
+.login-flow-workspace-button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: #6B7280 !important;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-family: var(--font-family);
+}
+
+.login-flow-workspace-button:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #0B0C0E !important;
+}
+
+.login-flow-workspace-button.selected {
+  background: #6366F1;
+  color: white !important;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Horizontal Button Group */
+.login-flow-button-group-horizontal {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0 12px 0;
+}
+
+.login-flow-button-group-horizontal .login-flow-button {
+  flex: 1;
+}
+
+/* Footer Text */
+.login-flow-footer-text {
+  font-size: 13px;
+  line-height: 18px;
+  color: #9CA3AF !important;
+  text-align: center;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ============================================
+   PERMISSION CARDS
+   ============================================ */
+
+.login-flow-permission-section {
+  margin: var(--space-sm) 0; /* Reduced from md */
+}
+
+.login-flow-permission-card {
+  border: 1px solid var(--color-stroke);
+  border-radius: var(--radius-input);
+  padding: var(--space-sm); /* Reduced from md */
+  background: rgba(255, 255, 255, 0.4);
+  margin-bottom: var(--space-xs); /* Reduced from sm */
+}
+
+.login-flow-permission-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0B0C0E !important;
+  margin-bottom: var(--space-sm);
+}
+
+.login-flow-permission-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-stroke);
+}
+
+.login-flow-permission-item:last-child {
+  border-bottom: none;
+}
+
+.login-flow-permission-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 14px;
+  color: #0B0C0E !important;
+}
+
+.login-flow-permission-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-accent);
+}
+
+/* Toggle Switch */
+.login-flow-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--color-stroke);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.login-flow-toggle.active {
+  background: var(--color-accent);
+}
+
+.login-flow-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--transition-fast);
+}
+
+.login-flow-toggle.active::after {
+  transform: translateX(20px);
+}
+
+.login-flow-toggle.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   SUCCESS CARDS
+   ============================================ */
+
+.login-flow-success-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xs); /* Reduced from sm */
+  margin: var(--space-md) 0; /* Reduced from lg */
+}
+
+.login-flow-success-card {
+  border: 1px solid var(--color-stroke);
+  border-radius: var(--radius-input);
+  padding: var(--space-sm); /* Reduced from md */
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.login-flow-success-card:hover {
+  background: var(--color-hover-bg);
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.login-flow-success-card-icon {
+  font-size: 32px;
+  margin-bottom: var(--space-sm);
+}
+
+.login-flow-success-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0B0C0E !important;
+  margin-bottom: 4px;
+}
+
+.login-flow-success-card-desc {
+  font-size: 12px;
+  color: #8C919A !important;
+}
+
+/* ============================================
+   ERROR STATES
+   ============================================ */
+
+.login-flow-error {
+  margin-top: var(--space-md);
+  padding: 14px 16px;
+  background: var(--color-error-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: var(--radius-input);
+  color: var(--color-error);
+  font-size: 14px;
+  line-height: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  animation: fadeIn var(--transition-fast);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-flow-error svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.login-flow-footer {
+  text-align: center;
+  font-size: 13px;
+  line-height: 20px;
+  color: #8C919A !important;
+  margin-top: var(--space-md); /* Reduced from lg */
+}
+
+.login-flow-footer a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.login-flow-footer a:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
+.login-flow-footer a:focus-visible {
+  outline: none;
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
+/* ============================================
+   LINK BUTTON
+   ============================================ */
+
+.login-flow-link-button {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--space-xs);
+  transition: color var(--transition-fast);
+  text-decoration: none;
+  font-family: var(--font-family);
+}
+
+.login-flow-link-button:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
+.login-flow-link-button:focus-visible {
+  outline: none;
+  color: var(--color-accent-hover);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+  border-radius: 4px;
+}
+
+/* ============================================
+   RESPONSIVE - OPTIMIZED FOR 1000x700 BASE SIZE
+   ============================================ */
+
+/* Base size 1000x700 - optimal layout (default styles above) */
+
+/* Smaller windows */
+@media (max-width: 900px) {
+  .login-flow-page {
+    padding: 16px;
+  }
+
+  .login-flow-container {
+    padding: 32px 28px 24px;
+  }
+
+  .login-flow-title {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .login-flow-subtitle {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  .login-flow-button {
+    height: 52px;
+    font-size: 15px;
+  }
+
+  .login-flow-input {
+    height: 52px;
+    font-size: 15px;
+  }
+
+  .login-flow-success-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Compact height - for 700px height */
+@media (max-height: 750px) {
+  .login-flow-page {
+    padding: 16px;
+  }
+
+  .login-flow-container {
+    padding: 32px 28px 24px;
+  }
+
+  .login-flow-title {
+    font-size: 28px;
+    line-height: 34px;
+    margin-bottom: 6px;
+  }
+
+  .login-flow-subtitle {
+    font-size: 14px;
+    line-height: 20px;
+    margin-bottom: var(--space-sm);
+  }
+
+  .login-flow-button,
+  .login-flow-input {
+    height: 48px;
+  }
+
+  .login-flow-button-group {
+    gap: 10px;
+    margin: var(--space-sm) 0;
+  }
+
+  .progress-bar {
+    margin-bottom: var(--space-sm);
+  }
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .login-flow-page {
+    padding: var(--space-sm);
+  }
+
+  .login-flow-container {
+    width: 100%;
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .login-flow-title {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .login-flow-subtitle {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .login-flow-button {
+    height: 52px;
+  }
+
+  .login-flow-input {
+    height: 52px;
+  }
+
+  .login-flow-success-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .login-flow-workspace-list {
+    max-height: 300px;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-focus-ring);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Reduced transparency */
+@media (prefers-reduced-transparency) {
+  .login-flow-container,
+  .login-flow-button,
+  .login-flow-input,
+  .login-flow-workspace-item,
+  .login-flow-permission-card,
+  .login-flow-success-card {
+    background: #FFFFFF;
+    backdrop-filter: none;
+  }
+}
+
+/* ============================================
+   FALLBACK FOR OLDER BROWSERS
+   ============================================ */
+
+@supports not (backdrop-filter: blur(22px)) {
+  .login-flow-container {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .login-flow-button,
+  .login-flow-input {
+    background: #FFFFFF;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.login-flow-hidden {
+  display: none;
+}
+
+.login-flow-text-center {
+  text-align: center;
+}
+
+.login-flow-mt-sm {
+  margin-top: var(--space-sm);
+}
+
+.login-flow-mt-md {
+  margin-top: var(--space-md);
+}
+
+.login-flow-mt-lg {
+  margin-top: var(--space-lg);
+}
+
+.login-flow-mb-sm {
+  margin-bottom: var(--space-sm);
+}
+
+.login-flow-mb-md {
+  margin-bottom: var(--space-md);
+}
+
+.login-flow-mb-lg {
+  margin-bottom: var(--space-lg);
+}

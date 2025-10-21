@@ -224,7 +224,7 @@ class WorkflowIntelligenceSystem {
       }))
     ];
 
-    // Check for assignment keywords
+    // Check for assignment keywords (polite requests)
     const assignmentKeywords = [
       /can you|could you|please/i,
       /assign(?:ed)? to/i,
@@ -234,13 +234,38 @@ class WorkflowIntelligenceSystem {
       /due|deadline|by (tomorrow|today|friday|monday|eod)/i
     ];
 
+    // Check for imperative verbs (direct commands)
+    const imperativeVerbs = [
+      /^schedule|^set up|^setup|^create|^send|^draft|^write/i,
+      /^call|^email|^contact|^reach out/i,
+      /^review|^analyze|^check|^update|^complete/i,
+      /^prepare|^organize|^coordinate|^arrange/i,
+      /^follow up|^followup|^respond|^reply/i,
+      /^book|^reserve|^confirm|^finalize/i
+    ];
+
+    // Check if message starts with @mention followed by imperative verb
+    const mentionImperativePattern = /<@[UW][A-Z0-9]+(?:\|[^>]+)?>\s+(schedule|set up|setup|create|send|draft|write|call|email|contact|reach out|review|analyze|check|update|complete|prepare|organize|coordinate|arrange|follow up|followup|respond|reply|book|reserve|confirm|finalize)/i;
+    
     const hasAssignmentKeyword = assignmentKeywords.some(pattern => 
       pattern.test(message)
     );
 
+    const hasImperativeVerb = imperativeVerbs.some(pattern =>
+      pattern.test(message)
+    );
+
+    const hasMentionWithImperative = mentionImperativePattern.test(message);
+
     // Determine if this is an assignment
-    assignmentInfo.isAssignment = hasAssignmentKeyword && 
-      (mentionedUserIds.length > 0 || mentionedUsernames.length > 0);
+    // It's an assignment if:
+    // 1. Has assignment keywords + mentions, OR
+    // 2. Starts with imperative verb + has mentions, OR
+    // 3. Has @mention followed directly by imperative verb
+    assignmentInfo.isAssignment = 
+      (hasAssignmentKeyword && (mentionedUserIds.length > 0 || mentionedUsernames.length > 0)) ||
+      (hasImperativeVerb && (mentionedUserIds.length > 0 || mentionedUsernames.length > 0)) ||
+      hasMentionWithImperative;
 
     // Determine primary assignee (first mentioned user)
     if (mentionedUserIds.length > 0) {

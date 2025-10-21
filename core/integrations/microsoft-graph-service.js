@@ -96,15 +96,29 @@ class MicrosoftGraphService extends EventEmitter {
 
     this.msalClient = new PublicClientApplication(this.msalConfig);
     this.graphClient = null;
-    this.accessToken = null;
-    this.tokenExpiry = null;
+    this.accessToken = options.accessToken || null;
+    this.tokenExpiry = options.tokenExpiry ? new Date(options.tokenExpiry).getTime() : null;
     this.codeVerifier = null;
     this.codeChallenge = null;
 
-    this.logger.info('Microsoft Graph Service initialized', {
-      tenantId: this.options.tenantId,
-      scopes: this.options.scopes.length
-    });
+    // If access token is provided, initialize the Graph client
+    if (this.accessToken) {
+      this.graphClient = Client.init({
+        authProvider: (done) => {
+          done(null, this.accessToken);
+        }
+      });
+
+      this.logger.info('Microsoft Graph Service initialized with existing tokens', {
+        hasAccessToken: !!this.accessToken,
+        tokenExpiry: this.tokenExpiry
+      });
+    } else {
+      this.logger.info('Microsoft Graph Service initialized without tokens', {
+        tenantId: this.options.tenantId,
+        scopes: this.options.scopes.length
+      });
+    }
   }
 
 
@@ -160,11 +174,14 @@ class MicrosoftGraphService extends EventEmitter {
       const response = await this.msalClient.acquireTokenByCode(tokenRequest);
       
       this.accessToken = response.accessToken;
+      this.refreshToken = response.refreshToken || null; // MSAL may manage refresh tokens internally
       this.tokenExpiry = response.expiresOn;
+      this.account = response.account;
 
       this.logger.info('Successfully authenticated with Microsoft', {
         account: response.account?.username,
-        expiresOn: this.tokenExpiry
+        expiresOn: this.tokenExpiry,
+        hasRefreshToken: !!this.refreshToken
       });
 
       this._initializeGraphClient();
@@ -1074,6 +1091,39 @@ class MicrosoftGraphService extends EventEmitter {
   }
 
   /**
+   * Get all emails from a folder (both read and unread)
+   * @param {string} folderId - Folder ID (default: 'inbox')
+   * @param {number} maxResults - Maximum number of emails to fetch
+   * @returns {Promise<Array>} All emails
+   */
+  async getEmails(folderId = 'inbox', maxResults = 50) {
+    try {
+      this.logger.info('Fetching all emails', { folderId, maxResults });
+
+      const response = await this.graphClient
+        .api(`/me/mailFolders/${folderId}/messages`)
+        .top(maxResults)
+        .orderby('receivedDateTime DESC')
+        .select('id,subject,bodyPreview,body,from,receivedDateTime,isRead,importance,hasAttachments')
+        .get();
+
+      this.logger.info('All emails fetched', {
+        folderId,
+        emailCount: response.value?.length || 0
+      });
+
+      return response.value || [];
+
+    } catch (error) {
+      this.logger.error('Failed to fetch emails', {
+        folderId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Mark an email as read
    * @param {string} messageId - Email message ID
    * @returns {Promise<Object>} Updated message
@@ -1093,6 +1143,95 @@ class MicrosoftGraphService extends EventEmitter {
     } catch (error) {
       this.logger.error('Failed to mark email as read', {
         messageId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Send an email (reply or new message)
+   * @param {Object} emailData - Email data
+   * @param {string} emailData.to - Recipient email address
+   * @param {string} emailData.subject - Email subject
+   * @param {string} emailData.body - Email body (plain text or HTML)
+   * @param {string} [emailData.messageId] - Message ID to reply to (for threading)
+   * @returns {Promise<Object>} Sent message details
+   */
+  async sendEmail(emailData) {
+    try {
+      this.logger.info('Sending email via Outlook', {
+        to: emailData.to,
+        subject: emailData.subject,
+        isReply: !!emailData.messageId
+      });
+
+      if (emailData.messageId) {
+        // Reply to existing message
+        const replyMessage = {
+          message: {
+            toRecipients: [
+              {
+                emailAddress: {
+                  address: emailData.to
+                }
+              }
+            ],
+            body: {
+              contentType: 'Text',
+              content: emailData.body
+            }
+          }
+        };
+
+        const response = await this.graphClient
+          .api(`/me/messages/${emailData.messageId}/reply`)
+          .post(replyMessage);
+
+        this.logger.info('Email reply sent successfully', {
+          messageId: emailData.messageId
+        });
+
+        return {
+          id: response.id || emailData.messageId,
+          success: true
+        };
+
+      } else {
+        // Send new message
+        const message = {
+          subject: emailData.subject,
+          body: {
+            contentType: 'Text',
+            content: emailData.body
+          },
+          toRecipients: [
+            {
+              emailAddress: {
+                address: emailData.to
+              }
+            }
+          ]
+        };
+
+        const response = await this.graphClient
+          .api('/me/sendMail')
+          .post({
+            message,
+            saveToSentItems: true
+          });
+
+        this.logger.info('Email sent successfully');
+
+        return {
+          success: true
+        };
+      }
+
+    } catch (error) {
+      this.logger.error('Failed to send email', {
+        to: emailData.to,
+        subject: emailData.subject,
         error: error.message
       });
       throw error;

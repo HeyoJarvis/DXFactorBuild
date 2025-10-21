@@ -601,6 +601,16 @@ class DesktopSupabaseAdapter {
    */
   async createTask(userId, taskData) {
     try {
+      // Get user's role to set default route_to
+      const { data: userData } = await this.supabase
+        .from('users')
+        .select('user_role')
+        .eq('id', userId)
+        .single();
+
+      const userRole = userData?.user_role || 'sales';
+      const defaultRoute = userRole === 'developer' ? 'mission-control' : 'tasks-sales';
+
       const workflowId = `${userId}_task_${Date.now()}`;
       
       const { data, error } = await this.supabase
@@ -620,7 +630,7 @@ class DesktopSupabaseAdapter {
             assignor: taskData.assignor || null, // Who assigned/created the task
             assignee: taskData.assignee || null, // Who the task is assigned to
             mentioned_users: taskData.mentionedUsers || [], // All mentioned users
-            route_to: taskData.routeTo || 'tasks-sales', // Where to route: 'tasks-sales' or 'mission-control'
+            route_to: taskData.routeTo || defaultRoute, // Auto-route based on user role
             work_type: taskData.workType || 'task', // Type: 'task', 'calendar', 'outreach'
             external_id: taskData.externalId || null, // For JIRA/external sync
             external_key: taskData.externalKey || null,
@@ -644,8 +654,9 @@ class DesktopSupabaseAdapter {
       this.logger.info('Task created', { 
         task_id: data.id, 
         title: taskData.title,
-        route_to: taskData.routeTo,
-        work_type: taskData.workType
+        user_role: userRole,
+        route_to: taskData.routeTo || defaultRoute,
+        work_type: taskData.workType || 'task'
       });
       return { success: true, task: data };
     } catch (error) {
@@ -656,14 +667,19 @@ class DesktopSupabaseAdapter {
 
   /**
    * Get user's tasks (conversation_sessions where workflow_type='task')
+   * With dual-routing support for calendar and email tasks
+   * With user assignment filtering (owner/assignee/assignor/mentioned)
+   * With external source filtering based on user role
    */
   async getUserTasks(userId, filters = {}) {
     try {
       let query = this.supabase
         .from('conversation_sessions')
         .select('*')
-        .eq('user_id', userId)
         .eq('workflow_type', 'task');
+
+      // IMPORTANT: Don't filter by user_id at SQL level - we need to check assignment fields
+      // Tasks can be owned by user OR assigned to them OR they're mentioned
 
       // Filter by completion status
       if (!filters.includeCompleted) {
@@ -675,15 +691,10 @@ class DesktopSupabaseAdapter {
         query = query.contains('workflow_metadata', { priority: filters.priority });
       }
 
-      // Filter by route_to (for role-based filtering: 'tasks-sales' vs 'mission-control')
-      if (filters.routeTo) {
-        query = query.contains('workflow_metadata', { route_to: filters.routeTo });
-      }
-
       // Sort by creation time
       query = query.order('started_at', { ascending: false });
 
-      const limit = filters.limit || 50;
+      const limit = filters.limit || 100;
       query = query.limit(limit);
 
       const { data, error } = await query;
@@ -691,7 +702,7 @@ class DesktopSupabaseAdapter {
       if (error) throw error;
 
       // Transform to task format for UI compatibility
-      const tasks = (data || []).map(session => ({
+      let tasks = (data || []).map(session => ({
         id: session.id,
         user_id: session.user_id,
         title: session.session_title,
@@ -715,10 +726,130 @@ class DesktopSupabaseAdapter {
         completed_at: session.completed_at
       }));
 
+      // Get user's Slack ID for assignment filtering
+      const userSlackId = filters.slackUserId;
+
+      // Apply user assignment filtering - user must be owner, assignee, assignor, or mentioned
+      tasks = tasks.filter(task => {
+        // User owns the task
+        if (task.user_id === userId) return true;
+
+        // User is assigned the task (by Slack ID)
+        if (userSlackId && task.assignee === userSlackId) return true;
+
+        // User assigned the task to someone else (by Slack ID)
+        if (userSlackId && task.assignor === userSlackId) return true;
+
+        // User is mentioned in the task (by Slack ID)
+        if (userSlackId && task.mentioned_users?.includes(userSlackId)) return true;
+
+        return false;
+      });
+
+      // Apply assignment view filtering (for "My Tasks", "Assigned by Me", "Assigned to Me" tabs)
+      if (filters.assignmentView && userSlackId) {
+        tasks = tasks.filter(task => {
+          switch (filters.assignmentView) {
+            case 'assigned_to_me':
+              return task.assignee === userSlackId;
+            case 'assigned_by_me':
+              return task.assignor === userSlackId && task.assignee !== userSlackId;
+            case 'my_tasks':
+              return task.user_id === userId;
+            default:
+              return true;
+          }
+        });
+      }
+
+      // Get user's role for route-based filtering
+      const { data: userData } = await this.supabase
+        .from('users')
+        .select('user_role')
+        .eq('id', userId)
+        .single();
+      
+      const userRole = filters.userRole || userData?.user_role || 'sales';
+
+      // Apply role-based route filtering
+      if (filters.routeTo) {
+        // Specific route requested
+        tasks = tasks.filter(task => {
+          const isDualRoute = task.work_type === 'calendar' || task.work_type === 'email';
+          if (isDualRoute) {
+            // Dual-route tasks appear in both views
+            return filters.routeTo === 'tasks-sales' || filters.routeTo === 'mission-control';
+          }
+          return task.route_to === filters.routeTo;
+        });
+      } else {
+        // Auto-filter by user role
+        tasks = tasks.filter(task => {
+          const isDualRoute = task.work_type === 'calendar' || task.work_type === 'email';
+          if (isDualRoute) return true; // Always show dual-route tasks
+          
+          if (userRole === 'sales') {
+            return task.route_to === 'tasks-sales';
+          } else if (userRole === 'developer') {
+            return task.route_to === 'mission-control';
+          }
+          return true; // Admin sees all
+        });
+      }
+
+      // Apply external source filtering based on user role
+      if (userRole) {
+        tasks = tasks.filter(task => {
+          const externalSource = task.external_source;
+
+          // Sales users see Slack tasks and manual tasks (no external source)
+          if (userRole === 'sales') {
+            return externalSource === 'slack' || externalSource === null || externalSource === 'manual';
+          }
+
+          // Developer users see JIRA tasks and manual tasks
+          if (userRole === 'developer') {
+            return externalSource === 'jira' || externalSource === null || externalSource === 'manual';
+          }
+
+          // Admin sees everything
+          return true;
+        });
+      }
+
+      // Apply route_to filtering with dual-routing logic
+      if (filters.routeTo) {
+        tasks = tasks.filter(task => {
+          const taskRoute = task.route_to;
+          const workType = task.work_type;
+
+          // Calendar and email tasks appear in both views
+          const isDualRouteTask = workType === 'calendar' || workType === 'email';
+
+          if (isDualRouteTask) {
+            // Show in both sales tasks and mission control
+            return filters.routeTo === 'tasks-sales' || filters.routeTo === 'mission-control';
+          }
+
+          // Regular tasks follow their route_to assignment
+          return taskRoute === filters.routeTo;
+        });
+      }
+
+      // Apply work_type filtering if specified
+      if (filters.workType) {
+        tasks = tasks.filter(task => task.work_type === filters.workType);
+      }
+
       this.logger.info('Fetched user tasks', {
         userId,
+        userSlackId,
         count: tasks.length,
-        routeToFilter: filters.routeTo || 'all'
+        routeToFilter: filters.routeTo || 'all',
+        workTypeFilter: filters.workType || 'all',
+        userRoleFilter: filters.userRole || 'none',
+        assignmentViewFilter: filters.assignmentView || 'all',
+        dualRouteTasks: tasks.filter(t => t.work_type === 'calendar' || t.work_type === 'email').length
       });
 
       return { success: true, tasks };

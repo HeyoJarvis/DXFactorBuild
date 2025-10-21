@@ -106,6 +106,10 @@ app.all('/api/engineering/repos', (req, res) => {
   require('./api/engineering/repos')(req, res);
 });
 
+app.all('/api/engineering/index', (req, res) => {
+  require('./api/engineering/index')(req, res);
+});
+
 // Static file serving
 app.use(express.static(__dirname));
 

@@ -1,0 +1,425 @@
+/* Tab Bar - Clean Header Design */
+.tab-bar {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 20px;
+  z-index: 100;
+  position: sticky;
+  top: 0;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 48px;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: drag; /* Make header draggable */
+}
+
+/* Make interactive elements clickable */
+.tab-bar * {
+  -webkit-app-region: no-drag;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-bar-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 24px;
+}
+
+/* Left: Navigation Tabs */
+.tab-bar-left {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0; /* Never compress tabs */
+}
+
+.tab-bar-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Text', sans-serif;
+}
+
+.tab-bar-item:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.tab-bar-item.active {
+  background: #111827;
+  color: white;
+}
+
+.tab-bar-item.active:hover {
+  background: #000000;
+}
+
+.tab-bar-item:active {
+  transform: scale(0.97);
+}
+
+/* Center: Search Bar */
+.tab-bar-center {
+  flex: 1; /* Grow to fill available space */
+  display: flex;
+  justify-content: center;
+  min-width: 200px; /* Minimum width before it gets too small */
+  max-width: 600px; /* Maximum width so it doesn't get too wide */
+  margin: 0 auto; /* Center within available space */
+}
+
+.tab-bar-search {
+  position: relative;
+  width: 100%;
+  max-width: 100%; /* Use full available width */
+}
+
+.tab-bar-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.tab-bar-search-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 60px 0 36px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  font-size: 13px;
+  color: #111827;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Text', sans-serif;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-bar-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.tab-bar-search-input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tab-bar-search-kbd {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b7280;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  pointer-events: none;
+}
+
+/* Right: Icons and Profile */
+.tab-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0; /* Never compress right side elements */
+  margin-left: auto; /* Always push to the right */
+}
+
+/* Voice/Mic Icon Button */
+.tab-bar-icon-button {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.tab-bar-icon-button:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.tab-bar-icon-button:active {
+  transform: scale(0.95);
+}
+
+/* Online Status Indicator */
+.tab-bar-status-indicator {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tab-bar-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px #10b981;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Profile Picture */
+.tab-bar-profile {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tab-bar-profile-button {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible; /* Fix cutoff issue */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tab-bar-profile-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px #e5e7eb;
+}
+
+.tab-bar-profile-button:active {
+  transform: scale(0.98);
+}
+
+.tab-bar-avatar {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.tab-bar-avatar-fallback {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+/* Dropdown Menu */
+.tab-bar-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 8px;
+  animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-bar-dropdown-header {
+  padding: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 4px;
+}
+
+.tab-bar-dropdown-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.tab-bar-dropdown-email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.tab-bar-dropdown-divider {
+  height: 1px;
+  background: #f3f4f6;
+  margin: 4px 0;
+}
+
+.tab-bar-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Text', sans-serif;
+}
+
+.tab-bar-dropdown-item:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.tab-bar-dropdown-item:active {
+  transform: scale(0.98);
+}
+
+.tab-bar-dropdown-item svg {
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+/* Tab bar items appear with staggered animation */
+.tab-bar-item:nth-child(1) { 
+  animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.05s backwards;
+}
+
+.tab-bar-item:nth-child(2) { 
+  animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
+}
+
+.tab-bar-item:nth-child(3) { 
+  animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.15s backwards;
+}
+
+.tab-bar-item:nth-child(4) { 
+  animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+}
+
+.tab-bar-item:nth-child(5) { 
+  animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.25s backwards;
+}
+
+.tab-bar-item:nth-child(6) { 
+  animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+}
+
+@keyframes fadeInTab {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .tab-bar-inner {
+    gap: 4px;
+  }
+  
+  .tab-bar-item {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .tab-bar-item span {
+    display: none; /* Hide labels on small screens, show only icons */
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-bar {
+    padding: 6px 12px;
+  }
+  
+  .tab-bar-item {
+    padding: 8px;
+  }
+}
+
+/* Glass morphism polish */
+@supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
+  .tab-bar {
+    background: rgba(255, 255, 255, 0.6);
+  }
+}
+
+@supports not ((backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px))) {
+  .tab-bar {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+

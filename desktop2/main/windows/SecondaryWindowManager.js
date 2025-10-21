@@ -15,6 +15,12 @@ class SecondaryWindowManager {
 
   /**
    * Create the secondary window
+   *
+   * NOTE: This configuration supports the enterprise login flow with native translucency:
+   * - macOS: Uses 'sidebar' vibrancy for liquid glass effect
+   * - Windows 11: Uses 'acrylic' background material
+   * - Transparent background with backdrop-filter CSS fallback
+   * - Dimensions: 1120×760 (optimal for login flow)
    */
   create(route = '/tasks') {
     if (this.window) {
@@ -28,20 +34,31 @@ class SecondaryWindowManager {
     this.currentRoute = route;
 
     this.window = new BrowserWindow({
-      width: 1000,
-      height: 700,
-      minWidth: 800,
-      minHeight: 600,
+      width: 1280,
+      height: 820,
       show: false,
-      backgroundColor: '#1c1c1e',
-      frame: false, // Frameless window - removes ALL window chrome including traffic lights
-      vibrancy: 'under-window',
-      visualEffectState: 'active',
+      transparent: false, // Disable transparency to properly hide traffic lights
+      backgroundColor: '#ffffff', // White background
+      frame: false, // Frameless window - removes ALL window chrome
+      resizable: true, // Allow window resizing
+      movable: true, // Allow window dragging
+      center: true, // Center the window on screen
+      ...(process.platform === 'darwin' ? {
+        titleBarStyle: 'customButtonsOnHover', // Hide traffic lights completely
+        trafficLightPosition: { x: -100, y: -100 }, // Move traffic lights off-screen
+        roundedCorners: true
+      } : {}),
+      ...(process.platform === 'win32' ? {
+        backgroundMaterial: 'acrylic' // Windows 11 native acrylic effect
+      } : {}),
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
         enableRemoteModule: false,
-        preload: path.join(__dirname, '../../bridge/preload.js')
+        preload: path.join(__dirname, '../../bridge/preload.js'),
+        ...(process.platform === 'darwin' ? {
+          scrollBounce: true // macOS-style scroll bounce
+        } : {})
       }
     });
 
@@ -55,6 +72,11 @@ class SecondaryWindowManager {
     // Show when ready
     this.window.once('ready-to-show', () => {
       this.logger.info('Secondary window ready to show');
+      
+      // CRITICAL: Ensure mouse events are NOT ignored (this is a clickable window)
+      this.window.setIgnoreMouseEvents(false);
+      this.logger.info('Mouse events enabled for secondary window');
+      
       this.window.show();
       
       // Setup maximum visibility (same as Arc Reactor)
@@ -129,6 +151,9 @@ class SecondaryWindowManager {
       if (this.window && !this.window.isDestroyed()) {
         this.window.setAlwaysOnTop(true, 'screen-saver');
         
+        // CRITICAL: Ensure mouse events stay enabled (this is NOT the Arc Reactor orb)
+        this.window.setIgnoreMouseEvents(false);
+        
         // Additional visibility enforcement
         if (this.window.isVisible() && !this.window.isFocused()) {
           setTimeout(() => {
@@ -148,6 +173,7 @@ class SecondaryWindowManager {
       setTimeout(() => {
         if (this.window && !this.window.isDestroyed()) {
           this.window.setAlwaysOnTop(true, 'screen-saver');
+          this.window.setIgnoreMouseEvents(false); // Keep clickable
           this.window.moveTop();
         }
       }, 100);
@@ -156,6 +182,7 @@ class SecondaryWindowManager {
     this.window.on('focus', () => {
       if (this.window && !this.window.isDestroyed()) {
         this.window.setAlwaysOnTop(true, 'screen-saver');
+        this.window.setIgnoreMouseEvents(false); // Keep clickable
       }
     });
     
@@ -194,9 +221,11 @@ class SecondaryWindowManager {
       return;
     }
 
+    // Ensure mouse events are enabled before showing
+    this.window.setIgnoreMouseEvents(false);
     this.window.show();
     this.window.focus();
-    this.logger.info('Secondary window shown');
+    this.logger.info('Secondary window shown with mouse events enabled');
   }
 
   /**

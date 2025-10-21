@@ -100,6 +100,41 @@
   border: 1.5px solid rgba(142, 142, 147, 0.3);
 }
 
+/* Work Type Badge - For calendar/email/outreach tasks */
+.action-work-type-badge {
+  position: absolute;
+  top: 75px;
+  right: 32px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.action-work-type-badge:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.work-type-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.work-type-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
 /* Header with Slack Logo and Title */
 .action-item-header {
   display: flex;

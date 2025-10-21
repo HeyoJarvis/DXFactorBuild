@@ -68,14 +68,32 @@ class GoogleGmailService extends EventEmitter {
 
     this.gmail = null;
     this.calendar = null;
-    this.accessToken = null;
-    this.refreshToken = null;
-    this.tokenExpiry = null;
+    this.accessToken = options.accessToken || null;
+    this.refreshToken = options.refreshToken || null;
+    this.tokenExpiry = options.tokenExpiry || null;
 
-    this.logger.info('Google Gmail Service initialized', {
-      redirectUri: this.options.redirectUri,
-      scopes: this.options.scopes.length
-    });
+    // If tokens are provided, set them on the OAuth2Client
+    if (this.accessToken) {
+      this.oauth2Client.setCredentials({
+        access_token: this.accessToken,
+        refresh_token: this.refreshToken,
+        expiry_date: this.tokenExpiry ? new Date(this.tokenExpiry).getTime() : null
+      });
+
+      // Initialize Gmail and Calendar APIs
+      this.gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
+      this.calendar = google.calendar({ version: 'v3', auth: this.oauth2Client });
+
+      this.logger.info('Google Gmail Service initialized with existing tokens', {
+        hasAccessToken: !!this.accessToken,
+        hasRefreshToken: !!this.refreshToken
+      });
+    } else {
+      this.logger.info('Google Gmail Service initialized without tokens', {
+        redirectUri: this.options.redirectUri,
+        scopes: this.options.scopes.length
+      });
+    }
   }
 
   /**
@@ -587,6 +605,365 @@ class GoogleGmailService extends EventEmitter {
         error: error.message
       });
 
+      throw error;
+    }
+  }
+
+  /**
+   * Get unread emails from inbox
+   */
+  async getUnreadEmails(maxResults = 50) {
+    try {
+      await this._ensureAuthenticated();
+
+      this.logger.info('Fetching unread emails', { maxResults });
+
+      // Get list of unread messages
+      const response = await this.gmail.users.messages.list({
+        userId: 'me',
+        q: 'is:unread in:inbox',
+        maxResults: maxResults
+      });
+
+      if (!response.data.messages || response.data.messages.length === 0) {
+        this.logger.info('No unread emails found');
+        return [];
+      }
+
+      // Fetch full message details for each email
+      const emailPromises = response.data.messages.map(msg =>
+        this.gmail.users.messages.get({
+          userId: 'me',
+          id: msg.id,
+          format: 'full'
+        })
+      );
+
+      const emails = await Promise.all(emailPromises);
+
+      // Transform to unified format
+      const transformedEmails = emails.map(email => {
+        const headers = email.data.payload.headers;
+        const getHeader = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || '';
+
+        // Extract email body
+        let body = '';
+        if (email.data.payload.parts) {
+          const textPart = email.data.payload.parts.find(p => p.mimeType === 'text/plain');
+          const htmlPart = email.data.payload.parts.find(p => p.mimeType === 'text/html');
+          const part = textPart || htmlPart;
+          if (part && part.body.data) {
+            body = Buffer.from(part.body.data, 'base64').toString('utf-8');
+          }
+        } else if (email.data.payload.body.data) {
+          body = Buffer.from(email.data.payload.body.data, 'base64').toString('utf-8');
+        }
+
+        // Create preview (first 150 chars)
+        const preview = body.replace(/<[^>]*>/g, '').substring(0, 150).trim();
+
+        return {
+          id: email.data.id,
+          threadId: email.data.threadId,
+          subject: getHeader('Subject'),
+          from: getHeader('From'),
+          to: getHeader('To'),
+          date: new Date(parseInt(email.data.internalDate)),
+          snippet: email.data.snippet,
+          preview: preview,
+          body: body,
+          labels: email.data.labelIds || [],
+          unread: email.data.labelIds?.includes('UNREAD') || false,
+          source: 'gmail'
+        };
+      });
+
+      this.logger.info('Unread emails fetched', { count: transformedEmails.length });
+      return transformedEmails;
+
+    } catch (error) {
+      this.logger.error('Failed to get unread emails', {
+        error: error.message,
+        stack: error.stack
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get emails from inbox with optional query
+   */
+  async getEmails(options = {}) {
+    try {
+      await this._ensureAuthenticated();
+
+      const {
+        maxResults = 50,
+        query = 'in:inbox',
+        pageToken = null
+      } = options;
+
+      this.logger.info('Fetching emails', { maxResults, query });
+
+      // Get list of messages
+      const listParams = {
+        userId: 'me',
+        q: query,
+        maxResults: maxResults
+      };
+
+      if (pageToken) {
+        listParams.pageToken = pageToken;
+      }
+
+      const response = await this.gmail.users.messages.list(listParams);
+
+      if (!response.data.messages || response.data.messages.length === 0) {
+        this.logger.info('No emails found');
+        return {
+          emails: [],
+          nextPageToken: null
+        };
+      }
+
+      // Fetch full message details for each email
+      const emailPromises = response.data.messages.map(msg =>
+        this.gmail.users.messages.get({
+          userId: 'me',
+          id: msg.id,
+          format: 'full'
+        })
+      );
+
+      const emails = await Promise.all(emailPromises);
+
+      // Transform to unified format
+      const transformedEmails = emails.map(email => {
+        const headers = email.data.payload.headers;
+        const getHeader = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || '';
+
+        // Extract email body
+        let body = '';
+        if (email.data.payload.parts) {
+          const textPart = email.data.payload.parts.find(p => p.mimeType === 'text/plain');
+          const htmlPart = email.data.payload.parts.find(p => p.mimeType === 'text/html');
+          const part = textPart || htmlPart;
+          if (part && part.body.data) {
+            body = Buffer.from(part.body.data, 'base64').toString('utf-8');
+          }
+        } else if (email.data.payload.body.data) {
+          body = Buffer.from(email.data.payload.body.data, 'base64').toString('utf-8');
+        }
+
+        // Create preview (first 150 chars)
+        const preview = body.replace(/<[^>]*>/g, '').substring(0, 150).trim();
+
+        return {
+          id: email.data.id,
+          threadId: email.data.threadId,
+          subject: getHeader('Subject'),
+          from: getHeader('From'),
+          to: getHeader('To'),
+          date: new Date(parseInt(email.data.internalDate)),
+          snippet: email.data.snippet,
+          preview: preview,
+          body: body,
+          labels: email.data.labelIds || [],
+          unread: email.data.labelIds?.includes('UNREAD') || false,
+          source: 'gmail'
+        };
+      });
+
+      this.logger.info('Emails fetched', { count: transformedEmails.length });
+
+      return {
+        emails: transformedEmails,
+        nextPageToken: response.data.nextPageToken || null
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to get emails', {
+        error: error.message,
+        stack: error.stack
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get email thread (conversation)
+   */
+  async getEmailThread(threadId) {
+    try {
+      await this._ensureAuthenticated();
+
+      this.logger.info('Fetching email thread', { threadId });
+
+      const response = await this.gmail.users.threads.get({
+        userId: 'me',
+        id: threadId,
+        format: 'full'
+      });
+
+      // Transform each message in the thread
+      const messages = response.data.messages.map(email => {
+        const headers = email.payload.headers;
+        const getHeader = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || '';
+
+        // Extract email body
+        let body = '';
+        if (email.payload.parts) {
+          const textPart = email.payload.parts.find(p => p.mimeType === 'text/plain');
+          const htmlPart = email.payload.parts.find(p => p.mimeType === 'text/html');
+          const part = textPart || htmlPart;
+          if (part && part.body.data) {
+            body = Buffer.from(part.body.data, 'base64').toString('utf-8');
+          }
+        } else if (email.payload.body.data) {
+          body = Buffer.from(email.payload.body.data, 'base64').toString('utf-8');
+        }
+
+        return {
+          id: email.id,
+          threadId: email.threadId,
+          subject: getHeader('Subject'),
+          from: getHeader('From'),
+          to: getHeader('To'),
+          date: new Date(parseInt(email.internalDate)),
+          snippet: email.snippet,
+          body: body,
+          labels: email.labelIds || [],
+          unread: email.labelIds?.includes('UNREAD') || false,
+          source: 'gmail'
+        };
+      });
+
+      this.logger.info('Email thread fetched', {
+        threadId,
+        messageCount: messages.length
+      });
+
+      return {
+        id: threadId,
+        messages: messages,
+        messageCount: messages.length
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to get email thread', {
+        threadId,
+        error: error.message,
+        stack: error.stack
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Mark email as read
+   */
+  async markEmailAsRead(messageId) {
+    try {
+      await this._ensureAuthenticated();
+
+      await this.gmail.users.messages.modify({
+        userId: 'me',
+        id: messageId,
+        resource: {
+          removeLabelIds: ['UNREAD']
+        }
+      });
+
+      this.logger.info('Email marked as read', { messageId });
+      return { success: true };
+
+    } catch (error) {
+      this.logger.error('Failed to mark email as read', {
+        messageId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Send an email (reply or new message)
+   * @param {Object} emailData - Email data
+   * @param {string} emailData.to - Recipient email address
+   * @param {string} emailData.subject - Email subject
+   * @param {string} emailData.body - Email body (plain text or HTML)
+   * @param {string} [emailData.threadId] - Thread ID for replies
+   * @param {string} [emailData.inReplyTo] - Message-ID of the email being replied to
+   * @param {string} [emailData.references] - References header for threading
+   * @returns {Promise<Object>} Sent message details
+   */
+  async sendEmail(emailData) {
+    try {
+      this.logger.info('Sending email via Gmail', {
+        to: emailData.to,
+        subject: emailData.subject,
+        isReply: !!emailData.threadId
+      });
+
+      // Build email message in RFC 2822 format
+      const messageParts = [
+        `To: ${emailData.to}`,
+        `Subject: ${emailData.subject}`,
+        'Content-Type: text/plain; charset=utf-8',
+        'MIME-Version: 1.0'
+      ];
+
+      // Add threading headers for replies
+      if (emailData.inReplyTo) {
+        messageParts.push(`In-Reply-To: ${emailData.inReplyTo}`);
+      }
+      if (emailData.references) {
+        messageParts.push(`References: ${emailData.references}`);
+      }
+
+      messageParts.push('', emailData.body); // Empty line separates headers from body
+
+      const message = messageParts.join('\r\n');
+
+      // Encode in base64url format
+      const encodedMessage = Buffer.from(message)
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+      // Send the email
+      const requestBody = {
+        raw: encodedMessage
+      };
+
+      // If replying, include threadId
+      if (emailData.threadId) {
+        requestBody.threadId = emailData.threadId;
+      }
+
+      const response = await this.gmail.users.messages.send({
+        userId: 'me',
+        requestBody
+      });
+
+      this.logger.info('Email sent successfully', {
+        messageId: response.data.id,
+        threadId: response.data.threadId
+      });
+
+      return {
+        id: response.data.id,
+        threadId: response.data.threadId,
+        labelIds: response.data.labelIds
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to send email', {
+        to: emailData.to,
+        subject: emailData.subject,
+        error: error.message
+      });
       throw error;
     }
   }

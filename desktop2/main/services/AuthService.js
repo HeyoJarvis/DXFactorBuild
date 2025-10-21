@@ -55,7 +55,7 @@ class AuthService {
   }
   
   /**
-   * Start Slack OAuth flow with PKCE
+   * Start Slack OAuth flow with PKCE (restored from working desktop implementation)
    */
   async signInWithSlack() {
     try {
@@ -90,6 +90,10 @@ class AuthService {
       if (session) {
         console.log('✅ Session received, saving user data...');
         await this.handleSuccessfulAuth(session);
+        
+        // Ensure user has proper onboarding fields
+        await this.ensureUserOnboardingFields(session.user.id);
+        
         return {
           success: true,
           user: this.currentUser,
@@ -101,6 +105,157 @@ class AuthService {
       
     } catch (error) {
       this.logger.error('Slack OAuth failed', { error: error.message });
+      console.error('❌ Auth error:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Ensure user has onboarding fields (for Supabase Auth users)
+   */
+  async ensureUserOnboardingFields(userId) {
+    try {
+      const { createClient } = require('@supabase/supabase-js');
+      const supabaseAdmin = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+      
+      // Check if user exists in our users table
+      const { data: existingUser, error: checkError } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+      
+      if (!existingUser) {
+        // User doesn't exist in our table, get from Supabase Auth
+        const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+        
+        if (authUser) {
+          // Create user in our table - force onboarding for all new users
+          await supabaseAdmin
+            .from('users')
+            .insert({
+              id: userId,
+              email: authUser.user.email,
+              name: authUser.user.user_metadata?.name || authUser.user.email.split('@')[0],
+              avatar_url: authUser.user.user_metadata?.avatar_url,
+              auth_provider: 'slack',
+              email_verified: true,
+              onboarding_completed: false,
+              onboarding_step: 'role_selection',
+              user_role: null,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+        }
+      } else {
+        // FORCE all existing users to go through onboarding again
+        await supabaseAdmin
+          .from('users')
+          .update({
+            onboarding_completed: false,
+            onboarding_step: 'role_selection',
+            user_role: null, // Reset role to force selection
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+      }
+    } catch (error) {
+      this.logger.error('Failed to ensure user onboarding fields', { error: error.message });
+      // Don't throw - this is not critical
+    }
+  }
+  
+  /**
+   * Start Microsoft Teams/Azure AD OAuth flow using existing OAuth server
+   */
+  async signInWithMicrosoft() {
+    try {
+      this.logger.info('Starting Microsoft OAuth flow with existing OAuth server...');
+      
+      // Microsoft uses port 8890 (OAuth server) but needs to match the redirect URI in Azure
+      // which is configured for port 8889 in .env
+      const oauthServerUrl = 'http://localhost:8890';
+      const authUrl = `${oauthServerUrl}/auth/microsoft`;
+      
+      console.log('🔐 Using existing OAuth server at', oauthServerUrl);
+      console.log('🌐 Opening OAuth in browser...');
+      
+      // Open OAuth in system browser
+      await this.createAuthWindow(authUrl);
+      
+      console.log('⏳ Waiting for OAuth callback...');
+      
+      // Wait for the OAuth server to complete and return user data
+      const userData = await this.waitForOAuthCallback(8890, 'microsoft');
+      
+      if (userData) {
+        console.log('✅ User data received from OAuth server:', userData.email);
+        
+        // Create/update user directly in Supabase database
+        await this.handleDirectAuth(userData, 'microsoft');
+        
+        return {
+          success: true,
+          user: this.currentUser,
+          session: this.currentSession
+        };
+      } else {
+        throw new Error('Authentication cancelled or failed');
+      }
+      
+    } catch (error) {
+      this.logger.error('Microsoft OAuth failed', { error: error.message });
+      console.error('❌ Auth error:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Start Google OAuth flow using existing OAuth server
+   */
+  async signInWithGoogle() {
+    try {
+      this.logger.info('Starting Google OAuth flow with existing OAuth server...');
+      
+      // Use your existing OAuth server on port 8890
+      const oauthServerUrl = 'http://localhost:8890';
+      const authUrl = `${oauthServerUrl}/auth/google`;
+      
+      console.log('🔐 Using existing OAuth server at', oauthServerUrl);
+      console.log('🌐 Opening OAuth in browser...');
+      
+      // Open OAuth in system browser
+      await this.createAuthWindow(authUrl);
+      
+      console.log('⏳ Waiting for OAuth callback...');
+      
+      // Wait for the OAuth server to complete and return user data
+      const userData = await this.waitForOAuthCallback(8890, 'google');
+      
+      if (userData) {
+        console.log('✅ User data received from OAuth server:', userData.email);
+        
+        // Create/update user directly in Supabase database
+        await this.handleDirectAuth(userData, 'google');
+        
+        return {
+          success: true,
+          user: this.currentUser,
+          session: this.currentSession
+        };
+      } else {
+        throw new Error('Authentication cancelled or failed');
+      }
+      
+    } catch (error) {
+      this.logger.error('Google OAuth failed', { error: error.message });
       console.error('❌ Auth error:', error);
       throw error;
     }
@@ -199,7 +354,7 @@ class AuthService {
                     <h1>✅ Authentication Successful!</h1>
                     <p>You can close this window and return to HeyJarvis.</p>
                   </div>
-                  <script>setTimeout(() => window.close(), 2000);</script>
+                  <script>setTimeout(() => window.close(), 300);</script>
                 </body>
                 </html>
               `);
@@ -336,7 +491,7 @@ class AuthService {
   /**
    * Handle successful authentication
    */
-  async handleSuccessfulAuth(session) {
+  async handleSuccessfulAuth(session, authProvider = 'slack') {
     try {
       this.currentSession = session;
       
@@ -345,21 +500,53 @@ class AuthService {
       
       if (error) throw error;
       
-      // Extract Slack identity from user metadata
-      const slackIdentity = user.identities?.find(id => id.provider === 'slack');
-      const slackData = slackIdentity?.identity_data || {};
+      // Extract identity based on provider
+      const identity = user.identities?.find(id => 
+        id.provider === authProvider || id.provider === `${authProvider}_oidc`
+      );
+      const identityData = identity?.identity_data || {};
+      
+      // Check if user exists (to determine if this is first login)
+      const { data: existingUser, error: checkError } = await this.supabase
+        .from('users')
+        .select('id, user_role, onboarding_completed')
+        .eq('id', user.id)
+        .single();
+      
+      const isNewUser = !existingUser || checkError;
       
       // Create or update user in our database
       const userData = {
         id: user.id,
         email: user.email,
-        name: slackData.name || user.user_metadata?.name || user.email?.split('@')[0],
-        avatar_url: slackData.image_512 || slackData.image_192 || user.user_metadata?.avatar_url,
-        slack_user_id: slackData.sub || slackData.user_id,
-        slack_team_id: slackData.team_id,
-        slack_team_name: slackData.team_name,
-        last_login: new Date().toISOString()
+        name: identityData.name || user.user_metadata?.name || user.email?.split('@')[0],
+        avatar_url: identityData.image_512 || identityData.image_192 || user.user_metadata?.avatar_url,
+        
+        // Slack identity
+        slack_user_id: authProvider === 'slack' ? (identityData.sub || identityData.user_id) : existingUser?.slack_user_id,
+        slack_team_id: authProvider === 'slack' ? identityData.team_id : existingUser?.slack_team_id,
+        slack_team_name: authProvider === 'slack' ? identityData.team_name : existingUser?.slack_team_name,
+        
+        // Microsoft identity  
+        microsoft_user_id: authProvider === 'microsoft' ? identityData.sub : existingUser?.microsoft_user_id,
+        microsoft_email: authProvider === 'microsoft' ? identityData.email : existingUser?.microsoft_email,
+        
+        // Google identity
+        google_user_id: authProvider === 'google' ? identityData.sub : existingUser?.google_user_id,
+        google_email: authProvider === 'google' ? identityData.email : existingUser?.google_email,
+        
+        // Auth tracking
+        primary_auth_provider: isNewUser ? authProvider : existingUser?.primary_auth_provider,
+        last_login_at: new Date().toISOString(),
+        last_active_at: new Date().toISOString()
       };
+      
+      // For new users, set onboarding state
+      if (isNewUser) {
+        userData.onboarding_completed = false;
+        userData.onboarding_step = 'role_selection'; // First step after auth
+        userData.onboarding_started_at = new Date().toISOString();
+      }
       
       // Upsert user in database
       const { data: dbUser, error: dbError } = await this.supabase
@@ -376,44 +563,23 @@ class AuthService {
         this.currentUser = dbUser;
       }
       
-      // 🔥 CLEAR ALL INTEGRATION TOKENS EXCEPT SLACK ON EVERY LOGIN (for testing)
-      // This forces fresh authentication for Microsoft, JIRA, Google, etc.
-      // BUT: Preserve role if ROLE_OVERRIDE is set (dev mode)
-      console.log('🧹 Clearing all integration tokens (except Slack) for fresh login...');
+      // Apply role override for development testing if set
       const hasRoleOverride = process.env.ROLE_OVERRIDE;
-      
-      try {
-        const updateData = {
-          integration_settings: {}  // Always clear integration settings
-        };
-        
-        // Only clear user_role if NOT using role override
-        if (!hasRoleOverride) {
-          updateData.user_role = null;
-          console.log('🔄 Also clearing user_role (no ROLE_OVERRIDE set)');
-        } else {
-          console.log(`🎭 Keeping user_role (ROLE_OVERRIDE=${hasRoleOverride} in use)`);
-        }
-        
-        const { error: clearError } = await this.supabase
-          .from('users')
-          .update(updateData)
-          .eq('id', user.id);
-        
-        if (clearError) {
-          this.logger.warn('Failed to clear integration tokens', { error: clearError.message });
-        } else {
-          console.log('✅ Integration tokens cleared - fresh authentication required');
-          // Update current user to reflect cleared settings
-          if (this.currentUser) {
-            this.currentUser.integration_settings = {};
-            if (!hasRoleOverride) {
-              this.currentUser.user_role = null;
-            }
+      if (hasRoleOverride) {
+        try {
+          console.log(`🎭 Development mode: Applying ROLE_OVERRIDE=${hasRoleOverride}`);
+          const { error: roleError } = await this.supabase
+            .from('users')
+            .update({ user_role: hasRoleOverride, onboarding_completed: true })
+            .eq('id', user.id);
+
+          if (!roleError && this.currentUser) {
+            this.currentUser.user_role = hasRoleOverride;
+            this.currentUser.onboarding_completed = true;
           }
+        } catch (error) {
+          this.logger.warn('Failed to apply role override', { error: error.message });
         }
-      } catch (clearTokensError) {
-        this.logger.warn('Error clearing integration tokens', { error: clearTokensError.message });
       }
       
       // Save session locally
@@ -422,13 +588,92 @@ class AuthService {
       this.logger.info('Authentication successful', {
         user_id: this.currentUser.id,
         email: this.currentUser.email,
-        slack_user_id: this.currentUser.slack_user_id,
+        auth_provider: authProvider,
+        is_new_user: isNewUser,
+        needs_onboarding: !this.currentUser.onboarding_completed,
         fresh_login: true
       });
+      
+      // Note: Integration auto-initialization is handled by the main process
+      // via autoInitializeUserIntegrations() after login completes
       
     } catch (error) {
       this.logger.error('Failed to handle successful auth', { error: error.message });
       throw error;
+    }
+  }
+  
+  
+  /**
+   * Update user's role and onboarding state
+   */
+  async updateUserRole(userId, role) {
+    try {
+      // Use service role client to bypass RLS
+      const { createClient } = require('@supabase/supabase-js');
+      const supabaseAdmin = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+      
+      const { data, error } = await supabaseAdmin
+        .from('users')
+        .update({ 
+          user_role: role,
+          onboarding_step: 'integration_setup', // Move to next step
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId)
+        .select();
+      
+      if (error) throw error;
+      
+      // Get the first (and should be only) user
+      const updatedUser = data && data.length > 0 ? data[0] : null;
+      
+      if (!updatedUser) {
+        throw new Error('User not found or update failed');
+      }
+      
+      if (this.currentUser && this.currentUser.id === userId) {
+        this.currentUser = updatedUser;
+      }
+      
+      this.logger.info('User role updated', { userId, role });
+      return { success: true, user: updatedUser };
+    } catch (error) {
+      this.logger.error('Failed to update user role', { userId, role, error: error.message });
+      return { success: false, error: error.message };
+    }
+  }
+  
+  /**
+   * Complete onboarding
+   */
+  async completeOnboarding(userId) {
+    try {
+      const { data, error } = await this.supabase
+        .from('users')
+        .update({ 
+          onboarding_completed: true,
+          onboarding_completed_at: new Date().toISOString(),
+          onboarding_step: 'completed'
+        })
+        .eq('id', userId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      if (this.currentUser && this.currentUser.id === userId) {
+        this.currentUser = data;
+      }
+      
+      this.logger.info('Onboarding completed', { userId });
+      return { success: true, user: data };
+    } catch (error) {
+      this.logger.error('Failed to complete onboarding', { userId, error: error.message });
+      return { success: false, error: error.message };
     }
   }
   
@@ -636,6 +881,431 @@ class AuthService {
    */
   needsRoleSelection() {
     return this.currentUser && !this.currentUser.user_role;
+  }
+
+  /**
+   * Check onboarding status for current user
+   * Returns what steps are needed
+   */
+  async checkOnboardingStatus() {
+    try {
+      if (!this.currentUser) {
+        return {
+          needsOnboarding: false,
+          needsRole: false,
+          needsTeam: false,
+          currentStep: null
+        };
+      }
+
+      const userId = this.currentUser.id;
+
+      // Get user data with team info
+      const { data: user, error: userError } = await this.supabase
+        .from('users')
+        .select('onboarding_completed, user_role, team_id, onboarding_step')
+        .eq('id', userId)
+        .single();
+
+      if (userError) {
+        this.logger.warn('Failed to check onboarding status', { error: userError.message });
+        return {
+          needsOnboarding: false,
+          needsRole: false,
+          needsTeam: false,
+          currentStep: null
+        };
+      }
+
+      const needsOnboarding = !user.onboarding_completed;
+      const needsRole = !user.user_role;
+      const needsTeam = !user.team_id;
+      const currentStep = user.onboarding_step || 'role_selection';
+
+      this.logger.info('Onboarding status checked', {
+        userId,
+        needsOnboarding,
+        needsRole,
+        needsTeam,
+        currentStep
+      });
+
+      return {
+        needsOnboarding,
+        needsRole,
+        needsTeam,
+        currentStep,
+        completedSteps: [],
+        selectedIntegrations: []
+      };
+    } catch (error) {
+      this.logger.error('Error checking onboarding status', { error: error.message });
+      return {
+        needsOnboarding: false,
+        needsRole: false,
+        needsTeam: false,
+        currentStep: null
+      };
+    }
+  }
+
+  /**
+   * Update onboarding progress
+   */
+  async updateOnboardingProgress(step, data = {}) {
+    try {
+      if (!this.currentUser) {
+        throw new Error('No authenticated user');
+      }
+
+      const userId = this.currentUser.id;
+
+      // Update user's onboarding_step (no more onboarding_progress table)
+      const { error } = await this.supabase
+        .from('users')
+        .update({ 
+          onboarding_step: step,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      this.logger.info('Onboarding progress updated', { userId, step });
+
+      return { success: true };
+    } catch (error) {
+      this.logger.error('Failed to update onboarding progress', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Mark onboarding as complete
+   * @param {string} userId - Optional user ID (defaults to currentUser)
+   */
+  async completeOnboarding(userId = null) {
+    try {
+      const targetUserId = userId || this.currentUser?.id;
+      
+      if (!targetUserId) {
+        throw new Error('No user ID provided');
+      }
+
+      // Use service role client to bypass RLS
+      const { createClient } = require('@supabase/supabase-js');
+      const supabaseAdmin = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+
+      // Update user
+      const { data, error } = await supabaseAdmin
+        .from('users')
+        .update({
+          onboarding_completed: true,
+          onboarding_step: 'completed',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', targetUserId)
+        .select();
+
+      if (error) throw error;
+
+      const updatedUser = data && data.length > 0 ? data[0] : null;
+
+      if (!updatedUser) {
+        throw new Error('User not found or update failed');
+      }
+
+      // Update current user in memory if it's the same user
+      if (this.currentUser && this.currentUser.id === targetUserId) {
+        this.currentUser.onboarding_completed = true;
+        this.currentUser.onboarding_step = 'completed';
+      }
+
+      this.logger.info('Onboarding completed', { userId: targetUserId });
+
+      return { success: true, user: updatedUser };
+    } catch (error) {
+      this.logger.error('Failed to complete onboarding', { error: error.message });
+      return { success: false, error: error.message };
+    }
+  }
+  
+  /**
+   * Wait for OAuth callback from existing OAuth server
+   * This polls the OAuth server's /auth/status endpoint to get user data
+   */
+  async waitForOAuthCallback(port, provider) {
+    return new Promise((resolve, reject) => {
+      const axios = require('axios');
+      let attempts = 0;
+      const maxAttempts = 60; // 5 minutes (5 seconds interval)
+      
+      console.log(`🔄 Polling OAuth server for ${provider} auth...`);
+      
+      const pollInterval = setInterval(async () => {
+        attempts++;
+        console.log(`🔍 Polling attempt ${attempts}/${maxAttempts}...`);
+        
+        try {
+          // Check if OAuth completed by polling the status endpoint
+          const response = await axios.get(`http://localhost:${port}/auth/status`, {
+            timeout: 3000
+          });
+          
+          if (response.data && response.data.authenticated && response.data.provider === provider) {
+            clearInterval(pollInterval);
+            console.log('✅ OAuth completed, user data received!');
+            resolve(response.data.user);
+          } else if (attempts >= maxAttempts) {
+            clearInterval(pollInterval);
+            console.log('❌ Authentication timeout after', attempts, 'attempts');
+            reject(new Error('Authentication timeout - please try again'));
+          } else {
+            console.log('⏳ No auth data yet, will retry in 5 seconds...');
+          }
+        } catch (error) {
+          // Server not ready or no auth yet
+          if (attempts >= maxAttempts) {
+            clearInterval(pollInterval);
+            console.log('❌ Authentication timeout');
+            reject(new Error('Authentication timeout - please try again'));
+          }
+          // Continue polling
+        }
+      }, 5000); // Poll every 5 seconds
+    });
+  }
+  
+  /**
+   * Handle direct authentication (no Supabase Auth)
+   * Creates/updates user directly in Supabase database
+   */
+  async handleDirectAuth(userData, provider) {
+    try {
+      console.log('💾 Creating/updating user in database...');
+      
+      // Use service role client to directly manipulate database
+      const { createClient } = require('@supabase/supabase-js');
+      const supabaseAdmin = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+      
+      // Check if user exists
+      const { data: existingUsers, error: checkError } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .eq('email', userData.email)
+        .limit(1);
+      
+      if (checkError) {
+        console.error('❌ Error checking for existing user:', checkError);
+        throw checkError;
+      }
+      
+      let user;
+      
+      if (existingUsers && existingUsers.length > 0) {
+        // Update existing user
+        console.log('📝 Updating existing user...');
+        user = existingUsers[0];
+        
+        const updateData = {
+          name: userData.name || user.name,
+          avatar_url: userData.avatar_url || userData.picture || user.avatar_url,
+          auth_provider: provider,
+          last_login: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        // Ensure onboarding fields exist (for legacy users)
+        if (user.onboarding_completed === null || user.onboarding_completed === undefined) {
+          updateData.onboarding_completed = false;
+        }
+        if (!user.onboarding_step) {
+          updateData.onboarding_step = user.user_role ? 'integration_setup' : 'role_selection';
+        }
+        
+        // Store provider-specific identity and tokens
+        if (provider === 'slack' && userData.slack_user_id) {
+          updateData.slack_user_id = userData.slack_user_id;
+          updateData.slack_team_id = userData.slack_team_id;
+          updateData.slack_team_name = userData.slack_team_name;
+        } else if (provider === 'microsoft') {
+          // Store Microsoft tokens for integration
+          const microsoftTokens = {
+            access_token: userData.tokens?.access_token,
+            refresh_token: userData.tokens?.refresh_token,
+            token_expiry: userData.tokens?.expires_in 
+              ? new Date(Date.now() + (userData.tokens.expires_in * 1000)).toISOString()
+              : null,
+            id: userData.id,
+            email: userData.email,
+            connected_at: new Date().toISOString()
+          };
+          
+          updateData.integration_settings = {
+            ...user.integration_settings,
+            microsoft: microsoftTokens
+          };
+          
+          console.log('💾 Saving Microsoft tokens to integration_settings');
+        } else if (provider === 'google') {
+          // Store Google tokens for integration
+          const googleTokens = {
+            access_token: userData.tokens?.access_token,
+            refresh_token: userData.tokens?.refresh_token,
+            token_expiry: userData.tokens?.expires_in 
+              ? new Date(Date.now() + (userData.tokens.expires_in * 1000)).toISOString()
+              : null,
+            id: userData.id,
+            email: userData.email,
+            connected_at: new Date().toISOString()
+          };
+          
+          updateData.integration_settings = {
+            ...user.integration_settings,
+            google: googleTokens
+          };
+          
+          console.log('💾 Saving Google tokens to integration_settings');
+        }
+        
+        const { data: updatedUser, error: updateError } = await supabaseAdmin
+          .from('users')
+          .update(updateData)
+          .eq('id', user.id)
+          .select()
+          .single();
+        
+        if (updateError) throw updateError;
+        user = updatedUser;
+        
+      } else {
+        // Create new user
+        console.log('✨ Creating new user...');
+        
+        const newUser = {
+          email: userData.email,
+          name: userData.name || userData.email.split('@')[0],
+          avatar_url: userData.avatar_url || userData.picture,
+          auth_provider: provider,
+          email_verified: true,
+          onboarding_completed: false,
+          onboarding_step: 'role_selection',
+          user_role: null, // Don't auto-assign role - let user choose
+          last_login: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        // Store provider-specific identity and tokens
+        if (provider === 'slack' && userData.slack_user_id) {
+          newUser.slack_user_id = userData.slack_user_id;
+          newUser.slack_team_id = userData.slack_team_id;
+          newUser.slack_team_name = userData.slack_team_name;
+        } else if (provider === 'microsoft') {
+          // Store Microsoft tokens for integration
+          newUser.integration_settings = {
+            microsoft: {
+              access_token: userData.tokens?.access_token,
+              refresh_token: userData.tokens?.refresh_token,
+              token_expiry: userData.tokens?.expires_in 
+                ? new Date(Date.now() + (userData.tokens.expires_in * 1000)).toISOString()
+                : null,
+              id: userData.id,
+              email: userData.email,
+              connected_at: new Date().toISOString()
+            }
+          };
+          
+          console.log('💾 Saving Microsoft tokens for new user');
+        } else if (provider === 'google') {
+          // Store Google tokens for integration
+          newUser.integration_settings = {
+            google: {
+              access_token: userData.tokens?.access_token,
+              refresh_token: userData.tokens?.refresh_token,
+              token_expiry: userData.tokens?.expires_in 
+                ? new Date(Date.now() + (userData.tokens.expires_in * 1000)).toISOString()
+                : null,
+              id: userData.id,
+              email: userData.email,
+              connected_at: new Date().toISOString()
+            }
+          };
+          
+          console.log('💾 Saving Google tokens for new user');
+        }
+        
+        const { data: createdUser, error: createError } = await supabaseAdmin
+          .from('users')
+          .insert(newUser)
+          .select()
+          .single();
+        
+        if (createError) throw createError;
+        user = createdUser;
+      }
+      
+      console.log('✅ User saved to database:', user.email);
+      
+      // Create local session
+      const session = {
+        user: user,
+        access_token: this.generateSessionToken(),
+        provider: provider,
+        created_at: new Date().toISOString()
+      };
+      
+      this.currentUser = user;
+      this.currentSession = session;
+      
+      // Store session locally
+      this.store.set('session', session);
+      this.store.set('user', user);
+      
+      console.log('💾 Session saved locally');
+      
+      return { user, session };
+      
+    } catch (error) {
+      this.logger.error('Direct auth failed', { error: error.message });
+      throw error;
+    }
+  }
+  
+  /**
+   * Generate a simple session token for local storage
+   */
+  generateSessionToken() {
+    const crypto = require('crypto');
+    return crypto.randomBytes(32).toString('hex');
+  }
+  
+  /**
+   * Determine user role based on email or default to 'sales'
+   */
+  determineUserRole(email) {
+    if (!email) {
+      return 'sales';
+    }
+    
+    // Check for developer indicators in email
+    const devKeywords = ['dev', 'engineer', 'tech', 'developer', 'code', 'software'];
+    const emailLower = email.toLowerCase();
+    
+    for (const keyword of devKeywords) {
+      if (emailLower.includes(keyword)) {
+        return 'developer';
+      }
+    }
+    
+    // Default to sales
+    return 'sales';
   }
 }
 

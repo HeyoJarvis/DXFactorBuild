@@ -1,16 +1,311 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import DraggableHeader from '../components/common/DraggableHeader';
 import './Settings.css';
 
 function Settings({ user }) {
+  const [loading, setLoading] = useState(true);
   const [integrations, setIntegrations] = useState({
-    slack: { enabled: true, connected: true, name: 'Slack', description: 'Team communication and task management' },
-    teams: { enabled: false, connected: false, name: 'Microsoft Teams', description: 'Meetings and collaboration' },
-    google: { enabled: true, connected: true, name: 'Google Workspace', description: 'Gmail, Calendar, and Drive' },
-    github: { enabled: true, connected: true, name: 'GitHub', description: 'Code repositories and pull requests' },
-    jira: { enabled: false, connected: false, name: 'Jira', description: 'Project tracking and issue management' }
+    slack: { 
+      enabled: false, 
+      connected: false, 
+      name: 'Slack', 
+      description: 'Team communication and task automation',
+      hasAuth: true
+    },
+    teams: { 
+      enabled: false, 
+      connected: false, 
+      name: 'Microsoft Teams', 
+      description: 'Meetings, emails, and Teams collaboration',
+      hasAuth: true
+    },
+    google: { 
+      enabled: false, 
+      connected: false, 
+      name: 'Google Workspace', 
+      description: 'Gmail, Calendar, and Drive integration',
+      hasAuth: true
+    },
+    github: { 
+      enabled: false, 
+      connected: false, 
+      name: 'GitHub', 
+      description: 'Code repositories and pull requests',
+      hasAuth: false
+    },
+    jira: { 
+      enabled: false, 
+      connected: false, 
+      name: 'JIRA', 
+      description: 'Project tracking and issue management',
+      hasAuth: true
+    },
+    crm: {
+      enabled: false,
+      connected: false,
+      name: 'CRM (HubSpot)',
+      description: 'Contact management and deal tracking',
+      hasAuth: true
+    },
+    website: {
+      enabled: false,
+      connected: false,
+      name: 'Website Monitor',
+      description: 'Monitor your website traffic and leads',
+      hasAuth: false
+    }
   });
 
+  useEffect(() => {
+    checkIntegrationStatuses();
+  }, []);
+
+  async function checkIntegrationStatuses() {
+    setLoading(true);
+    try {
+      const statuses = {};
+
+      // Check Slack
+      if (window.electronAPI?.system?.getStatus) {
+        const systemStatus = await window.electronAPI.system.getStatus();
+        if (systemStatus.success) {
+          statuses.slack = {
+            connected: systemStatus.data.slack?.connected || false,
+            enabled: systemStatus.data.slack?.connected || false
+          };
+        }
+      }
+
+      // Check Microsoft/Teams
+      if (window.electronAPI?.microsoft?.checkConnection) {
+        const msStatus = await window.electronAPI.microsoft.checkConnection();
+        console.log('Microsoft status:', msStatus);
+        statuses.teams = {
+          connected: msStatus.success && msStatus.connected || false,
+          enabled: msStatus.success && msStatus.connected || false
+        };
+      }
+
+      // Check Google
+      if (window.electronAPI?.google?.checkConnection) {
+        const googleStatus = await window.electronAPI.google.checkConnection();
+        console.log('Google status:', googleStatus);
+        statuses.google = {
+          connected: googleStatus.success && googleStatus.connected || false,
+          enabled: googleStatus.success && googleStatus.connected || false
+        };
+      }
+
+      // Check JIRA
+      if (window.electronAPI?.jira?.checkConnection) {
+        const jiraStatus = await window.electronAPI.jira.checkConnection();
+        console.log('JIRA status:', jiraStatus);
+        statuses.jira = {
+          connected: jiraStatus.success && jiraStatus.connected || false,
+          enabled: jiraStatus.success && jiraStatus.connected || false
+        };
+      }
+
+      // Check CRM (from system status)
+      if (window.electronAPI?.system?.getStatus) {
+        const systemStatus = await window.electronAPI.system.getStatus();
+        if (systemStatus.success) {
+          statuses.crm = {
+            connected: systemStatus.data.crm?.connected || false,
+            enabled: systemStatus.data.crm?.connected || false
+          };
+        }
+      }
+
+      console.log('All integration statuses:', statuses);
+
+      // Update all statuses
+      setIntegrations(prev => {
+        const updated = { ...prev };
+        Object.keys(statuses).forEach(key => {
+          if (updated[key]) {
+            updated[key] = {
+              ...updated[key],
+              ...statuses[key]
+            };
+          }
+        });
+        return updated;
+      });
+
+    } catch (error) {
+      console.error('Error checking integration statuses:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleConnect(integrationKey) {
+    try {
+      console.log(`🔗 Connecting to ${integrationKey}...`);
+      
+      // Set loading for this specific integration
+      setIntegrations(prev => ({
+        ...prev,
+        [integrationKey]: {
+          ...prev[integrationKey],
+          loading: true
+        }
+      }));
+
+      let result;
+      switch (integrationKey) {
+        case 'slack':
+          // Slack OAuth
+          if (window.electronAPI?.auth?.signInWithSlack) {
+            result = await window.electronAPI.auth.signInWithSlack();
+            console.log('Slack auth result:', result);
+          }
+          break;
+
+        case 'teams':
+          // Microsoft OAuth
+          if (window.electronAPI?.microsoft?.authenticate) {
+            result = await window.electronAPI.microsoft.authenticate();
+            console.log('Microsoft auth result:', result);
+            if (result.success) {
+              console.log('✅ Microsoft authenticated successfully');
+              // Immediately update the state
+              setIntegrations(prev => ({
+                ...prev,
+                teams: {
+                  ...prev.teams,
+                  connected: true,
+                  enabled: true,
+                  loading: false
+                }
+              }));
+              return; // Exit early, no need to wait
+            }
+          }
+          break;
+
+        case 'google':
+          // Google OAuth
+          if (window.electronAPI?.google?.authenticate) {
+            result = await window.electronAPI.google.authenticate();
+            console.log('Google auth result:', result);
+            if (result.success) {
+              console.log('✅ Google authenticated successfully');
+              // Immediately update the state
+              setIntegrations(prev => ({
+                ...prev,
+                google: {
+                  ...prev.google,
+                  connected: true,
+                  enabled: true,
+                  loading: false
+                }
+              }));
+              return; // Exit early
+            }
+          }
+          break;
+
+        case 'jira':
+          // JIRA OAuth
+          if (window.electronAPI?.jira?.authenticate) {
+            result = await window.electronAPI.jira.authenticate();
+            console.log('JIRA auth result:', result);
+            if (result.success) {
+              console.log('✅ JIRA authenticated successfully');
+              // Immediately update the state
+              setIntegrations(prev => ({
+                ...prev,
+                jira: {
+                  ...prev.jira,
+                  connected: true,
+                  enabled: true,
+                  loading: false
+                }
+              }));
+              return; // Exit early
+            }
+          }
+          break;
+
+        case 'crm':
+          // HubSpot OAuth (would need to implement)
+          console.log('CRM auth not yet implemented');
+          alert('HubSpot CRM authentication coming soon!');
+          break;
+
+        case 'github':
+          console.log('GitHub auth uses existing connection');
+          break;
+
+        case 'website':
+          console.log('Website monitoring is automatic');
+          break;
+      }
+
+      // Clear loading state
+      setIntegrations(prev => ({
+        ...prev,
+        [integrationKey]: {
+          ...prev[integrationKey],
+          loading: false
+        }
+      }));
+
+      // If auth failed, show error
+      if (result && !result.success) {
+        alert(`Failed to connect to ${integrationKey}: ${result.error || 'Unknown error'}`);
+      }
+
+      // Refresh statuses after a delay
+      setTimeout(() => checkIntegrationStatuses(), 3000);
+
+    } catch (error) {
+      console.error(`Error connecting to ${integrationKey}:`, error);
+      setIntegrations(prev => ({
+        ...prev,
+        [integrationKey]: {
+          ...prev[integrationKey],
+          loading: false
+        }
+      }));
+      alert(`Failed to connect to ${integrationKey}: ${error.message}`);
+    }
+  }
+
+  async function handleDisconnect(integrationKey) {
+    try {
+      console.log(`🔌 Disconnecting from ${integrationKey}...`);
+
+      switch (integrationKey) {
+        case 'jira':
+          if (window.electronAPI?.jira?.disconnect) {
+            await window.electronAPI.jira.disconnect();
+            console.log('✅ JIRA disconnected');
+          }
+          break;
+
+        default:
+          console.log(`Disconnect for ${integrationKey} not yet implemented`);
+      }
+
+      // Refresh statuses
+      setTimeout(() => checkIntegrationStatuses(), 1000);
+
+    } catch (error) {
+      console.error(`Error disconnecting from ${integrationKey}:`, error);
+    }
+  }
+
   const handleToggle = (integrationKey) => {
+    const integration = integrations[integrationKey];
+    
+    if (!integration.connected) {
+      // Can't toggle if not connected
+      return;
+    }
+
     setIntegrations(prev => ({
       ...prev,
       [integrationKey]: {
@@ -68,6 +363,22 @@ function Settings({ user }) {
             </defs>
           </svg>
         );
+      case 'crm':
+        return (
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="8" r="5" fill="#FF7A59"/>
+            <path d="M12 14c-5.5 0-10 2.5-10 5.5V22h20v-2.5c0-3-4.5-5.5-10-5.5z" fill="#FF7A59"/>
+            <circle cx="18" cy="6" r="3" fill="#FFB74D"/>
+            <circle cx="6" cy="6" r="3" fill="#FFB74D"/>
+          </svg>
+        );
+      case 'website':
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" stroke="#4CAF50"/>
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#4CAF50"/>
+          </svg>
+        );
       default:
         return null;
     }
@@ -75,6 +386,9 @@ function Settings({ user }) {
 
   return (
     <div className="settings-page">
+      {/* Draggable Window Controls */}
+      <DraggableHeader title="Settings" />
+      
       {/* Header */}
       <div className="settings-header">
         <div className="settings-header-content">
@@ -82,9 +396,11 @@ function Settings({ user }) {
             <h1 className="settings-title">Settings</h1>
             <p className="settings-subtitle">Manage your integrations and preferences</p>
           </div>
-          <button className="minimize-btn" onClick={() => window.electronAPI?.window?.minimize?.()}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
+          <button className="settings-refresh-btn" onClick={checkIntegrationStatuses} disabled={loading} title="Refresh">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={loading ? 'spinning' : ''}>
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
           </button>
         </div>
@@ -105,6 +421,12 @@ function Settings({ user }) {
             <span className="section-count">{Object.values(integrations).filter(i => i.enabled).length} active</span>
           </div>
 
+          {loading ? (
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Checking integrations...</p>
+            </div>
+          ) : (
           <div className="integrations-grid">
             {Object.entries(integrations).map(([key, integration]) => (
               <div key={key} className={`integration-card ${integration.enabled ? 'active' : ''}`}>
@@ -118,27 +440,55 @@ function Settings({ user }) {
                 <div className="integration-info">
                   <h3 className="integration-name">{integration.name}</h3>
                   <p className="integration-description">{integration.description}</p>
-                  {integration.connected && (
-                    <span className="connection-status">
+                    {integration.connected ? (
+                      <span className="connection-status connected">
                       {integration.enabled ? 'Connected & Active' : 'Connected (Paused)'}
                     </span>
+                    ) : (
+                      <span className="connection-status disconnected">
+                        Not Connected
+                      </span>
                   )}
                 </div>
 
                 <div className="integration-actions">
+                    {integration.connected ? (
+                      <>
                   <label className="toggle-switch">
                     <input
                       type="checkbox"
                       checked={integration.enabled}
                       onChange={() => handleToggle(key)}
-                      disabled={!integration.connected}
                     />
                     <span className="toggle-slider"></span>
                   </label>
-                </div>
+                        {integration.hasAuth && (
+                          <button 
+                            className="integration-disconnect-btn" 
+                            onClick={() => handleDisconnect(key)}
+                            title="Disconnect"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <button 
+                        className="integration-connect-btn" 
+                        onClick={() => handleConnect(key)}
+                        disabled={!integration.hasAuth}
+                      >
+                        Connect
+                      </button>
+                    )}
+                  </div>
               </div>
             ))}
           </div>
+          )}
         </div>
 
         {/* Profile Section */}
@@ -155,13 +505,39 @@ function Settings({ user }) {
 
           <div className="profile-card">
             <div className="profile-avatar">
-              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+              {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="profile-info">
-              <h3 className="profile-name">{user?.name || 'User'}</h3>
+              <h3 className="profile-name">{user?.name || user?.email?.split('@')[0] || 'User'}</h3>
               <p className="profile-email">{user?.email || 'user@company.com'}</p>
-              <span className="profile-role">Sales</span>
+              <span className="profile-role">{user?.user_role || 'Sales'}</span>
             </div>
+          </div>
+          
+          <div className="profile-actions">
+            <button 
+              className="logout-button"
+              onClick={async () => {
+                if (window.confirm('Are you sure you want to logout?')) {
+                  try {
+                    console.log('🚪 Logging out...');
+                    await window.electronAPI.auth.signOut();
+                    console.log('✅ Logged out successfully');
+                    window.location.reload();
+                  } catch (error) {
+                    console.error('❌ Logout failed:', error);
+                    alert('Failed to logout: ' + error.message);
+                  }
+                }
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Logout
+            </button>
           </div>
         </div>
       </div>
@@ -170,4 +546,3 @@ function Settings({ user }) {
 }
 
 export default Settings;
-

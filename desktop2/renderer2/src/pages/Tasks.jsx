@@ -4,14 +4,16 @@ import ActionList from '../components/Tasks/ActionList';
 import TaskChat from '../components/Tasks/TaskChat';
 import './Tasks.css';
 
-export default function Tasks() {
-  const { 
-    tasks, 
-    loading, 
-    updateTask, 
-    deleteTask, 
+export default function Tasks({ user }) {
+  const [assignmentView, setAssignmentView] = useState('all');
+
+  const {
+    tasks,
+    loading,
+    updateTask,
+    deleteTask,
     toggleTask
-  } = useSalesTasks();
+  } = useSalesTasks(user, assignmentView);
   
   const [chatTask, setChatTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');

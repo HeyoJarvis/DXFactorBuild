@@ -3,6 +3,7 @@ import { toPng } from 'html-to-image';
 import TechnologyPalette from '../components/Architecture/TechnologyPalette';
 import DiagramCanvas from '../components/Architecture/DiagramCanvas';
 import AIGenerator from '../components/Architecture/AIGenerator';
+import DraggableHeader from '../components/common/DraggableHeader';
 import './ArchitectureDiagram.css';
 
 export default function ArchitectureDiagram({ user }) {
@@ -69,6 +70,9 @@ export default function ArchitectureDiagram({ user }) {
 
   return (
     <div className="architecture-diagram-page">
+      {/* Draggable Window Controls */}
+      <DraggableHeader title="Architecture Diagram" />
+
       {/* Header */}
       <div className="architecture-header" style={{ WebkitAppRegion: 'drag' }}>
         <div className="header-content" style={{ WebkitAppRegion: 'no-drag' }}>

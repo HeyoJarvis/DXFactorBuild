@@ -61,6 +61,7 @@ class GoogleService extends EventEmitter {
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         redirectUri: process.env.GOOGLE_REDIRECT_URI,
+        port: 8893, // Google uses port 8893
         logger: this.logger
       });
 
@@ -69,21 +70,16 @@ class GoogleService extends EventEmitter {
       this.oauthHandler.refreshToken = googleTokens.refresh_token;
       this.oauthHandler.tokenExpiry = googleTokens.token_expiry ? new Date(googleTokens.token_expiry).getTime() : null;
 
-      // Initialize Gmail service
+      // Initialize Gmail service with existing tokens
       this.gmailService = new GoogleGmailService({
         accessToken: googleTokens.access_token,
         refreshToken: googleTokens.refresh_token,
+        tokenExpiry: googleTokens.token_expiry,
         logger: this.logger
       });
 
-      // Listen for token refresh events
-      this.oauthHandler.on('token_refreshed', async (tokens) => {
-        await this.saveTokens(userId, tokens);
-        // Update Gmail service with new token
-        if (this.gmailService) {
-          this.gmailService.accessToken = tokens.access_token;
-        }
-      });
+      // Note: GoogleOAuthHandler doesn't extend EventEmitter, so we don't set up event listeners
+      // Token refresh is handled internally by GoogleGmailService
 
       this.isInitialized = true;
       this.logger.info('Google service initialized successfully', { userId });
@@ -283,6 +279,167 @@ class GoogleService extends EventEmitter {
         success: false,
         error: error.message,
         events: []
+      };
+    }
+  }
+
+  /**
+   * Get unread emails
+   */
+  async getUnreadEmails(maxResults = 50) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Google not connected');
+      }
+
+      this.logger.info('Fetching unread emails', { maxResults });
+
+      const emails = await this.gmailService.getUnreadEmails(maxResults);
+
+      this.logger.info('Unread emails fetched', { count: emails.length });
+
+      return {
+        success: true,
+        emails
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to fetch unread emails', {
+        error: error.message
+      });
+
+      return {
+        success: false,
+        error: error.message,
+        emails: []
+      };
+    }
+  }
+
+  /**
+   * Get emails with optional query
+   */
+  async getEmails(options = {}) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Google not connected');
+      }
+
+      this.logger.info('Fetching emails', options);
+
+      const result = await this.gmailService.getEmails(options);
+
+      this.logger.info('Emails fetched', { count: result.emails.length });
+
+      return {
+        success: true,
+        ...result
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to fetch emails', {
+        error: error.message
+      });
+
+      return {
+        success: false,
+        error: error.message,
+        emails: [],
+        nextPageToken: null
+      };
+    }
+  }
+
+  /**
+   * Get email thread
+   */
+  async getEmailThread(threadId) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Google not connected');
+      }
+
+      this.logger.info('Fetching email thread', { threadId });
+
+      const thread = await this.gmailService.getEmailThread(threadId);
+
+      this.logger.info('Email thread fetched', {
+        threadId,
+        messageCount: thread.messageCount
+      });
+
+      return {
+        success: true,
+        thread
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to fetch email thread', {
+        threadId,
+        error: error.message
+      });
+
+      return {
+        success: false,
+        error: error.message,
+        thread: null
+      };
+    }
+  }
+
+  /**
+   * Mark email as read
+   */
+  async markEmailAsRead(messageId) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Google not connected');
+      }
+
+      await this.gmailService.markEmailAsRead(messageId);
+
+      this.logger.info('Email marked as read', { messageId });
+
+      return {
+        success: true
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to mark email as read', {
+        messageId,
+        error: error.message
+      });
+
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Send an email
+   */
+  async sendEmail(emailData) {
+    try {
+      if (!this.isConnected()) {
+        throw new Error('Google not connected');
+      }
+
+      const result = await this.gmailService.sendEmail(emailData);
+
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      this.logger.error('Failed to send email', {
+        error: error.message
+      });
+
+      return {
+        success: false,
+        error: error.message
       };
     }
   }

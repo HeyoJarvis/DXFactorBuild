@@ -385,30 +385,71 @@ class MainWindowManager {
   }
 
   /**
-   * Expand window to full chat interface
+   * Expand window to LoginFlow size (579x729)
    */
-  expandToFullChat() {
+  expandToLoginFlow() {
     if (!this.window || this.window.isDestroyed()) return;
-    
-    console.log('🔄 Expanding window to full UI...');
-    
-    // Arc Reactor expanded size
-    const expandedWidth = 656;
-    const expandedHeight = 900;
-    
+
+    console.log('🔄 Expanding window for LoginFlow...');
+
+    // LoginFlow size - 579×729 (optimal for login)
+    const loginWidth = 579;
+    const loginHeight = 729;
+
     // Get screen dimensions to center the window
     const { screen } = require('electron');
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
-    
+
+    // Center the login window
+    const x = Math.floor((screenWidth - loginWidth) / 2);
+    const y = Math.floor((screenHeight - loginHeight) / 2);
+
+    // Update window properties for login mode
+    this.window.setResizable(true);
+    this.window.setMinimumSize(1, 1); // Remove minimum size restrictions
+    this.window.setMaximumSize(0, 0); // Remove maximum size restrictions
+
+    // Expand to LoginFlow size, centered
+    this.window.setBounds({
+      x: x,
+      y: y,
+      width: loginWidth,
+      height: loginHeight
+    });
+
+    // Make background semi-transparent for glass effect
+    this.window.setBackgroundColor('#F7F7F8');
+
+    console.log(`✅ Window expanded to ${loginWidth}x${loginHeight} at (${x}, ${y}) for LoginFlow`);
+    this.logger.info('Window expanded for LoginFlow');
+  }
+
+  /**
+   * Expand window to full chat interface
+   */
+  expandToFullChat() {
+    if (!this.window || this.window.isDestroyed()) return;
+
+    console.log('🔄 Expanding window to full UI...');
+
+    // Arc Reactor expanded size
+    const expandedWidth = 656;
+    const expandedHeight = 900;
+
+    // Get screen dimensions to center the window
+    const { screen } = require('electron');
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+
     // Center the expanded window
     const x = Math.floor((screenWidth - expandedWidth) / 2);
     const y = Math.floor((screenHeight - expandedHeight) / 2);
-    
+
     // Update window properties for expanded mode
     this.window.setResizable(true);
     this.window.setMaximumSize(0, 0); // Remove size restrictions
-    
+
     // Expand to Arc Reactor full size, centered
     this.window.setBounds({
       x: x,
@@ -416,13 +457,13 @@ class MainWindowManager {
       width: expandedWidth,
       height: expandedHeight
     });
-    
+
     // Update minimum size constraints
     this.window.setMinimumSize(656, 900);
-    
+
     // Make background opaque for expanded mode
     this.window.setBackgroundColor('#1c1c1e');
-    
+
     console.log(`✅ Window expanded to ${expandedWidth}x${expandedHeight} at (${x}, ${y})`);
     this.logger.info('Window expanded to full UI');
   }

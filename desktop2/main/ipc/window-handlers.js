@@ -90,6 +90,19 @@ function registerWindowHandlers(windows, logger) {
   });
 
   /**
+   * Expand window to LoginFlow size (1000x700)
+   */
+  ipcMain.handle('window:expandToLoginFlow', async () => {
+    try {
+      windows.main?.expandToLoginFlow();
+      return { success: true };
+    } catch (error) {
+      logger.error('Window expandToLoginFlow error:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
    * Expand copilot (legacy - now opens secondary window)
    */
   ipcMain.handle('window:expandCopilot', async () => {
@@ -124,7 +137,16 @@ function registerWindowHandlers(windows, logger) {
    */
   ipcMain.handle('window:setMouseForward', async (event, shouldForward) => {
     try {
+      // CRITICAL: Only apply to the Arc Reactor (main) window, NOT secondary windows
+      const callingWindow = event.sender.getOwnerBrowserWindow();
       const mainWindow = windows.main?.getWindow();
+      
+      // Only process if this is the Arc Reactor window calling
+      if (callingWindow !== mainWindow) {
+        logger.debug('Ignoring setMouseForward from non-main window');
+        return { success: true, message: 'Only applies to main window' };
+      }
+      
       if (!mainWindow) {
         return { success: false, error: 'Main window not found' };
       }
@@ -132,7 +154,7 @@ function registerWindowHandlers(windows, logger) {
       if (shouldForward !== mouseEventsIgnored) {
         mouseEventsIgnored = shouldForward;
         mainWindow.setIgnoreMouseEvents(shouldForward, { forward: true });
-        logger.debug('Mouse event forwarding:', { shouldForward });
+        logger.debug('Mouse event forwarding for Arc Reactor:', { shouldForward });
       }
 
       return { success: true };
@@ -201,6 +223,55 @@ function registerWindowHandlers(windows, logger) {
     } catch (error) {
       logger.error('Failed to resize window:', error);
       return { success: false, error: error.message };
+    }
+  });
+
+  /**
+   * Minimize current window
+   */
+  ipcMain.on('window:minimize', (event) => {
+    const window = event.sender.getOwnerBrowserWindow();
+    if (window) {
+      window.minimize();
+      logger.debug('Window minimized');
+    }
+  });
+
+  /**
+   * Maximize current window
+   */
+  ipcMain.on('window:maximize', (event) => {
+    const window = event.sender.getOwnerBrowserWindow();
+    if (window) {
+      window.maximize();
+      logger.debug('Window maximized');
+    }
+  });
+
+  /**
+   * Toggle maximize/restore current window
+   */
+  ipcMain.on('window:toggleMaximize', (event) => {
+    const window = event.sender.getOwnerBrowserWindow();
+    if (window) {
+      if (window.isMaximized()) {
+        window.unmaximize();
+        logger.debug('Window unmaximized');
+      } else {
+        window.maximize();
+        logger.debug('Window maximized');
+      }
+    }
+  });
+
+  /**
+   * Close current window
+   */
+  ipcMain.on('window:close', (event) => {
+    const window = event.sender.getOwnerBrowserWindow();
+    if (window) {
+      window.close();
+      logger.debug('Window closed');
     }
   });
 

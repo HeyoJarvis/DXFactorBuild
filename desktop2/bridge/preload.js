@@ -45,7 +45,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Auth APIs
   auth: {
     signInWithSlack: () => ipcRenderer.invoke('auth:signInWithSlack'),
-    signInWithTeams: () => ipcRenderer.invoke('auth:signInWithTeams'),
+    signInWithMicrosoft: () => ipcRenderer.invoke('auth:signInWithMicrosoft'),
+    signInWithGoogle: () => ipcRenderer.invoke('auth:signInWithGoogle'),
     signOut: () => ipcRenderer.invoke('auth:signOut'),
     getSession: () => ipcRenderer.invoke('auth:getSession'),
     getCurrentUser: () => ipcRenderer.invoke('auth:getCurrentUser'),
@@ -53,6 +54,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('auth:stateChanged', (event, data) => callback(data));
       return () => ipcRenderer.removeListener('auth:stateChanged', callback);
     }
+  },
+
+  // Onboarding APIs
+  onboarding: {
+    getStatus: () => ipcRenderer.invoke('onboarding:getStatus'),
+    setRole: (role) => ipcRenderer.invoke('onboarding:setRole', role),
+    saveRole: (role) => ipcRenderer.invoke('onboarding:saveRole', role),
+    setTeam: (teamName) => ipcRenderer.invoke('onboarding:setTeam', teamName),
+    skipIntegrations: () => ipcRenderer.invoke('onboarding:skipIntegrations'),
+    complete: () => ipcRenderer.invoke('onboarding:complete'),
+    getRecommendedIntegrations: () => ipcRenderer.invoke('onboarding:getRecommendedIntegrations')
   },
 
   // Arc Reactor APIs
@@ -67,11 +79,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
     toggleCopilot: () => ipcRenderer.invoke('window:toggleCopilot'),
     expandCopilot: () => ipcRenderer.invoke('window:expandCopilot'),
     collapseCopilot: () => ipcRenderer.invoke('window:collapseCopilot'),
+    expandToLoginFlow: () => ipcRenderer.invoke('window:expandToLoginFlow'),
     openSecondary: (route) => ipcRenderer.invoke('window:openSecondary', route),
     navigateSecondary: (route) => ipcRenderer.invoke('window:navigateSecondary', route),
     setMouseForward: (shouldForward) => ipcRenderer.invoke('window:setMouseForward', shouldForward),
     moveWindow: (x, y) => ipcRenderer.invoke('window:moveWindow', x, y),
-    resizeForMenu: (isOpen) => ipcRenderer.invoke('window:resizeForMenu', isOpen)
+    resizeForMenu: (isOpen) => ipcRenderer.invoke('window:resizeForMenu', isOpen),
+    // Window controls
+    minimize: () => ipcRenderer.send('window:minimize'),
+    maximize: () => ipcRenderer.send('window:maximize'),
+    toggleMaximize: () => ipcRenderer.send('window:toggleMaximize'),
+    close: () => ipcRenderer.send('window:close')
   },
 
   // Code Indexer APIs
@@ -102,7 +120,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     sendEmail: (emailData) => ipcRenderer.invoke('microsoft:sendEmail', emailData),
     getUpcomingEvents: (options) => ipcRenderer.invoke('microsoft:getUpcomingEvents', options),
     findMeetingTimes: (attendees, durationMinutes, options) => ipcRenderer.invoke('microsoft:findMeetingTimes', attendees, durationMinutes, options),
-    healthCheck: () => ipcRenderer.invoke('microsoft:healthCheck')
+    healthCheck: () => ipcRenderer.invoke('microsoft:healthCheck'),
+    // Email APIs
+    getEmails: (folderId, maxResults) => ipcRenderer.invoke('microsoft:getEmails', folderId, maxResults),
+    getUnreadEmails: (maxResults) => ipcRenderer.invoke('microsoft:getUnreadEmails', maxResults),
+    markEmailAsRead: (messageId) => ipcRenderer.invoke('microsoft:markEmailAsRead', messageId)
   },
 
   // Google Workspace APIs
@@ -112,7 +134,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
     createEvent: (eventData) => ipcRenderer.invoke('google:createEvent', eventData),
     sendEmail: (emailData) => ipcRenderer.invoke('google:sendEmail', emailData),
     getUpcomingEvents: (options) => ipcRenderer.invoke('google:getUpcomingEvents', options),
-    healthCheck: () => ipcRenderer.invoke('google:healthCheck')
+    healthCheck: () => ipcRenderer.invoke('google:healthCheck'),
+    // Email APIs
+    getEmails: (options) => ipcRenderer.invoke('google:getEmails', options),
+    getUnreadEmails: (maxResults) => ipcRenderer.invoke('google:getUnreadEmails', maxResults),
+    getEmailThread: (threadId) => ipcRenderer.invoke('google:getEmailThread', threadId),
+    markEmailAsRead: (messageId) => ipcRenderer.invoke('google:markEmailAsRead', messageId)
+  },
+
+  // Unified Inbox API
+  inbox: {
+    getUnified: (options) => ipcRenderer.invoke('inbox:getUnified', options)
+  },
+
+  // Team/Workspace APIs
+  teams: {
+    getAvailable: () => ipcRenderer.invoke('teams:getAvailable'),
+    getUserTeams: () => ipcRenderer.invoke('teams:getUserTeams'),
+    join: (teamId, role) => ipcRenderer.invoke('teams:join', teamId, role),
+    leave: (teamId) => ipcRenderer.invoke('teams:leave', teamId),
+    create: (teamData) => ipcRenderer.invoke('teams:create', teamData)
   }
 });
 

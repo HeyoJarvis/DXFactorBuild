@@ -224,47 +224,68 @@ Be concise, practical, and focused on helping complete this specific task.`;
         };
       }
       
-      // First, verify the task exists and belongs to this user
+      // First, verify the TASK exists and user has access to it
       const { data: taskSession, error: taskError } = await dbAdapter.supabase
         .from('conversation_sessions')
         .select('id, user_id, workflow_metadata, session_title')
         .eq('id', taskId)
-        .eq('workflow_type', 'task')
+        .eq('workflow_type', 'task')  // ✅ Verify the task itself
         .single();
-      
+
       if (taskError || !taskSession) {
-        logger.warn('Task not found or access denied', { taskId, userId, error: taskError?.message });
+        logger.warn('Task not found', { taskId, userId, error: taskError?.message });
         return {
           success: false,
           error: 'Task not found',
           messages: []
         };
       }
-      
-      // Verify task belongs to user
-      if (taskSession.user_id !== userId) {
-        logger.warn('Task access denied: user mismatch', { taskId, userId, taskUserId: taskSession.user_id });
+
+      // Get current user's Slack ID for assignment checking
+      const userSlackId = services.auth?.currentUser?.slack_user_id;
+
+      // Verify user has access to task (owner, assignee, assignor, or mentioned)
+      const isOwner = taskSession.user_id === userId;
+      const isAssignee = userSlackId && taskSession.workflow_metadata?.assignee === userSlackId;
+      const isAssignor = userSlackId && taskSession.workflow_metadata?.assignor === userSlackId;
+      const isMentioned = userSlackId && taskSession.workflow_metadata?.mentioned_users?.includes(userSlackId);
+
+      const hasAccess = isOwner || isAssignee || isAssignor || isMentioned;
+
+      if (!hasAccess) {
+        logger.warn('Task access denied: user not associated with task', {
+          taskId,
+          userId,
+          userSlackId,
+          taskUserId: taskSession.user_id,
+          isOwner,
+          isAssignee,
+          isAssignor,
+          isMentioned
+        });
         return {
           success: false,
           error: 'Access denied',
           messages: []
         };
       }
-      
-      logger.info('Task verified for chat access', { 
-        taskId, 
+
+      logger.info('Task verified for chat access', {
+        taskId,
         userId,
+        userSlackId,
+        accessType: isOwner ? 'owner' : isAssignee ? 'assignee' : isAssignor ? 'assignor' : 'mentioned',
         routeTo: taskSession.workflow_metadata?.route_to,
         workType: taskSession.workflow_metadata?.work_type
       });
       
-      // Check in-memory cache first
+      // Now look for the CHAT session (workflow_type='task_chat')
       let taskSessionId = taskSessionIds[taskId];
       
       // If not in memory, look up in database
       if (!taskSessionId) {
         const workflowId = `task_${taskId}`;
-        logger.info('Task session not in cache, looking up in database', { 
+        logger.info('Task chat session not in cache, looking up in database', { 
           taskId, 
           userId,
           workflowId,
@@ -275,23 +296,23 @@ Be concise, practical, and focused on helping complete this specific task.`;
           }
         });
         
-        // Query database for existing task chat session
+        // Query for task_chat session, NOT task session
         const { data: sessions, error } = await dbAdapter.supabase
           .from('conversation_sessions')
           .select('id, workflow_id, workflow_type, started_at')
           .eq('user_id', userId)
-          .eq('workflow_type', 'task_chat')
+          .eq('workflow_type', 'task_chat')  // ✅ Look for chat session
           .eq('workflow_id', workflowId)
           .order('started_at', { ascending: false })
           .limit(1);
         
         if (error) {
-          logger.error('Failed to look up task session', { error: error.message });
+          logger.error('Failed to look up task chat session', { error: error.message });
         } else if (sessions && sessions.length > 0) {
           taskSessionId = sessions[0].id;
           // Cache it for future use
           taskSessionIds[taskId] = taskSessionId;
-          logger.info('Found task session in database', { 
+          logger.info('Found task chat session in database', { 
             taskId, 
             sessionId: taskSessionId,
             workflowId: sessions[0].workflow_id,
@@ -309,7 +330,7 @@ Be concise, practical, and focused on helping complete this specific task.`;
           };
         }
       } else {
-        logger.info('Task session found in cache', { taskId, sessionId: taskSessionId });
+        logger.info('Task chat session found in cache', { taskId, sessionId: taskSessionId });
       }
       
       if (!taskSessionId) {
@@ -319,12 +340,14 @@ Be concise, practical, and focused on helping complete this specific task.`;
         };
       }
       
+      // Get messages from the chat session
       const historyResult = await dbAdapter.getSessionMessages(taskSessionId);
       
       if (historyResult.success) {
         logger.info('Loaded chat history', { 
           taskId, 
           messageCount: historyResult.messages.length,
+          sessionId: taskSessionId,
           routeTo: taskSession.workflow_metadata?.route_to
         });
         return {

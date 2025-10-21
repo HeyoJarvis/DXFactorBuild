@@ -709,3 +709,11 @@
 {"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-15T16:02:40.381Z"}
 {"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-15T16:15:14.601Z"}
 {"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-15T16:15:15.994Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T03:46:36.495Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-16T03:46:37.655Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T03:46:52.769Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-16T03:46:54.427Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T03:47:07.634Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-16T03:47:08.977Z"}
+{"level":"info","message":"Microsoft Graph Service initialized","scopes":14,"service":"microsoft-graph-service","tenantId":"common","timestamp":"2025-10-16T03:47:33.653Z"}
+{"error":"Not authenticated or token expired. Please authenticate first.","level":"error","message":"Failed to get user profile","service":"microsoft-graph-service","timestamp":"2025-10-16T03:47:34.793Z"}

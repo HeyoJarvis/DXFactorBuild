@@ -8,7 +8,10 @@ import Indexer from './pages/Indexer';
 import MissionControl from './pages/MissionControl';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
+import LoginFlow from './pages/LoginFlow';
+import DiagnosticMicrosoft from './pages/DiagnosticMicrosoft';
 import Navigation from './components/common/Navigation';
+import TabBar from './components/common/TabBar';
 import ArcReactor from './components/ArcReactor/ArcReactor';
 
 function App() {
@@ -21,39 +24,13 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [userRole, setUserRole] = useState('sales'); // Default to sales
+  const [userRole, setUserRole] = useState(null);
+  
+  // Onboarding state - REMOVED, now handled in LoginFlow
 
   useEffect(() => {
     initializeApp();
     checkAuthStatus();
-    loadUserRole();
-  }, []);
-
-  // Load user role from localStorage
-  function loadUserRole() {
-    const savedRole = localStorage.getItem('heyjarvis-role');
-    if (savedRole && (savedRole === 'developer' || savedRole === 'sales')) {
-      setUserRole(savedRole);
-    } else {
-      setUserRole('sales');
-      localStorage.setItem('heyjarvis-role', 'sales');
-    }
-  }
-
-  // Listen for role changes
-  useEffect(() => {
-    const handleStorageChange = () => {
-      loadUserRole();
-    };
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Poll for role changes (since storage event doesn't fire in same window)
-    const interval = setInterval(loadUserRole, 500);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
   }, []);
 
   // Force mouse forwarding state based on auth and collapsed state
@@ -73,16 +50,36 @@ function App() {
     }
   }, [isCollapsed, isAuthenticated, authLoading]);
 
+  // Expand window to LoginFlow size when not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated && window.electronAPI?.window?.expandToLoginFlow) {
+      window.electronAPI.window.expandToLoginFlow();
+      console.log('🔄 Requested window expansion to LoginFlow size');
+    }
+
+    // Collapse window immediately when authenticated
+    if (!authLoading && isAuthenticated && window.electronAPI?.window?.collapseCopilot) {
+      window.electronAPI.window.collapseCopilot()
+        .then(() => console.log('✅ Window collapsed on auth state change'))
+        .catch(error => console.error('❌ Failed to collapse window:', error));
+    }
+  }, [isAuthenticated, authLoading]);
+
   async function checkAuthStatus() {
     try {
       console.log('🔐 Checking auth status...');
       if (window.electronAPI?.auth) {
         const result = await window.electronAPI.auth.getSession();
-        
+
         if (result.success && result.session) {
           console.log('✅ User is authenticated:', result.session.user);
           setIsAuthenticated(true);
           setCurrentUser(result.session.user);
+
+          // Extract user role from user object
+          const role = result.session.user?.user_role;
+          console.log('👤 User role:', role || 'none');
+          setUserRole(role);
         } else {
           console.log('⚠️ No active session found');
           setIsAuthenticated(false);
@@ -96,8 +93,15 @@ function App() {
     }
   }
 
-  function handleLoginSuccess(user, session) {
+  async function handleLoginSuccess(user, session) {
     console.log('✅ Login successful!', user);
+
+    // Extract and set user role
+    const role = user?.user_role;
+    console.log('👤 User role after login:', role || 'none');
+    setUserRole(role);
+
+    // Update state - this will trigger useEffect to collapse window
     setCurrentUser(user);
     setIsAuthenticated(true);
   }
@@ -226,11 +230,11 @@ function App() {
     );
   }
 
-  // Show login if not authenticated (wrapped in app container with pointer-events enabled)
+  // Show login if not authenticated (includes LoginFlow with role selection)
   if (!isAuthenticated) {
     return (
       <div className="app app-login">
-        <Login onLoginSuccess={handleLoginSuccess} />
+        <LoginFlow onLoginSuccess={handleLoginSuccess} />
       </div>
     );
   }
@@ -258,7 +262,7 @@ function App() {
   const isSettingsPage = window.location.hash === '#/settings';
   const hideNavigation = isTasksPage || isArchitecturePage || isIndexerPage || isMissionControlPage || isSettingsPage;
   
-  // If this is the secondary window, show the main UI (no orb)
+  // If this is the secondary window, show the main UI with tab bar (no orb)
   return (
     <div className="app app-secondary">
       {!hideNavigation && (
@@ -273,6 +277,8 @@ function App() {
           }} 
         />
       )}
+      {/* Tab Bar for easy navigation between views */}
+      <TabBar userRole={userRole} user={currentUser} onLogout={handleLogout} />
       <div className="app-content">
         <Routes>
           <Route path="/" element={<Navigate to="/tasks" replace />} />
@@ -286,6 +292,7 @@ function App() {
           <Route path="/indexer" element={<Indexer user={currentUser} />} />
           <Route path="/mission-control" element={<MissionControl user={currentUser} />} />
           <Route path="/settings" element={<Settings user={currentUser} />} />
+          <Route path="/diagnostic-microsoft" element={<DiagnosticMicrosoft />} />
         </Routes>
       </div>
     </div>

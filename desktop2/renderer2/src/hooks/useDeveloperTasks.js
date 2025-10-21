@@ -5,26 +5,39 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export function useDeveloperTasks() {
+export function useDeveloperTasks(user, assignmentView = 'all') {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   /**
    * Load developer tasks only (route_to: 'mission-control')
+   * Filtered by user role and assignment
    */
   const loadTasks = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await window.electronAPI.tasks.getAll({
-        routeTo: 'mission-control'
-      });
+      const filters = {
+        routeTo: 'mission-control',
+        userRole: user?.user_role || 'developer',
+        slackUserId: user?.slack_user_id
+      };
+
+      // Add assignment view filter if specified
+      if (assignmentView && assignmentView !== 'all') {
+        filters.assignmentView = assignmentView;
+      }
+
+      const response = await window.electronAPI.tasks.getAll(filters);
 
       if (response.success) {
         console.log('💻 Developer tasks loaded:', {
           count: response.tasks?.length || 0,
+          userRole: filters.userRole,
+          slackUserId: filters.slackUserId,
+          assignmentView: assignmentView,
           tasks: response.tasks
         });
         setTasks(response.tasks || []);
@@ -38,7 +51,7 @@ export function useDeveloperTasks() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user, assignmentView]);
 
   /**
    * Create a new developer task

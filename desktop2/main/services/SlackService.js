@@ -115,15 +115,52 @@ class SlackService extends EventEmitter {
   detectAndCreateTask(message) {
     try {
       const text = message.text.toLowerCase();
+      const originalText = message.text; // Keep original case for mention extraction
       
-      // Simple task detection keywords
-      const taskKeywords = ['task', 'todo', 'can you', 'could you', 'please', 'need to', 'should', 'must', 
-                           'follow up', 'reach out', 'schedule', 'meeting', 'call', 'connect'];
-      const hasTaskKeyword = taskKeywords.some(keyword => text.includes(keyword));
+      // Extract mentions to verify task assignment
+      const mentions = this.extractMentions(originalText);
       
-      if (!hasTaskKeyword) {
+      // Must have at least one mention to be a task assignment
+      if (mentions.length === 0) {
+        return; // No one to assign to
+      }
+      
+      // Check for polite request keywords (original logic)
+      const politeKeywords = ['task', 'todo', 'can you', 'could you', 'please', 'need to', 
+                              'should', 'must', 'need you to', 'want you to'];
+      const hasPoliteKeyword = politeKeywords.some(keyword => text.includes(keyword));
+      
+      // Check for imperative action verbs (NEW - matches workflow-analyzer.js)
+      const imperativeVerbs = ['schedule', 'set up', 'setup', 'create', 'send', 'draft', 'write',
+                               'call', 'email', 'contact', 'reach out', 'review', 'analyze', 
+                               'check', 'update', 'complete', 'prepare', 'organize', 'coordinate',
+                               'arrange', 'follow up', 'followup', 'respond', 'reply', 'book',
+                               'reserve', 'confirm', 'finalize', 'meeting', 'connect'];
+      const hasImperativeVerb = imperativeVerbs.some(verb => {
+        // Check if message starts with verb (after removing mention)
+        const textWithoutMention = text.replace(/<@[uw]\w+(\|\w+)?>/gi, '').trim();
+        return textWithoutMention.startsWith(verb);
+      });
+      
+      // Check if mention is immediately followed by imperative verb
+      // Pattern: @user schedule, @user send, etc.
+      const mentionImperativePattern = /<@[uw]\w+(?:\|\w+)?>\s+(schedule|set up|setup|create|send|draft|write|call|email|contact|reach out|review|analyze|check|update|complete|prepare|organize|coordinate|arrange|follow up|followup|respond|reply|book|reserve|confirm|finalize|meeting)/i;
+      const hasMentionWithImperative = mentionImperativePattern.test(originalText);
+      
+      // Task detection: polite keywords OR imperative verbs OR mention+imperative
+      const isTask = hasPoliteKeyword || hasImperativeVerb || hasMentionWithImperative;
+      
+      if (!isTask) {
         return; // Not a task
       }
+      
+      this.logger.info('Task detected in Slack message', {
+        hasPoliteKeyword,
+        hasImperativeVerb,
+        hasMentionWithImperative,
+        mentionCount: mentions.length,
+        text: text.substring(0, 100)
+      });
       
       // Detect calendar/outreach actions
       const calendarKeywords = ['meeting', 'schedule', 'calendar', 'call', 'sync', 'catch up', 'connect with'];
@@ -131,8 +168,7 @@ class SlackService extends EventEmitter {
       const isCalendarAction = calendarKeywords.some(keyword => text.includes(keyword));
       const isOutreachAction = outreachKeywords.some(keyword => text.includes(keyword));
       
-      // Count mentions to determine routing
-      const mentions = this.extractMentions(message.text);
+      // Use mention count from earlier extraction
       const mentionCount = mentions.length;
       
       // ROUTING LOGIC:

@@ -89,7 +89,7 @@ class JIRAOAuthHandler {
                       <p>Connected to: <strong>${result.site_url || 'JIRA'}</strong></p>
                       <p style="color: #666;">You can close this window and return to HeyJarvis.</p>
                       <script>
-                        setTimeout(() => window.close(), 3000);
+                        setTimeout(() => window.close(), 300);
                       </script>
                     </body>
                   </html>

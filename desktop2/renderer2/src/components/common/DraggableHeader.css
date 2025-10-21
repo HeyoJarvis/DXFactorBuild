@@ -1,0 +1,112 @@
+/* Draggable Header - Window Controls */
+.draggable-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0 12px;
+  user-select: none;
+  position: relative;
+  z-index: 1000;
+}
+
+.draggable-header-drag-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  -webkit-app-region: drag; /* Makes this area draggable */
+  cursor: move;
+}
+
+.draggable-header-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+}
+
+.draggable-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-app-region: no-drag; /* Buttons should be clickable, not draggable */
+}
+
+.draggable-header-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #737373;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+.draggable-header-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1d1d1f;
+}
+
+.draggable-header-btn:active {
+  transform: scale(0.95);
+}
+
+/* Minimize button */
+.draggable-header-btn.minimize:hover {
+  background: rgba(251, 191, 36, 0.15);
+  color: #F59E0B;
+}
+
+/* Maximize button */
+.draggable-header-btn.maximize:hover {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22C55E;
+}
+
+/* Close button */
+.draggable-header-btn.close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+}
+
+/* macOS style traffic lights (optional alternative) */
+.draggable-header.macos-style .draggable-header-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 4px;
+  border: none;
+}
+
+.draggable-header.macos-style .draggable-header-btn svg {
+  display: none;
+}
+
+.draggable-header.macos-style .draggable-header-btn.close {
+  background: #FF5F57;
+}
+
+.draggable-header.macos-style .draggable-header-btn.minimize {
+  background: #FFBD2E;
+}
+
+.draggable-header.macos-style .draggable-header-btn.maximize {
+  background: #28C940;
+}
+
+.draggable-header.macos-style .draggable-header-btn:hover svg {
+  display: block;
+  color: rgba(0, 0, 0, 0.7);
+  width: 8px;
+  height: 8px;
+}
+
