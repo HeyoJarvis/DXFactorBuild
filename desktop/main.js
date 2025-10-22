@@ -91,6 +91,8 @@ let emailMonitoring; // Email monitoring service (auto-task creation)
 let jiraCommandParser; // JIRA command parser (natural language)
 let engineeringIntelligence; // Engineering intelligence service
 let codeIndexer; // Code repository indexer for semantic search
+let jiraSemanticTranslator; // JIRA semantic translator (tech → business)
+let contextLinker; // Context linker (links JIRA to original Slack/email requests)
 let currentUser = null; // Currently authenticated user
 let conversationHistory = []; // Store conversation history
 let currentSessionId = null; // Track current conversation session
@@ -1846,7 +1848,85 @@ ipcMain.handle('jira:syncTasks', async (event, options = {}) => {
   }
 });
 
-console.log('✅ JIRA IPC handlers registered');
+// Semantic Translation Testing IPC Handlers
+ipcMain.handle('jira:getContext', async (event, issueKey) => {
+  try {
+    if (!contextLinker) {
+      return { success: false, error: 'Context linker not initialized' };
+    }
+
+    const context = await contextLinker.getOriginalContext(issueKey);
+    return {
+      success: true,
+      context: context || null,
+      message: context ? 'Context found' : 'No context stored for this issue'
+    };
+  } catch (error) {
+    console.error('❌ Get context error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('jira:translateIssue', async (event, issueKey) => {
+  try {
+    if (!jiraSemanticTranslator) {
+      return { success: false, error: 'Semantic translator not initialized' };
+    }
+
+    if (!jiraOAuthHandler || !jiraOAuthHandler.jiraService) {
+      return { success: false, error: 'JIRA not connected' };
+    }
+
+    // Fetch issue
+    const issue = await jiraOAuthHandler.jiraService.getIssue(issueKey);
+    if (!issue) {
+      return { success: false, error: 'Issue not found' };
+    }
+
+    // Get context
+    const originalContext = contextLinker ? await contextLinker.getOriginalContext(issueKey) : null;
+
+    // Translate
+    const translation = await jiraSemanticTranslator.translateIssueUpdate(issue, {
+      audiences: ['sales', 'executive', 'support', 'technical'],
+      originalContext
+    });
+
+    return {
+      success: true,
+      translation,
+      originalContext,
+      issue: {
+        key: issue.key,
+        summary: issue.fields?.summary,
+        status: issue.fields?.status?.name
+      }
+    };
+  } catch (error) {
+    console.error('❌ Translation error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('jira:listStoredContexts', async () => {
+  try {
+    if (!contextLinker) {
+      return { success: false, error: 'Context linker not initialized' };
+    }
+
+    const allContexts = contextLinker.getAllContexts();
+    return {
+      success: true,
+      contexts: allContexts,
+      count: allContexts.length
+    };
+  } catch (error) {
+    console.error('❌ List contexts error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+console.log('✅ JIRA IPC handlers registered (including semantic translation testing)');
 
 // Initialize services with auto-startup
 function initializeServices() {
@@ -1928,6 +2008,9 @@ function initializeServices() {
         logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info'
       });
       console.log('✅ JIRA OAuth handler initialized');
+
+      // Set up JIRA semantic translation event listeners
+      setupJIRASemanticTranslation();
     } catch (error) {
       console.warn('⚠️ JIRA OAuth initialization failed:', error.message);
       console.log('💡 JIRA features will be disabled. Add credentials to .env to enable.');
@@ -2131,8 +2214,26 @@ function initializeServices() {
     analysisWindow: 7, // days
     minPatternOccurrences: 3
   });
-  
+
   console.log('✅ Workflow detection systems initialized');
+
+  // Initialize JIRA Semantic Translator (translates tech language → business language)
+  const JIRASemanticTranslator = require('../core/intelligence/jira-semantic-translator');
+  jiraSemanticTranslator = new JIRASemanticTranslator({
+    logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+    model: 'claude-3-5-sonnet-20241022',
+    temperature: 0.3
+  });
+  console.log('✅ JIRA Semantic Translator initialized');
+
+  // Initialize Context Linker (links JIRA tickets to original Slack/email requests)
+  const ContextLinker = require('../core/intelligence/context-linker');
+  contextLinker = new ContextLinker(workflowIntelligence, {
+    logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+    maxContextAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    cleanupInterval: 24 * 60 * 60 * 1000 // Daily cleanup
+  });
+  console.log('✅ Context Linker initialized');
   
   // Initialize Slack service
   slackService = new SlackService();
@@ -3933,7 +4034,24 @@ function setupWorkflowDetection() {
                 title: taskData.title,
                       assigned_to: targetUser.email
               });
-              
+
+                    // Link context for semantic translation (JIRA updates → business language)
+                    if (contextLinker && result.task) {
+                      await contextLinker.linkIssueToContext(result.task.external_id || result.task.id, {
+                        source: 'slack',
+                        message: message.text,
+                        user: message.user,
+                        user_name: message.user_name,
+                        channel: message.channel,
+                        channel_name: message.channel_name,
+                        timestamp: message.timestamp,
+                        message_id: message.ts,
+                        work_analysis: workRequestAnalysis,
+                        workflow_data: workflowData
+                      });
+                      console.log('🔗 Context linked for future JIRA translation');
+                    }
+
                     // Notify UI if task is for current logged-in user
                     if (mainWindow && currentUser && targetUser.id === currentUser.id) {
                 mainWindow.webContents.send('task:created', result.task);
@@ -3974,7 +4092,24 @@ function setupWorkflowDetection() {
                       title: taskData.title,
                       delegated_to: mentionedSlackIds[0]
                     });
-                    
+
+                    // Link context for semantic translation
+                    if (contextLinker && result.task) {
+                      await contextLinker.linkIssueToContext(result.task.external_id || result.task.id, {
+                        source: 'slack',
+                        message: message.text,
+                        user: message.user,
+                        user_name: message.user_name,
+                        channel: message.channel,
+                        channel_name: message.channel_name,
+                        timestamp: message.timestamp,
+                        message_id: message.ts,
+                        work_analysis: workRequestAnalysis,
+                        workflow_data: workflowData
+                      });
+                      console.log('🔗 Context linked for future JIRA translation');
+                    }
+
                     // Notify UI if this is the current logged-in user
                     if (mainWindow && currentUser && senderUser.id === currentUser.id) {
                       mainWindow.webContents.send('task:created', result.task);
@@ -4043,7 +4178,24 @@ function setupWorkflowDetection() {
                     assignee: taskData.assignee,
                     isDelegation: isDelegation
                   });
-                  
+
+                  // Link context for semantic translation
+                  if (contextLinker && result.task) {
+                    await contextLinker.linkIssueToContext(result.task.external_id || result.task.id, {
+                      source: 'slack',
+                      message: message.text,
+                      user: message.user,
+                      user_name: message.user_name,
+                      channel: message.channel,
+                      channel_name: message.channel_name,
+                      timestamp: message.timestamp,
+                      message_id: message.ts,
+                      work_analysis: workRequestAnalysis,
+                      workflow_data: workflowData
+                    });
+                    console.log('🔗 Context linked for future JIRA translation');
+                  }
+
                   // Notify UI if task is for current logged-in user
                   if (mainWindow && currentUser && senderUser.id === currentUser.id) {
                     mainWindow.webContents.send('task:created', result.task);
@@ -4137,7 +4289,24 @@ function setupWorkflowDetection() {
                     created_for_user: targetUser.email,
                     slack_user_id: slackUserId
               });
-              
+
+                  // Link context for semantic translation
+                  if (contextLinker && result.task) {
+                    await contextLinker.linkIssueToContext(result.task.external_id || result.task.id, {
+                      source: 'slack',
+                      message: message.text,
+                      user: message.user,
+                      user_name: message.user_name,
+                      channel: message.channel,
+                      channel_name: message.channel_name,
+                      timestamp: message.timestamp,
+                      message_id: message.ts,
+                      work_analysis: workRequestAnalysis,
+                      workflow_data: workflowData
+                    });
+                    console.log('🔗 Context linked for future JIRA translation');
+                  }
+
                   // Notify UI if this task is for the current logged-in user
                   if (mainWindow && currentUser && targetUser.id === currentUser.id) {
                 mainWindow.webContents.send('task:created', result.task);
@@ -4172,6 +4341,129 @@ function setupWorkflowDetection() {
   });
   
   console.log('✅ Workflow detection integration complete');
+}
+
+/**
+ * Setup JIRA Semantic Translation
+ * Listens for JIRA issue updates and translates them to business language
+ */
+function setupJIRASemanticTranslation() {
+  if (!jiraOAuthHandler || !jiraOAuthHandler.jiraService) {
+    console.log('⚠️ JIRA service not available - semantic translation disabled');
+    return;
+  }
+
+  if (!jiraSemanticTranslator || !contextLinker) {
+    console.log('⚠️ Semantic translator or context linker not initialized');
+    return;
+  }
+
+  const jiraService = jiraOAuthHandler.jiraService;
+
+  // Listen for JIRA issue updates and translate them
+  jiraService.on('issue_updated', async (event) => {
+    try {
+      console.log('🔔 JIRA issue updated:', event.issue || event.issueKey);
+
+      // Get full issue details
+      const issueKey = event.issueKey || event.issue;
+      if (!issueKey) {
+        console.warn('⚠️ No issue key in JIRA update event');
+        return;
+      }
+
+      // Fetch full issue data
+      const issue = await jiraService.getIssue(issueKey);
+      if (!issue) {
+        console.warn('⚠️ Could not fetch issue details:', issueKey);
+        return;
+      }
+
+      // Only translate customer-facing issues
+      if (!jiraSemanticTranslator.isCustomerFacing(issue)) {
+        console.log('ℹ️ Issue not customer-facing, skipping translation:', issueKey);
+        return;
+      }
+
+      // Get original context (if this task was created from Slack/email)
+      const originalContext = await contextLinker.getOriginalContext(issueKey);
+
+      // Translate for sales and executives
+      const translated = await jiraSemanticTranslator.translateIssueUpdate(issue, {
+        audiences: ['sales', 'executive'],
+        originalContext
+      });
+
+      console.log('✅ JIRA issue translated:', {
+        issueKey,
+        audiences: Object.keys(translated.translations),
+        demoReady: translated.demo_ready?.ready,
+        confidence: translated.confidence
+      });
+
+      // Send translated update to Slack if demo-ready
+      if (translated.demo_ready?.ready && slackService) {
+        const salesTranslation = translated.translations.sales;
+        const slackMessage = {
+          text: `✅ *Demo Ready:* ${salesTranslation.summary}`,
+          blocks: [
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `✅ *Demo Ready:* ${salesTranslation.summary}\n\n*What You Can Demo:*\n${salesTranslation.demo_points?.map(p => `• ${p}`).join('\n') || 'N/A'}\n\n*Customer Benefit:* ${salesTranslation.customer_benefit || 'N/A'}\n*Timeline:* ${salesTranslation.timeline || 'Ready today'}`
+              }
+            },
+            {
+              type: 'context',
+              elements: [
+                {
+                  type: 'mrkdwn',
+                  text: `<${translated.issue_url}|View in JIRA: ${issueKey}>`
+                }
+              ]
+            }
+          ]
+        };
+
+        // Try to send to #sales channel
+        try {
+          await slackService.sendMessage('#sales', slackMessage);
+          console.log('📤 Sent demo notification to #sales');
+        } catch (slackError) {
+          console.warn('⚠️ Could not send to #sales:', slackError.message);
+        }
+      }
+
+      // Notify UI with translated update
+      if (mainWindow) {
+        mainWindow.webContents.send('jira:translated_update', {
+          issueKey,
+          translation: translated,
+          originalContext
+        });
+      }
+
+    } catch (error) {
+      console.error('❌ JIRA semantic translation failed:', error.message);
+      console.error('Stack:', error.stack);
+    }
+  });
+
+  // Listen for JIRA issue creation (for initial context linking)
+  jiraService.on('issue_created', async (event) => {
+    try {
+      console.log('🔔 JIRA issue created:', event.issueKey || event.id);
+
+      // If created manually (not from Slack), we won't have context
+      // This is OK - context linking is optional enhancement
+
+    } catch (error) {
+      console.error('❌ JIRA issue creation handling failed:', error.message);
+    }
+  });
+
+  console.log('✅ JIRA semantic translation enabled');
 }
 
 // Setup CRM startup event handlers

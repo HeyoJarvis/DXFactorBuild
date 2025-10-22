@@ -164,3 +164,14 @@
 {"level":"info","message":"OAuth server started","port":8893,"service":"google-oauth-handler","timestamp":"2025-10-21T15:44:23.061Z"}
 {"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-21T15:44:23.062Z"}
 {"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-21T15:44:36.150Z"}
+{"level":"info","message":"OAuth server started","port":8893,"service":"google-oauth-handler","timestamp":"2025-10-21T22:40:07.285Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-21T22:40:07.286Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-21T22:40:13.297Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-21T22:41:24.100Z"}
+{"level":"info","message":"OAuth server started","port":8893,"service":"google-oauth-handler","timestamp":"2025-10-22T02:55:20.725Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-22T02:55:20.725Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-22T02:55:26.712Z"}
+{"level":"info","message":"OAuth server started","port":8893,"service":"google-oauth-handler","timestamp":"2025-10-22T03:33:37.402Z"}
+{"authUrl":"https://accounts.google.com/o/oauth2/v2/auth?acces...","level":"info","message":"Authorization URL generated","service":"google-oauth-handler","timestamp":"2025-10-22T03:33:37.403Z"}
+{"email":"avi@heyjarvis.ai","level":"info","message":"Authentication successful","service":"google-oauth-handler","timestamp":"2025-10-22T03:33:44.523Z"}
+{"level":"info","message":"OAuth server stopped","service":"google-oauth-handler","timestamp":"2025-10-22T03:37:37.349Z"}

@@ -33,7 +33,7 @@ export default function TabBar({ userRole, user, onLogout }) {
     }
   }, [showDropdown]);
 
-  // Define tabs in the correct order: Mission Control, Code, Tasks
+  // Define tabs in the correct order: Mission Control, Code, Architecture, Tasks
   const tabs = [
     {
       id: 'mission-control',
@@ -44,6 +44,12 @@ export default function TabBar({ userRole, user, onLogout }) {
       id: 'indexer',
       path: '/indexer',
       label: 'Code',
+    },
+    {
+      id: 'architecture',
+      path: '/architecture',
+      label: 'Architecture',
+      roles: ['developer'] // Only show for developers
     },
     {
       id: 'tasks',

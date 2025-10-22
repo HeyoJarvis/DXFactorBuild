@@ -326,3 +326,15 @@
 {"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-21T15:44:19.986Z"}
 {"account":"avi@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-21T15:44:23.466Z"}
 {"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-21T15:44:28.472Z"}
+{"level":"info","message":"OAuth server started","port":8889,"service":"microsoft-oauth-handler","timestamp":"2025-10-21T22:40:04.605Z"}
+{"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-21T22:40:04.606Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-21T22:40:07.806Z"}
+{"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-21T22:40:12.809Z"}
+{"level":"info","message":"OAuth server started","port":8889,"service":"microsoft-oauth-handler","timestamp":"2025-10-22T02:55:14.950Z"}
+{"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-22T02:55:14.952Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-22T02:55:18.647Z"}
+{"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-22T02:55:23.653Z"}
+{"level":"info","message":"OAuth server started","port":8889,"service":"microsoft-oauth-handler","timestamp":"2025-10-22T03:33:31.512Z"}
+{"authUrl":"https://login.microsoftonline.com/common/oauth2/v2...","level":"info","message":"Authorization URL generated","service":"microsoft-oauth-handler","timestamp":"2025-10-22T03:33:31.513Z"}
+{"account":"avi@jarv1s.onmicrosoft.com","level":"info","message":"Authentication successful","service":"microsoft-oauth-handler","timestamp":"2025-10-22T03:33:35.580Z"}
+{"level":"info","message":"OAuth server stopped","service":"microsoft-oauth-handler","timestamp":"2025-10-22T03:33:40.586Z"}

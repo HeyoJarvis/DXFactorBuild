@@ -654,3 +654,657 @@
 .criteria-banner-list li:last-child {
   margin-bottom: 0;
 }
+
+/* Task Requirements Banner */
+.task-requirements-banner {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 2px solid #0284c7;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12);
+}
+
+.requirements-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.requirements-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.requirements-header-left svg {
+  flex-shrink: 0;
+  stroke: #0369a1;
+}
+
+.requirements-toggle {
+  display: flex;
+  gap: 6px;
+  background: white;
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn {
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toggle-btn:hover:not(:disabled) {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0369a1;
+}
+
+.toggle-btn.active {
+  background: #0284c7;
+  color: white;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.3);
+}
+
+.toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.requirements-content {
+  min-height: 60px;
+}
+
+/* Acceptance Criteria View */
+.acceptance-criteria {
+  padding: 8px 0;
+}
+
+.criteria-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.criteria-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #0c4a6e;
+  white-space: pre-wrap;
+}
+
+/* Product Requirements View */
+.product-requirements {
+  padding: 8px 0;
+}
+
+.generating-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  color: #0369a1;
+  font-size: 13px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(2, 132, 199, 0.2);
+  border-top-color: #0284c7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.no-requirements {
+  padding: 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.requirements-table {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #0c4a6e;
+}
+
+.requirements-table strong {
+  color: #0369a1;
+  font-weight: 700;
+}
+
+.requirements-table br {
+  margin: 4px 0;
+}
+
+/* Slack-highlighted items in red */
+.requirements-table .slack-item {
+  color: #ff4444;
+  font-weight: 500;
+}
+
+/* Empty description state */
+.empty-description {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.empty-description svg {
+  margin-bottom: 16px;
+  stroke: #cbd5e1;
+}
+
+.empty-description p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0 0 8px 0;
+}
+
+.empty-description .hint {
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Markdown Table Styling */
+.markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.markdown-table thead {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: white;
+}
+
+.markdown-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #0369a1;
+}
+
+.markdown-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+/* Handle nested paragraphs in table cells (from ADF) */
+.markdown-table th p,
+.markdown-table td p {
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+
+.markdown-table th p:not(:last-child),
+.markdown-table td p:not(:last-child) {
+  margin-bottom: 4px;
+  display: block;
+}
+
+.markdown-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-table tbody tr:hover {
+  background: rgba(2, 132, 199, 0.05);
+}
+
+/* Alternating row colors for better readability */
+.markdown-table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.markdown-table tbody tr:nth-child(even):hover {
+  background: rgba(2, 132, 199, 0.08);
+}
+
+/* Style for formatted text in tables */
+.markdown-table strong {
+  font-weight: 700;
+  color: #0369a1;
+}
+
+.markdown-table em {
+  font-style: italic;
+  color: #64748b;
+}
+
+/* Criteria text with tables */
+.criteria-text {
+  line-height: 1.6;
+}
+
+.criteria-text p {
+  margin: 0 0 12px 0;
+  color: #0c4a6e;
+}
+
+.criteria-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Empty description state */
+.empty-description {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #64748b;
+}
+
+.empty-description svg {
+  margin-bottom: 16px;
+  color: #94a3b8;
+}
+
+.empty-description p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  margin: 0 0 8px 0;
+}
+
+.empty-description .hint {
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Editable fields */
+.editable {
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.editable:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+
+.edit-icon {
+  opacity: 0;
+  margin-left: 6px;
+  transition: opacity 0.2s ease;
+  vertical-align: middle;
+}
+
+.editable:hover .edit-icon {
+  opacity: 0.5;
+}
+
+/* Title editing */
+.task-title-input {
+  width: 100%;
+  font-size: 18px;
+  font-weight: 700;
+  color: #171717;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  padding: 4px 8px;
+  border: 2px solid #0284c7;
+  border-radius: 6px;
+  background: white;
+  font-family: inherit;
+}
+
+.task-title-input:focus {
+  outline: none;
+  border-color: #0369a1;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.task-title-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.saving-indicator {
+  font-size: 11px;
+  color: #0284c7;
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+/* Repository editing */
+.repository-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.repository-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.repository-link:hover {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+}
+
+.repository-select {
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid #0284c7;
+  border-radius: 4px;
+  background: white;
+  color: #171717;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.repository-select:focus {
+  outline: none;
+  border-color: #0369a1;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.1);
+}
+
+/* Description editing */
+.criteria-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.edit-description-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: white;
+  border: 1px solid #0284c7;
+  border-radius: 6px;
+  color: #0284c7;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-description-btn:hover {
+  background: #0284c7;
+  color: white;
+}
+
+.description-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.description-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #0284c7;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  line-height: 1.6;
+  color: #1f2937;
+  background: white;
+  resize: vertical;
+  min-height: 200px;
+}
+
+.description-textarea:focus {
+  outline: none;
+  border-color: #0369a1;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.description-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.description-editor-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.save-btn {
+  background: #0284c7;
+  color: white;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #0369a1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Clickable fields - simpler UX */
+.clickable {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.clickable:hover {
+  opacity: 0.7;
+}
+
+/* Inline edit actions */
+.inline-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.inline-save-btn,
+.inline-cancel-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.inline-save-btn {
+  background: #0284c7;
+  color: white;
+}
+
+.inline-save-btn:hover:not(:disabled) {
+  background: #0369a1;
+}
+
+.inline-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inline-cancel-btn {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.inline-cancel-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.inline-cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Rich Description Editor */
+.description-editor-rich {
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 16px;
+  border: 2px solid #0284c7;
+  border-radius: 12px;
+  background: white;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  cursor: text;
+  transition: all 0.2s ease;
+}
+
+.description-editor-rich:focus {
+  outline: none;
+  border-color: #0369a1;
+  box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.2);
+}
+
+.description-editor-rich table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+  border: 1px solid #cbd5e1;
+}
+
+.description-editor-rich th,
+.description-editor-rich td {
+  border: 1px solid #cbd5e1;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.description-editor-rich th {
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #334155;
+}
+
+.description-editor-rich tr:hover {
+  background: #f8fafc;
+}
+
+.editor-hint {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  border-left: 3px solid #0284c7;
+}
+
+/* Make title more visually editable */
+.task-chat-name.clickable {
+  padding: 4px 8px;
+  margin: -4px -8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.task-chat-name.clickable:hover {
+  background: rgba(2, 132, 199, 0.1);
+  opacity: 1;
+}
+
+.task-title-input {
+  font-size: 20px;
+  font-weight: 700;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+/* Repository selector styling */
+.repository-link.editable {
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.repository-link.editable:hover {
+  background: rgba(2, 132, 199, 0.1);
+  opacity: 1;
+}
+
+.repository-select {
+  font-size: 12px;
+  padding: 4px 8px;
+  min-width: 150px;
+}

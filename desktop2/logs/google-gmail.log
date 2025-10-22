@@ -1466,3 +1466,419 @@
 {"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T16:39:22.993Z"}
 {"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T17:19:00.001Z"}
 {"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T17:19:04.610Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:34:27.107Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:37:59.694Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-21T22:40:07.286Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:40:13.027Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-21T22:40:13.184Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-21T23:40:12.183Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-21T22:40:13.297Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:40:16.889Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:40:16.898Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:40:17.120Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:40:17.121Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-21T22:40:17.813Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:40:18.832Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-21T22:40:20.164Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:40:21.155Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-21T22:40:28.510Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:40:29.730Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:44:10.171Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:44:10.172Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:44:10.212Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:44:36.525Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:44:36.525Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:46:35.174Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:46:35.175Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:46:35.205Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:46:41.695Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:46:41.698Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:46:41.948Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:46:41.958Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:47:12.583Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:47:12.584Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:47:12.643Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:52:08.863Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:52:08.864Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:52:08.911Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:53:54.360Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:53:54.362Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:53:54.588Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:53:54.622Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:54:37.897Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:54:37.897Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:54:37.944Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:56:32.606Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:56:32.606Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:56:32.713Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:57:25.827Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:57:25.828Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:57:25.830Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:58:03.577Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:58:03.576Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:58:03.701Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T22:58:29.939Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T22:58:29.939Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:58:39.133Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:58:39.146Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:58:39.390Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:58:39.426Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:58:41.299Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T22:58:41.302Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:58:41.545Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T22:58:41.546Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:17:18.549Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:17:18.550Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:17:18.683Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:19:21.379Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:19:21.380Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:19:21.425Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:20:47.839Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:20:47.839Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:20:47.983Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:21:17.350Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:21:17.351Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:21:17.502Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:21:49.834Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:21:49.835Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:21:49.937Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:23:10.044Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:23:10.043Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:23:10.152Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:23:30.214Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:23:30.213Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:23:30.379Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:24:43.350Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:24:43.350Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:24:43.352Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:25:47.957Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:25:47.958Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:25:47.984Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:26:10.296Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:26:10.297Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:26:18.932Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:26:18.940Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:26:19.170Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:26:19.172Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:27:02.805Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:27:02.806Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:27:02.842Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:27:15.974Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:27:15.976Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:27:16.273Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:27:16.274Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:29:29.999Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:29:29.999Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:29:30.105Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:30:00.267Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:30:00.276Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:30:00.525Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:30:00.528Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:30:20.792Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:30:20.793Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:30:20.796Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:31:24.698Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:31:24.699Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:31:24.713Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:33:12.123Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:33:12.123Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:33:12.135Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:33:26.576Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:33:26.576Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:33:53.511Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:33:53.512Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:33:53.745Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:34:03.851Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:34:03.852Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:34:03.884Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:35:47.821Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:35:47.822Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:35:47.824Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:36:04.694Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:36:04.694Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:36:15.702Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:36:15.708Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:36:16.149Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:36:16.150Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:36:22.319Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:36:22.320Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:36:22.393Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:36:43.912Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:36:43.912Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:36:43.944Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:38:12.699Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:38:12.700Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:38:12.884Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:39:23.583Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:39:23.584Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:39:23.607Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:40:31.909Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:40:31.909Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:40:31.952Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:40:46.400Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:40:46.401Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:40:46.480Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:40:56.459Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:40:56.467Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:40:56.860Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:40:56.871Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:40:58.347Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:40:58.348Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:40:58.572Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:40:58.584Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:42:33.337Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:42:33.336Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:42:33.434Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:50:04.159Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:50:04.169Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:50:04.550Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:50:04.551Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:50:10.767Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:50:10.767Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:50:10.994Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:50:10.998Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-21T23:50:12.593Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:50:12.802Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-21T23:50:13.666Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-21T23:50:14.570Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:51:32.291Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:51:32.292Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:51:32.344Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:52:53.439Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:52:53.439Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:52:53.445Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:53:15.333Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:53:15.334Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:53:15.394Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:53:36.789Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:53:36.790Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:53:36.810Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:54:35.363Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:54:35.364Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:54:35.388Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:55:42.723Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:55:42.722Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:55:42.783Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:56:52.216Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:56:52.216Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:56:52.296Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:57:09.690Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-21T23:57:09.691Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-21T23:57:09.732Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T00:47:02.731Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T00:47:02.732Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T00:47:02.833Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:09.200Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:09.202Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:09.589Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:09.593Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:29.289Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:29.290Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:29.567Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:29.685Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:30.923Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:31.143Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:36.226Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:36.227Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:36.502Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:36.503Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T00:47:37.020Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:38.145Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T00:47:39.940Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:40.955Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:41.272Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:41.491Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:43.697Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:43.910Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:46.131Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:46.360Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:47.377Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:47.597Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T00:47:51.151Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:52.626Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T00:47:54.105Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T00:47:54.473Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:22:42.554Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:36:58.768Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:37:14.006Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:37:45.320Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:39:00.088Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:39:43.655Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:40:20.233Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:41:03.364Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:42:00.031Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:43:27.201Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:46:36.361Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:47:51.854Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:49:04.487Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:49:57.562Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:51:42.316Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:53:54.507Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:54:22.903Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-22T02:55:20.725Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-22T02:55:26.401Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-22T02:55:26.632Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-22T03:55:25.631Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-22T02:55:26.712Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T02:55:31.351Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T02:55:31.353Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:55:31.684Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:55:31.699Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T02:55:36.912Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T02:55:36.925Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:55:37.198Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:55:37.302Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T02:55:41.208Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:55:41.498Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T02:55:42.779Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:55:44.834Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T02:55:55.516Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:55:55.729Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T02:55:57.343Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:55:58.703Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T02:56:05.330Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T02:56:06.301Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:57:43.995Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T02:57:43.996Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:57:44.027Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T02:58:04.518Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T02:58:04.518Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:00:25.290Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:00:25.291Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:00:25.317Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:03:06.030Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:03:06.031Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:03:06.173Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:04:00.584Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:04:00.585Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:04:00.623Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:04:52.027Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:04:52.029Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:04:52.084Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:06:47.492Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:06:58.202Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:06:58.201Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:08:28.209Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:08:28.227Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:08:28.478Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:08:28.544Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:09:48.753Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:09:48.753Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:09:48.824Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:10:25.100Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:10:25.242Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:10:25.421Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:10:25.466Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:10:26.056Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:10:26.059Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:10:26.295Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:10:26.299Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:10:59.378Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:10:59.378Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:10:59.505Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:14:08.844Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:14:08.845Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:14:08.887Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:14:22.964Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:14:33.145Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:14:33.145Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:14:46.652Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:14:46.652Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:14:46.654Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:15:05.664Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:15:05.664Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:15:41.774Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:15:48.547Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:15:48.548Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:16:29.067Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:16:29.071Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:16:29.351Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:16:29.353Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:16:53.886Z"}
+{"hasAccessToken":true,"hasRefreshToken":true,"level":"info","message":"Google Gmail Service initialized with existing tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:16:53.886Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:17:02.152Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:17:02.175Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:17:02.387Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:17:02.407Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:17:05.681Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:17:05.888Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:18:55.370Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:18:55.375Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:18:55.590Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:18:55.599Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:18:56.443Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:18:56.677Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:18:57.567Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:18:57.841Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T03:19:16.830Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:19:17.924Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:20:15.830Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:20:16.025Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:20:16.083Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:20:16.249Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:20:32.782Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:20:32.791Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:20:33.020Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:20:33.048Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:20:40.479Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:20:40.484Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:20:40.700Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:20:40.748Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:20:56.631Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:20:56.975Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:20:59.192Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:20:59.445Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:21:01.112Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:21:01.438Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T03:21:06.675Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:21:07.768Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:21:18.557Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:21:18.561Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:21:18.823Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:21:18.838Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:21:40.940Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:21:41.167Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T03:21:42.840Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:21:43.731Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:21:49.578Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:21:49.810Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:23:00.906Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:23:00.907Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:23:01.085Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:23:01.100Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:23:01.156Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:23:01.157Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:23:01.305Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:23:01.315Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:23:02.880Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:23:03.132Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:23:03.988Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:23:04.217Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:23:51.182Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:25:53.225Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:32:52.401Z"}
+{"level":"info","message":"Google Gmail Service initialized without tokens","redirectUri":"http://localhost:8893/auth/google/callback","scopes":7,"service":"google-gmail-service","timestamp":"2025-10-22T03:33:04.663Z"}
+{"level":"info","message":"Generated auth URL","scopes":7,"service":"google-gmail-service","state":null,"timestamp":"2025-10-22T03:33:37.403Z"}
+{"level":"info","message":"Exchanging authorization code for tokens","service":"google-gmail-service","timestamp":"2025-10-22T03:33:44.231Z"}
+{"level":"info","message":"API clients initialized","service":"google-gmail-service","timestamp":"2025-10-22T03:33:44.438Z"}
+{"email":"avi@heyjarvis.ai","expiresOn":"2025-10-22T04:33:43.438Z","level":"info","message":"Successfully authenticated with Google","service":"google-gmail-service","timestamp":"2025-10-22T03:33:44.523Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:34:59.977Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:34:59.992Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:00.226Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:00.243Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:35:01.555Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:01.780Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:35:08.279Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:08.503Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:35:27.046Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:35:27.048Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:27.263Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:27.286Z"}
+{"endDateTime":"2025-10-28T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:35:29.132Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:29.344Z"}
+{"endDateTime":"2025-10-22T06:00:00.000Z","level":"info","maxResults":50,"message":"Fetching upcoming calendar events","service":"google-gmail-service","startDateTime":"2025-10-21T06:00:00.000Z","timestamp":"2025-10-22T03:35:30.454Z"}
+{"count":0,"level":"info","message":"Calendar events fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:30.683Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T03:35:39.063Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:40.165Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T03:35:51.249Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:35:52.337Z"}
+{"level":"info","maxResults":50,"message":"Fetching unread emails","service":"google-gmail-service","timestamp":"2025-10-22T03:36:09.716Z"}
+{"count":50,"level":"info","message":"Unread emails fetched","service":"google-gmail-service","timestamp":"2025-10-22T03:36:10.841Z"}

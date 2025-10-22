@@ -133,7 +133,7 @@ function registerTaskHandlers(services, logger) {
           title: result.task.session_title,
           priority: result.task.workflow_metadata?.priority,
           status: result.task.is_completed ? 'completed' : 'todo',
-          updatedAt: result.task.last_activity_at
+          updatedAt: result.task.last_message_at
         }
       };
     } catch (error) {

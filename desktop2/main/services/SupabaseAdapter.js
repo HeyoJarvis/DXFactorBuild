@@ -110,30 +110,57 @@ class DesktopSupabaseAdapter {
   /**
    * Save a message to a conversation session
    */
-  async saveMessageToSession(sessionId, message, role = 'user', metadata = {}) {
+  async saveMessageToSession(sessionId, message, role = 'user', metadata = {}, userId = null) {
     try {
+      // If userId not provided, try to get from session
+      if (!userId) {
+        const { data: session } = await this.supabase
+          .from('conversation_sessions')
+          .select('user_id')
+          .eq('id', sessionId)
+          .single();
+
+        userId = session?.user_id;
+      }
+
+      if (!userId) {
+        throw new Error('user_id is required for message insertion');
+      }
+
       const { data, error } = await this.supabase
         .from('conversation_messages')
         .insert([{
           session_id: sessionId,
+          user_id: userId,  // ✅ Added required field
           message_text: message,
           role: role,
-          metadata: metadata,
+          metadata: metadata,  // ✅ Use actual column name from schema
           timestamp: new Date().toISOString()
         }])
         .select();
 
       if (error) throw error;
 
-      this.logger.debug('Message saved to session', { 
+      // Update session's last_message_at and message_count manually (since trigger might fail)
+      // Note: We rely on the database trigger to update message_count
+      await this.supabase
+        .from('conversation_sessions')
+        .update({
+          last_message_at: new Date().toISOString()
+        })
+        .eq('id', sessionId)
+        .catch(err => this.logger.warn('Failed to update session metadata', { error: err.message }));
+
+      this.logger.debug('Message saved to session', {
         session_id: sessionId,
+        user_id: userId,
         role,
-        message_length: message.length 
+        message_length: message.length
       });
-      
+
       return { success: true, data };
     } catch (error) {
-      this.logger.error('Failed to save message to session', { 
+      this.logger.error('Failed to save message to session', {
         error: error.message,
         session_id: sessionId
       });
@@ -199,8 +226,8 @@ class DesktopSupabaseAdapter {
           .eq('user_id', userId)
           .eq('is_active', true)
           .eq('workflow_type', 'general')
-          .gte('last_activity_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-          .order('last_activity_at', { ascending: false })
+          .gte('last_message_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .order('last_message_at', { ascending: false })
           .limit(1);
 
         if (fetchError) throw fetchError;
@@ -281,7 +308,7 @@ class DesktopSupabaseAdapter {
         .from('conversation_sessions')
         .select('*')
         .eq('user_id', userId)
-        .order('last_activity_at', { ascending: false })
+        .order('last_message_at', { ascending: false })
         .limit(limit);
 
       if (error) throw error;
@@ -436,8 +463,8 @@ class DesktopSupabaseAdapter {
         .eq('user_id', userId)
         .eq('is_active', true)
         .eq('is_completed', false)
-        .gte('last_activity_at', cutoffTime.toISOString())
-        .order('last_activity_at', { ascending: false })
+        .gte('last_message_at', cutoffTime.toISOString())
+        .order('last_message_at', { ascending: false })
         .limit(1);
 
       if (error) throw error;
@@ -512,7 +539,7 @@ class DesktopSupabaseAdapter {
       }
 
       query = query
-        .order('last_activity_at', { ascending: false })
+        .order('last_message_at', { ascending: false })
         .limit(limit);
 
       const { data, error } = await query;
@@ -656,7 +683,13 @@ class DesktopSupabaseAdapter {
         title: taskData.title,
         user_role: userRole,
         route_to: taskData.routeTo || defaultRoute,
-        work_type: taskData.workType || 'task'
+        work_type: taskData.workType || 'task',
+        assignee: taskData.assignee,
+        assignor: taskData.assignor,
+        mentioned_users: taskData.mentionedUsers,
+        external_key: taskData.externalKey,
+        external_id: taskData.externalId,
+        external_source: taskData.externalSource
       });
       return { success: true, task: data };
     } catch (error) {
@@ -722,28 +755,43 @@ class DesktopSupabaseAdapter {
         external_url: session.workflow_metadata?.external_url || null,
         external_source: session.workflow_metadata?.external_source || null,
         created_at: session.started_at,
-        updated_at: session.last_activity_at,
+        updated_at: session.last_message_at,
         completed_at: session.completed_at
       }));
 
       // Get user's Slack ID for assignment filtering
       const userSlackId = filters.slackUserId;
 
+      this.logger.debug('Task assignment filtering', {
+        totalTasksBeforeFilter: tasks.length,
+        userId,
+        userSlackId
+      });
+
       // Apply user assignment filtering - user must be owner, assignee, assignor, or mentioned
       tasks = tasks.filter(task => {
-        // User owns the task
-        if (task.user_id === userId) return true;
+        const isOwner = task.user_id === userId;
+        const isAssignee = userSlackId && task.assignee === userSlackId;
+        const isAssignor = userSlackId && task.assignor === userSlackId;
+        const isMentioned = userSlackId && task.mentioned_users?.includes(userSlackId);
+        
+        const hasAccess = isOwner || isAssignee || isAssignor || isMentioned;
 
-        // User is assigned the task (by Slack ID)
-        if (userSlackId && task.assignee === userSlackId) return true;
+        if (!hasAccess) {
+          this.logger.debug('Task filtered out', {
+            task_id: task.id,
+            task_title: task.title,
+            task_assignee: task.assignee,
+            task_assignor: task.assignor,
+            task_mentioned_users: task.mentioned_users,
+            isOwner,
+            isAssignee,
+            isAssignor,
+            isMentioned
+          });
+        }
 
-        // User assigned the task to someone else (by Slack ID)
-        if (userSlackId && task.assignor === userSlackId) return true;
-
-        // User is mentioned in the task (by Slack ID)
-        if (userSlackId && task.mentioned_users?.includes(userSlackId)) return true;
-
-        return false;
+        return hasAccess;
       });
 
       // Apply assignment view filtering (for "My Tasks", "Assigned by Me", "Assigned to Me" tabs)
@@ -944,11 +992,14 @@ class DesktopSupabaseAdapter {
    */
   async getTaskByExternalId(externalId) {
     try {
+      // Use JSONB operator to query external_id field
       const { data, error } = await this.supabase
         .from('conversation_sessions')
         .select('*')
         .eq('workflow_type', 'task')
-        .contains('workflow_metadata', { externalId: externalId });
+        .eq('workflow_metadata->>external_id', externalId)
+        .order('started_at', { ascending: false })
+        .limit(1);
 
       if (error && error.code !== 'PGRST116') { // Ignore "not found" error
         throw error;
@@ -962,6 +1013,12 @@ class DesktopSupabaseAdapter {
           this.logger.info('Task found by external ID', { 
             external_id: externalId,
             task_id: task.id 
+          });
+        }
+      } else {
+        if (this.logger.info) {
+          this.logger.info('Task NOT found by external ID', { 
+            external_id: externalId
           });
         }
       }

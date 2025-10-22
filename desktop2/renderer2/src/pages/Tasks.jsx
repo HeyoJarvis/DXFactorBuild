@@ -12,7 +12,8 @@ export default function Tasks({ user }) {
     loading,
     updateTask,
     deleteTask,
-    toggleTask
+    toggleTask,
+    refreshTasks
   } = useSalesTasks(user, assignmentView);
   
   const [chatTask, setChatTask] = useState(null);
@@ -52,6 +53,18 @@ export default function Tasks({ user }) {
       await toggleTask(taskId, currentStatus);
     } catch (error) {
       console.error('Failed to toggle task:', error);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setIsSyncing(true);
+    try {
+      await refreshTasks();
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Failed to refresh tasks:', error);
+    } finally {
+      setTimeout(() => setIsSyncing(false), 1000);
     }
   };
 
@@ -102,6 +115,28 @@ export default function Tasks({ user }) {
             <div className="sync-status">
               <div className={`sync-dot ${isSyncing ? 'syncing' : ''}`}></div>
               <span className="sync-text">Synced from Slack</span>
+              <button 
+                className="refresh-button"
+                onClick={handleRefresh}
+                disabled={isSyncing}
+                title="Refresh tasks"
+              >
+                <svg 
+                  className={`refresh-icon ${isSyncing ? 'spinning' : ''}`} 
+                  width="14" 
+                  height="14" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+              </button>
             </div>
           </div>
 

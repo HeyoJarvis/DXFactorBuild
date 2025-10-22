@@ -142,20 +142,30 @@ export function useSalesTasks(user, assignmentView = 'all') {
     };
   }, [tasks]);
 
-  // Load tasks on mount
+  // Load tasks on mount and set up auto-refresh
   useEffect(() => {
     loadTasks();
     
     // Listen for task created events from main process
+    let taskCreatedCleanup;
     if (window.electronAPI?.onTaskCreated) {
-      const cleanup = window.electronAPI.onTaskCreated(() => {
+      taskCreatedCleanup = window.electronAPI.onTaskCreated(() => {
         console.log('🔔 Task created event received, refreshing sales tasks');
         // Auto-refresh tasks when new task is created from Slack
         loadTasks();
       });
-      
-      return cleanup;
     }
+    
+    // Set up periodic refresh every 30 seconds to catch external changes
+    const refreshInterval = setInterval(() => {
+      console.log('🔄 Auto-refreshing sales tasks (periodic)');
+      loadTasks();
+    }, 30000); // 30 seconds
+    
+    return () => {
+      if (taskCreatedCleanup) taskCreatedCleanup();
+      clearInterval(refreshInterval);
+    };
   }, [loadTasks]);
 
   return {

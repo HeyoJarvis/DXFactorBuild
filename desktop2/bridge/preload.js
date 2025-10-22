@@ -23,7 +23,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     
     // Task chat
     sendChatMessage: (taskId, message, context) => ipcRenderer.invoke('tasks:sendChatMessage', taskId, message, context),
-    getChatHistory: (taskId) => ipcRenderer.invoke('tasks:getChatHistory', taskId)
+    getChatHistory: (taskId) => ipcRenderer.invoke('tasks:getChatHistory', taskId),
+    
+    // Product requirements generation (silent, no chat history)
+    generateProductRequirements: (taskId, taskData) => ipcRenderer.invoke('tasks:generateProductRequirements', taskId, taskData)
   },
   
   // Task event listeners

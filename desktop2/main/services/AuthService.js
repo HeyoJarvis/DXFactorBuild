@@ -720,10 +720,26 @@ class AuthService {
         
         // Save refreshed session
         this.currentSession = data.session;
-        this.currentUser = storedSession.user;
+        
+        // Fetch latest user data from database
+        const { data: dbUser, error: dbError } = await this.supabase
+          .from('users')
+          .select('*')
+          .eq('id', storedSession.user.id)
+          .single();
+        
+        if (dbError || !dbUser) {
+          this.logger.warn('Failed to fetch user from database during refresh, using cached version');
+          this.currentUser = storedSession.user;
+        } else {
+          this.currentUser = dbUser;
+        }
+        
         this.saveSession(data.session, this.currentUser);
         
-        this.logger.info('Session refreshed successfully');
+        this.logger.info('Session refreshed successfully', { 
+          user_role: this.currentUser.user_role 
+        });
         return { session: this.currentSession, user: this.currentUser };
       }
       
@@ -740,9 +756,32 @@ class AuthService {
       }
       
       this.currentSession = data.session;
-      this.currentUser = storedSession.user;
       
-      this.logger.info('Session loaded successfully', { user_id: this.currentUser.id });
+      // Fetch latest user data from database (don't use cached version)
+      const { data: dbUser, error: dbError } = await this.supabase
+        .from('users')
+        .select('*')
+        .eq('id', storedSession.user.id)
+        .single();
+      
+      if (dbError || !dbUser) {
+        this.logger.warn('Failed to fetch user from database, using cached version', { 
+          error: dbError?.message 
+        });
+        this.currentUser = storedSession.user;
+      } else {
+        // Use fresh data from database (includes latest user_role)
+        this.currentUser = dbUser;
+        this.logger.info('User data refreshed from database', { 
+          user_id: dbUser.id,
+          user_role: dbUser.user_role 
+        });
+      }
+      
+      this.logger.info('Session loaded successfully', { 
+        user_id: this.currentUser.id,
+        user_role: this.currentUser.user_role 
+      });
       
       return { session: this.currentSession, user: this.currentUser };
       

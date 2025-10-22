@@ -937,7 +937,12 @@ class JIRAService extends EventEmitter {
         payload.fields.summary = updateData.summary;
       }
 
-      if (updateData.description) {
+      // Handle description - can be plain text or ADF object
+      if (updateData.descriptionADF) {
+        // Full ADF object provided (from rich editor)
+        payload.fields.description = updateData.descriptionADF;
+      } else if (updateData.description) {
+        // Plain text - wrap in ADF
         payload.fields.description = {
           type: 'doc',
           version: 1,

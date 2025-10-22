@@ -17,6 +17,14 @@ function TasksDeveloper({ user }) {
   const [jiraSiteUrl, setJiraSiteUrl] = useState('');
   const [syncStatus, setSyncStatus] = useState('');
   const [error, setError] = useState(null);
+  
+  // Inline editing states
+  const [editingTitle, setEditingTitle] = useState(null); // taskId being edited
+  const [editedTitleValue, setEditedTitleValue] = useState('');
+  const [editingRepo, setEditingRepo] = useState(null); // taskId being edited
+  const [editedRepoValue, setEditedRepoValue] = useState('');
+  const [availableRepos, setAvailableRepos] = useState([]);
+  const [savingTask, setSavingTask] = useState(null);
 
   // Mock JIRA feature progress items (epic-level with sub-tasks)
   const mockActionItems = [
@@ -260,7 +268,102 @@ Acceptance Criteria:
   useEffect(() => {
     checkJIRAConnection();
     loadJIRAIssues();
+    loadAvailableRepositories();
   }, []);
+  
+  // Load available GitHub repositories
+  const loadAvailableRepositories = async () => {
+    try {
+      const response = await window.electronAPI.codeIndexer.listRepositories();
+      if (response.success && response.repositories) {
+        setAvailableRepos(response.repositories.map(repo => repo.name || repo.full_name));
+      }
+    } catch (error) {
+      console.error('Failed to load repositories:', error);
+    }
+  };
+  
+  // Start editing title
+  const startEditingTitle = (item) => {
+    setEditingTitle(item.id);
+    setEditedTitleValue(item.title);
+  };
+  
+  // Save title
+  const saveTitle = async (item) => {
+    if (!editedTitleValue.trim()) {
+      alert('Title cannot be empty');
+      return;
+    }
+    
+    setSavingTask(item.id);
+    try {
+      const response = await window.electronAPI.jira.updateIssue(item.id, {
+        summary: editedTitleValue
+      });
+      
+      if (response.success) {
+        // Update local state
+        setActionItems(prev => prev.map(task => 
+          task.id === item.id ? { ...task, title: editedTitleValue } : task
+        ));
+        setEditingTitle(null);
+      } else {
+        alert('Failed to update title: ' + (response.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to save title:', error);
+      alert('Failed to update title');
+    } finally {
+      setSavingTask(null);
+    }
+  };
+  
+  // Cancel title edit
+  const cancelTitleEdit = () => {
+    setEditingTitle(null);
+    setEditedTitleValue('');
+  };
+  
+  // Start editing repository
+  const startEditingRepo = (item) => {
+    setEditingRepo(item.id);
+    setEditedRepoValue(item.repository);
+  };
+  
+  // Save repository
+  const saveRepository = async (item) => {
+    setSavingTask(item.id);
+    try {
+      // Update JIRA with repository link
+      const response = await window.electronAPI.jira.updateIssue(item.id, {
+        customFields: {
+          repository: editedRepoValue
+        }
+      });
+      
+      if (response.success) {
+        // Update local state
+        setActionItems(prev => prev.map(task => 
+          task.id === item.id ? { ...task, repository: editedRepoValue } : task
+        ));
+        setEditingRepo(null);
+      } else {
+        alert('Failed to update repository: ' + (response.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to save repository:', error);
+      alert('Failed to update repository');
+    } finally {
+      setSavingTask(null);
+    }
+  };
+  
+  // Cancel repository edit
+  const cancelRepoEdit = () => {
+    setEditingRepo(null);
+    setEditedRepoValue('');
+  };
 
   // Check JIRA connection status
   const checkJIRAConnection = async () => {
@@ -368,14 +471,16 @@ Acceptance Criteria:
     let userStory = null;
     let acceptanceCriteria = [];
     
-    // Ensure description is a string (JIRA can return null or object)
-    const description = typeof issue.description === 'string' ? issue.description : '';
+    // For parsing, convert description to string if it's an object (ADF format)
+    // But we'll keep the original for the task object
+    const descriptionForParsing = typeof issue.description === 'string' ? issue.description : 
+                                   (issue.description ? JSON.stringify(issue.description) : '');
     
-    if (description) {
-      // Try to parse user story format
-      const asAMatch = description.match(/As a\s+(.+?)[\n\r]/i);
-      const whenIMatch = description.match(/(?:When I|I want to)\s+(.+?)[\n\r]/i);
-      const soThatMatch = description.match(/(?:So that|In order to)\s+(.+?)[\n\r]/i);
+    if (descriptionForParsing) {
+      // Try to parse user story format (only works for plain text descriptions)
+      const asAMatch = descriptionForParsing.match(/As a\s+(.+?)[\n\r]/i);
+      const whenIMatch = descriptionForParsing.match(/(?:When I|I want to)\s+(.+?)[\n\r]/i);
+      const soThatMatch = descriptionForParsing.match(/(?:So that|In order to)\s+(.+?)[\n\r]/i);
       
       if (asAMatch || whenIMatch || soThatMatch) {
         userStory = {
@@ -385,8 +490,8 @@ Acceptance Criteria:
         };
       }
 
-      // Parse acceptance criteria
-      const acMatch = description.match(/Acceptance Criteria:?\s*\n([\s\S]*?)(?:\n\n|\n[A-Z]|$)/i);
+      // Parse acceptance criteria (only works for plain text descriptions)
+      const acMatch = descriptionForParsing.match(/Acceptance Criteria:?\s*\n([\s\S]*?)(?:\n\n|\n[A-Z]|$)/i);
       if (acMatch) {
         acceptanceCriteria = acMatch[1]
           .split('\n')
@@ -410,7 +515,7 @@ Acceptance Criteria:
         'Code reviewed',
         'Documentation updated'
       ],
-      description: description || issue.summary,
+      description: issue.description || issue.summary, // Keep original description (ADF object or string)
       assignees: issue.assignee ? [issue.assignee.display_name || issue.assignee.name || 'Unassigned'] : ['Unassigned'],
       priority: issue.priority?.name || 'Medium',
       status: issue.status?.name || 'To Do',
@@ -433,7 +538,10 @@ Acceptance Criteria:
       cycleTime: calculateCycleTime(issue),
       sprint: issue.sprint || 'Backlog',
       blockReason: issue.status?.name === 'Blocked' ? (issue.blocked_reason || 'Waiting on dependencies') : null,
-      jiraUrl: issue.url
+      jiraUrl: issue.url,
+      external_source: 'jira', // Mark as JIRA task for inline editing
+      external_url: issue.url,
+      external_key: issue.key
     };
   };
 
@@ -692,7 +800,42 @@ Acceptance Criteria:
                       <div className="title-group">
                         <div className="title-main-row">
                           <span className="feature-jira-key">{item.id}</span>
-                          <h3 className="feature-task-title">{item.title}</h3>
+                          {editingTitle === item.id ? (
+                            <div className="inline-title-edit">
+                              <input
+                                type="text"
+                                value={editedTitleValue}
+                                onChange={(e) => setEditedTitleValue(e.target.value)}
+                                className="title-edit-input"
+                                autoFocus
+                                disabled={savingTask === item.id}
+                              />
+                              <div className="inline-edit-actions">
+                                <button 
+                                  className="save-btn-inline" 
+                                  onClick={() => saveTitle(item)}
+                                  disabled={savingTask === item.id}
+                                >
+                                  {savingTask === item.id ? 'Saving...' : 'Save'}
+                                </button>
+                                <button 
+                                  className="cancel-btn-inline" 
+                                  onClick={cancelTitleEdit}
+                                  disabled={savingTask === item.id}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <h3 
+                              className="feature-task-title editable-title" 
+                              onClick={() => startEditingTitle(item)}
+                              title="Click to edit title"
+                            >
+                              {item.title}
+                            </h3>
+                          )}
                         </div>
                         <p className="feature-epic-subtitle">{item.epicName}</p>
                       </div>
@@ -733,11 +876,49 @@ Acceptance Criteria:
                             <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
                           </svg>
                         </div>
-                        <div className="tech-content">
-                          <span className="tech-repo">{item.repository}</span>
-                          <span className="tech-divider">/</span>
-                          <span className="tech-branch">{item.branch}</span>
-                        </div>
+                        {editingRepo === item.id ? (
+                          <div className="repo-edit-container">
+                            <select
+                              value={editedRepoValue}
+                              onChange={(e) => setEditedRepoValue(e.target.value)}
+                              className="repo-select"
+                              disabled={savingTask === item.id}
+                            >
+                              <option value="">Select repository</option>
+                              {availableRepos.map(repo => (
+                                <option key={repo} value={repo}>{repo}</option>
+                              ))}
+                            </select>
+                            <div className="inline-edit-actions-small">
+                              <button 
+                                className="save-btn-small" 
+                                onClick={() => saveRepository(item)}
+                                disabled={savingTask === item.id}
+                              >
+                                ✓
+                              </button>
+                              <button 
+                                className="cancel-btn-small" 
+                                onClick={cancelRepoEdit}
+                                disabled={savingTask === item.id}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="tech-content">
+                            <span 
+                              className="tech-repo editable-repo" 
+                              onClick={() => startEditingRepo(item)}
+                              title="Click to change repository"
+                            >
+                              {item.repository}
+                            </span>
+                            <span className="tech-divider">/</span>
+                            <span className="tech-branch">{item.branch}</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* PR Status Chips - Right Aligned */}

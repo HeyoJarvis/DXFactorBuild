@@ -12,9 +12,80 @@ function registerTaskChatHandlers(services, logger) {
   const { dbAdapter, ai } = services;
 
   /**
+   * Helper: Resolve task ID (handles both Supabase IDs and JIRA external keys)
+   */
+  async function resolveTaskId(taskIdOrKey, userId) {
+    logger.info('🔍 Resolving task ID', { taskIdOrKey, userId });
+    
+    // Try direct ID lookup first
+    const { data: directTask, error: directError } = await dbAdapter.supabase
+      .from('conversation_sessions')
+      .select('id, user_id, workflow_metadata, session_title')
+      .eq('id', taskIdOrKey)
+      .eq('workflow_type', 'task')
+      .single();
+    
+    if (directTask) {
+      logger.info('✅ Found task by direct ID', { taskId: directTask.id });
+      return { taskId: directTask.id, task: directTask };
+    }
+    
+    logger.info('❌ Task not found by ID, trying external_key lookup', { 
+      taskIdOrKey,
+      directError: directError?.message 
+    });
+    
+    // Try lookup by external_key (for JIRA tasks like "PROJ-123")
+    // Note: Use .limit(1) instead of .single() to handle potential duplicates
+    const { data: externalTasks, error: externalError } = await dbAdapter.supabase
+      .from('conversation_sessions')
+      .select('id, user_id, workflow_metadata, session_title')
+      .eq('workflow_metadata->>external_key', taskIdOrKey)
+      .eq('workflow_type', 'task')
+      .order('started_at', { ascending: false }) // Get most recent
+      .limit(1);
+    
+    const externalTask = externalTasks && externalTasks.length > 0 ? externalTasks[0] : null;
+    
+    if (externalTask) {
+      logger.info('✅ Found task by external_key', { 
+        providedId: taskIdOrKey, 
+        actualTaskId: externalTask.id,
+        externalKey: externalTask.workflow_metadata?.external_key
+      });
+      return { taskId: externalTask.id, task: externalTask };
+    }
+    
+    logger.error('❌ Task not found by ID or external_key', { 
+      taskIdOrKey,
+      userId,
+      externalError: externalError?.message
+    });
+    
+    // Debug: Let's see what tasks exist
+    const { data: allTasks } = await dbAdapter.supabase
+      .from('conversation_sessions')
+      .select('id, workflow_metadata, session_title')
+      .eq('workflow_type', 'task')
+      .limit(5);
+    
+    logger.info('📋 Sample tasks in database:', { 
+      count: allTasks?.length || 0,
+      samples: allTasks?.map(t => ({
+        id: t.id,
+        title: t.session_title,
+        external_key: t.workflow_metadata?.external_key,
+        external_source: t.workflow_metadata?.external_source
+      }))
+    });
+    
+    return { taskId: null, task: null };
+  }
+
+  /**
    * Send message to task-specific AI chat
    */
-  ipcMain.handle('tasks:sendChatMessage', async (event, taskId, message, requestContext) => {
+  ipcMain.handle('tasks:sendChatMessage', async (event, taskIdOrKey, message, requestContext) => {
     try {
       // Get current authenticated user ID
       const userId = services.auth?.currentUser?.id;
@@ -27,9 +98,21 @@ function registerTaskChatHandlers(services, logger) {
         };
       }
       
-      logger.info('Task chat message received', { taskId, userId, message: message.substring(0, 50) });
+      // Resolve actual task ID (handles JIRA external keys)
+      const { taskId, task: dbTask } = await resolveTaskId(taskIdOrKey, userId);
       
-      const task = requestContext.task;
+      if (!taskId) {
+        logger.error('Task not found', { taskIdOrKey });
+        return {
+          success: false,
+          error: 'Task not found'
+        };
+      }
+      
+      logger.info('Task chat message received', { taskId, providedId: taskIdOrKey, userId, message: message.substring(0, 50) });
+      
+      // Use task from request context, but ensure we have the correct ID
+      const task = { ...requestContext.task, id: taskId };
       
       // Get or create task-specific session
       if (!taskSessionIds[taskId]) {
@@ -131,6 +214,14 @@ Your role is to help the user complete this task by:
 - Offering relevant insights from live Slack/CRM data
 - Connecting this task to current team workflows and priorities
 
+SPECIAL INSTRUCTIONS FOR PRODUCT REQUIREMENTS:
+When asked to generate product requirements:
+1. Create a structured table with columns: Requirement | Priority | Source | Status
+2. Mark 2-3 requirements as coming from "Slack" (these will be highlighted in red)
+3. Use realistic requirements based on the task description
+4. Include a mix of sources: Slack, JIRA, and Inferred
+5. Format as markdown table for clean display
+
 Be concise, practical, and focused on helping complete this specific task.`;
 
       // Add Slack context to prompt if available
@@ -179,18 +270,18 @@ Be concise, practical, and focused on helping complete this specific task.`;
       // Save messages to task-specific session
       if (dbAdapter && taskSessionId) {
         logger.info('Saving messages to task session', { taskSessionId });
-        
+
         // Save user message
         await dbAdapter.saveMessageToSession(taskSessionId, message, 'user', {
           task_id: taskId,
           task_title: task.title
-        }).catch(err => logger.warn('Failed to save user message', { error: err.message }));
-        
+        }, userId).catch(err => logger.warn('Failed to save user message', { error: err.message }));
+
         // Save AI response
         await dbAdapter.saveMessageToSession(taskSessionId, responseContent, 'assistant', {
           task_id: taskId,
           task_title: task.title
-        }).catch(err => logger.warn('Failed to save AI message', { error: err.message }));
+        }, userId).catch(err => logger.warn('Failed to save AI message', { error: err.message }));
       }
       
       logger.info('Task chat response generated', { taskId, responseLength: responseContent?.length });
@@ -211,7 +302,7 @@ Be concise, practical, and focused on helping complete this specific task.`;
   /**
    * Get chat history for a task
    */
-  ipcMain.handle('tasks:getChatHistory', async (event, taskId) => {
+  ipcMain.handle('tasks:getChatHistory', async (event, taskIdOrKey) => {
     try {
       // Get current authenticated user ID
       const userId = services.auth?.currentUser?.id;
@@ -224,16 +315,11 @@ Be concise, practical, and focused on helping complete this specific task.`;
         };
       }
       
-      // First, verify the TASK exists and user has access to it
-      const { data: taskSession, error: taskError } = await dbAdapter.supabase
-        .from('conversation_sessions')
-        .select('id, user_id, workflow_metadata, session_title')
-        .eq('id', taskId)
-        .eq('workflow_type', 'task')  // ✅ Verify the task itself
-        .single();
-
-      if (taskError || !taskSession) {
-        logger.warn('Task not found', { taskId, userId, error: taskError?.message });
+      // Resolve actual task ID (handles JIRA external keys)
+      const { taskId, task: taskSession } = await resolveTaskId(taskIdOrKey, userId);
+      
+      if (!taskId || !taskSession) {
+        logger.warn('Task not found', { taskIdOrKey, userId });
         return {
           success: false,
           error: 'Task not found',
@@ -370,6 +456,57 @@ Be concise, practical, and focused on helping complete this specific task.`;
         success: false,
         error: error.message,
         messages: []
+      };
+    }
+  });
+
+  /**
+   * Generate product requirements silently (without saving to chat history)
+   */
+  ipcMain.handle('tasks:generateProductRequirements', async (event, taskId, taskData) => {
+    try {
+      logger.info('Generating product requirements silently', { taskId, taskTitle: taskData.title });
+
+      // Build specialized prompt for product requirements
+      const prompt = `Based on this task, generate a product requirements table.
+
+TASK DETAILS:
+- Title: ${taskData.title}
+- Description: ${typeof taskData.description === 'object' ? 'See structured description' : taskData.description}
+- Priority: ${taskData.priority}
+- Status: ${taskData.status}
+
+Generate a structured table with these columns:
+- Requirement: Specific, actionable requirement
+- Priority: High/Medium/Low
+- Source: Slack/JIRA/Inferred (mark 2-3 as "Slack" to simulate team discussions)
+- Status: To Do/In Progress/Done
+
+Format as a markdown table. Make requirements realistic and relevant to the task.
+Return ONLY the table, no additional text.`;
+
+      // Get AI response without saving to chat history
+      const aiResponse = await ai.sendMessage(prompt, {
+        systemPrompt: `You are a product requirements analyst. Generate realistic, actionable requirements based on the task provided. Mark 2-3 requirements as coming from "Slack" to indicate they came from team discussions.`,
+        taskContext: taskData
+      });
+
+      const requirementsText = typeof aiResponse === 'string' ? aiResponse : aiResponse.content;
+
+      logger.info('Product requirements generated successfully', {
+        taskId,
+        requirementsLength: requirementsText?.length
+      });
+
+      return {
+        success: true,
+        requirements: requirementsText
+      };
+    } catch (error) {
+      logger.error('Failed to generate product requirements:', error);
+      return {
+        success: false,
+        error: error.message
       };
     }
   });

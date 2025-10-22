@@ -810,7 +810,13 @@ Generate the follow-up response now:`;
                             {suggestion.suggestedTime}
                           </div>
                           <div className="agent-recommendation-action">
-                            <button className="agent-recommendation-action-btn">
+                            <button 
+                              className="agent-recommendation-action-btn"
+                              onClick={() => {
+                                setSelectedMeetingEvent(suggestion);
+                                setShowNewMeetingModal(true);
+                              }}
+                            >
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -1256,10 +1262,14 @@ Generate the follow-up response now:`;
       {/* New Meeting Modal */}
       {showNewMeetingModal && (
         <NewMeetingModal
-          onClose={() => setShowNewMeetingModal(false)}
+          onClose={() => {
+            setShowNewMeetingModal(false);
+            setSelectedMeetingEvent(null);
+          }}
           onCreate={handleCreateMeeting}
           serviceConnected={microsoftConnected || googleConnected}
           serviceName={microsoftConnected ? 'Microsoft Teams' : 'Google Meet'}
+          initialData={selectedMeetingEvent}
         />
       )}
 
@@ -1336,13 +1346,13 @@ Generate the follow-up response now:`;
 }
 
 // New Meeting Modal Component
-function NewMeetingModal({ onClose, onCreate, serviceConnected, serviceName }) {
+function NewMeetingModal({ onClose, onCreate, serviceConnected, serviceName, initialData }) {
   const [formData, setFormData] = useState({
-    title: '',
+    title: initialData?.title || '',
     startTime: '',
     endTime: '',
-    attendees: '',
-    description: '',
+    attendees: initialData?.attendees?.join(', ') || '',
+    description: initialData?.reason || '',
     includeTeamsLink: true
   });
 

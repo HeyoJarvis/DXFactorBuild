@@ -203,8 +203,9 @@ class SlackService extends EventEmitter {
         priority,
         description: message.text,
         tags: ['slack-auto', message.type, workType],
-        assignor: message.user,
-        mentionedUsers: mentions,
+        assignor: message.user, // Who assigned the task (message sender)
+        assignee: mentions[0] || null, // Who the task is assigned to (first mentioned user)
+        mentionedUsers: mentions, // All mentioned users
         workType: workType,
         routeTo: shouldRouteToMissionControl ? 'mission-control' : 'tasks-sales'
       };

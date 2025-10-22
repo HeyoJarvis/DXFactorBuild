@@ -17,27 +17,82 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
   const [currentRole, setCurrentRole] = useState('sales'); // Default to sales
   const [orbPosition, setOrbPosition] = useState({ x: 20, y: window.innerHeight - 100 });
 
-  // Load saved role from localStorage
+  // Load user role from database (synced with backend)
   useEffect(() => {
-    const savedRole = localStorage.getItem('heyjarvis-role');
-    if (savedRole && (savedRole === 'developer' || savedRole === 'sales')) {
-      setCurrentRole(savedRole);
-    } else {
-      // Set default to sales if no saved role
-      setCurrentRole('sales');
-      localStorage.setItem('heyjarvis-role', 'sales');
-    }
+    const loadUserRole = async () => {
+      console.log('🔄 Loading user role...');
+      try {
+        // Check if electronAPI exists
+        if (!window.electronAPI?.auth?.getCurrentUser) {
+          console.warn('⚠️ electronAPI.auth.getCurrentUser not available, using localStorage');
+          const savedRole = localStorage.getItem('heyjarvis-role') || 'sales';
+          setCurrentRole(savedRole);
+          return;
+        }
+
+        // Get user role from auth service (which loads from database)
+        console.log('📡 Calling getCurrentUser...');
+        const result = await window.electronAPI.auth.getCurrentUser();
+        console.log('📥 getCurrentUser result:', result);
+        
+        if (result.success && result.user?.user_role) {
+          const dbRole = result.user.user_role;
+          console.log('✅ Loaded role from database:', dbRole);
+          setCurrentRole(dbRole);
+          // Sync localStorage with database
+          localStorage.setItem('heyjarvis-role', dbRole);
+        } else {
+          console.log('⚠️ No user role in database, using fallback');
+          // Fallback to localStorage if database fails
+          const savedRole = localStorage.getItem('heyjarvis-role');
+          if (savedRole && (savedRole === 'developer' || savedRole === 'sales')) {
+            console.log('📦 Using localStorage role:', savedRole);
+            setCurrentRole(savedRole);
+          } else {
+            // Default to sales
+            console.log('🔧 Defaulting to sales role');
+            setCurrentRole('sales');
+            localStorage.setItem('heyjarvis-role', 'sales');
+          }
+        }
+      } catch (error) {
+        console.error('❌ Failed to load user role:', error);
+        // Fallback to localStorage
+        const savedRole = localStorage.getItem('heyjarvis-role');
+        if (savedRole) {
+          console.log('📦 Fallback to localStorage:', savedRole);
+          setCurrentRole(savedRole);
+        } else {
+          console.log('🔧 Fallback to default: sales');
+          setCurrentRole('sales');
+        }
+      }
+    };
+
+    loadUserRole();
   }, []);
 
-  // Save role to localStorage when it changes
-  const handleRoleChange = (newRole) => {
+  // Save role to database and localStorage when it changes
+  const handleRoleChange = async (newRole) => {
     setCurrentRole(newRole);
     localStorage.setItem('heyjarvis-role', newRole);
     setIsMenuOpen(false); // Close menu when switching roles
     
     console.log(`🎭 Role switched to: ${newRole}`);
     
-    // Notify backend of role change
+    // Save to database via onboarding handler (persists role)
+    try {
+      const result = await window.electronAPI.onboarding.setRole(newRole);
+      if (result.success) {
+        console.log('✅ Role saved to database:', newRole);
+      } else {
+        console.error('❌ Failed to save role to database:', result.error);
+      }
+    } catch (error) {
+      console.error('❌ Error saving role:', error);
+    }
+    
+    // Also notify backend state (for immediate use)
     if (window.electronAPI?.system?.setRole) {
       window.electronAPI.system.setRole(newRole);
     }
