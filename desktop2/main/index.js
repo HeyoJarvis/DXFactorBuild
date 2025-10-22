@@ -26,6 +26,7 @@ const registerAuthHandlers = require('./ipc/auth-handlers');
 const registerChatHandlers = require('./ipc/chat-handlers');
 const registerTaskHandlers = require('./ipc/task-handlers');
 const registerTaskChatHandlers = require('./ipc/task-chat-handlers');
+const registerTeamChatHandlers = require('./ipc/team-chat-handlers');
 const registerSystemHandlers = require('./ipc/system-handlers');
 const registerWindowHandlers = require('./ipc/window-handlers');
 const registerArcReactorHandlers = require('./ipc/arc-reactor-handlers');
@@ -614,6 +615,7 @@ function setupIPC() {
   registerChatHandlers(appState.services, logger);
   registerTaskHandlers(appState.services, logger);
   registerTaskChatHandlers(appState.services, logger);
+  registerTeamChatHandlers(appState.services, logger);
   registerSystemHandlers(appState.services, logger);
   registerWindowHandlers(appState.windows, logger);
   registerArcReactorHandlers(appState.services, logger);
@@ -621,7 +623,7 @@ function setupIPC() {
   registerMissionControlHandlers(appState.services, logger);
   registerOnboardingHandlers(appState.services, logger);
   registerTeamHandlers(appState.services, logger);
-  
+
   // Setup code indexer handlers
   const codeIndexerHandlers = new CodeIndexerHandlers(logger);
   codeIndexerHandlers.setup();

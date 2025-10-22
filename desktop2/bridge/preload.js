@@ -157,6 +157,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     join: (teamId, role) => ipcRenderer.invoke('teams:join', teamId, role),
     leave: (teamId) => ipcRenderer.invoke('teams:leave', teamId),
     create: (teamData) => ipcRenderer.invoke('teams:create', teamData)
+  },
+
+  // Team Chat APIs
+  teamChat: {
+    loadTeams: () => ipcRenderer.invoke('team-chat:load-teams'),
+    getHistory: (teamId) => ipcRenderer.invoke('team-chat:get-history', teamId),
+    sendMessage: (teamId, message) => ipcRenderer.invoke('team-chat:send-message', teamId, message),
+    saveContextSettings: (teamId, settings) => ipcRenderer.invoke('team-chat:save-context-settings', teamId, settings)
   }
 });
 

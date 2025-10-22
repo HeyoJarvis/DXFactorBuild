@@ -14,6 +14,7 @@ export default function TabBar({ userRole, user, onLogout }) {
     const path = location.pathname;
     if (path.includes('/tasks')) setActiveTab('tasks');
     else if (path.includes('/mission-control')) setActiveTab('mission-control');
+    else if (path.includes('/team-chat')) setActiveTab('team-chat');
     else if (path.includes('/architecture')) setActiveTab('architecture');
     else if (path.includes('/indexer')) setActiveTab('indexer');
     else if (path.includes('/settings')) setActiveTab('settings');
@@ -33,12 +34,17 @@ export default function TabBar({ userRole, user, onLogout }) {
     }
   }, [showDropdown]);
 
-  // Define tabs in the correct order: Mission Control, Code, Architecture, Tasks
+  // Define tabs in the correct order: Mission Control, Team Chat, Code, Architecture, Tasks
   const tabs = [
     {
       id: 'mission-control',
       path: '/mission-control',
       label: 'Mission Control',
+    },
+    {
+      id: 'team-chat',
+      path: '/team-chat',
+      label: 'Team Chat',
     },
     {
       id: 'indexer',

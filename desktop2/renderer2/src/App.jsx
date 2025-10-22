@@ -6,6 +6,7 @@ import TasksDeveloper from './pages/TasksDeveloper';
 import ArchitectureDiagram from './pages/ArchitectureDiagram';
 import Indexer from './pages/Indexer';
 import MissionControl from './pages/MissionControl';
+import TeamChat from './pages/TeamChat';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import LoginFlow from './pages/LoginFlow';
@@ -276,8 +277,9 @@ function App() {
   const isArchitecturePage = window.location.hash === '#/architecture';
   const isIndexerPage = window.location.hash === '#/indexer';
   const isMissionControlPage = window.location.hash === '#/mission-control';
+  const isTeamChatPage = window.location.hash === '#/team-chat';
   const isSettingsPage = window.location.hash === '#/settings';
-  const hideNavigation = isTasksPage || isArchitecturePage || isIndexerPage || isMissionControlPage || isSettingsPage;
+  const hideNavigation = isTasksPage || isArchitecturePage || isIndexerPage || isMissionControlPage || isTeamChatPage || isSettingsPage;
   
   // If this is the secondary window, show the main UI with tab bar (no orb)
   return (
@@ -301,13 +303,14 @@ function App() {
           <Route path="/" element={<Navigate to="/tasks" replace />} />
           <Route path="/copilot" element={<Copilot systemStatus={systemStatus} initialMessage={initialChatMessage} user={currentUser} />} />
           <Route path="/tasks" element={
-            userRole === 'developer' 
+            userRole === 'developer'
               ? <TasksDeveloper user={currentUser} />
               : <Tasks user={currentUser} />
           } />
           <Route path="/architecture" element={<ArchitectureDiagram user={currentUser} />} />
           <Route path="/indexer" element={<Indexer user={currentUser} />} />
           <Route path="/mission-control" element={<MissionControl user={currentUser} />} />
+          <Route path="/team-chat" element={<TeamChat user={currentUser} />} />
           <Route path="/settings" element={<Settings user={currentUser} />} />
           <Route path="/diagnostic-microsoft" element={<DiagnosticMicrosoft />} />
         </Routes>
