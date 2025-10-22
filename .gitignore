@@ -18,4 +18,5 @@ fix-task-title.js
 debug-task-sessions.js
 check-specific-session.js
 test-task-chat-sync.js
-desktop2/dist/
+desktop2/dist/*.log
+logs/
