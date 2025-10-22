@@ -1,6 +1,0 @@
-{"level":"info","message":"Starting Production OAuth System...","service":"production-oauth","timestamp":"2025-09-23T19:02:37.176Z"}
-{"level":"warn","message":"SLACK_REDIRECT_URI not set, using default","redirectUri":"http://localhost:3001/auth/slack/callback","service":"production-oauth","timestamp":"2025-09-23T19:02:37.177Z"}
-{"level":"info","message":"Environment validation passed","service":"production-oauth","timestamp":"2025-09-23T19:02:37.177Z"}
-{"level":"info","message":"System integration setup complete","service":"production-oauth","timestamp":"2025-09-23T19:02:37.177Z"}
-{"level":"info","message":"Production OAuth System started successfully","service":"production-oauth","timestamp":"2025-09-23T19:02:37.332Z"}
-{"level":"info","message":"Stopping Production OAuth System...","service":"production-oauth","timestamp":"2025-09-23T19:08:43.923Z"}
