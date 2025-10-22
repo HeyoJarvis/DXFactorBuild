@@ -1,0 +1,125 @@
+{
+  "name": "tsi_TeamsMeetingTranscriptSync",
+  "id": "00000000-0000-0000-0000-000000000001",
+  "type": "Microsoft.Flow/flows",
+  "properties": {
+    "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+    "displayName": "Teams Meeting Transcript to OneDrive",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 30
+          },
+          "type": "Recurrence"
+        }
+      },
+      "actions": {
+        "Get_calendar_view_of_events": {
+          "runAfter": {},
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['shared_office365']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/v2/calendar/events",
+            "queries": {
+              "startTime": "@addDays(utcNow(), -1)",
+              "endTime": "@utcNow()",
+              "timeZone": "UTC"
+            }
+          }
+        },
+        "Filter_online_meetings": {
+          "runAfter": {
+            "Get_calendar_view_of_events": ["Succeeded"]
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@body('Get_calendar_view_of_events')?['value']",
+            "where": "@equals(item()?['isOnlineMeeting'], true)"
+          }
+        },
+        "Apply_to_each_meeting": {
+          "foreach": "@body('Filter_online_meetings')",
+          "actions": {
+            "Condition_check_has_online_meeting": {
+              "actions": {
+                "Create_file_placeholder": {
+                  "runAfter": {},
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['shared_onedrive']['connectionId']"
+                      }
+                    },
+                    "method": "post",
+                    "body": "@concat('Meeting: ', items('Apply_to_each_meeting')?['subject'], '\nDate: ', items('Apply_to_each_meeting')?['start']?['dateTime'], '\nOnline Meeting: ', items('Apply_to_each_meeting')?['onlineMeetingUrl'], '\n\nTranscript will be available after meeting ends and processing completes (~30 minutes).')",
+                    "path": "/datasets/default/files",
+                    "queries": {
+                      "folderPath": "/Recordings",
+                      "name": "@{items('Apply_to_each_meeting')?['subject']}-@{formatDateTime(utcNow(), 'yyyy-MM-dd-HHmm')}.txt"
+                    }
+                  }
+                }
+              },
+              "runAfter": {},
+              "expression": {
+                "and": [
+                  {
+                    "not": {
+                      "equals": [
+                        "@items('Apply_to_each_meeting')?['onlineMeetingUrl']",
+                        "@null"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "Filter_online_meetings": ["Succeeded"]
+          },
+          "type": "Foreach"
+        }
+      },
+      "outputs": {}
+    },
+    "connectionReferences": {
+      "shared_office365": {
+        "connection": {
+          "id": ""
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      },
+      "shared_onedrive": {
+        "connection": {
+          "id": ""
+        },
+        "api": {
+          "name": "shared_onedrive"
+        }
+      }
+    },
+    "state": "Draft",
+    "flowState": "Draft"
+  }
+}
+

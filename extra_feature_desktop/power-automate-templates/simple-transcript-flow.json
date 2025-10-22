@@ -1,0 +1,217 @@
+{
+  "name": "Teams Meeting Transcript to OneDrive (Simple)",
+  "description": "Automatically saves Teams meeting transcripts to OneDrive /Recordings folder every 30 minutes",
+  "version": "1.0",
+  "trigger": {
+    "type": "Recurrence",
+    "recurrence": {
+      "frequency": "Minute",
+      "interval": 30,
+      "startTime": "2025-01-01T00:00:00Z"
+    }
+  },
+  "actions": [
+    {
+      "name": "Initialize_ProcessedMeetings",
+      "type": "InitializeVariable",
+      "inputs": {
+        "variables": [
+          {
+            "name": "ProcessedMeetingIds",
+            "type": "array",
+            "value": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "Get_Calendar_Events",
+      "type": "ApiConnection",
+      "connector": "office365",
+      "operation": "CalendarGetItems_V2",
+      "inputs": {
+        "calendarId": "Calendar",
+        "$filter": "start/dateTime ge '@{addDays(utcNow(), -1)}' and end/dateTime le '@{utcNow()}'",
+        "$select": "id,subject,isOnlineMeeting,onlineMeetingUrl,start,end,onlineMeeting",
+        "$top": 50
+      }
+    },
+    {
+      "name": "Filter_Online_Meetings",
+      "type": "Query",
+      "inputs": {
+        "from": "@body('Get_Calendar_Events')?['value']",
+        "where": "@equals(item()?['isOnlineMeeting'], true)"
+      },
+      "runAfter": {
+        "Get_Calendar_Events": ["Succeeded"]
+      }
+    },
+    {
+      "name": "Apply_to_each_meeting",
+      "type": "Foreach",
+      "foreach": "@body('Filter_Online_Meetings')",
+      "actions": [
+        {
+          "name": "Extract_Meeting_ID",
+          "type": "Compose",
+          "inputs": "@split(split(items('Apply_to_each_meeting')?['onlineMeetingUrl'], '/')[last()], '?')[0]"
+        },
+        {
+          "name": "Check_If_Already_Processed",
+          "type": "If",
+          "expression": {
+            "and": [
+              {
+                "not": {
+                  "contains": [
+                    "@variables('ProcessedMeetingIds')",
+                    "@outputs('Extract_Meeting_ID')"
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "name": "Try_Get_Transcript",
+              "type": "Scope",
+              "actions": [
+                {
+                  "name": "HTTP_Get_Transcripts",
+                  "type": "Http",
+                  "inputs": {
+                    "method": "GET",
+                    "uri": "https://graph.microsoft.com/v1.0/me/onlineMeetings/@{outputs('Extract_Meeting_ID')}/transcripts",
+                    "authentication": {
+                      "type": "ManagedServiceIdentity",
+                      "audience": "https://graph.microsoft.com"
+                    }
+                  }
+                },
+                {
+                  "name": "Parse_Transcript_List",
+                  "type": "ParseJson",
+                  "inputs": {
+                    "content": "@body('HTTP_Get_Transcripts')",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": { "type": "string" },
+                              "createdDateTime": { "type": "string" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "HTTP_Get_Transcripts": ["Succeeded"]
+                  }
+                },
+                {
+                  "name": "Check_Transcript_Exists",
+                  "type": "If",
+                  "expression": {
+                    "and": [
+                      {
+                        "greater": [
+                          "@length(body('Parse_Transcript_List')?['value'])",
+                          0
+                        ]
+                      }
+                    ]
+                  },
+                  "actions": [
+                    {
+                      "name": "Get_First_Transcript_ID",
+                      "type": "Compose",
+                      "inputs": "@first(body('Parse_Transcript_List')?['value'])?['id']"
+                    },
+                    {
+                      "name": "HTTP_Get_Transcript_Content",
+                      "type": "Http",
+                      "inputs": {
+                        "method": "GET",
+                        "uri": "https://graph.microsoft.com/v1.0/me/onlineMeetings/@{outputs('Extract_Meeting_ID')}/transcripts/@{outputs('Get_First_Transcript_ID')}/content?$format=text/vtt",
+                        "authentication": {
+                          "type": "ManagedServiceIdentity",
+                          "audience": "https://graph.microsoft.com"
+                        }
+                      },
+                      "runAfter": {
+                        "Get_First_Transcript_ID": ["Succeeded"]
+                      }
+                    },
+                    {
+                      "name": "Create_File_Name",
+                      "type": "Compose",
+                      "inputs": "@{items('Apply_to_each_meeting')?['subject']}-Transcript-@{formatDateTime(utcNow(), 'yyyy-MM-dd-HHmm')}.vtt",
+                      "runAfter": {
+                        "HTTP_Get_Transcript_Content": ["Succeeded"]
+                      }
+                    },
+                    {
+                      "name": "Create_OneDrive_File",
+                      "type": "ApiConnection",
+                      "connector": "onedrive",
+                      "operation": "CreateFile",
+                      "inputs": {
+                        "folderPath": "/Recordings",
+                        "name": "@outputs('Create_File_Name')",
+                        "body": "@body('HTTP_Get_Transcript_Content')"
+                      },
+                      "runAfter": {
+                        "Create_File_Name": ["Succeeded"]
+                      }
+                    },
+                    {
+                      "name": "Add_to_Processed_List",
+                      "type": "AppendToArrayVariable",
+                      "inputs": {
+                        "name": "ProcessedMeetingIds",
+                        "value": "@outputs('Extract_Meeting_ID')"
+                      },
+                      "runAfter": {
+                        "Create_OneDrive_File": ["Succeeded"]
+                      }
+                    }
+                  ],
+                  "runAfter": {
+                    "Parse_Transcript_List": ["Succeeded"]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "runAfter": {
+        "Filter_Online_Meetings": ["Succeeded"]
+      }
+    }
+  ],
+  "outputs": {},
+  "parameters": {
+    "$connections": {
+      "value": {
+        "office365": {
+          "connectionId": "[CONNECTION_ID_PLACEHOLDER]",
+          "connectionName": "office365",
+          "id": "/subscriptions/[SUBSCRIPTION_ID]/providers/Microsoft.Web/locations/[REGION]/managedApis/office365"
+        },
+        "onedrive": {
+          "connectionId": "[CONNECTION_ID_PLACEHOLDER]",
+          "connectionName": "onedrive",
+          "id": "/subscriptions/[SUBSCRIPTION_ID]/providers/Microsoft.Web/locations/[REGION]/managedApis/onedrive"
+        }
+      }
+    }
+  }
+}
+

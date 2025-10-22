@@ -13,8 +13,10 @@ function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', on
   const [isDragging, setIsDragging] = useState(false);
   const [clickStart, setClickStart] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
-  const dragOffset = useRef({ x: 0, y: 0 });
+  const [dragTransform, setDragTransform] = useState({ x: 0, y: 0 }); // Visual offset during drag
+  const dragOffset = useRef({ x: 0, y: 0 }); // Offset from mouse to window top-left
   const orbRef = useRef(null); // Reference to the orb element
+  const dragStartPos = useRef({ x: 0, y: 0 }); // Screen position when drag started
   
   // Orb is always positioned consistently
   // Centered in the window with enough space for the glow
@@ -33,16 +35,15 @@ function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', on
     // In expanded mode, pointer-events CSS handles everything
     if (isCollapsed && window.electronAPI?.window?.setMouseForward) {
       window.electronAPI.window.setMouseForward(false);
+      console.log('🖱️ [ORB] Mouse entered orb - disabled forwarding');
     }
   };
 
   const handleMouseLeave = () => {
-    // NEVER re-enable mouse forwarding when menu is open
-    // Only re-enable in collapsed mode when menu is closed
-    if (isCollapsed && !isDragging && !isMenuOpen && window.electronAPI?.window?.setMouseForward) {
-      window.electronAPI.window.setMouseForward(true);
-      console.log('🖱️ Mouse left orb - re-enabled forwarding (menu closed)');
-    }
+    // NEVER re-enable mouse forwarding in collapsed mode!
+    // The orb should ALWAYS remain clickable
+    // User can click desktop by minimizing the app (not by mouse forwarding)
+    console.log('🖱️ [ORB] Mouse left orb - keeping forwarding DISABLED (orb always clickable)');
   };
 
   const handleMouseDown = (e) => {
@@ -52,11 +53,18 @@ function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', on
     setClickStart(Date.now());
     setHasMoved(false);
     setIsDragging(true);
+    setDragTransform({ x: 0, y: 0 }); // Reset transform
     
     const rect = e.currentTarget.getBoundingClientRect();
     dragOffset.current = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
+    };
+    
+    // Store starting screen position for smooth CSS transform
+    dragStartPos.current = {
+      x: e.screenX,
+      y: e.screenY
     };
   };
 
@@ -65,41 +73,39 @@ function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', on
     
     setHasMoved(true);
     
-    // Move the entire window, not just the orb within the window
-    // Use screenX/screenY for absolute screen coordinates
-    if (window.electronAPI?.window?.moveWindow) {
-      const windowX = e.screenX - dragOffset.current.x;
-      const windowY = e.screenY - dragOffset.current.y;
-      
-      window.electronAPI.window.moveWindow(windowX, windowY);
-    }
+    // Calculate offset from drag start for instant visual feedback
+    const deltaX = e.screenX - dragStartPos.current.x;
+    const deltaY = e.screenY - dragStartPos.current.y;
+    
+    // ONLY update CSS transform for perfectly smooth visual feedback
+    // NO IPC calls during drag = butter smooth movement
+    setDragTransform({ x: deltaX, y: deltaY });
   };
 
   const handleMouseUp = (e) => {
     if (!isDragging) return;
     
     const clickDuration = Date.now() - clickStart;
-    setIsDragging(false);
     
-    console.log('🖱️ Mouse up:', { clickDuration, hasMoved, isDragging });
-    
-    // Re-enable mouse event forwarding after drag (only in collapsed mode)
-    if (isCollapsed && window.electronAPI?.window?.setMouseForward && orbRef.current) {
-      // Check if mouse is still over the orb using the ref
-      const rect = orbRef.current.getBoundingClientRect();
-      const isStillOver = e.clientX >= rect.left && e.clientX <= rect.right &&
-                          e.clientY >= rect.top && e.clientY <= rect.bottom;
-      if (!isStillOver) {
-        window.electronAPI.window.setMouseForward(true);
-      }
+    // Move window to final position ONCE at the end of drag
+    // This is the only IPC call, making drag perfectly smooth
+    if (hasMoved && window.electronAPI?.window?.moveWindow) {
+      const finalX = e.screenX - dragOffset.current.x;
+      const finalY = e.screenY - dragOffset.current.y;
+      window.electronAPI.window.moveWindow(finalX, finalY);
+      console.log('🪟 Window moved to final position:', { x: finalX, y: finalY });
     }
+    
+    // Reset drag state
+    setIsDragging(false);
+    setDragTransform({ x: 0, y: 0 });
+    
+    console.log('🖱️ Mouse up:', { clickDuration, hasMoved });
     
     // Quick click (< 300ms) and no movement = toggle menu
     if (clickDuration < 300 && !hasMoved) {
       console.log('🎯 Quick click detected - toggling menu');
       onMenuToggle();
-    } else {
-      console.log('⏱️ Not a quick click:', { clickDuration, threshold: 300, hasMoved });
     }
   };
 
@@ -115,6 +121,14 @@ function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', on
     }
   }, [isDragging]);
 
+  // Ensure forwarding is always disabled when in collapsed mode
+  useEffect(() => {
+    if (isCollapsed && window.electronAPI?.window?.setMouseForward) {
+      window.electronAPI.window.setMouseForward(false);
+      console.log('🖱️ [ORB] Window collapsed - forcing forwarding DISABLED');
+    }
+  }, [isCollapsed]);
+
   return (
     <div
       ref={orbRef}
@@ -122,6 +136,7 @@ function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', on
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
+        transform: `translate(${dragTransform.x}px, ${dragTransform.y}px)`,
         '--orb-color': colors.primary,
         '--orb-glow': colors.glow
       }}

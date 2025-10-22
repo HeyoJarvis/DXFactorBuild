@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.0.0" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SolutionManifest>
+    <UniqueName>TeamsTranscriptAutomation</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="Teams Transcript to OneDrive Automation" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="Automatically saves Microsoft Teams meeting transcripts to OneDrive /Recordings folder for integration with Team Sync Intelligence" languagecode="1033" />
+    </Descriptions>
+    <Version>1.0.0.0</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>TeamSyncPublisher</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="Team Sync Intelligence" languagecode="1033" />
+      </LocalizedNames>
+      <Descriptions>
+        <Description description="Publisher for Team Sync Intelligence solutions" languagecode="1033" />
+      </Descriptions>
+      <EMailAddress>support@example.com</EMailAddress>
+      <SupportingWebsiteUrl>https://github.com/yourusername/teamsync</SupportingWebsiteUrl>
+      <CustomizationPrefix>tsi</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>10000</CustomizationOptionValuePrefix>
+      <Addresses>
+        <Address>
+          <AddressNumber>1</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+        </Address>
+      </Addresses>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="29" schemaName="tsi_TeamsMeetingTranscriptSync" behavior="0" />
+    </RootComponents>
+    <MissingDependencies />
+  </SolutionManifest>
+</ImportExportXml>
+

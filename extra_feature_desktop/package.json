@@ -1,0 +1,64 @@
+{
+  "name": "@heyjarvis/team-sync-intelligence",
+  "version": "1.0.0",
+  "description": "AI-powered team synchronization with meeting summaries and intelligent Q&A",
+  "main": "main/index.js",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:electron\"",
+    "dev:renderer": "vite",
+    "dev:electron": "wait-on tcp:5174 && electron .",
+    "build": "npm run build:renderer && npm run build:electron",
+    "build:renderer": "vite build",
+    "build:electron": "electron-builder",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@heyjarvis/core": "file:../core",
+    "@heyjarvis/data": "file:../data",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@supabase/supabase-js": "^2.75.1",
+    "axios": "^1.6.7",
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.2",
+    "electron-store": "^8.1.0",
+    "express": "^5.1.0",
+    "isomorphic-fetch": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^2.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.1",
+    "vite": "^5.0.11",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.heyjarvis.teamsync",
+    "productName": "Team Sync Intelligence",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main/**/*",
+      "renderer/dist/**/*",
+      "bridge/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "icon": "assets/icon.png",
+      "category": "Office",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
+  }
+}

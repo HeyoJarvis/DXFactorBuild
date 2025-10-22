@@ -89,3 +89,9 @@
 {"level":"info","message":"Webhook server started","port":"30001","service":"slack-app","timestamp":"2025-10-12T21:19:59.478Z"}
 {"level":"info","message":"Now connected to Slack","service":"slack-app","timestamp":"2025-10-12T21:19:59.747Z"}
 {"level":"info","message":"Disconnecting ...","service":"slack-app","timestamp":"2025-10-12T21:23:01.736Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for Slack bot","service":"slack-app","timestamp":"2025-10-19T01:15:09.269Z"}
+{"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-10-19T01:15:09.310Z"}
+{"level":"info","message":"HeyJarvis Slack app started successfully","port":3000,"service":"slack-app","timestamp":"2025-10-19T01:15:09.529Z","webhook_port":3001}
+{"level":"info","message":"Webhook server started","port":3001,"service":"slack-app","timestamp":"2025-10-19T01:15:09.529Z"}
+{"level":"info","message":"Now connected to Slack","service":"slack-app","timestamp":"2025-10-19T01:15:09.808Z"}
+{"level":"info","message":"Disconnecting ...","service":"slack-app","timestamp":"2025-10-19T01:15:13.219Z"}
