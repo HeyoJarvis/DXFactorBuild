@@ -61,14 +61,26 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
-      "icon": "assets/icon.icns"
+      "icon": "assets/icon.icns",
+      "target": ["dmg", "zip"]
     },
     "win": {
-      "icon": "assets/icon.ico"
+      "icon": "assets/icon.ico",
+      "target": ["nsis", "portable"]
     },
     "linux": {
       "icon": "assets/icon.png",
-      "category": "Office"
+      "category": "Office",
+      "target": ["AppImage", "deb"],
+      "executableName": "heyjarvis",
+      "synopsis": "AI-powered competitive intelligence platform",
+      "description": "HeyJarvis Desktop - Your AI assistant for competitive intelligence and workflow automation",
+      "desktop": {
+        "Name": "HeyJarvis",
+        "Type": "Application",
+        "Terminal": "false",
+        "Categories": "Office;Utility;"
+      }
     }
   }
 }

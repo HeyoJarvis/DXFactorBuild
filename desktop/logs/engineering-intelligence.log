@@ -2479,3 +2479,7 @@
 {"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-15T16:15:16.016Z"}
 {"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-15T16:15:16.615Z"}
 {"authType":"GitHub App","level":"info","message":"GitHub health check passed","rateLimit":5000,"remaining":4997,"service":"engineering-intelligence","timestamp":"2025-10-15T16:15:17.048Z"}
+{"level":"info","message":"Engineering Intelligence Service initialized","repository":"multi-repo mode","service":"engineering-intelligence","timestamp":"2025-10-19T01:15:11.082Z"}
+{"appId":"2081293","authType":"github-app","installationId":"89170981","level":"info","message":"GitHub App authentication successful","service":"engineering-intelligence","timestamp":"2025-10-19T01:15:12.283Z"}
+{"level":"info","message":"Auto-detecting repository from GitHub App installation","service":"engineering-intelligence","timestamp":"2025-10-19T01:15:12.284Z"}
+{"level":"info","message":"Repository auto-detected","owner":"HeyoJarvis","repo":"Mark-I","service":"engineering-intelligence","timestamp":"2025-10-19T01:15:13.178Z"}

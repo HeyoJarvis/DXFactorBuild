@@ -131,3 +131,5 @@ Instead of:
 Users can now authenticate with their own Google accounts to use Gmail and Calendar features, just like they do with Microsoft 365. The integration is complete and ready to use!
 
 
+
+

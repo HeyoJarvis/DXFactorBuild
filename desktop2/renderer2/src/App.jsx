@@ -59,17 +59,34 @@ function App() {
   // Force mouse forwarding state based on auth and collapsed state
   useEffect(() => {
     if (window.electronAPI?.window?.setMouseForward) {
+      // CRITICAL: While loading auth, keep forwarding DISABLED so orb is clickable
+      if (authLoading) {
+        window.electronAPI.window.setMouseForward(false);
+        console.log(`🖱️ Mouse forwarding DISABLED (auth loading)`);
+        return;
+      }
+      
       // NEVER forward on login page - must be fully interactive
-      if (!authLoading && !isAuthenticated) {
+      if (!isAuthenticated) {
         window.electronAPI.window.setMouseForward(false);
         console.log(`🖱️ Mouse forwarding DISABLED (login page)`);
         return;
       }
       
-      // Only forward in collapsed mode when authenticated
-      const shouldForward = isCollapsed;
-      window.electronAPI.window.setMouseForward(shouldForward);
-      console.log(`🖱️ Mouse forwarding ${shouldForward ? 'ENABLED' : 'DISABLED'} (${isCollapsed ? 'collapsed' : 'expanded'} mode)`);
+      // When authenticated:
+      // - In EXPANDED mode: Always disable forwarding (full UI needs clicks)
+      // - In COLLAPSED mode: Start with forwarding DISABLED
+      //   Let ArcReactorOrb control forwarding via its mouse enter/leave handlers
+      if (!isCollapsed) {
+        // Expanded mode - disable forwarding for full UI interaction
+        window.electronAPI.window.setMouseForward(false);
+        console.log(`🖱️ Mouse forwarding DISABLED (expanded mode - full UI)`);
+      } else {
+        // Collapsed mode - START with forwarding disabled
+        // ArcReactorOrb will enable it on mouse leave
+        window.electronAPI.window.setMouseForward(false);
+        console.log(`🖱️ Mouse forwarding DISABLED (collapsed mode - orb controls it)`);
+      }
     }
   }, [isCollapsed, isAuthenticated, authLoading]);
 

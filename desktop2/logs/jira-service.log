@@ -378,3 +378,20 @@
 {"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","level":"error","message":"Token refresh failed","service":"jira-service","timestamp":"2025-10-16T02:54:19.197Z"}
 {"error":"JIRA refresh token expired. Please re-authenticate with JIRA.","jql":"assignee = currentUser() AND status IN (\"In Progress\",\"To Do\",\"Code Review\",\"Testing\",\"Blocked\") ORDER BY priority DESC, updated DESC","level":"error","message":"Failed to get issues","service":"jira-service","timestamp":"2025-10-16T02:54:19.197Z"}
 {"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T02:54:19.207Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T03:19:31.755Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T03:20:29.117Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T03:21:33.891Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T03:22:06.009Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T03:22:35.404Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T17:48:51.178Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T18:06:10.471Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T18:09:20.440Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T18:11:57.649Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T18:17:05.027Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T18:18:21.227Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T18:46:27.888Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T18:48:59.977Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T18:53:15.374Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T19:02:26.806Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T19:06:47.311Z"}
+{"clientId":"***fcOY","level":"info","message":"JIRA Service initialized","scopes":4,"service":"jira-service","timestamp":"2025-10-16T19:09:47.742Z"}

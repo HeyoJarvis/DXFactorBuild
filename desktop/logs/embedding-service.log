@@ -579,3 +579,5 @@
 {"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T16:02:39.249Z"}
 {"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T16:15:14.604Z"}
 {"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-15T16:15:14.605Z"}
+{"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-19T01:15:11.083Z"}
+{"dimensions":1536,"level":"info","message":"Embedding Service initialized","model":"text-embedding-3-small","service":"embedding-service","timestamp":"2025-10-19T01:15:11.084Z"}

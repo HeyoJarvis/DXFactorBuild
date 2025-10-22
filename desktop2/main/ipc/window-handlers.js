@@ -5,7 +5,7 @@
 
 const { ipcMain } = require('electron');
 
-let mouseEventsIgnored = true; // Track current state
+let mouseEventsIgnored = false; // Track current state - matches initial window state from MainWindowManager
 
 function registerWindowHandlers(windows, logger) {
   /**

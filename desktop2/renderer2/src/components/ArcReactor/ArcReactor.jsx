@@ -45,12 +45,12 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
 
   const handleMenuToggle = async () => {
     const newState = !isMenuOpen;
-    console.log('🔄 Menu toggle:', newState ? 'OPEN' : 'CLOSE');
+    console.log('🔄 [ARCREACTOR] Menu toggle:', newState ? 'OPEN' : 'CLOSE');
     
     // CRITICAL: Disable mouse forwarding BEFORE opening menu
     if (newState && window.electronAPI?.window?.setMouseForward) {
       await window.electronAPI.window.setMouseForward(false);
-      console.log('🖱️ DISABLED mouse forwarding for menu');
+      console.log('🖱️ [ARCREACTOR] DISABLED mouse forwarding for menu');
     }
     
     // Resize window to accommodate menu
@@ -60,31 +60,19 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
     
     setIsMenuOpen(newState);
     
-    // CRITICAL: Only re-enable forwarding in collapsed mode after menu closes
-    if (!newState && isCollapsed && window.electronAPI?.window?.setMouseForward) {
-      // Small delay to ensure menu click completes first
-      setTimeout(async () => {
-        await window.electronAPI.window.setMouseForward(true);
-        console.log('🖱️ Re-enabled mouse forwarding after menu close');
-      }, 100);
-    }
+    // DON'T re-enable forwarding here!
+    // Let ArcReactorOrb handle it via mouse leave
+    console.log('🖱️ [ARCREACTOR] Menu closed - letting orb control forwarding');
   };
 
   const handleMenuItemClick = async (itemId) => {
     if (!itemId) {
       setIsMenuOpen(false);
-      
-      // Re-enable mouse forwarding only in collapsed mode
-      if (isCollapsed && window.electronAPI?.window?.setMouseForward) {
-        setTimeout(() => {
-          window.electronAPI.window.setMouseForward(true);
-          console.log('🖱️ Menu closed without selection - re-enabled forwarding');
-        }, 100);
-      }
+      console.log('🖱️ [ARCREACTOR] Menu closed without selection - letting orb control forwarding');
       return;
     }
 
-    console.log(`🎯 Menu item clicked: ${itemId}`);
+    console.log(`🎯 [ARCREACTOR] Menu item clicked: ${itemId}`);
     
     setIsMenuOpen(false);
     
@@ -106,17 +94,13 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
     
     // Open secondary window with the route
     if (window.electronAPI?.window?.openSecondary) {
-      console.log(`🪟 Opening secondary window: ${route}`);
+      console.log(`🪟 [ARCREACTOR] Opening secondary window: ${route}`);
       await window.electronAPI.window.openSecondary(route);
     }
     
-    // Keep mouse forwarding enabled so orb stays clickable
-    if (window.electronAPI?.window?.setMouseForward) {
-      setTimeout(() => {
-        window.electronAPI.window.setMouseForward(true);
-        console.log('🖱️ Re-enabled mouse forwarding (orb window stays active)');
-      }, 100);
-    }
+    // DON'T re-enable forwarding here!
+    // Let ArcReactorOrb handle it via mouse leave
+    console.log('🖱️ [ARCREACTOR] Secondary window opened - letting orb control forwarding');
   };
 
   // Track orb position for menu placement
