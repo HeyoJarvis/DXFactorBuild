@@ -89,7 +89,7 @@ function registerTaskChatHandlers(services, logger) {
     try {
       // Get current authenticated user ID
       const userId = services.auth?.currentUser?.id;
-      
+
       if (!userId) {
         logger.error('Task chat: No authenticated user');
         return {
@@ -97,10 +97,10 @@ function registerTaskChatHandlers(services, logger) {
           error: 'User not authenticated'
         };
       }
-      
+
       // Resolve actual task ID (handles JIRA external keys)
       const { taskId, task: dbTask } = await resolveTaskId(taskIdOrKey, userId);
-      
+
       if (!taskId) {
         logger.error('Task not found', { taskIdOrKey });
         return {
@@ -108,9 +108,18 @@ function registerTaskChatHandlers(services, logger) {
           error: 'Task not found'
         };
       }
-      
-      logger.info('Task chat message received', { taskId, providedId: taskIdOrKey, userId, message: message.substring(0, 50) });
-      
+
+      // Extract repository from request context (if provided)
+      const connectedRepo = requestContext.repository;
+
+      logger.info('Task chat message received', {
+        taskId,
+        providedId: taskIdOrKey,
+        userId,
+        message: message.substring(0, 50),
+        repository: connectedRepo
+      });
+
       // Use task from request context, but ensure we have the correct ID
       const task = { ...requestContext.task, id: taskId };
       
@@ -152,7 +161,89 @@ function registerTaskChatHandlers(services, logger) {
       const aiContext = {
         taskContext: task
       };
-      
+
+      // Query code indexer if repository is connected
+      let codeContext = null;
+      if (connectedRepo) {
+        try {
+          logger.info('Querying code indexer for repository context', {
+            repository: connectedRepo,
+            query: message.substring(0, 100)
+          });
+
+          // Parse repository name (format: "owner/repo")
+          const repoParts = connectedRepo.split('/');
+          if (repoParts.length === 2) {
+            const [owner, repo] = repoParts;
+
+            // Use the Engineering Intelligence API via HTTP
+            const fetch = require('node-fetch');
+            const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
+
+            const response = await fetch(`${API_BASE_URL}/api/engineering/query`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                query: message,
+                repository: { owner, repo },
+                context: {
+                  ticket: {
+                    key: task.id,
+                    summary: task.title,
+                    description: task.description,
+                    priority: task.priority
+                  }
+                },
+                useSemanticParsing: true
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              codeContext = data.result;
+              aiContext.codeContext = codeContext;
+
+              logger.info('Code indexer query successful', {
+                repository: connectedRepo,
+                resultsCount: codeContext.sources?.length || 0
+              });
+            } else {
+              const errorData = await response.json();
+              logger.warn('Code indexer query returned error', {
+                repository: connectedRepo,
+                error: errorData.error,
+                status: response.status
+              });
+              // Set error in codeContext so AI knows it was attempted
+              codeContext = {
+                error: errorData.error || `HTTP ${response.status}`,
+                available: false
+              };
+              aiContext.codeContext = codeContext;
+            }
+          } else {
+            logger.warn('Invalid repository format', { repository: connectedRepo });
+            codeContext = {
+              error: 'Invalid repository format (expected "owner/repo")',
+              available: false
+            };
+            aiContext.codeContext = codeContext;
+          }
+        } catch (codeIndexerError) {
+          logger.warn('Code indexer query failed, continuing without code context', {
+            repository: connectedRepo,
+            error: codeIndexerError.message
+          });
+          codeContext = {
+            error: codeIndexerError.message,
+            available: false
+          };
+          aiContext.codeContext = codeContext;
+        }
+      }
+
       // Try to get Slack data for context
       if (services.slack?.isInitialized) {
         try {
@@ -223,6 +314,44 @@ When asked to generate product requirements:
 5. Format as markdown table for clean display
 
 Be concise, practical, and focused on helping complete this specific task.`;
+
+      // Add repository access information if connected
+      if (connectedRepo) {
+        systemPrompt += `\n\n🔗 REPOSITORY ACCESS:
+You have access to the ${connectedRepo} repository through the code indexer.
+When users ask questions about the codebase, you can reference code snippets and files.
+The code indexer has been queried for this conversation and relevant code context is provided below.`;
+      }
+
+      // Add code context to prompt if available
+      if (codeContext && codeContext.answer) {
+        // The code indexer provides a business-friendly answer
+        systemPrompt += `\n\n💻 CODE ANALYSIS FROM REPOSITORY (${connectedRepo}):`;
+        systemPrompt += `\n${codeContext.answer}`;
+        
+        if (codeContext.sources && codeContext.sources.length > 0) {
+          systemPrompt += `\n\nRelevant files analyzed:`;
+          codeContext.sources.forEach(source => {
+            const filePath = source.filePath || source.file || 'unknown';
+            const language = source.language || 'unknown';
+            const chunkInfo = source.chunkName ? ` (${source.chunkName})` : '';
+            const lineInfo = source.startLine ? ` line ${source.startLine}` : '';
+            systemPrompt += `\n- ${filePath}${chunkInfo}${lineInfo} [${language}]`;
+          });
+        }
+        
+        systemPrompt += `\n\nThe code analysis above is based on semantic search of the repository. Use this information to provide context-aware answers about the codebase.`;
+      } else if (connectedRepo && codeContext && codeContext.error) {
+        // Code indexer query failed
+        systemPrompt += `\n\n💻 REPOSITORY ACCESS NOTE:
+You are connected to the ${connectedRepo} repository, but the code indexer query encountered an error: ${codeContext.error}
+You can still provide general guidance about the task, but specific code references are not available for this query.`;
+      } else if (connectedRepo && (!codeContext || !codeContext.sources || codeContext.sources.length === 0)) {
+        // No relevant code found
+        systemPrompt += `\n\n💻 REPOSITORY ACCESS NOTE:
+You are connected to the ${connectedRepo} repository. The code indexer was queried but did not find code snippets directly relevant to this specific question.
+You can still provide general guidance about the task and repository.`;
+      }
 
       // Add Slack context to prompt if available
       if (aiContext.slackData && aiContext.slackData.connected && aiContext.slackData.messageCount > 0) {

@@ -532,9 +532,9 @@ async function initializeServices() {
       supabaseAdapter: appState.services.dbAdapter 
     });
     
-    appState.services.microsoft = new MicrosoftService({ 
-      logger, 
-      supabaseAdapter: appState.services.dbAdapter 
+    appState.services.microsoft = new MicrosoftService({
+      logger,
+      supabaseAdapter: appState.services.dbAdapter
     });
 
     // Start core services

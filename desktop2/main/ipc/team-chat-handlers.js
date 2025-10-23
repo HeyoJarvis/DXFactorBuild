@@ -66,6 +66,43 @@ function registerTeamChatHandlers(services, logger) {
   });
 
   /**
+   * Load team context (meetings, tasks, code repos) without chat history
+   */
+  ipcMain.handle('team-chat:load-team-context', async (event, teamId) => {
+    try {
+      logger.info('📋 Loading team context', { teamId });
+
+      // Get current user from auth service
+      const userId = services.auth?.currentUser?.id;
+
+      if (!userId) {
+        logger.warn('Cannot load team context: No authenticated user');
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      // Build context summary with details and settings
+      const { context, contextDetails, contextSettings } = await buildTeamContext(teamId, userId, dbAdapter, logger);
+
+      logger.info(`✅ Loaded team context`, {
+        teamId,
+        meetings: contextDetails.meetings.length,
+        tasks: contextDetails.tasks.length,
+        repos: contextDetails.code_repos.length
+      });
+
+      return {
+        success: true,
+        context: contextDetails, // Send full details
+        summary: context.summary,
+        settings: contextSettings
+      };
+    } catch (error) {
+      logger.error('Error loading team context', { error: error.message });
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
    * Get chat history and context for a team
    */
   ipcMain.handle('team-chat:get-history', async (event, teamId) => {
@@ -371,9 +408,9 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
       }
     }
 
-    // Get JIRA tickets if enabled
+    // Get JIRA and Slack tasks if enabled
     if (contextSettings.include_tasks) {
-      // Get team members to find their JIRA tickets
+      // Get team members to find their tasks
       const { data: teamMembers, error: membersError } = await dbAdapter.supabase
         .from('team_members')
         .select('user_id')
@@ -381,6 +418,8 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
         .eq('is_active', true);
 
       if (!membersError && teamMembers && teamMembers.length > 0) {
+        const allTasks = [];
+
         // Try to get JIRA issues for the current user
         // Note: JIRA integration is per-user, so we get the requesting user's JIRA tickets
         try {
@@ -406,42 +445,77 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
               });
 
               if (issuesResult.success && issuesResult.issues) {
-                context.tasks_count = issuesResult.issues.length;
-                contextDetails.tasks = issuesResult.issues.map(issue => ({
+                // Add JIRA tasks to allTasks
+                allTasks.push(...issuesResult.issues.map(issue => ({
                   id: issue.key,
                   title: issue.summary,
                   external_key: issue.key,
-                  status: issue.status
-                }));
+                  status: issue.status,
+                  source: 'jira'
+                })));
               }
             }
           }
         } catch (jiraError) {
           logger.warn('Could not load JIRA tickets', { error: jiraError.message });
         }
+
+        // Get Slack tasks from the database
+        try {
+          const { data: slackTasks, error: slackError } = await dbAdapter.supabase
+            .from('tasks')
+            .select('id, title, status, external_id, external_source')
+            .eq('external_source', 'slack')
+            .in('status', ['pending', 'in_progress'])
+            .eq('created_by', userId)
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+          if (!slackError && slackTasks && slackTasks.length > 0) {
+            // Add Slack tasks to allTasks
+            allTasks.push(...slackTasks.map(task => ({
+              id: task.id,
+              title: task.title,
+              external_key: task.external_id || task.id,
+              status: task.status,
+              source: 'slack'
+            })));
+          }
+        } catch (slackError) {
+          logger.warn('Could not load Slack tasks', { error: slackError.message });
+        }
+
+        // Update context with combined tasks
+        context.tasks_count = allTasks.length;
+        contextDetails.tasks = allTasks;
       }
     }
 
-    // Get code repos if enabled
+    // Get code repos from GitHub if enabled
     if (contextSettings.include_code) {
-      // Get unique repo names from code_embeddings
+      // Get unique repos from code_embeddings (GitHub indexed repos)
       const { data: codeFiles, error: codeError } = await dbAdapter.supabase
         .from('code_embeddings')
-        .select('metadata')
+        .select('repository_owner, repository_name, repository_branch')
         .limit(1000);
 
       if (!codeError && codeFiles) {
-        // Group by repository path
+        // Group by repository (owner/name)
         const repoMap = new Map();
         codeFiles.forEach(file => {
-          const repoPath = file.metadata?.repository_path || file.metadata?.repository || 'Unknown';
-          const repoName = file.metadata?.repository_name || repoPath.split('/').pop() || repoPath;
+          const repoOwner = file.repository_owner || 'Unknown';
+          const repoName = file.repository_name || 'Unknown';
+          const repoBranch = file.repository_branch || 'main';
+          const repoPath = `${repoOwner}/${repoName}`;
 
           if (!repoMap.has(repoPath)) {
             repoMap.set(repoPath, {
               path: repoPath,
               name: repoName,
+              owner: repoOwner,
+              branch: repoBranch,
               file_count: 0,
+              source: 'github', // Explicitly mark as GitHub source
               selected: !contextSettings.selected_repo_paths ||
                         contextSettings.selected_repo_paths.length === 0 ||
                         contextSettings.selected_repo_paths.includes(repoPath)

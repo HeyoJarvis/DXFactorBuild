@@ -1,6 +1,93 @@
 /* Global Styles */
 @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&display=swap');
 
+/* ===== MISSION CONTROL FULL-SCREEN MODAL ===== */
+.mission-control-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modalFadeIn 0.3s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mission-control-modal-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #fafafa;
+  overflow: hidden;
+  animation: modalSlideIn 0.4s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.mission-control-close-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.28, 0.11, 0.32, 1);
+  z-index: 10001;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 0 0 0.5px rgba(255, 255, 255, 0.05);
+}
+
+.mission-control-close-btn:hover {
+  background: rgba(239, 68, 68, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+  box-shadow: 
+    0 6px 20px rgba(239, 68, 68, 0.4),
+    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+.mission-control-close-btn:active {
+  transform: scale(0.95);
+  transition: all 0.1s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+.mission-control-close-btn svg {
+  flex-shrink: 0;
+}
+
 * {
   margin: 0;
   padding: 0;

@@ -1,14 +1,261 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useDeveloperTasks } from '../hooks/useDeveloperTasks';
+import { useSalesTasks } from '../hooks/useSalesTasks';
 import DraggableHeader from '../components/common/DraggableHeader';
+import ModeToggle from '../components/MissionControl/ModeToggle';
+import GroupedActionList from '../components/Tasks/GroupedActionList';
+import TaskChat from '../components/Tasks/TaskChat';
+import TeamChat from './TeamChat';
+import TeamContext from '../components/Teams/TeamContext';
+import CalendarEmail from '../components/MissionControl/CalendarEmail';
 import './MissionControl.css';
 
 /**
- * Mission Control - Calendar & Email Management
- * Integrated with Outlook/Google Suite for scheduling and communication
- * Now includes AI-detected calendar and email tasks from Slack/JIRA
+ * Mission Control - Dual Mode Interface
+ * Personal Mode: Individual work (Tasks page)
+ * Team Mode: Team collaboration (Team Chat with full context)
  */
 export default function MissionControl({ user }) {
+  // URL params for mode and team
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Mode state: 'personal' | 'team'
+  const [mode, setMode] = useState(() => {
+    // Try URL first, then localStorage, default to personal
+    const urlMode = searchParams.get('mode');
+    if (urlMode === 'team' || urlMode === 'personal') return urlMode;
+    return localStorage.getItem('missionControlMode') || 'personal';
+  });
+
+  // Team state for team mode
+  const [teams, setTeams] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [teamsLoading, setTeamsLoading] = useState(false);
+
+  // Selected task for Personal mode chat
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  // Load tasks for Personal mode
+  const isDeveloper = user?.role === 'developer';
+  const { tasks: devTasks, loading: devLoading, updateTask: updateDevTask, deleteTask: deleteDevTask, toggleTask: toggleDevTask } = useDeveloperTasks(user, 'all');
+  const { tasks: salesTasks, loading: salesLoading, updateTask: updateSalesTask, deleteTask: deleteSalesTask, toggleTask: toggleSalesTask } = useSalesTasks(user, 'all');
+
+  const tasks = isDeveloper ? devTasks : salesTasks;
+  const tasksLoading = isDeveloper ? devLoading : salesLoading;
+  const updateTask = isDeveloper ? updateDevTask : updateSalesTask;
+  const deleteTask = isDeveloper ? deleteDevTask : deleteSalesTask;
+  const toggleTask = isDeveloper ? toggleDevTask : toggleSalesTask;
+
+  // Load teams when switching to team mode
+  useEffect(() => {
+    if (mode === 'team') {
+      loadTeams();
+    }
+  }, [mode]);
+
+  // Persist mode to localStorage and URL
+  useEffect(() => {
+    localStorage.setItem('missionControlMode', mode);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('mode', mode);
+    if (mode === 'team' && selectedTeam) {
+      newParams.set('teamId', selectedTeam.id);
+    } else {
+      newParams.delete('teamId');
+    }
+    setSearchParams(newParams, { replace: true });
+  }, [mode, selectedTeam]);
+
+  // Try to restore selected team from URL or localStorage
+  useEffect(() => {
+    if (mode === 'team' && teams.length > 0 && !selectedTeam) {
+      const urlTeamId = searchParams.get('teamId');
+      const savedTeamId = localStorage.getItem('missionControlTeamId');
+      const teamId = urlTeamId || savedTeamId;
+
+      if (teamId) {
+        const team = teams.find(t => t.id === teamId);
+        if (team) {
+          setSelectedTeam(team);
+          return;
+        }
+      }
+
+      // Default to first team
+      setSelectedTeam(teams[0]);
+    }
+  }, [mode, teams]);
+
+  // Persist selected team
+  useEffect(() => {
+    if (selectedTeam) {
+      localStorage.setItem('missionControlTeamId', selectedTeam.id);
+    }
+  }, [selectedTeam]);
+
+  // Load teams from database
+  const loadTeams = async () => {
+    try {
+      setTeamsLoading(true);
+
+      if (!window.electronAPI?.teamChat?.loadTeams) {
+        console.error('Team Chat API not available');
+        return;
+      }
+
+      const result = await window.electronAPI.teamChat.loadTeams();
+      if (result.success) {
+        setTeams(result.teams);
+      } else {
+        console.error('Failed to load teams:', result.error);
+      }
+    } catch (error) {
+      console.error('Error loading teams:', error);
+    } finally {
+      setTeamsLoading(false);
+    }
+  };
+
+  // Handle mode change
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
+  };
+
+  // Handle team change
+  const handleTeamChange = (team) => {
+    setSelectedTeam(team);
+  };
+
+  // Render mode toggle header
+  return (
+    <div className="mission-control-page">
+      {/* Mode Toggle Header */}
+      <ModeToggle
+        user={user}
+        mode={mode}
+        onModeChange={handleModeChange}
+        selectedTeam={selectedTeam}
+        onTeamChange={handleTeamChange}
+        teams={teams}
+        loading={teamsLoading}
+      />
+
+      {/* 3-Panel Grid Layout */}
+      <div className="mission-control-grid">
+        {/* Left Panel - Context (Tasks List) */}
+        <div className="panel panel-context">
+          {mode === 'personal' ? (
+            // Personal Mode: My tasks list
+            <div className="tasks-list-container">
+              <div className="tasks-list-header">
+                <h3 className="tasks-list-title">My Tasks</h3>
+                <span className="tasks-count">{tasks.length}</span>
+              </div>
+              {tasksLoading ? (
+                <div className="loading-tasks">Loading...</div>
+              ) : (
+                <GroupedActionList
+                  tasks={tasks}
+                  onToggle={toggleTask}
+                  onDelete={deleteTask}
+                  onUpdate={updateTask}
+                  onChat={setSelectedTask}
+                />
+              )}
+            </div>
+          ) : (
+            // Team Mode: Team context (meetings, tasks, code)
+            <div className="team-context-panel">
+              <TeamContext selectedTeam={selectedTeam} />
+            </div>
+          )}
+        </div>
+
+        {/* Middle Panel - Conversation (Chat) */}
+        <div className="panel panel-conversation">
+          {mode === 'personal' ? (
+            // Personal Mode: Task-specific chat (AI assistant)
+            selectedTask ? (
+              <TaskChat
+                task={selectedTask}
+                onClose={() => setSelectedTask(null)}
+              />
+            ) : (
+              <div className="task-chat-empty">
+                <img src="/Jarvis.png" alt="Jarvis AI" className="empty-icon" />
+                <h3>Ready to Assist</h3>
+                <p>Select a task from the left to start an AI-powered conversation</p>
+                
+                <div className="capabilities-list">
+                  <div className="capability-item">
+                    <div className="capability-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                      </svg>
+                    </div>
+                    <span className="capability-text">Query connected codebases with semantic search</span>
+                  </div>
+                  <div className="capability-item">
+                    <div className="capability-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2v20M2 12h20"></path>
+                        <circle cx="12" cy="12" r="4"></circle>
+                      </svg>
+                    </div>
+                    <span className="capability-text">Get intelligent suggestions and insights</span>
+                  </div>
+                  <div className="capability-item">
+                    <div className="capability-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                      </svg>
+                    </div>
+                    <span className="capability-text">Generate requirements and documentation</span>
+                  </div>
+                  <div className="capability-item">
+                    <div className="capability-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </div>
+                    <span className="capability-text">Context-aware answers from your workspace</span>
+                  </div>
+                </div>
+              </div>
+            )
+          ) : (
+            // Team Mode: Team-wide chat with shared context
+            <TeamChat user={user} selectedTeam={selectedTeam} />
+          )}
+        </div>
+
+        {/* Right Panel - Coordination (Calendar + Email) */}
+        <div className="panel panel-coordination">
+          {mode === 'personal' ? (
+            // Personal Mode: Calendar & Email with AI suggestions from tasks
+            <CalendarEmail user={user} tasks={tasks} />
+          ) : (
+            // Team Mode: Team calendar + transcripts
+            <div className="team-calendar-panel">
+              <h3>Team Calendar</h3>
+              <p>Shared calendar with meeting transcripts</p>
+              {/* TODO: Implement TeamCalendar component */}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Keep all the modal components below for potential future use
+function LegacyMissionControl({ user }) {
   const [activeTab, setActiveTab] = useState('calendar'); // 'calendar' or 'email'
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showNewMeetingModal, setShowNewMeetingModal] = useState(false);
@@ -67,520 +314,10 @@ export default function MissionControl({ user }) {
       taskData: task
     }));
 
-  // Check integration status on mount
-  useEffect(() => {
-    checkIntegrations();
-  }, []);
-
-  // Reload events when calendar view changes
-  useEffect(() => {
-    const reloadEvents = async () => {
-      setLoading(true);
-      if (microsoftConnected) {
-        await loadMicrosoftEvents();
-      }
-      if (googleConnected) {
-        await loadGoogleEvents();
-      }
-      setLoading(false);
-    };
-    
-    // Only reload if we're already connected (not on initial mount)
-    if (microsoftConnected || googleConnected) {
-      reloadEvents();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calendarView]);
-
-  // Check if Microsoft and Google are connected
-  const checkIntegrations = async () => {
-    try {
-      setLoading(true);
-
-      // Check Microsoft connection
-      if (window.electronAPI?.microsoft) {
-        const msResult = await window.electronAPI.microsoft.checkConnection();
-        console.log('Microsoft connection check:', msResult);
-        setMicrosoftConnected(msResult.connected || false);
-
-        if (msResult.connected) {
-          await loadMicrosoftEvents();
-        }
-      }
-
-      // Check Google connection
-      if (window.electronAPI?.google) {
-        const googleResult = await window.electronAPI.google.checkConnection();
-        console.log('Google connection check:', googleResult);
-        setGoogleConnected(googleResult.connected || false);
-        
-        if (googleResult.connected) {
-          await loadGoogleEvents();
-        }
-      }
-      
-      // If neither connected, no events to show
-      if (!microsoftConnected && !googleConnected) {
-        setEvents([]);
-      }
-      
-    } catch (error) {
-      console.error('Failed to check integrations:', error);
-      setError('Failed to check integration status');
-      setEvents([]); // Clear events on error
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Authenticate with Microsoft
-  const handleMicrosoftAuth = async () => {
-    try {
-      setAuthenticating('microsoft');
-      setError(null);
-      
-      const result = await window.electronAPI.microsoft.authenticate();
-      
-      if (result.success) {
-        setMicrosoftConnected(true);
-        await loadMicrosoftEvents();
-      } else {
-        setError(result.error || 'Failed to authenticate with Microsoft');
-      }
-    } catch (error) {
-      console.error('Microsoft authentication error:', error);
-      setError(error.message || 'Failed to authenticate with Microsoft');
-    } finally {
-      setAuthenticating(null);
-    }
-  };
-
-  // Authenticate with Google
-  const handleGoogleAuth = async () => {
-    try {
-      setAuthenticating('google');
-      setError(null);
-      
-      const result = await window.electronAPI.google.authenticate();
-      
-      if (result.success) {
-        setGoogleConnected(true);
-        await loadGoogleEvents();
-      } else {
-        setError(result.error || 'Failed to authenticate with Google');
-      }
-    } catch (error) {
-      console.error('Google authentication error:', error);
-      setError(error.message || 'Failed to authenticate with Google');
-    } finally {
-      setAuthenticating(null);
-    }
-  };
-
-  // Load Microsoft calendar events
-  const loadMicrosoftEvents = async () => {
-    try {
-      // Calculate date range based on view
-      const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const endDate = calendarView === 'daily' 
-        ? new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000) // End of today
-        : new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
-      
-      const result = await window.electronAPI.microsoft.getUpcomingEvents({
-        startDateTime: startOfDay.toISOString(),
-        endDateTime: endDate.toISOString()
-      });
-      
-      if (result.success && result.events) {
-        // Debug: Log the first event to see the exact format
-        if (result.events.length > 0) {
-          console.log('Microsoft event sample:', JSON.stringify(result.events[0], null, 2));
-        }
-        
-        // Transform Microsoft events to our format
-        const transformedEvents = result.events.map(event => {
-          // Microsoft Graph API now returns times in local timezone (America/Denver)
-          // With Prefer header: { dateTime: "2025-10-16T09:00:00.0000000", timeZone: "America/Denver" }
-          // Parse these as local times (no timezone conversion needed)
-          
-          let startDate, endDate;
-          
-          if (event.start.timeZone === 'UTC') {
-            // If still UTC, append Z to parse correctly
-            startDate = new Date(event.start.dateTime + (event.start.dateTime.endsWith('Z') ? '' : 'Z'));
-            endDate = new Date(event.end.dateTime + (event.end.dateTime.endsWith('Z') ? '' : 'Z'));
-          } else {
-            // For local timezone, parse the datetime directly
-            // Remove trailing zeros and parse
-            const startStr = event.start.dateTime.replace(/\.0+$/, '');
-            const endStr = event.end.dateTime.replace(/\.0+$/, '');
-            startDate = new Date(startStr);
-            endDate = new Date(endStr);
-          }
-          
-          // Format the date and time
-          const eventDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          const eventTime = startDate.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-          });
-          
-          // Check if event is today
-          const today = new Date();
-          const isToday = startDate.toDateString() === today.toDateString();
-          const isTomorrow = startDate.toDateString() === new Date(today.getTime() + 86400000).toDateString();
-          
-          let displayTime = eventTime;
-          if (!isToday) {
-            if (isTomorrow) {
-              displayTime = `Tomorrow, ${eventTime}`;
-            } else {
-              displayTime = `${eventDate}, ${eventTime}`;
-            }
-          }
-          
-          return {
-            id: event.id,
-            title: event.subject,
-            time: displayTime,
-            rawDate: startDate, // Store raw date for sorting
-            duration: calculateDuration(event.start.dateTime, event.end.dateTime),
-            attendees: event.attendees?.map(a => a.emailAddress.name || a.emailAddress.address) || [],
-      type: 'meeting',
-      status: 'confirmed',
-            location: event.isOnlineMeeting ? 'Teams' : (event.location?.displayName || 'Not specified'),
-            color: '#0078d4',
-            source: 'microsoft',
-            meetingLink: event.onlineMeeting?.joinUrl
-          };
-        });
-        
-        setEvents(prev => [...prev.filter(e => e.source !== 'microsoft'), ...transformedEvents]);
-      }
-    } catch (error) {
-      console.error('Failed to load Microsoft events:', error);
-    }
-  };
-
-  // Load Google calendar events
-  const loadGoogleEvents = async () => {
-    try {
-      // Calculate date range based on view
-      const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const endDate = calendarView === 'daily' 
-        ? new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000) // End of today
-        : new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
-      
-      const result = await window.electronAPI.google.getUpcomingEvents({
-        timeMin: startOfDay.toISOString(),
-        timeMax: endDate.toISOString()
-      });
-      
-      if (result.success && result.events) {
-        // Debug: Log the first event to see format
-        if (result.events.length > 0) {
-          console.log('Google event sample:', JSON.stringify(result.events[0], null, 2));
-        }
-        
-        // Transform Google events to our format
-        const transformedEvents = result.events.map(event => {
-          // Google Calendar returns times with timezone info
-          // Parse the datetime correctly
-          const startDate = new Date(event.start.dateTime || event.start.date);
-          const endDate = new Date(event.end.dateTime || event.end.date);
-          
-          // Format the date and time
-          const eventDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          const eventTime = startDate.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-          });
-          
-          // Check if event is today
-          const today = new Date();
-          const isToday = startDate.toDateString() === today.toDateString();
-          const isTomorrow = startDate.toDateString() === new Date(today.getTime() + 86400000).toDateString();
-          
-          let displayTime = eventTime;
-          if (!isToday) {
-            if (isTomorrow) {
-              displayTime = `Tomorrow, ${eventTime}`;
-            } else {
-              displayTime = `${eventDate}, ${eventTime}`;
-            }
-          }
-          
-          return {
-            id: event.id,
-            title: event.summary,
-            time: displayTime,
-            rawDate: startDate,
-            duration: calculateDuration(event.start.dateTime || event.start.date, event.end.dateTime || event.end.date),
-            attendees: event.attendees?.map(a => a.displayName || a.email) || [],
-            type: 'meeting',
-            status: 'confirmed',
-            location: event.hangoutLink ? 'Google Meet' : (event.location || 'Not specified'),
-            color: '#4285f4',
-            source: 'google',
-            meetingLink: event.hangoutLink || event.conferenceData?.entryPoints?.[0]?.uri
-          };
-        });
-        
-        setEvents(prev => [...prev.filter(e => e.source !== 'google'), ...transformedEvents]);
-      }
-    } catch (error) {
-      console.error('Failed to load Google events:', error);
-    }
-  };
-
-  // Calculate duration between two times
-  const calculateDuration = (start, end) => {
-    const startTime = new Date(start);
-    const endTime = new Date(end);
-    const diffMs = endTime - startTime;
-    const diffMins = Math.round(diffMs / 60000);
-    
-    if (diffMins < 60) {
-      return `${diffMins} min`;
-    } else {
-      const hours = Math.floor(diffMins / 60);
-      const mins = diffMins % 60;
-      return mins > 0 ? `${hours}h ${mins}m` : `${hours} hour${hours > 1 ? 's' : ''}`;
-    }
-  };
-
-  // Create new meeting
-  const handleCreateMeeting = async (meetingData) => {
-    try {
-      setError(null);
-      
-      // Parse the datetime-local input (which is in local time without timezone info)
-      // and format as ISO string for the API
-      const startDate = new Date(meetingData.startTime);
-      const endDate = new Date(meetingData.endTime);
-      
-      const eventData = {
-        subject: meetingData.title,
-        startTime: startDate.toISOString(),
-        endTime: endDate.toISOString(),
-        attendees: meetingData.attendees.split(',').map(email => email.trim()).filter(e => e),
-        isOnlineMeeting: meetingData.includeTeamsLink,
-        body: meetingData.description || '',
-        timeZone: 'America/Denver'
-      };
-      
-      // Use the connected service
-      const result = microsoftConnected 
-        ? await window.electronAPI.microsoft.createEvent(eventData)
-        : await window.electronAPI.google.createEvent(eventData);
-      
-      if (result.success) {
-        // Close modal
-        setShowNewMeetingModal(false);
-        
-        // Reload events
-        if (microsoftConnected) {
-          await loadMicrosoftEvents();
-        }
-        if (googleConnected) {
-          await loadGoogleEvents();
-        }
-        
-        // Show success message
-        alert(`Meeting created successfully!${result.meetingLink ? '\n\nMeeting link: ' + result.meetingLink : ''}`);
-      } else {
-        setError(result.error || 'Failed to create meeting');
-      }
-    } catch (error) {
-      console.error('Failed to create meeting:', error);
-      setError(error.message || 'Failed to create meeting');
-    }
-  };
-
-  // Load unified inbox (emails from Gmail + Outlook)
-  const loadUnifiedInbox = async () => {
-    try {
-      setEmailsLoading(true);
-      setError(null);
-
-      console.log('Loading unified inbox...');
-
-      // Fetch unified inbox
-      const result = await window.electronAPI.inbox.getUnified({
-        maxResults: 50,
-        includeSources: ['gmail', 'outlook']
-      });
-
-      if (result.success && result.emails) {
-        console.log('Unified inbox loaded:', result.emails.length, 'emails');
-        console.log('Email sources:', result.emails.map(e => e.source));
-        console.log('Sample email:', result.emails[0]);
-
-        // Transform emails to unified format with consistent fields
-        const transformedEmails = result.emails.map((email, index) => {
-          // Parse sender - handle both Gmail (string) and Outlook (object) formats
-          let senderName = 'Unknown';
-          let senderEmail = '';
-
-          if (email.from) {
-            if (typeof email.from === 'string') {
-              // Gmail format: "Sender Name <email@domain.com>"
-              const fromMatch = email.from.match(/(.*?)<(.+?)>/) || email.from.match(/(.+)/);
-              senderName = fromMatch ? fromMatch[1]?.trim() || fromMatch[2]?.trim() : 'Unknown';
-              senderEmail = fromMatch ? fromMatch[2]?.trim() || fromMatch[1]?.trim() : '';
-            } else if (email.from.emailAddress) {
-              // Outlook format: { emailAddress: { name: "...", address: "..." } }
-              senderName = email.from.emailAddress.name || email.from.emailAddress.address || 'Unknown';
-              senderEmail = email.from.emailAddress.address || '';
-            }
-          }
-
-          // Format date
-          const emailDate = email.date || email.receivedDateTime;
-
-          if (!emailDate) {
-            console.warn(`Email ${index} missing date:`, email);
-          }
-
-          const date = emailDate ? new Date(emailDate) : new Date();
-          const now = new Date();
-          const isToday = date.toDateString() === now.toDateString();
-          const isYesterday = date.toDateString() === new Date(now.getTime() - 86400000).toDateString();
-
-          let timeDisplay;
-          if (isToday) {
-            timeDisplay = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-          } else if (isYesterday) {
-            timeDisplay = 'Yesterday';
-          } else {
-            timeDisplay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          }
-
-          return {
-            ...email,
-            senderName,
-            senderEmail,
-            timeDisplay,
-            rawDate: date
-          };
-        });
-
-        // Sort by date (newest first)
-        transformedEmails.sort((a, b) => b.rawDate - a.rawDate);
-
-        setEmails(transformedEmails);
-        setSelectedEmail(transformedEmails[0] || null);
-      } else {
-        console.error('Failed to load unified inbox:', result.error);
-        setError(result.error || 'Failed to load emails');
-        setEmails([]);
-      }
-    } catch (error) {
-      console.error('Failed to load unified inbox:', error);
-      setError(error.message || 'Failed to load emails');
-      setEmails([]);
-    } finally {
-      setEmailsLoading(false);
-    }
-  };
-
-  // Load emails when email tab is active
-  useEffect(() => {
-    if (activeTab === 'email' && (microsoftConnected || googleConnected) && emailView === 'inbox') {
-      loadUnifiedInbox();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, microsoftConnected, googleConnected, emailView]);
-
-  // Generate AI Follow Up
-  const handleGenerateAIFollowUp = async () => {
-    if (!selectedEmail) return;
-
-    try {
-      setGeneratingDraft(true);
-      setShowAIFollowUpModal(true);
-      setAiDraftContent(''); // Clear previous draft
-
-      console.log('Generating AI follow-up for email:', selectedEmail.subject);
-
-      // Extract email body content (handle both string and object formats)
-      let emailBody = '';
-      if (selectedEmail.body) {
-        if (typeof selectedEmail.body === 'string') {
-          emailBody = selectedEmail.body;
-        } else if (selectedEmail.body.content) {
-          emailBody = selectedEmail.body.content;
-        }
-      }
-
-      // Fallback to preview/snippet if no body
-      if (!emailBody) {
-        emailBody = selectedEmail.preview || selectedEmail.snippet || selectedEmail.bodyPreview || '';
-      }
-
-      // Strip HTML tags for cleaner context
-      const plainTextBody = emailBody.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-
-      // Build the prompt for AI
-      const prompt = `Generate a professional follow-up email response to the email below.
-
-IMPORTANT REQUIREMENTS:
-- Write in a professional, business-appropriate tone
-- Do NOT use any emojis
-- Keep it concise (2-3 paragraphs maximum)
-- Do NOT include a subject line in the response (I'll handle that)
-- Format as plain text (no HTML)
-- Be specific and relevant to the email content
-
-Original Email:
-From: ${selectedEmail.senderName || selectedEmail.from}
-Subject: ${selectedEmail.subject || '(No subject)'}
-
-${plainTextBody.substring(0, 2000)}
-
-Generate the follow-up response now:`;
-
-      // Call chat API to generate follow-up (pass just the string, not an object)
-      const result = await window.electronAPI.chat.send(prompt);
-
-      console.log('AI response result:', result);
-
-      if (result && result.success && result.data && result.data.content) {
-        setAiDraftContent(result.data.content);
-      } else if (result && result.response) {
-        // Fallback to alternate response format
-        setAiDraftContent(result.response);
-      } else {
-        throw new Error('No response from AI');
-      }
-
-    } catch (error) {
-      console.error('Failed to generate AI follow-up:', error);
-      setError('Failed to generate AI follow-up: ' + error.message);
-      setShowAIFollowUpModal(false);
-    } finally {
-      setGeneratingDraft(false);
-    }
-  };
-
-  // Format date for display
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
   return (
-    <div className="mission-control-page">
+    <div className="legacy-mission-control-page">
       {/* Draggable Window Controls */}
-      <DraggableHeader title="Mission Control" />
+      <DraggableHeader title="Legacy Mission Control" />
 
       {/* Tab Navigation - Simplified */}
       <div className="mc-tabs">

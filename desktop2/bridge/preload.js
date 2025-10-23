@@ -99,6 +99,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   codeIndexer: {
     query: (params) => ipcRenderer.invoke('codeIndexer:query', params),
     listRepositories: (params) => ipcRenderer.invoke('codeIndexer:listRepositories', params),
+    indexRepository: (params) => ipcRenderer.invoke('codeIndexer:indexRepository', params),
+    getIndexingStatus: (params) => ipcRenderer.invoke('codeIndexer:getIndexingStatus', params),
     getStatus: () => ipcRenderer.invoke('codeIndexer:getStatus'),
     checkAvailability: () => ipcRenderer.invoke('codeIndexer:checkAvailability')
   },
@@ -162,9 +164,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Team Chat APIs
   teamChat: {
     loadTeams: () => ipcRenderer.invoke('team-chat:load-teams'),
+    loadTeamContext: (teamId) => ipcRenderer.invoke('team-chat:load-team-context', teamId),
     getHistory: (teamId) => ipcRenderer.invoke('team-chat:get-history', teamId),
     sendMessage: (teamId, message) => ipcRenderer.invoke('team-chat:send-message', teamId, message),
     saveContextSettings: (teamId, settings) => ipcRenderer.invoke('team-chat:save-context-settings', teamId, settings)
+  },
+
+  // AI APIs
+  ai: {
+    generateEmailDraft: (prompt) => ipcRenderer.invoke('ai:generateEmailDraft', prompt)
   }
 });
 

@@ -1,35 +1,49 @@
-/* Action List Container */
+/* Action List - Modern, Elegant Container */
+
 .action-list-items {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  padding: 4px;
 }
 
-/* Empty State */
-.action-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  text-align: center;
+/* Smooth stagger animation on load */
+.action-list-items .action-item-modern {
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 }
 
-.empty-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-  opacity: 0.4;
+.action-list-items .action-item-modern:nth-child(1) { animation-delay: 0.05s; }
+.action-list-items .action-item-modern:nth-child(2) { animation-delay: 0.1s; }
+.action-list-items .action-item-modern:nth-child(3) { animation-delay: 0.15s; }
+.action-list-items .action-item-modern:nth-child(4) { animation-delay: 0.2s; }
+.action-list-items .action-item-modern:nth-child(5) { animation-delay: 0.25s; }
+.action-list-items .action-item-modern:nth-child(n+6) { animation-delay: 0.3s; }
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.empty-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #171717;
-  margin-bottom: 8px;
+/* Scrollbar styling */
+.action-list-items::-webkit-scrollbar {
+  width: 6px;
 }
 
-.empty-subtitle {
-  font-size: 14px;
-  color: #737373;
-  max-width: 320px;
+.action-list-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.action-list-items::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.action-list-items::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
 }

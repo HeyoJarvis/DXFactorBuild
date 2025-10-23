@@ -10,8 +10,12 @@ export default function TaskChat({ task, onClose }) {
   const [viewMode, setViewMode] = useState('acceptance'); // 'acceptance' or 'requirements'
   const [productRequirements, setProductRequirements] = useState(null);
   const [isGeneratingRequirements, setIsGeneratingRequirements] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState([]);
+  const [showRepoSelector, setShowRepoSelector] = useState(false);
+  const [connectedRepo, setConnectedRepo] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Editing state
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -64,12 +68,20 @@ export default function TaskChat({ task, onClose }) {
 
   const loadAvailableRepositories = async () => {
     try {
+      console.log('🔄 TaskChat: Loading available repositories...');
       const response = await window.electronAPI.codeIndexer.listRepositories();
+      console.log('📦 TaskChat: Repository response:', response);
+
       if (response.success && response.repositories) {
-        setAvailableRepositories(response.repositories.map(repo => repo.name));
+        // Use full_name (owner/repo format) instead of just name
+        const repoNames = response.repositories.map(repo => repo.full_name);
+        setAvailableRepositories(repoNames);
+        console.log('✅ TaskChat: Loaded', repoNames.length, 'repositories:', repoNames);
+      } else {
+        console.error('❌ TaskChat: Failed to load repositories:', response.error);
       }
     } catch (error) {
-      console.error('Failed to load repositories:', error);
+      console.error('💥 TaskChat: Error loading repositories:', error);
     }
   };
 
@@ -342,7 +354,9 @@ export default function TaskChat({ task, onClose }) {
     if (!input.trim() || isTyping) return;
 
     const userMessage = input.trim();
+    const currentRepo = connectedRepo; // Capture current repo for this request
     setInput('');
+    setConnectedRepo(null); // Clear repo connection for next request
 
     // Add user message immediately
     const newUserMessage = {
@@ -356,13 +370,14 @@ export default function TaskChat({ task, onClose }) {
     setIsTyping(true);
 
     try {
-      console.log('📤 Sending chat message for task:', { 
-        taskId: task.id, 
+      console.log('📤 Sending chat message for task:', {
+        taskId: task.id,
         title: task.title,
         jiraUrl: task.jiraUrl || task.external_url,
-        external_source: task.external_source
+        external_source: task.external_source,
+        connectedRepo: currentRepo
       });
-      
+
       const response = await window.electronAPI.tasks.sendChatMessage(task.id, userMessage, {
         task: {
           id: task.id,
@@ -373,7 +388,8 @@ export default function TaskChat({ task, onClose }) {
           created_at: task.created_at,
           route_to: task.route_to || 'mission-control', // JIRA tasks go to mission-control
           work_type: task.work_type || 'task'
-        }
+        },
+        repository: currentRepo // Pass the repository to the backend
       });
 
       console.log('📥 Chat response:', response);
@@ -413,11 +429,55 @@ export default function TaskChat({ task, onClose }) {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  // Handle file upload
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/csv',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/gif',
+      'image/webp'
+    ];
+
+    const validFiles = files.filter(file => {
+      const isValid = allowedTypes.includes(file.type);
+      if (!isValid) {
+        alert(`File type not supported: ${file.name}\nSupported: PDF, Excel, CSV, Word, PowerPoint, Images`);
+      }
+      return isValid;
+    });
+
+    if (validFiles.length > 0) {
+      setAttachedFiles(prev => [...prev, ...validFiles]);
+    }
+  };
+
+  // Remove attached file
+  const removeAttachedFile = (index) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Handle GitHub repo selection
+  const handleRepoSelect = async (repo) => {
+    setShowRepoSelector(false);
+    // Set the connected repository for this chat request
+    setConnectedRepo(repo);
   };
 
   // Format date
@@ -899,55 +959,131 @@ export default function TaskChat({ task, onClose }) {
 
         {/* Input Area with Controls */}
         <div className="task-chat-input-wrapper">
+          {/* Attached Files Display */}
+          {attachedFiles.length > 0 && (
+            <div className="attached-files-container">
+              {attachedFiles.map((file, index) => (
+                <div key={index} className="attached-file">
+                  <span className="file-icon">📎</span>
+                  <span className="file-name">{file.name}</span>
+                  <button
+                    className="remove-file-btn"
+                    onClick={() => removeAttachedFile(index)}
+                    title="Remove file"
+                  >×</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Repository Selector Modal */}
+          {showRepoSelector && (
+            <div className="repo-selector-modal">
+              <div className="repo-selector-header">
+                <span>Select Repository</span>
+                <button onClick={() => setShowRepoSelector(false)}>×</button>
+              </div>
+              <div className="repo-selector-list">
+                {availableRepositories.length > 0 ? (
+                  availableRepositories.map(repo => (
+                    <button
+                      key={repo}
+                      className="repo-option"
+                      onClick={() => handleRepoSelect(repo)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                      </svg>
+                      {repo}
+                    </button>
+                  ))
+                ) : (
+                  <div className="no-repos">
+                    <p>No repositories found</p>
+                    <span>Index repositories in Settings to use this feature</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="task-chat-input-container">
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept=".pdf,.xls,.xlsx,.csv,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.webp"
+              multiple
+              style={{ display: 'none' }}
+            />
+
             {/* Left Controls */}
             <div className="chat-input-controls-left">
-              <button className="chat-control-btn" title="Add attachment">
+              <button
+                className="chat-control-btn"
+                title="Add files (PDF, Excel, CSV, Word, PowerPoint, Images)"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
               </button>
-              <button className="chat-control-btn" title="Filter">
+              <button
+                className={`chat-control-btn ${connectedRepo ? 'active-repo' : ''}`}
+                title={connectedRepo ? `Connected: ${connectedRepo}` : "Connect to GitHub repository"}
+                onClick={() => {
+                  if (!showRepoSelector) {
+                    // Load repositories when opening the modal
+                    loadAvailableRepositories();
+                  }
+                  setShowRepoSelector(!showRepoSelector);
+                }}
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="4" y1="21" x2="4" y2="14"></line>
-                  <line x1="4" y1="10" x2="4" y2="3"></line>
-                  <line x1="12" y1="21" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12" y2="3"></line>
-                  <line x1="20" y1="21" x2="20" y2="16"></line>
-                  <line x1="20" y1="12" x2="20" y2="3"></line>
-                  <line x1="1" y1="14" x2="7" y2="14"></line>
-                  <line x1="9" y1="8" x2="15" y2="8"></line>
-                  <line x1="17" y1="16" x2="23" y2="16"></line>
-                </svg>
-              </button>
-              <button className="chat-control-btn" title="Extended search">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.35-4.35"></path>
-                  <path d="M11 8v6"></path>
-                  <path d="M8 11h6"></path>
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                 </svg>
               </button>
             </div>
 
-            {/* Text Input */}
-            <textarea
-              ref={inputRef}
-              className="task-chat-textarea"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="How can I help you today?"
-              rows={1}
-              disabled={isTyping}
-            />
+            {/* Text Input Area - Now with connection status */}
+            <div className="task-chat-input-area">
+              {/* Connection Status Display */}
+              {connectedRepo && (
+                <div className="repo-connection-status">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                  </svg>
+                  <span>Connected: {connectedRepo}</span>
+                  <button
+                    className="disconnect-repo-btn"
+                    onClick={() => setConnectedRepo(null)}
+                    title="Disconnect repository"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              {/* Text Input */}
+              <textarea
+                ref={inputRef}
+                className="task-chat-textarea"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="How can I help you today?"
+                rows={3}
+                disabled={isTyping}
+              />
+            </div>
 
             {/* Right Controls */}
             <div className="chat-input-controls-right">
               {/* Model Selector */}
               <div className="model-selector-wrapper">
-                <button 
+                <button
                   className="model-selector-btn"
                   onClick={() => setShowModelDropdown(!showModelDropdown)}
                   title="Select model"
@@ -976,9 +1112,9 @@ export default function TaskChat({ task, onClose }) {
               </div>
 
               {/* Send Button */}
-              <button 
+              <button
                 className="task-chat-send-btn"
-                onClick={handleSend} 
+                onClick={handleSend}
                 disabled={!input.trim() || isTyping}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

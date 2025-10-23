@@ -99,49 +99,37 @@ function Navigation({ user, onLogout }) {
 }
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Bypass login for demo - use mock user
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [currentUser, setCurrentUser] = useState({
+    id: 'demo-user-123',
+    email: 'demo@cgi.com',
+    name: 'Demo User'
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      // Check for existing session with Supabase
-      const result = await window.electronAPI.auth.getSession();
-      
-      if (result.success && result.user) {
-        setCurrentUser(result.user);
-        setIsAuthenticated(true);
-        
-        // Initialize services with user
-        await window.electronAPI.auth.initializeServices(result.user.id);
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-    } finally {
-      setLoading(false);
+    // Initialize services with mock user
+    if (window.electronAPI?.auth?.initializeServices) {
+      window.electronAPI.auth.initializeServices(currentUser.id).catch(err => {
+        console.log('Service initialization skipped:', err);
+      });
     }
-  };
+  }, []);
 
   const handleLogin = async (user) => {
     setCurrentUser(user);
     setIsAuthenticated(true);
     
     // Initialize services with user
-    await window.electronAPI.auth.initializeServices(user.id);
+    if (window.electronAPI?.auth?.initializeServices) {
+      await window.electronAPI.auth.initializeServices(user.id);
+    }
   };
 
   const handleLogout = async () => {
-    try {
-      await window.electronAPI.auth.logout();
-      setIsAuthenticated(false);
-      setCurrentUser(null);
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    console.log('Logout clicked - staying in demo mode');
+    // Don't actually logout in demo mode
   };
 
   if (loading) {
@@ -151,10 +139,6 @@ function App() {
         <p>Loading...</p>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
   }
 
   return (

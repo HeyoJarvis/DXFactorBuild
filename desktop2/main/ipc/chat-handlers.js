@@ -115,6 +115,29 @@ function registerChatHandlers(services, logger) {
     }
   });
 
+  /**
+   * Generate email draft using AI
+   */
+  ipcMain.handle('ai:generateEmailDraft', async (event, prompt) => {
+    try {
+      logger.info('Generating email draft with AI');
+
+      // Use AI service to generate email draft
+      const response = await services.ai.sendMessage(prompt, {});
+
+      return {
+        success: true,
+        draft: response.content || response.text || response
+      };
+    } catch (error) {
+      logger.error('AI generateEmailDraft error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
   logger.info('Chat handlers registered');
 }
 

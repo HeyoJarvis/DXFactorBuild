@@ -238,13 +238,13 @@ class GoogleGmailService extends EventEmitter {
       } : undefined;
 
       const event = {
-        summary: eventData.subject || eventData.title,
+        summary: eventData.subject || eventData.title || eventData.summary,
         description: eventData.body || eventData.description || '',
-        start: {
+        start: eventData.start || {
           dateTime: eventData.startTime,
           timeZone: eventData.timeZone || 'America/Denver'
         },
-        end: {
+        end: eventData.end || {
           dateTime: eventData.endTime,
           timeZone: eventData.timeZone || 'America/Denver'
         },
@@ -257,7 +257,7 @@ class GoogleGmailService extends EventEmitter {
           }
           return { email };
         }).filter(Boolean),
-        conferenceData: conferenceData,
+        conferenceData: eventData.conferenceData || conferenceData,
         reminders: {
           useDefault: true
         }

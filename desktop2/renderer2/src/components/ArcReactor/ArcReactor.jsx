@@ -131,7 +131,7 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
     
     setIsMenuOpen(false);
     
-    // Map itemId to route
+    // Map itemId to route for all pages
     const routeMap = {
       'chat': '/copilot',
       'mission-control': '/mission-control',

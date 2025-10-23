@@ -11,8 +11,6 @@ import Settings from './pages/Settings';
 import Login from './pages/Login';
 import LoginFlow from './pages/LoginFlow';
 import DiagnosticMicrosoft from './pages/DiagnosticMicrosoft';
-import Navigation from './components/common/Navigation';
-import TabBar from './components/common/TabBar';
 import ArcReactor from './components/ArcReactor/ArcReactor';
 
 function App() {
@@ -259,8 +257,8 @@ function App() {
 
   // Check if we're in the orb window or secondary window based on hash
   const isOrbWindow = !window.location.hash || window.location.hash === '#/';
-  
-  // If this is the orb window, show only Arc Reactor
+
+  // If this is the orb window, show Arc Reactor only
   if (isOrbWindow) {
     return (
       <div className="app app-collapsed">
@@ -272,32 +270,9 @@ function App() {
     );
   }
 
-  // Check if we're on pages without navigation
-  const isTasksPage = window.location.hash === '#/tasks';
-  const isArchitecturePage = window.location.hash === '#/architecture';
-  const isIndexerPage = window.location.hash === '#/indexer';
-  const isMissionControlPage = window.location.hash === '#/mission-control';
-  const isTeamChatPage = window.location.hash === '#/team-chat';
-  const isSettingsPage = window.location.hash === '#/settings';
-  const hideNavigation = isTasksPage || isArchitecturePage || isIndexerPage || isMissionControlPage || isTeamChatPage || isSettingsPage;
-  
-  // If this is the secondary window, show the main UI with tab bar (no orb)
+  // If this is the secondary window, show the main UI (no orb, no tab bar, no navigation - using native window frame)
   return (
     <div className="app app-secondary">
-      {!hideNavigation && (
-        <Navigation 
-          user={currentUser}
-          onLogout={handleLogout}
-          onMinimize={() => {
-            // Close this window instead of minimizing
-            if (window.electronAPI?.window) {
-              window.close();
-            }
-          }} 
-        />
-      )}
-      {/* Tab Bar for easy navigation between views */}
-      <TabBar userRole={userRole} user={currentUser} onLogout={handleLogout} />
       <div className="app-content">
         <Routes>
           <Route path="/" element={<Navigate to="/tasks" replace />} />

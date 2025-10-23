@@ -37,15 +37,14 @@ class SecondaryWindowManager {
       width: 1280,
       height: 820,
       show: false,
-      transparent: false, // Disable transparency to properly hide traffic lights
-      backgroundColor: '#ffffff', // White background
-      frame: false, // Frameless window - removes ALL window chrome
+      backgroundColor: '#fafafa', // Light background
+      frame: true, // Native window frame with title bar and controls
       resizable: true, // Allow window resizing
       movable: true, // Allow window dragging
       center: true, // Center the window on screen
+      title: 'HeyJarvis', // Window title
       ...(process.platform === 'darwin' ? {
-        titleBarStyle: 'customButtonsOnHover', // Hide traffic lights completely
-        trafficLightPosition: { x: -100, y: -100 }, // Move traffic lights off-screen
+        titleBarStyle: 'hiddenInset', // macOS: Hide title bar but keep traffic lights
         roundedCorners: true
       } : {}),
       ...(process.platform === 'win32' ? {
@@ -78,6 +77,10 @@ class SecondaryWindowManager {
       this.logger.info('Mouse events enabled for secondary window');
       
       this.window.show();
+      
+      // Maximize the window to fill the screen (like a normal desktop app)
+      this.window.maximize();
+      this.logger.info('Secondary window maximized');
       
       // Setup maximum visibility (same as Arc Reactor)
       this.setupMaximumVisibility();
@@ -224,8 +227,14 @@ class SecondaryWindowManager {
     // Ensure mouse events are enabled before showing
     this.window.setIgnoreMouseEvents(false);
     this.window.show();
+    
+    // Maximize the window to fill the screen
+    if (!this.window.isMaximized()) {
+      this.window.maximize();
+    }
+    
     this.window.focus();
-    this.logger.info('Secondary window shown with mouse events enabled');
+    this.logger.info('Secondary window shown and maximized with mouse events enabled');
   }
 
   /**

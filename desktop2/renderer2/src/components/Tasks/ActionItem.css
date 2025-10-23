@@ -1,374 +1,96 @@
-/* Action Item Card - Original Design with Minimal Updates */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* Action Item - Clean, Spacious Design */
 
-.action-item {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 18px;
-  padding: 28px 32px;
-  min-height: 160px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: visible;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.02);
-}
-
-.action-item::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.02), rgba(118, 75, 162, 0.01));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.action-item:hover {
-  border-color: rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
-.action-item:hover::after {
-  opacity: 1;
-}
-
-.action-item:active {
-  transform: translateY(-1px);
-}
-
-.action-item.completed {
-  opacity: 0.6;
-}
-
-.action-item.completed .action-title {
-  text-decoration: line-through;
-  opacity: 0.7;
-}
-
-/* Priority Badge - Top Right */
-.action-priority-badge {
-  position: absolute;
-  top: 28px;
-  right: 32px;
-  padding: 7px 14px;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  z-index: 2;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-}
-
-.action-priority-badge:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.action-priority-badge.priority-urgent {
-  background: rgba(255, 59, 48, 0.12);
-  color: #FF3B30;
-  border: 1.5px solid rgba(255, 59, 48, 0.3);
-}
-
-.action-priority-badge.priority-high {
-  background: rgba(255, 159, 10, 0.12);
-  color: #FF9F0A;
-  border: 1.5px solid rgba(255, 159, 10, 0.3);
-}
-
-.action-priority-badge.priority-medium {
-  background: rgba(0, 122, 255, 0.12);
-  color: #007AFF;
-  border: 1.5px solid rgba(0, 122, 255, 0.3);
-}
-
-.action-priority-badge.priority-low {
-  background: rgba(142, 142, 147, 0.12);
-  color: #8E8E93;
-  border: 1.5px solid rgba(142, 142, 147, 0.3);
-}
-
-/* Work Type Badge - For calendar/email/outreach tasks */
-.action-work-type-badge {
-  position: absolute;
-  top: 75px;
-  right: 32px;
-  padding: 7px 12px;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  transition: all 0.2s ease;
-  backdrop-filter: blur(8px);
-}
-
-.action-work-type-badge:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.work-type-icon {
-  font-size: 13px;
-  line-height: 1;
-}
-
-.work-type-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-/* Header with Slack Logo and Title */
-.action-item-header {
+.action-item-clean {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding-right: 110px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  margin-bottom: -6px;
+  padding: 16px 18px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 64px;
 }
 
-.action-app-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.02));
-  border: 1px solid rgba(0, 0, 0, 0.06);
+.action-item-clean:hover {
+  border-color: rgba(0, 122, 255, 0.4);
+  background: rgba(0, 122, 255, 0.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transform: translateX(2px);
+}
+
+.action-item-clean.completed {
+  opacity: 0.5;
+  background: rgba(0, 0, 0, 0.01);
+}
+
+.action-item-clean.completed:hover {
+  opacity: 0.7;
+}
+
+/* Logo Container */
+.action-logo {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.action-app-icon:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.06));
-  border-color: rgba(102, 126, 234, 0.2);
-  transform: scale(1.05);
-}
-
-.action-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #0a0a0a;
-  letter-spacing: -0.03em;
-  line-height: 1.3;
-  flex: 1;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  transition: color 0.2s ease;
-}
-
-.action-item:hover .action-title {
-  color: #171717;
-}
-
-/* Progress Bar */
-.action-progress-container {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding-right: 110px;
-  padding-top: 6px;
-}
-
-.action-progress-bar {
-  flex: 1;
-  height: 12px;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.04));
-  border-radius: 16px;
-  overflow: hidden;
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.action-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
-  position: relative;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+.logo-image {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
 }
 
-.action-progress-fill::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
-  border-radius: 16px;
+.logo-emoji-fallback {
+  font-size: 24px;
+  line-height: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
 }
 
-.action-progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-.action-progress-text {
-  font-size: 15px;
-  font-weight: 700;
-  color: #737373;
-  min-width: 48px;
-  text-align: right;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Footer with Metadata and Status */
-.action-footer {
+/* Content Area */
+.action-content {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
-  margin-top: -4px;
 }
 
-.action-footer-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 13px;
-  color: #666;
-  background: rgba(0, 0, 0, 0.03);
-  padding: 6px 12px;
-  border-radius: 8px;
+/* Title */
+.action-title-clean {
+  font-size: 14px;
   font-weight: 500;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
+  color: #1e293b;
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  letter-spacing: -0.01em;
 }
 
-.meta-item:hover {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-}
-
-.meta-item svg {
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-.meta-item.assignee:hover {
-  background: rgba(102, 126, 234, 0.08);
-  border-color: rgba(102, 126, 234, 0.2);
-  color: #667eea;
-}
-
-/* Status Badge - Bottom Right */
-.action-status-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.action-status-badge:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-}
-
-.status-indicator {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-  box-shadow: 0 0 6px currentColor;
-}
-
-.action-status-badge.status-todo {
-  background: rgba(142, 142, 147, 0.1);
-  color: #8E8E93;
-  border: 1px solid rgba(142, 142, 147, 0.2);
-}
-
-.action-status-badge.status-in_progress {
-  background: rgba(255, 159, 10, 0.1);
-  color: #FF9F0A;
-  border: 1px solid rgba(255, 159, 10, 0.2);
-}
-
-.action-status-badge.status-completed {
-  background: rgba(52, 199, 89, 0.1);
-  color: #34C759;
-  border: 1px solid rgba(52, 199, 89, 0.2);
+.action-item-clean.completed .action-title-clean {
+  text-decoration: line-through;
+  color: #64748b;
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .action-item {
-    padding: 20px 24px;
-    min-height: 140px;
+@media (max-width: 1400px) {
+  .action-item-clean {
+    padding: 12px 14px;
+    min-height: 52px;
   }
 
-  .action-item-header {
-    padding-right: 90px;
-  }
-
-  .action-progress-container {
-    padding-right: 90px;
-  }
-
-  .action-priority-badge {
-    top: 20px;
-    right: 24px;
-    padding: 5px 10px;
-    font-size: 10px;
-  }
-
-  .action-title {
-    font-size: 16px;
-  }
-
-  .action-app-icon {
-    width: 36px;
-    height: 36px;
+  .action-title-clean {
+    font-size: 13px;
   }
 }

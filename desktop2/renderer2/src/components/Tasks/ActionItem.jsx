@@ -1,8 +1,8 @@
 import './ActionItem.css';
 
 /**
- * ActionItem Component
- * Displays a single task card with minimal luxury aesthetic
+ * ActionItem Component - Modern, Elegant Task Card
+ * Clean, minimalist design with smooth interactions
  */
 export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, onChat }) {
 
@@ -17,8 +17,43 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
     assignee = task.workflow_metadata?.assignee,
     assignedBy = task.workflow_metadata?.assignedBy,
     created_at = task.started_at || task.created_at,
-    progress = status === 'completed' ? 100 : status === 'in_progress' ? 83 : 0
+    progress = status === 'completed' ? 100 : status === 'in_progress' ? 65 : 0
   } = task;
+
+  // Handle description - can be string or ADF object (from JIRA)
+  const rawDescription = task.description || task.body || task.action_description || '';
+  const description = typeof rawDescription === 'string' 
+    ? rawDescription 
+    : (rawDescription?.content ? extractTextFromADF(rawDescription) : '');
+
+  // Extract plain text from ADF (Atlassian Document Format) object
+  function extractTextFromADF(adf) {
+    if (!adf || typeof adf !== 'object') return '';
+    
+    // If it has content array, extract text from it
+    if (Array.isArray(adf.content)) {
+      return adf.content
+        .map(node => {
+          if (node.type === 'paragraph' && Array.isArray(node.content)) {
+            return node.content
+              .map(textNode => textNode.text || '')
+              .join('');
+          }
+          if (node.type === 'text') {
+            return node.text || '';
+          }
+          // Recursively handle nested content
+          if (node.content) {
+            return extractTextFromADF(node);
+          }
+          return '';
+        })
+        .filter(text => text.trim())
+        .join(' ');
+    }
+    
+    return '';
+  }
 
   // Format date
   const formatDate = (dateString) => {
@@ -34,17 +69,6 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  // Get priority color
-  const getPriorityColor = () => {
-    const colors = {
-      urgent: '#FF3B30',
-      high: '#FF9F0A',
-      medium: '#007AFF',
-      low: '#8E8E93'
-    };
-    return colors[priority] || colors.medium;
-  };
-
   // Get status label
   const getStatusLabel = () => {
     const labels = {
@@ -55,31 +79,53 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
     return labels[status] || 'To Do';
   };
 
+  // Get source display (Slack or JIRA)
+  const getSourceDisplay = () => {
+    const sources = {
+      slack: {
+        icon: '/Slack_icon_2019.svg.png',
+        label: 'Slack',
+        color: '#4A154B',
+        bgColor: 'rgba(74, 21, 75, 0.1)'
+      },
+      jira: {
+        icon: '🔷',
+        label: 'Jira',
+        color: '#0052CC',
+        bgColor: 'rgba(0, 82, 204, 0.1)'
+      }
+    };
+    return sources[source] || sources.slack;
+  };
+
   // Get work type icon and color
   const getWorkTypeDisplay = () => {
     const workTypes = {
       calendar: {
         icon: '📅',
-        label: 'Calendar',
-        color: '#34C759',
-        bgColor: 'rgba(52, 199, 89, 0.1)'
+        label: 'Meeting',
+        color: '#34C759'
       },
       email: {
         icon: '📧',
         label: 'Email',
-        color: '#5AC8FA',
-        bgColor: 'rgba(90, 200, 250, 0.1)'
+        color: '#5AC8FA'
       },
       outreach: {
         icon: '📤',
         label: 'Outreach',
-        color: '#AF52DE',
-        bgColor: 'rgba(175, 82, 222, 0.1)'
+        color: '#AF52DE'
+      },
+      task: {
+        icon: '✓',
+        label: 'Task',
+        color: '#007AFF'
       }
     };
-    return workTypes[work_type] || null;
+    return workTypes[work_type] || workTypes.task;
   };
 
+  const sourceDisplay = getSourceDisplay();
   const workTypeDisplay = getWorkTypeDisplay();
 
   // Handle card click - open chat
@@ -101,84 +147,37 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
 
   return (
     <div
-      className={`action-item ${status === 'completed' ? 'completed' : ''} priority-${priority}`}
+      className={`action-item-clean ${status === 'completed' ? 'completed' : ''}`}
       onClick={handleCardClick}
     >
-      {/* Priority Badge - Top Right */}
-      <div className={`action-priority-badge priority-${priority}`}>
-        {priority.charAt(0).toUpperCase() + priority.slice(1)}
-      </div>
-
-      {/* Work Type Badge - Special tasks (Calendar/Email) */}
-      {workTypeDisplay && (
-        <div 
-          className="action-work-type-badge"
-          style={{ 
-            backgroundColor: workTypeDisplay.bgColor,
-            color: workTypeDisplay.color,
-            border: `1px solid ${workTypeDisplay.color}40`
-          }}
-          title={workTypeDisplay.label}
-        >
-          <span className="work-type-icon">{workTypeDisplay.icon}</span>
-          <span className="work-type-label">{workTypeDisplay.label}</span>
-        </div>
-      )}
-
-      {/* Header with Slack Logo and Title */}
-      <div className="action-item-header">
-        {/* Slack Logo Icon */}
-        <div className="action-app-icon">
+      {/* Source Logo */}
+      <div className="action-logo">
+        {source === 'slack' ? (
           <img 
-            src="/Slack_icon_2019.svg.png" 
+            src={sourceDisplay.icon} 
             alt="Slack" 
-            style={{ width: '24px', height: '24px', objectFit: 'contain' }}
+            className="logo-image"
           />
-        </div>
-
-        {/* Task Title */}
-        <div className="action-title">{title}</div>
+        ) : source === 'jira' ? (
+          <img 
+            src="/JIRALOGO.png" 
+            alt="Jira"
+            className="logo-image"
+            onError={(e) => {
+              // Fallback to emoji if image not found
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <span className="logo-emoji-fallback" style={{ display: 'none' }}>
+          {sourceDisplay.icon}
+        </span>
       </div>
-
-      {/* Progress Bar */}
-      <div className="action-progress-container">
-        <div className="action-progress-bar">
-          <div 
-            className="action-progress-fill"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-        <div className="action-progress-text">{progress}%</div>
-      </div>
-
-      {/* Footer with Metadata and Status */}
-      <div className="action-footer">
-        <div className="action-footer-left">
-          {assignedBy && (
-            <div className="meta-item assignee">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              {assignedBy}
-            </div>
-          )}
-          {created_at && (
-            <div className="meta-item date">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              {formatDate(created_at)}
-            </div>
-          )}
-        </div>
-
-        {/* Status Badge - Bottom Right */}
-        <div className={`action-status-badge status-${status}`}>
-          <div className="status-indicator"></div>
-          {getStatusLabel()}
-        </div>
+      
+      {/* Title */}
+      <div className="action-content">
+        <h3 className="action-title-clean">{title}</h3>
       </div>
     </div>
   );

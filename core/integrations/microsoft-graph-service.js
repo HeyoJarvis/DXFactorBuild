@@ -1199,19 +1199,20 @@ class MicrosoftGraphService extends EventEmitter {
 
       } else {
         // Send new message
+        // Handle both array and string for 'to' field
+        const toArray = Array.isArray(emailData.to) ? emailData.to : [emailData.to];
+
         const message = {
           subject: emailData.subject,
           body: {
-            contentType: 'Text',
+            contentType: emailData.isHtml ? 'HTML' : 'Text',
             content: emailData.body
           },
-          toRecipients: [
-            {
-              emailAddress: {
-                address: emailData.to
-              }
+          toRecipients: toArray.map(email => ({
+            emailAddress: {
+              address: typeof email === 'string' ? email : email.address
             }
-          ]
+          }))
         };
 
         const response = await this.graphClient

@@ -165,15 +165,13 @@ class GoogleService extends EventEmitter {
       const googleEvent = {
         summary: eventData.subject || eventData.summary,
         description: eventData.body || eventData.description,
-        start: {
-          dateTime: eventData.startTime || eventData.start,
-          timeZone: eventData.timeZone || 'America/Denver'
+        start: eventData.start || {
+          dateTime: eventData.startTime
         },
-        end: {
-          dateTime: eventData.endTime || eventData.end,
-          timeZone: eventData.timeZone || 'America/Denver'
+        end: eventData.end || {
+          dateTime: eventData.endTime
         },
-        attendees: (eventData.attendees || []).map(email => 
+        attendees: (eventData.attendees || []).map(email =>
           typeof email === 'string' ? { email } : email
         ),
         conferenceData: eventData.isOnlineMeeting ? {
