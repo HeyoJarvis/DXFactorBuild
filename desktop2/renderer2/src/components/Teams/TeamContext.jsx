@@ -9,6 +9,7 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
     codebase: true
   });
   const [contextSummary, setContextSummary] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Repository management state
   const [showRepoSelector, setShowRepoSelector] = useState(false);
@@ -19,6 +20,10 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
   // Load team context when team changes
   useEffect(() => {
     if (selectedTeam) {
+      // Clear previous team's data immediately when switching teams
+      setIsLoading(true);
+      setContextDetails(null);
+      setContextSummary(null);
       loadTeamContext(selectedTeam.id);
     }
   }, [selectedTeam]);
@@ -27,6 +32,7 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
     try {
       if (!window.electronAPI?.teamChat?.loadTeamContext) {
         console.error('Team Chat API not available');
+        setIsLoading(false);
         return;
       }
 
@@ -35,11 +41,16 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
       console.log('📦 Team context result:', result);
 
       if (result.success) {
-        console.log('✅ Context details:', {
+        console.log('✅ Context details for team', teamId, ':', {
           meetings: result.context?.meetings?.length || 0,
           tasks: result.context?.tasks?.length || 0,
           repos: result.context?.code_repos?.length || 0
         });
+        console.log('📋 Task details:', result.context?.tasks?.map(t => ({
+          title: t.title,
+          source: t.source,
+          assignee: t.assignee
+        })));
         setContextDetails(result.context);
         setContextSummary(result.summary);
       } else {
@@ -47,6 +58,8 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
       }
     } catch (error) {
       console.error('💥 Error loading team context:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -163,7 +176,7 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
-              <span className="context-label">Meeting Notes</span>
+              <span className="context-label">Recent Meeting Notes</span>
             </div>
             <div className="context-header-right">
               {contextDetails?.meetings && Array.isArray(contextDetails.meetings) && (
@@ -215,7 +228,7 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
               <span className="context-label">Tasks (JIRA & Slack)</span>
             </div>
             <div className="context-header-right">
-              {contextDetails?.tasks && Array.isArray(contextDetails.tasks) && (
+              {!isLoading && contextDetails?.tasks && Array.isArray(contextDetails.tasks) && (
                 <span className="context-count">{contextDetails.tasks.length}</span>
               )}
               <svg
@@ -231,20 +244,23 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
               </svg>
             </div>
           </div>
-          {expandedSections.tasks && contextDetails?.tasks && (
+          {expandedSections.tasks && !isLoading && contextDetails?.tasks && (
             <div className="context-items-list">
               {Array.isArray(contextDetails.tasks) && contextDetails.tasks.length > 0 ? (
                 contextDetails.tasks.map((task, idx) => (
                   <div key={idx} className="context-detail-item">
                     <div className="context-detail-header">
                       <div className="context-detail-title">{String(task?.title || 'Untitled Task')}</div>
-                      {task?.external_key && (
+                      {task?.external_key && task?.source === 'jira' && (
                         <span className="task-key">{String(task.external_key)}</span>
                       )}
                     </div>
                     {task?.source && (
                       <div className="context-detail-meta">
-                        {task.source === 'jira' ? 'JIRA' : 'Slack'} • {String(task.status || 'Open')}
+                        {task.source === 'jira' ? 'JIRA' : task.source === 'teams' ? 'Teams' : 'Slack'} • {String(task.status || 'Open')}
+                        {task?.assignee && task.assignee !== 'Unassigned' && (
+                          <span className="task-assignee"> • 👤 {String(task.assignee)}</span>
+                        )}
                       </div>
                     )}
                   </div>

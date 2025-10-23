@@ -8,6 +8,7 @@ import GroupedActionList from '../components/Tasks/GroupedActionList';
 import TaskChat from '../components/Tasks/TaskChat';
 import TeamChat from './TeamChat';
 import TeamContext from '../components/Teams/TeamContext';
+import TeamCalendar from '../components/Teams/TeamCalendar';
 import CalendarEmail from '../components/MissionControl/CalendarEmail';
 import './MissionControl.css';
 
@@ -106,6 +107,7 @@ export default function MissionControl({ user }) {
 
       const result = await window.electronAPI.teamChat.loadTeams();
       if (result.success) {
+        console.log('📋 Loaded teams:', result.teams.map(t => ({ name: t.name, id: t.id })));
         setTeams(result.teams);
       } else {
         console.error('Failed to load teams:', result.error);
@@ -124,6 +126,7 @@ export default function MissionControl({ user }) {
 
   // Handle team change
   const handleTeamChange = (team) => {
+    console.log('🔄 Team changed to:', team?.name, 'ID:', team?.id);
     setSelectedTeam(team);
   };
 
@@ -167,7 +170,7 @@ export default function MissionControl({ user }) {
           ) : (
             // Team Mode: Team context (meetings, tasks, code)
             <div className="team-context-panel">
-              <TeamContext selectedTeam={selectedTeam} />
+              <TeamContext key={selectedTeam?.id} selectedTeam={selectedTeam} />
             </div>
           )}
         </div>
@@ -241,12 +244,8 @@ export default function MissionControl({ user }) {
             // Personal Mode: Calendar & Email with AI suggestions from tasks
             <CalendarEmail user={user} tasks={tasks} />
           ) : (
-            // Team Mode: Team calendar + transcripts
-            <div className="team-calendar-panel">
-              <h3>Team Calendar</h3>
-              <p>Shared calendar with meeting transcripts</p>
-              {/* TODO: Implement TeamCalendar component */}
-            </div>
+            // Team Mode: Team calendar with upcoming meetings
+            <TeamCalendar selectedTeam={selectedTeam} />
           )}
         </div>
       </div>

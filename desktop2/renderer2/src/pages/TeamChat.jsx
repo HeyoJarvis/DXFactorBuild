@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import './TeamChat.css';
 
-export default function TeamChat({ user }) {
-  const [teams, setTeams] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState(null);
+export default function TeamChat({ user, selectedTeam }) {
+  // selectedTeam now comes from MissionControl dropdown - just react to it changing
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,40 +27,16 @@ export default function TeamChat({ user }) {
     scrollToBottom();
   }, [messages]);
 
-  // Load teams on mount
+  // Load chat history when selectedTeam changes from parent (MissionControl dropdown)
   useEffect(() => {
-    loadTeams();
-  }, []);
-
-  // Load chat history when team is selected
-  useEffect(() => {
-    if (selectedTeam) {
+    if (selectedTeam?.id) {
+      console.log('💬 TeamChat: Loading chat for team', selectedTeam.name, '(ID:', selectedTeam.id, ')');
       loadChatHistory(selectedTeam.id);
+    } else {
+      // Clear messages if no team selected
+      setMessages([]);
     }
-  }, [selectedTeam]);
-
-  const loadTeams = async () => {
-    try {
-      if (!window.electronAPI?.teamChat?.loadTeams) {
-        console.error('Team Chat API not available');
-        return;
-      }
-
-      const result = await window.electronAPI.teamChat.loadTeams();
-      if (result.success) {
-        setTeams(result.teams);
-
-        // Auto-select first team if available
-        if (result.teams.length > 0 && !selectedTeam) {
-          setSelectedTeam(result.teams[0]);
-        }
-      } else {
-        console.error('Failed to load teams:', result.error);
-      }
-    } catch (error) {
-      console.error('Error loading teams:', error);
-    }
-  };
+  }, [selectedTeam?.id]); // React to selectedTeam.id changes
 
   const loadChatHistory = async (teamId) => {
     try {
@@ -170,6 +145,8 @@ export default function TeamChat({ user }) {
         return;
       }
 
+      console.log('💬 Sending message to team:', selectedTeam.name, '(ID:', selectedTeam.id, ')');
+
       const result = await window.electronAPI.teamChat.sendMessage(
         selectedTeam.id,
         userMessage
@@ -211,11 +188,7 @@ export default function TeamChat({ user }) {
     }
   };
 
-  const handleTeamSelect = (team) => {
-    setSelectedTeam(team);
-    setMessages([]);
-    setContextSummary(null);
-  };
+  // Team selection is now handled by parent (MissionControl)
 
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
@@ -232,6 +205,86 @@ export default function TeamChat({ user }) {
     return date.toLocaleDateString();
   };
 
+  // Format message content with markdown support
+  const formatMessageContent = (content) => {
+    if (!content) return '';
+    
+    // Process bold text in a string
+    const processBoldText = (text, lineIndex) => {
+      const boldRegex = /\*\*(.*?)\*\*/g;
+      const parts = [];
+      let lastIndex = 0;
+      let match;
+      let matchCount = 0;
+      
+      while ((match = boldRegex.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+          parts.push(text.substring(lastIndex, match.index));
+        }
+        parts.push(<strong key={`b-${lineIndex}-${matchCount++}`}>{match[1]}</strong>);
+        lastIndex = match.index + match[0].length;
+      }
+      if (lastIndex < text.length) {
+        parts.push(text.substring(lastIndex));
+      }
+      
+      return parts.length > 0 ? parts : text;
+    };
+    
+    const lines = content.split('\n');
+    const elements = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Empty line - add spacing
+      if (line.trim() === '') {
+        elements.push(<div key={`space-${i}`} className="message-spacer" />);
+        continue;
+      }
+      
+      // Numbered list: "1. text" or "  1. text"
+      const numberedMatch = line.match(/^(\s*)(\d+)\.\s+(.*)$/);
+      if (numberedMatch) {
+        const indent = numberedMatch[1].length;
+        const number = numberedMatch[2];
+        const content = numberedMatch[3];
+        
+        elements.push(
+          <div key={`num-${i}`} className="message-numbered-item" style={{ marginLeft: `${indent * 8}px` }}>
+            <span className="item-number">{number}.</span>
+            <span className="item-content">{processBoldText(content, i)}</span>
+          </div>
+        );
+        continue;
+      }
+      
+      // Bullet list: "- text" or "  - text" or "• text"
+      const bulletMatch = line.match(/^(\s*)[-•*]\s+(.*)$/);
+      if (bulletMatch) {
+        const indent = bulletMatch[1].length;
+        const content = bulletMatch[2];
+        
+        elements.push(
+          <div key={`bullet-${i}`} className="message-bullet-item" style={{ marginLeft: `${indent * 8}px` }}>
+            <span className="item-bullet">•</span>
+            <span className="item-content">{processBoldText(content, i)}</span>
+          </div>
+        );
+        continue;
+      }
+      
+      // Regular paragraph
+      elements.push(
+        <div key={`para-${i}`} className="message-paragraph">
+          {processBoldText(line, i)}
+        </div>
+      );
+    }
+    
+    return <div className="formatted-content">{elements}</div>;
+  };
+
   return (
     <div className="team-chat-container">
       {/* Header */}
@@ -244,29 +297,7 @@ export default function TeamChat({ user }) {
         </div>
 
         {/* Team Selector */}
-        <div className="team-selector">
-          <label htmlFor="team-select" className="team-selector-label">
-            Select Team:
-          </label>
-          <select
-            id="team-select"
-            className="team-selector-dropdown"
-            value={selectedTeam?.id || ''}
-            onChange={(e) => {
-              const team = teams.find(t => t.id === e.target.value);
-              if (team) handleTeamSelect(team);
-            }}
-          >
-            {teams.length === 0 && (
-              <option value="">No teams available</option>
-            )}
-            {teams.map(team => (
-              <option key={team.id} value={team.id}>
-                {team.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Team selector is in MissionControl header - removed duplicate */}
       </div>
 
       {/* Main Content Area - Full Width Chat */}
@@ -322,7 +353,9 @@ export default function TeamChat({ user }) {
                           {formatTimestamp(msg.timestamp)}
                         </span>
                       </div>
-                      <div className="message-text">{msg.content}</div>
+                      <div className="message-text">
+                        {formatMessageContent(msg.content)}
+                      </div>
                     </div>
                   </div>
                 ))}

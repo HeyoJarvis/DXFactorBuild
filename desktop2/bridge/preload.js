@@ -167,7 +167,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     loadTeamContext: (teamId) => ipcRenderer.invoke('team-chat:load-team-context', teamId),
     getHistory: (teamId) => ipcRenderer.invoke('team-chat:get-history', teamId),
     sendMessage: (teamId, message) => ipcRenderer.invoke('team-chat:send-message', teamId, message),
-    saveContextSettings: (teamId, settings) => ipcRenderer.invoke('team-chat:save-context-settings', teamId, settings)
+    saveContextSettings: (teamId, settings) => ipcRenderer.invoke('team-chat:save-context-settings', teamId, settings),
+    getUpcomingMeetings: (teamId) => ipcRenderer.invoke('team-chat:get-upcoming-meetings', teamId)
   },
 
   // AI APIs

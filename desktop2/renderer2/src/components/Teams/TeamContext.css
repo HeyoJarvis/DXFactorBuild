@@ -225,6 +225,12 @@
   white-space: nowrap;
 }
 
+.task-assignee {
+  color: #007aff;
+  font-weight: 500;
+  font-size: 12px;
+}
+
 /* Repository Items */
 .context-repo-item {
   display: flex;
@@ -314,6 +320,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  pointer-events: auto !important; /* Ensure button is clickable */
 }
 
 .add-repo-button:hover {
@@ -354,7 +361,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000 !important; /* Very high z-index to appear above everything */
+  pointer-events: auto !important; /* Enable clicks */
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -377,6 +385,8 @@
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease-out;
+  pointer-events: auto !important; /* Enable all clicks within modal */
+  z-index: 10001 !important; /* Above overlay */
 }
 
 @keyframes slideUp {
@@ -418,6 +428,7 @@
   color: #86868b;
   cursor: pointer;
   transition: all 0.2s;
+  pointer-events: auto !important; /* Ensure button is clickable */
 }
 
 .close-button:hover {
@@ -555,6 +566,7 @@
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  pointer-events: auto !important; /* Ensure button is clickable */
 }
 
 .index-button:hover:not(:disabled) {
