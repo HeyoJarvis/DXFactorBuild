@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import './ArcReactorOrb.css';
 
@@ -7,9 +8,9 @@ import './ArcReactorOrb.css';
  * - Draggable by mouse (hold and drag)
  * - Quick click to open menu
  * - Pulsing glow animation
- * - Role-based indicator (developer/sales)
+ * - Text-based notification messages
  */
-function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', onPositionChange, isCollapsed = true }) {
+function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', onPositionChange, isCollapsed = true, notificationMessage = null }) {
   const [isDragging, setIsDragging] = useState(false);
   const [clickStart, setClickStart] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
@@ -167,10 +168,12 @@ function ArcReactorOrb({ onMenuToggle, isMenuOpen, currentRole = 'developer', on
         <div className="orb-particle orb-particle-4"></div>
       </div>
       
-      {/* Role indicator badge */}
-      <div className="orb-role-indicator">
-        {currentRole === 'developer' ? '👨‍💻' : '💼'}
-      </div>
+      {/* Notification message - only show if there are notifications */}
+      {notificationMessage && (
+        <div className="orb-notification-message">
+          {notificationMessage}
+        </div>
+      )}
     </div>
   );
 }

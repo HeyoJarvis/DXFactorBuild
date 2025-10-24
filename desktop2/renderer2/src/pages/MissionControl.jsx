@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDeveloperTasks } from '../hooks/useDeveloperTasks';
 import { useSalesTasks } from '../hooks/useSalesTasks';
@@ -9,6 +9,8 @@ import TaskChat from '../components/Tasks/TaskChat';
 import TeamChat from './TeamChat';
 import TeamContext from '../components/Teams/TeamContext';
 import CalendarEmail from '../components/MissionControl/CalendarEmail';
+import MissionControlLoader from '../components/LoadingScreen/MissionControlLoader';
+import Dashboard from '../components/Dashboard/Dashboard';
 import './MissionControl.css';
 
 /**
@@ -35,6 +37,85 @@ export default function MissionControl({ user }) {
 
   // Selected task for Personal mode chat
   const [selectedTask, setSelectedTask] = useState(null);
+
+  // Loading state for initial mount animation
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Show loading animation on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // Remove component after animation (slightly before 3.2s to ensure smooth transition)
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Panel sizing state
+  const [leftPanelWidth, setLeftPanelWidth] = useState(parseInt(localStorage.getItem('leftPanelWidth')) || 380);
+  const [rightPanelWidth, setRightPanelWidth] = useState(parseInt(localStorage.getItem('rightPanelWidth')) || 420);
+
+  // Panel visibility state
+  const [panelVisibility, setPanelVisibility] = useState(() => {
+    const stored = localStorage.getItem('panelVisibility');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return { left: true, middle: true, right: true };
+  });
+
+  const handleTogglePanel = (panel) => {
+    const newVisibility = { ...panelVisibility, [panel]: !panelVisibility[panel] };
+    setPanelVisibility(newVisibility);
+    localStorage.setItem('panelVisibility', JSON.stringify(newVisibility));
+  };
+
+  // Panel resizing
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (window.resizingPanel === 'left') {
+        const newWidth = Math.max(280, Math.min(600, e.clientX));
+        setLeftPanelWidth(newWidth);
+        document.documentElement.style.setProperty('--left-panel-width', `${newWidth}px`);
+      } else if (window.resizingPanel === 'right') {
+        const newWidth = Math.max(320, Math.min(700, window.innerWidth - e.clientX));
+        setRightPanelWidth(newWidth);
+        document.documentElement.style.setProperty('--right-panel-width', `${newWidth}px`);
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (window.resizingPanel) {
+        if (window.resizingPanel === 'left') {
+          localStorage.setItem('leftPanelWidth', leftPanelWidth);
+        } else {
+          localStorage.setItem('rightPanelWidth', rightPanelWidth);
+        }
+        window.resizingPanel = null;
+        document.body.style.cursor = 'default';
+        document.body.style.userSelect = 'auto';
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [leftPanelWidth, rightPanelWidth]);
+
+  // Initialize panel widths
+  useEffect(() => {
+    document.documentElement.style.setProperty('--left-panel-width', `${leftPanelWidth}px`);
+    document.documentElement.style.setProperty('--right-panel-width', `${rightPanelWidth}px`);
+  }, []);
+
+  const handleResizeStart = (panel) => {
+    window.resizingPanel = panel;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   // Load tasks for Personal mode
   const isDeveloper = user?.role === 'developer';
@@ -127,9 +208,60 @@ export default function MissionControl({ user }) {
     setSelectedTeam(team);
   };
 
+  // Task filtering and search state
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Helper functions for task management
+  const getCompletedCount = () => {
+    return tasks.filter(task => task.status === 'completed').length;
+  };
+
+  const getSourceCounts = () => {
+    const jira = tasks.filter(task => task.source === 'jira').length;
+    const slack = tasks.filter(task => task.source === 'slack').length;
+    return { jira, slack };
+  };
+
+  const handleNewTask = () => {
+    console.log('New task button clicked');
+    // TODO: Implement new task creation modal
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  const getFilteredTasks = () => {
+    let filtered = tasks;
+    
+    if (searchQuery) {
+      filtered = filtered.filter(task =>
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  };
+
   // Render mode toggle header
   return (
     <div className="mission-control-page">
+      {/* Loading Animation */}
+      <MissionControlLoader isVisible={isLoading} />
+      
+      {/* Ambient Background Elements */}
+      <div className="ambient-background">
+        <div className="ambient-orb orb-1"></div>
+        <div className="ambient-orb orb-2"></div>
+        <div className="ambient-orb orb-3"></div>
+        <div className="floating-particles">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className={`particle particle-${i + 1}`}></div>
+          ))}
+        </div>
+      </div>
+      
       {/* Mode Toggle Header */}
       <ModeToggle
         user={user}
@@ -139,24 +271,73 @@ export default function MissionControl({ user }) {
         onTeamChange={handleTeamChange}
         teams={teams}
         loading={teamsLoading}
+        panelVisibility={panelVisibility}
+        onTogglePanel={handleTogglePanel}
       />
 
       {/* 3-Panel Grid Layout */}
-      <div className="mission-control-grid">
+      <div 
+        className="mission-control-grid"
+        style={{
+          gridTemplateColumns: `
+            ${panelVisibility.left ? 'var(--left-panel-width, 380px)' : '0px'}
+            ${panelVisibility.middle ? '1fr' : '0px'}
+            ${panelVisibility.right ? 'var(--right-panel-width, 420px)' : '0px'}
+          `.trim().replace(/\s+/g, ' ')
+        }}
+      >
         {/* Left Panel - Context (Tasks List) */}
+        {panelVisibility.left && (
         <div className="panel panel-context">
           {mode === 'personal' ? (
             // Personal Mode: My tasks list
             <div className="tasks-list-container">
               <div className="tasks-list-header">
-                <h3 className="tasks-list-title">My Tasks</h3>
-                <span className="tasks-count">{tasks.length}</span>
+                <div className="tasks-header-top">
+                  <div className="tasks-header-left">
+                    <h3 className="tasks-list-title">My Tasks</h3>
+                    {getCompletedCount() > 0 && (
+                      <span className="tasks-completion-stats">
+                        {getCompletedCount()} of {tasks.length} completed · {Math.round((getCompletedCount() / tasks.length) * 100)}% done
+                      </span>
+                    )}
+                  </div>
+                  <div className="tasks-header-right">
+                    <div className="tasks-source-badges">
+                      {getSourceCounts().jira > 0 && (
+                        <div className="source-badge jira-badge">
+                          <span className="badge-label">JI</span>
+                          <span className="badge-count">{getSourceCounts().jira}</span>
+                        </div>
+                      )}
+                      {getSourceCounts().slack > 0 && (
+                        <div className="source-badge slack-badge">
+                          <span className="badge-label">SL</span>
+                          <span className="badge-count">{getSourceCounts().slack}</span>
+                        </div>
+                      )}
+                    </div>
+                    <button className="new-task-button" onClick={handleNewTask}>
+                      + New
+                    </button>
+                  </div>
+                </div>
+
+                <div className="tasks-header-filters">
+                  <input
+                    type="text"
+                    className="tasks-search-input"
+                    placeholder="Search tasks..."
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                  />
+                </div>
               </div>
               {tasksLoading ? (
                 <div className="loading-tasks">Loading...</div>
               ) : (
                 <GroupedActionList
-                  tasks={tasks}
+                  tasks={getFilteredTasks()}
                   onToggle={toggleTask}
                   onDelete={deleteTask}
                   onUpdate={updateTask}
@@ -170,9 +351,19 @@ export default function MissionControl({ user }) {
               <TeamContext selectedTeam={selectedTeam} />
             </div>
           )}
+
+          {/* Resize Handle */}
+          <div
+            className="panel-resize-handle"
+            onMouseDown={() => handleResizeStart('left')}
+          >
+            <div className="resize-handle-bar"></div>
+          </div>
         </div>
+        )}
 
         {/* Middle Panel - Conversation (Chat) */}
+        {panelVisibility.middle && (
         <div className="panel panel-conversation">
           {mode === 'personal' ? (
             // Personal Mode: Task-specific chat (AI assistant)
@@ -182,60 +373,17 @@ export default function MissionControl({ user }) {
                 onClose={() => setSelectedTask(null)}
               />
             ) : (
-              <div className="task-chat-empty">
-                <img src="/Jarvis.png" alt="Jarvis AI" className="empty-icon" />
-                <h3>Ready to Assist</h3>
-                <p>Select a task from the left to start an AI-powered conversation</p>
-                
-                <div className="capabilities-list">
-                  <div className="capability-item">
-                    <div className="capability-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="m21 21-4.35-4.35"></path>
-                      </svg>
-                    </div>
-                    <span className="capability-text">Query connected codebases with semantic search</span>
-                  </div>
-                  <div className="capability-item">
-                    <div className="capability-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 2v20M2 12h20"></path>
-                        <circle cx="12" cy="12" r="4"></circle>
-                      </svg>
-                    </div>
-                    <span className="capability-text">Get intelligent suggestions and insights</span>
-                  </div>
-                  <div className="capability-item">
-                    <div className="capability-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                      </svg>
-                    </div>
-                    <span className="capability-text">Generate requirements and documentation</span>
-                  </div>
-                  <div className="capability-item">
-                    <div className="capability-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                      </svg>
-                    </div>
-                    <span className="capability-text">Context-aware answers from your workspace</span>
-                  </div>
-                </div>
-              </div>
+              <Dashboard user={user} />
             )
           ) : (
             // Team Mode: Team-wide chat with shared context
             <TeamChat user={user} selectedTeam={selectedTeam} />
           )}
         </div>
+        )}
 
         {/* Right Panel - Coordination (Calendar + Email) */}
+        {panelVisibility.right && (
         <div className="panel panel-coordination">
           {mode === 'personal' ? (
             // Personal Mode: Calendar & Email with AI suggestions from tasks
@@ -248,7 +396,16 @@ export default function MissionControl({ user }) {
               {/* TODO: Implement TeamCalendar component */}
             </div>
           )}
+
+          {/* Resize Handle */}
+          <div
+            className="panel-resize-handle panel-resize-handle-left"
+            onMouseDown={() => handleResizeStart('right')}
+          >
+            <div className="resize-handle-bar"></div>
+          </div>
         </div>
+        )}
       </div>
     </div>
   );

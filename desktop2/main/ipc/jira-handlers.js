@@ -338,28 +338,40 @@ function registerJIRAHandlers(services, logger) {
         throw new Error('User not authenticated');
       }
 
+      logger.info('JIRA update issue request', { 
+        issueKey, 
+        updateFields: Object.keys(updateData),
+        userId 
+      });
+
       // Ensure JIRA is initialized
       if (!jiraService.isConnected()) {
+        logger.info('JIRA not connected, initializing...', { userId });
         await jiraService.initialize(userId);
       }
 
       const result = await jiraService.updateIssue(issueKey, updateData);
 
       if (!result.success) {
+        logger.error('JIRA update failed', { issueKey, error: result.error });
         throw new Error(result.error);
       }
 
-      logger.info('JIRA issue updated', { issueKey });
+      logger.info('JIRA issue updated successfully', { issueKey });
 
       return {
         success: true
       };
 
     } catch (error) {
-      logger.error('JIRA update issue error:', error);
+      logger.error('JIRA update issue error', { 
+        issueKey, 
+        error: error.message,
+        stack: error.stack 
+      });
       return {
         success: false,
-        error: error.message
+        error: `JIRA API error: ${error.message}`
       };
     }
   });

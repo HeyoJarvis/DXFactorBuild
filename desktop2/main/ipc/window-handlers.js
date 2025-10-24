@@ -7,6 +7,9 @@ const { ipcMain } = require('electron');
 
 let mouseEventsIgnored = false; // Track current state - matches initial window state from MainWindowManager
 
+// Store previous window bounds for maximize/restore functionality
+const windowStates = new WeakMap();
+
 function registerWindowHandlers(windows, logger) {
   /**
    * Show main window
@@ -64,6 +67,12 @@ function registerWindowHandlers(windows, logger) {
       // Create or show the secondary window
       windows.secondary.create(route);
       logger.info('Secondary window opened', { route });
+      
+      // Notify main window that secondary window opened
+      if (windows.main?.getWindow()) {
+        windows.main.getWindow().webContents.send('secondary-window:changed', true, route);
+        logger.debug('Notified main window: secondary opened', { route });
+      }
       
       return { success: true };
     } catch (error) {
@@ -238,28 +247,106 @@ function registerWindowHandlers(windows, logger) {
   });
 
   /**
-   * Maximize current window
+   * Maximize current window - true full screen like native traffic lights
    */
   ipcMain.on('window:maximize', (event) => {
     const window = event.sender.getOwnerBrowserWindow();
     if (window) {
-      window.maximize();
-      logger.debug('Window maximized');
+      try {
+        // Store current bounds before maximizing (if not already stored)
+        if (!windowStates.has(window)) {
+          windowStates.set(window, {
+            previousBounds: window.getBounds(),
+            isMaximized: false
+          });
+        }
+
+        const { screen } = require('electron');
+        
+        // Get the display where the window is currently located
+        const windowBounds = window.getBounds();
+        const display = screen.getDisplayMatching(windowBounds);
+        
+        // Use FULL bounds (not workArea) to maximize to entire screen
+        const bounds = display.bounds;
+
+        // FORCE RESET all constraints that might be limiting the window
+        window.setMinimumSize(0, 0);
+        window.setMaximumSize(0, 0);
+        window.setResizable(true);
+        window.setFrame(false);
+        window.setAlwaysOnTop(false);
+
+        logger.debug(`Display info: bounds=${JSON.stringify(bounds)}`);
+        logger.debug(`Forcing window constraints reset before maximize`);
+
+        // Maximize to fill entire screen
+        window.setBounds(bounds);
+        
+        // Mark as maximized in state
+        const state = windowStates.get(window);
+        state.isMaximized = true;
+
+        const actualBounds = window.getBounds();
+        logger.debug(`Window maximized to: x=${actualBounds.x}, y=${actualBounds.y}, w=${actualBounds.width}, h=${actualBounds.height}`);
+      } catch (error) {
+        logger.error('Error maximizing window:', error);
+      }
     }
   });
 
   /**
-   * Toggle maximize/restore current window
+   * Toggle maximize/restore current window - like native traffic lights
    */
   ipcMain.on('window:toggleMaximize', (event) => {
     const window = event.sender.getOwnerBrowserWindow();
     if (window) {
-      if (window.isMaximized()) {
-        window.unmaximize();
-        logger.debug('Window unmaximized');
-      } else {
-        window.maximize();
-        logger.debug('Window maximized');
+      try {
+        // Initialize state if not exists
+        if (!windowStates.has(window)) {
+          windowStates.set(window, {
+            previousBounds: window.getBounds(),
+            isMaximized: false
+          });
+        }
+
+        const state = windowStates.get(window);
+
+        if (state.isMaximized) {
+          // Restore to previous bounds
+          window.setBounds(state.previousBounds);
+          state.isMaximized = false;
+          logger.debug('Window restored to previous size');
+        } else {
+          // Store current bounds
+          state.previousBounds = window.getBounds();
+
+          // Get the display where the window is currently located
+          const windowBounds = window.getBounds();
+          const { screen } = require('electron');
+          const display = screen.getDisplayMatching(windowBounds);
+
+          // Use workArea to respect menu bar/taskbar on the system
+          const bounds = display.workArea;
+
+          // Reset size constraints to allow full maximize
+          window.setMinimumSize(0, 0);
+          window.setMaximumSize(0, 0);
+          window.setResizable(true);
+
+          logger.debug(`Display info: workArea=${JSON.stringify(bounds)}`);
+          logger.debug(`Maximizing window to fill work area`);
+
+          // Maximize to fill the work area (respects menu bar/taskbar)
+          window.setBounds(bounds);
+
+          state.isMaximized = true;
+
+          const actualBounds = window.getBounds();
+          logger.debug(`Window maximized to: x=${actualBounds.x}, y=${actualBounds.y}, w=${actualBounds.width}, h=${actualBounds.height}`);
+        }
+      } catch (error) {
+        logger.error('Error toggling maximize:', error);
       }
     }
   });

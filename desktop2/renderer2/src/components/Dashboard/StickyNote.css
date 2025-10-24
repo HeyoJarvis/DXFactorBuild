@@ -1,0 +1,134 @@
+/* Sticky Note Styles */
+.sticky-note {
+  position: absolute;
+  width: 200px;
+  min-height: 150px;
+  border-radius: 4px;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sticky-note.dragging {
+  cursor: move;
+  box-shadow: 
+    0 12px 24px rgba(0, 0, 0, 0.25),
+    0 4px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+}
+
+.sticky-note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  cursor: move;
+  user-select: none;
+}
+
+.sticky-note-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.sticky-note-delete {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  color: #64748b;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.sticky-note-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.sticky-note-content {
+  flex: 1;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.sticky-note-content textarea {
+  width: 100%;
+  height: 100px;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1e293b;
+  font-family: inherit;
+  outline: none;
+}
+
+.sticky-note-content textarea::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.sticky-note-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1e293b;
+  min-height: 100px;
+  cursor: text;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.sticky-note-text:empty::before {
+  content: 'Click to edit...';
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.sticky-note-timestamp {
+  padding: 6px 12px;
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  text-align: right;
+}
+
+/* Color variations */
+.sticky-note[style*="rgb(254, 243, 199)"] {
+  /* Yellow */
+  border-left: 3px solid #fbbf24;
+}
+
+.sticky-note[style*="rgb(219, 234, 254)"] {
+  /* Blue */
+  border-left: 3px solid #60a5fa;
+}
+
+.sticky-note[style*="rgb(252, 231, 243)"] {
+  /* Pink */
+  border-left: 3px solid #f472b6;
+}
+
+.sticky-note[style*="rgb(220, 252, 231)"] {
+  /* Green */
+  border-left: 3px solid #34d399;
+}
+
+.sticky-note[style*="rgb(243, 232, 255)"] {
+  /* Purple */
+  border-left: 3px solid #a78bfa;
+}
+

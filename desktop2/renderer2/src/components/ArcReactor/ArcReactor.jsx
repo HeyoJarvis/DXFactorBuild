@@ -16,6 +16,8 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentRole, setCurrentRole] = useState('sales'); // Default to sales
   const [orbPosition, setOrbPosition] = useState({ x: 20, y: window.innerHeight - 100 });
+  const [notifications, setNotifications] = useState([]);
+  const [currentNotification, setCurrentNotification] = useState(null);
 
   // Load user role from database (synced with backend)
   useEffect(() => {
@@ -99,26 +101,79 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
   };
 
   const handleMenuToggle = async () => {
-    const newState = !isMenuOpen;
-    console.log('🔄 [ARCREACTOR] Menu toggle:', newState ? 'OPEN' : 'CLOSE');
+    console.log('🎯 [ARCREACTOR] Orb clicked - opening Mission Control directly');
     
-    // CRITICAL: Disable mouse forwarding BEFORE opening menu
-    if (newState && window.electronAPI?.window?.setMouseForward) {
-      await window.electronAPI.window.setMouseForward(false);
-      console.log('🖱️ [ARCREACTOR] DISABLED mouse forwarding for menu');
+    // Open Mission Control directly (no menu)
+    if (window.electronAPI?.window?.openSecondary) {
+      await window.electronAPI.window.openSecondary('/mission-control');
+      console.log('🪟 [ARCREACTOR] Mission Control window opened');
     }
-    
-    // Resize window to accommodate menu
-    if (window.electronAPI?.window?.resizeForMenu) {
-      await window.electronAPI.window.resizeForMenu(newState);
-    }
-    
-    setIsMenuOpen(newState);
-    
-    // DON'T re-enable forwarding here!
-    // Let ArcReactorOrb handle it via mouse leave
-    console.log('🖱️ [ARCREACTOR] Menu closed - letting orb control forwarding');
   };
+  
+  // DEV ONLY: Test notification trigger
+  const triggerTestNotification = () => {
+    const testNotification = {
+      type: 'new_task',
+      taskKey: 'TEST-123',
+      title: 'Test Task',
+      priority: 'high',
+      timestamp: Date.now(),
+      source: 'test'
+    };
+    
+    console.log('🧪 Triggering test notification:', testNotification);
+    const message = formatNotificationMessage(testNotification);
+    setCurrentNotification(message);
+    setNotifications(prev => [...prev, testNotification]);
+    
+    // Auto-clear after 5 seconds
+    setTimeout(() => {
+      setCurrentNotification(null);
+      setNotifications([]);
+    }, 5000);
+  };
+  
+  // DEV: Expose trigger to window for console access
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    window.testNotification = triggerTestNotification;
+  }
+  
+  // DEV: Add keyboard shortcut (Cmd/Ctrl + K then N) - two key sequence to avoid conflicts
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      let cmdKPressed = false;
+      let cmdKTimeout = null;
+      
+      const handleKeyPress = (e) => {
+        // First press Cmd+K (or Ctrl+K)
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          cmdKPressed = true;
+          console.log('🎹 Cmd+K pressed, now press N for test notification');
+          
+          // Reset after 2 seconds if N not pressed
+          if (cmdKTimeout) clearTimeout(cmdKTimeout);
+          cmdKTimeout = setTimeout(() => {
+            cmdKPressed = false;
+          }, 2000);
+        }
+        // Then press N
+        else if (cmdKPressed && e.key === 'n') {
+          e.preventDefault();
+          cmdKPressed = false;
+          if (cmdKTimeout) clearTimeout(cmdKTimeout);
+          console.log('🎹 Keyboard shortcut triggered: Cmd+K then N');
+          triggerTestNotification();
+        }
+      };
+      
+      window.addEventListener('keydown', handleKeyPress);
+      return () => {
+        window.removeEventListener('keydown', handleKeyPress);
+        if (cmdKTimeout) clearTimeout(cmdKTimeout);
+      };
+    }
+  }, []);
 
   const handleMenuItemClick = async (itemId) => {
     if (!itemId) {
@@ -163,6 +218,58 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
     setOrbPosition(position);
   };
 
+  // Listen for notifications from main process
+  useEffect(() => {
+    if (window.electronAPI?.onNotification) {
+      const cleanup = window.electronAPI.onNotification((notification) => {
+        console.log('🔔 New notification received:', notification);
+        
+        // Add to notifications array
+        setNotifications(prev => [...prev, notification]);
+        
+        // Format the notification message
+        const message = formatNotificationMessage(notification);
+        setCurrentNotification(message);
+        
+        // Clear message after 5 seconds if no new notifications
+        setTimeout(() => {
+          setNotifications(prev => {
+            const updated = prev.filter(n => n.timestamp !== notification.timestamp);
+            if (updated.length === 0) {
+              setCurrentNotification(null);
+            } else {
+              // Show next notification
+              setCurrentNotification(formatNotificationMessage(updated[updated.length - 1]));
+            }
+            return updated;
+          });
+        }, 5000);
+      });
+      
+      return cleanup;
+    }
+  }, []);
+  
+  // Format notification message based on type
+  const formatNotificationMessage = (notification) => {
+    switch (notification.type) {
+      case 'new_task':
+      case 'jira_task_synced':
+        return 'You have a new task';
+      case 'task_updated':
+      case 'jira_update':
+        return `Progress on ${notification.taskKey || 'task'}`;
+      case 'status_change':
+        return `Task moved to ${notification.changes?.status?.to || 'updated'}`;
+      case 'requirements_generated':
+        return 'Product requirements ready';
+      case 'pr_review':
+        return 'PR requires your review';
+      default:
+        return notification.message || 'New notification';
+    }
+  };
+
   // Ensure mouse forwarding is disabled when expanded
   useEffect(() => {
     if (!isCollapsed && window.electronAPI?.window?.setMouseForward) {
@@ -180,6 +287,7 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
         currentRole={currentRole}
         onPositionChange={handleOrbMove}
         isCollapsed={isCollapsed}
+        notificationMessage={currentNotification}
       />
       
       <RadialMenu

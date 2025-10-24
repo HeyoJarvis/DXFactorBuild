@@ -101,3 +101,20 @@
 {"level":"info","message":"Webhook server started","port":"30001","service":"slack-app","timestamp":"2025-10-22T18:01:17.478Z"}
 {"level":"info","message":"Now connected to Slack","service":"slack-app","timestamp":"2025-10-22T18:01:17.796Z"}
 {"level":"info","message":"Disconnecting ...","service":"slack-app","timestamp":"2025-10-22T18:01:22.934Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for Slack bot","service":"slack-app","timestamp":"2025-10-23T00:49:15.642Z"}
+{"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-10-23T00:49:15.696Z"}
+{"level":"info","message":"HeyJarvis Slack app started successfully","port":"3000","service":"slack-app","timestamp":"2025-10-23T00:49:15.924Z","webhook_port":"30001"}
+{"level":"info","message":"✅ Supabase adapter initialized for Slack bot","service":"slack-app","timestamp":"2025-10-23T15:41:43.541Z"}
+{"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-10-23T15:41:43.574Z"}
+{"level":"info","message":"HeyJarvis Slack app started successfully","port":"3000","service":"slack-app","timestamp":"2025-10-23T15:41:43.846Z","webhook_port":"30001"}
+{"level":"info","message":"Webhook server started","port":"30001","service":"slack-app","timestamp":"2025-10-23T15:41:43.846Z"}
+{"level":"info","message":"Now connected to Slack","service":"slack-app","timestamp":"2025-10-23T15:41:44.166Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for Slack bot","service":"slack-app","timestamp":"2025-10-23T17:01:29.063Z"}
+{"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-10-23T17:01:29.086Z"}
+{"level":"info","message":"HeyJarvis Slack app started successfully","port":"3000","service":"slack-app","timestamp":"2025-10-23T17:01:29.305Z","webhook_port":"30001"}
+{"level":"info","message":"Reconnecting to Slack ...","service":"slack-app","timestamp":"2025-10-23T20:41:49.029Z"}
+{"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-10-23T20:41:49.030Z"}
+{"level":"info","message":"Now connected to Slack","service":"slack-app","timestamp":"2025-10-23T20:41:49.488Z"}
+{"level":"info","message":"A pong wasn't received from the server before the timeout of 5000ms!","service":"slack-app","timestamp":"2025-10-23T23:50:01.988Z"}
+{"level":"info","message":"Reconnecting to Slack ...","service":"slack-app","timestamp":"2025-10-23T23:50:01.989Z"}
+{"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-10-23T23:50:01.990Z"}

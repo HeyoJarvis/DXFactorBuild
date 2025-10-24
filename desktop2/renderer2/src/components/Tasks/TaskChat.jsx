@@ -14,6 +14,7 @@ export default function TaskChat({ task, onClose }) {
   const [showRepoSelector, setShowRepoSelector] = useState(false);
   const [connectedRepo, setConnectedRepo] = useState(null);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -26,6 +27,8 @@ export default function TaskChat({ task, onClose }) {
   const [editedRepository, setEditedRepository] = useState(task.repository || '');
   const [isSaving, setIsSaving] = useState(false);
   const [availableRepositories, setAvailableRepositories] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showRequirementsModal, setShowRequirementsModal] = useState(false);
 
   const models = ['Sonnet 4.5', 'Sonnet 3.5', 'Opus 3', 'Haiku 3.5'];
 
@@ -54,8 +57,12 @@ export default function TaskChat({ task, onClose }) {
   }, [task]);
 
   useEffect(() => {
-    // Focus input on mount
-    inputRef.current?.focus();
+    // Focus input on mount without causing page scroll
+    try {
+      inputRef.current?.focus({ preventScroll: true });
+    } catch (_) {
+      inputRef.current?.focus();
+    }
     
     // Load chat history for this task
     loadChatHistory();
@@ -65,6 +72,22 @@ export default function TaskChat({ task, onClose }) {
       loadAvailableRepositories();
     }
   }, [task.id]);
+
+  // Load current logged-in user for header chip
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        if (window.electronAPI?.auth?.getCurrentUser) {
+          const result = await window.electronAPI.auth.getCurrentUser();
+          setCurrentUser(result?.user || result || null);
+        } else {
+          const cached = localStorage.getItem('heyjarvis.currentUser');
+          if (cached) setCurrentUser(JSON.parse(cached));
+        }
+      } catch (_) {}
+    };
+    loadUser();
+  }, []);
 
   const loadAvailableRepositories = async () => {
     try {
@@ -93,7 +116,18 @@ export default function TaskChat({ task, onClose }) {
 
     setIsSaving(true);
     try {
-      const response = await window.electronAPI.jira.updateIssue(task.id, {
+      // CRITICAL: Use JIRA key (external_key) not the database UUID (id)
+      // Task IDs from database are UUIDs like cfac5763-a1d6-44d6-b5b3-6a892090bb94
+      // JIRA keys are like PROJ-123
+      const jiraKey = task.external_key || task.jira_key || task.id;
+      
+      console.log('🔧 Updating JIRA issue:', {
+        taskId: task.id,
+        jiraKey: jiraKey,
+        title: editedTitle
+      });
+
+      const response = await window.electronAPI.jira.updateIssue(jiraKey, {
         summary: editedTitle
       });
 
@@ -102,12 +136,16 @@ export default function TaskChat({ task, onClose }) {
         task.title = editedTitle;
         setIsEditingTitle(false);
       } else {
-        alert('Failed to update title: ' + (response.error || 'Unknown error'));
+        const errorMsg = response.error || 'Unknown error';
+        console.error('Failed to update title:', errorMsg);
+        alert(`Failed to update title: ${errorMsg}\n\nMake sure:\n1. You're connected to JIRA\n2. You have permission to edit this issue\n3. The issue exists\n\nTask ID: ${task.id}\nJIRA Key: ${jiraKey}`);
         setEditedTitle(task.title); // Revert
       }
     } catch (error) {
       console.error('Failed to save title:', error);
-      alert('Failed to update title');
+      const errorMsg = error.message || error;
+      const jiraKey = task.external_key || task.jira_key || task.id;
+      alert(`Failed to update title: ${errorMsg}\n\nMake sure:\n1. You're connected to JIRA\n2. You have permission to edit this issue\n3. The issue exists\n\nTask ID: ${task.id}\nJIRA Key: ${jiraKey}`);
       setEditedTitle(task.title); // Revert
     } finally {
       setIsSaving(false);
@@ -203,6 +241,9 @@ export default function TaskChat({ task, onClose }) {
   const saveDescription = async () => {
     setIsSaving(true);
     try {
+      // CRITICAL: Use JIRA key (external_key) not the database UUID (id)
+      const jiraKey = task.external_key || task.jira_key || task.id;
+      
       // Determine the format and convert if needed
       let descriptionToSave;
       let isADF = false;
@@ -222,12 +263,14 @@ export default function TaskChat({ task, onClose }) {
       }
       
       console.log('💾 Saving description:', {
+        taskId: task.id,
+        jiraKey: jiraKey,
         type: typeof descriptionToSave,
         isADF,
         preview: isADF ? 'ADF object' : descriptionToSave.substring(0, 100)
       });
       
-      const response = await window.electronAPI.jira.updateIssue(task.id, {
+      const response = await window.electronAPI.jira.updateIssue(jiraKey, {
         descriptionADF: isADF ? descriptionToSave : null,
         description: !isADF ? descriptionToSave : null
       });
@@ -238,12 +281,15 @@ export default function TaskChat({ task, onClose }) {
         setIsEditingDescription(false);
         alert('Description updated successfully in JIRA!');
       } else {
-        alert('Failed to update description: ' + (response.error || 'Unknown error'));
+        const errorMsg = response.error || 'Unknown error';
+        console.error('Failed to update description:', errorMsg);
+        alert(`Failed to update description: ${errorMsg}\n\nTask ID: ${task.id}\nJIRA Key: ${jiraKey}`);
         setEditedDescription(task.description); // Revert
       }
     } catch (error) {
       console.error('Failed to save description:', error);
-      alert('Failed to update description: ' + error.message);
+      const jiraKey = task.external_key || task.jira_key || task.id;
+      alert(`Failed to update description: ${error.message}\n\nTask ID: ${task.id}\nJIRA Key: ${jiraKey}`);
       setEditedDescription(task.description); // Revert
     } finally {
       setIsSaving(false);
@@ -267,8 +313,17 @@ export default function TaskChat({ task, onClose }) {
 
     setIsSaving(true);
     try {
+      // CRITICAL: Use JIRA key (external_key) not the database UUID (id)
+      const jiraKey = task.external_key || task.jira_key || task.id;
+      
+      console.log('🔗 Updating repository:', {
+        taskId: task.id,
+        jiraKey: jiraKey,
+        repository: editedRepository
+      });
+
       // Update JIRA with repository link in custom field or comment
-      const response = await window.electronAPI.jira.updateIssue(task.id, {
+      const response = await window.electronAPI.jira.updateIssue(jiraKey, {
         customFields: {
           repository: editedRepository
         }
@@ -279,12 +334,15 @@ export default function TaskChat({ task, onClose }) {
         task.repository = editedRepository;
         setIsEditingRepository(false);
       } else {
-        alert('Failed to update repository: ' + (response.error || 'Unknown error'));
+        const errorMsg = response.error || 'Unknown error';
+        console.error('Failed to update repository:', errorMsg);
+        alert(`Failed to update repository: ${errorMsg}\n\nTask ID: ${task.id}\nJIRA Key: ${jiraKey}`);
         setEditedRepository(task.repository || ''); // Revert
       }
     } catch (error) {
       console.error('Failed to save repository:', error);
-      alert('Failed to update repository');
+      const jiraKey = task.external_key || task.jira_key || task.id;
+      alert(`Failed to update repository: ${error.message}\n\nTask ID: ${task.id}\nJIRA Key: ${jiraKey}`);
       setEditedRepository(task.repository || ''); // Revert
     } finally {
       setIsSaving(false);
@@ -292,8 +350,14 @@ export default function TaskChat({ task, onClose }) {
   };
 
   useEffect(() => {
-    // Auto-scroll to bottom when messages change
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Auto-scroll to bottom within the messages container only (no page scroll)
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
+    } else {
+      // Fallback (should not trigger window scroll due to preventScroll focus)
+      messagesEndRef.current?.scrollIntoView({ block: 'nearest' });
+    }
   }, [messages]);
 
   const loadChatHistory = async () => {
@@ -505,6 +569,21 @@ export default function TaskChat({ task, onClose }) {
     return labels[task.priority || 'medium'] || 'Medium';
   };
 
+  // Source icon (Slack or JIRA)
+  const sourceIcon = task.external_source === 'jira' ? '/JIRALOGO.png' : '/Slack_icon_2019.svg.png';
+
+  // User display helpers
+  const userName =
+    currentUser?.name || currentUser?.fullName || currentUser?.username ||
+    task.user?.name || task.user?.fullName || task.assignee?.name || 'User';
+  const getInitials = (name) => {
+    if (!name || typeof name !== 'string') return 'U';
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0]?.[0] || '';
+    const second = parts[1]?.[0] || '';
+    return (first + second).toUpperCase() || first.toUpperCase() || 'U';
+  };
+
   // Convert JIRA ADF (Atlassian Document Format) to HTML
   const convertADFToHTML = (adf) => {
     if (!adf || !adf.content) return '';
@@ -712,74 +791,104 @@ export default function TaskChat({ task, onClose }) {
     return html;
   };
 
+  const getAcceptanceCount = (html) => {
+    if (!html) return 0;
+    try {
+      const tbodyMatch = html.match(/<tbody[\s\S]*?<\/tbody>/i);
+      const body = tbodyMatch ? tbodyMatch[0] : html;
+      const matches = body.match(/<tr[\s\S]*?<\/tr>/gi);
+      return matches ? matches.length : 0;
+    } catch (_) {
+      return 0;
+    }
+  };
+
+  const hasRequirementsTable = (html) => /<table[\s\S]*?<\/table>/i.test(html || '');
+
 
   return (
     <div className="task-chat-modal">
       <div className="task-chat-container">
-        {/* Header - Task Card */}
+        {/* Header - Task Card (sticky in modal layout) */}
         <div className="task-chat-header">
           <div className="task-chat-card">
             <button className="task-chat-close" onClick={onClose}>×</button>
             
             <div className="task-chat-card-header">
-              <div className="task-chat-app-icon">
-                <img 
-                  src="/JIRALOGO.png" 
-                  alt="JIRA" 
-                  style={{ width: '24px', height: '24px', objectFit: 'contain' }}
-                />
-              </div>
-              <div className="task-chat-title">
-                {isEditingTitle ? (
-                  <div className="task-chat-name-edit">
-                    <input
-                      type="text"
-                      value={editedTitle}
-                      onChange={(e) => setEditedTitle(e.target.value)}
-                      className="task-title-input"
-                      autoFocus
-                      disabled={isSaving}
-                      placeholder="Enter task title"
+              {/* Left: Icon + Title + Meta Row */}
+              <div className="task-card-left">
+                <div className="task-title-row with-gap-under">
+                  <div className="task-chat-app-icon">
+                    <img 
+                      src={sourceIcon}
+                      alt={task.external_source === 'jira' ? 'Jira' : 'Slack'} 
+                      style={{ width: '24px', height: '24px', objectFit: 'contain' }}
                     />
-                    {hasTitleChanged() && (
-                      <div className="inline-edit-actions">
-                        <button 
-                          className="inline-save-btn" 
-                          onClick={saveTitle}
+                  </div>
+                  <div className="task-chat-title">
+                    {isEditingTitle ? (
+                      <div className="task-chat-name-edit">
+                        <input
+                          type="text"
+                          value={editedTitle}
+                          onChange={(e) => setEditedTitle(e.target.value)}
+                          className="task-title-input"
+                          autoFocus
                           disabled={isSaving}
-                        >
-                          {isSaving ? 'Saving...' : 'Save'}
-                        </button>
-                        <button 
-                          className="inline-cancel-btn" 
-                          onClick={cancelTitleEdit}
-                          disabled={isSaving}
-                        >
-                          Cancel
-                        </button>
+                          placeholder="Enter task title"
+                        />
+                        {hasTitleChanged() && (
+                          <div className="inline-edit-actions">
+                            <button 
+                              className="inline-save-btn" 
+                              onClick={saveTitle}
+                              disabled={isSaving}
+                            >
+                              {isSaving ? 'Saving...' : 'Save'}
+                            </button>
+                            <button 
+                              className="inline-cancel-btn" 
+                              onClick={cancelTitleEdit}
+                              disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div 
+                        className="task-chat-name clickable" 
+                        onClick={() => task.external_source === 'jira' && setIsEditingTitle(true)}
+                        title={task.external_source === 'jira' ? 'Click to edit title' : ''}
+                      >
+                        {task.title}
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div 
-                    className="task-chat-name clickable" 
-                    onClick={() => task.external_source === 'jira' && setIsEditingTitle(true)}
-                    title={task.external_source === 'jira' ? 'Click to edit title' : ''}
-                  >
-                    {task.title}
-                  </div>
-                )}
-                <div className="task-chat-subtitle">
-                  {task.epicName && (
-                    <span className="task-chat-meta-item">
-                      {task.epicName}
-                    </span>
+                </div>
+
+                {/* Meta Row: Scrum key, date, user */}
+                <div className="task-meta-row">
+                  {task.external_key && (
+                    <span className="chip chip-key">Scrum #{task.external_key}</span>
                   )}
-                  <span className="task-chat-meta-item">
-                    {task.id}
+                  <span className="chip chip-date">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    {formatDate(task.created_at)}
                   </span>
+                  <span className="task-user">
+                    <span className="task-user-avatar">{getInitials(userName)}</span>
+                    <span className="task-user-name">{userName}</span>
+                  </span>
+                  <span className={`chip priority-chip priority-${task.priority || 'medium'}`}>{getPriorityLabel()}</span>
                   {task.external_source === 'jira' && (task.repository || isEditingRepository) && (
-                    <span className="task-chat-meta-item repository-item">
+                    <span className="chip repository-item">
                       {isEditingRepository ? (
                         <select
                           value={editedRepository}
@@ -810,16 +919,16 @@ export default function TaskChat({ task, onClose }) {
                   )}
                 </div>
               </div>
+
+              {/* Right side now empty (priority moved to meta row) */}
+              <div className="task-card-right"></div>
             </div>
             
-            <div className={`task-chat-priority-badge priority-${task.priority || 'medium'}`}>
-              {getPriorityLabel()}
-            </div>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="task-chat-messages">
+        <div className="task-chat-messages" ref={messagesContainerRef}>
           {/* Task Description / Requirements Section */}
           {(task.description || task.external_source === 'jira') && (
             <div className="task-requirements-banner">
@@ -891,12 +1000,23 @@ export default function TaskChat({ task, onClose }) {
                         )}
                       </div>
                     ) : task.description ? (
-                      <div 
-                        className="criteria-text clickable" 
-                        onClick={() => task.external_source === 'jira' && setIsEditingDescription(true)}
-                        title={task.external_source === 'jira' ? 'Click to edit description' : ''}
-                        dangerouslySetInnerHTML={{ __html: formatMarkdownContent(task.description) }}
-                      />
+                      <div className="criteria-table-wrapper">
+                        <div 
+                          className="criteria-text clickable"
+                          onClick={() => task.external_source === 'jira' && setIsEditingDescription(true)}
+                          title={task.external_source === 'jira' ? 'Click to edit description' : ''}
+                          dangerouslySetInnerHTML={{ __html: formatMarkdownContent(task.description) }}
+                        />
+                        {hasRequirementsTable(formatMarkdownContent(task.description)) && (
+                          <div className="criteria-footer">
+                            <button className="view-all-criteria" onClick={() => setShowRequirementsModal(true)}>
+                              {`Click to view all ${getAcceptanceCount(formatMarkdownContent(task.description))} acceptance criteria`}
+                              <span className="dots">•••</span>
+                              <span className="arrow">→</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <div className="empty-description">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3">
@@ -956,6 +1076,71 @@ export default function TaskChat({ task, onClose }) {
           )}
           <div ref={messagesEndRef} />
         </div>
+
+        {/* Full Acceptance Criteria Modal */}
+        {showRequirementsModal && (
+          <div className="requirements-modal-backdrop" onClick={() => setShowRequirementsModal(false)}>
+            <div className="requirements-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="requirements-modal-header">
+                <div>
+                  <div className="requirements-modal-title">Acceptance Criteria</div>
+                  <div className="criteria-label" style={{ marginTop: 4 }}>User stories for: {task.title}</div>
+                </div>
+                <button className="modal-btn" onClick={() => setShowRequirementsModal(false)}>Close</button>
+              </div>
+              <div className="requirements-modal-body">
+                {isEditingDescription ? (
+                  <div className="description-editor">
+                    <div className="editor-hint">
+                      Edit the description below. Tables and formatting will be preserved in JIRA.
+                    </div>
+                    <div 
+                      className="description-editor-rich"
+                      contentEditable
+                      suppressContentEditableWarning
+                      onInput={(e) => setEditedDescription(e.currentTarget.innerHTML)}
+                      dangerouslySetInnerHTML={{ 
+                        __html: typeof editedDescription === 'string' 
+                          ? editedDescription 
+                          : formatMarkdownContent(editedDescription)
+                      }}
+                      disabled={isSaving}
+                    />
+                    {hasDescriptionChanged() && (
+                      <div className="description-editor-actions">
+                        <button 
+                          className="save-btn" 
+                          onClick={async () => { await saveDescription(); }}
+                          disabled={isSaving}
+                        >
+                          {isSaving ? 'Saving...' : 'Save to JIRA'}
+                        </button>
+                        <button 
+                          className="cancel-btn" 
+                          onClick={cancelDescriptionEdit}
+                          disabled={isSaving}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div 
+                    className="criteria-text"
+                    dangerouslySetInnerHTML={{ __html: formatMarkdownContent(task.description) }}
+                  />
+                )}
+              </div>
+              <div className="requirements-modal-actions">
+                {task.external_source === 'jira' && !isEditingDescription && (
+                  <button className="modal-btn" onClick={() => setIsEditingDescription(true)}>Edit Criteria</button>
+                )}
+                <button className="modal-btn primary" onClick={() => setShowRequirementsModal(false)}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Input Area with Controls */}
         <div className="task-chat-input-wrapper">

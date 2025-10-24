@@ -25,6 +25,9 @@ export default function GroupedActionList({ tasks, onToggle, onDelete, onUpdate,
     completed: false
   });
 
+  // Track if showing all tasks
+  const [showAllTasks, setShowAllTasks] = useState(false);
+
   // Limit for initial display
   const INITIAL_DISPLAY_LIMIT = 5;
 
@@ -53,6 +56,16 @@ export default function GroupedActionList({ tasks, onToggle, onDelete, onUpdate,
     }));
   };
 
+  // Calculate statistics
+  const stats = {
+    todo: groupedTasks.urgent.length + groupedTasks.high.length + groupedTasks.medium.length + groupedTasks.low.length,
+    active: Math.max(1, tasks.filter(t => t.status === 'in_progress' || t.workflow_metadata?.status === 'in_progress').length),
+    done: groupedTasks.completed.length,
+    total: tasks.length
+  };
+  
+  const progressPercentage = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0;
+
   // Section configuration
   const sections = [
     {
@@ -68,13 +81,6 @@ export default function GroupedActionList({ tasks, onToggle, onDelete, onUpdate,
       icon: '⚡',
       color: '#FF9F0A',
       tasks: groupedTasks.high
-    },
-    {
-      key: 'medium',
-      title: 'Normal',
-      icon: '●',
-      color: '#007AFF',
-      tasks: groupedTasks.medium
     },
     {
       key: 'low',
@@ -94,81 +100,73 @@ export default function GroupedActionList({ tasks, onToggle, onDelete, onUpdate,
 
   return (
     <div className="grouped-action-list">
-      {sections.map(section => {
-        // Only show sections that have tasks
-        if (section.tasks.length === 0) return null;
+      <div className="action-list-items">
+        {/* Render tasks in a flat list with limit */}
+        {(showAllTasks ? tasks : tasks.slice(0, INITIAL_DISPLAY_LIMIT)).map((task, index) => (
+          <ActionItem
+            key={task.id}
+            task={task}
+            index={index}
+            onToggle={onToggle}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+            onChat={onChat}
+          />
+        ))}
 
-        const isCollapsed = collapsed[section.key];
+        {/* Show More/Less Button */}
+        {tasks.length > INITIAL_DISPLAY_LIMIT && (
+          <button 
+            className="show-more-btn"
+            onClick={() => setShowAllTasks(!showAllTasks)}
+          >
+            {showAllTasks 
+              ? `Show less` 
+              : `Show ${tasks.length - INITIAL_DISPLAY_LIMIT} more`
+            }
+          </button>
+        )}
 
-        return (
-          <div key={section.key} className="task-section">
-            {/* Section Header */}
-            <div 
-              className="section-header"
-              onClick={() => toggleSection(section.key)}
-              style={{ '--section-color': section.color }}
-            >
-              <div className="section-header-left">
-                <svg 
-                  className={`collapse-icon ${isCollapsed ? 'collapsed' : ''}`}
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2"
-                >
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-                <span className="section-icon">{section.icon}</span>
-                <h3 className="section-title">{section.title}</h3>
-              </div>
-              <span className="section-count">{section.tasks.length}</span>
-            </div>
-
-            {/* Section Content */}
-            {!isCollapsed && (
-              <div className="section-content">
-                {/* Show limited or all tasks */}
-                {(showAll[section.key] ? section.tasks : section.tasks.slice(0, INITIAL_DISPLAY_LIMIT)).map((task, index) => (
-                  <ActionItem
-                    key={task.id}
-                    task={task}
-                    index={index}
-                    onToggle={onToggle}
-                    onDelete={onDelete}
-                    onUpdate={onUpdate}
-                    onChat={onChat}
-                  />
-                ))}
-                
-                {/* Show More/Less Button */}
-                {section.tasks.length > INITIAL_DISPLAY_LIMIT && (
-                  <button 
-                    className="show-more-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleShowAll(section.key);
-                    }}
-                  >
-                    {showAll[section.key] 
-                      ? `Show less` 
-                      : `Show ${section.tasks.length - INITIAL_DISPLAY_LIMIT} more`
-                    }
-                  </button>
-                )}
-              </div>
-            )}
+        {/* Empty State */}
+        {tasks.length === 0 && (
+          <div className="tasks-empty-state">
+            <div className="empty-icon">✨</div>
+            <h3 className="empty-title">All clear!</h3>
+            <p className="empty-subtitle">No tasks to show</p>
           </div>
-        );
-      })}
+        )}
+      </div>
 
-      {/* Empty State */}
-      {tasks.length === 0 && (
-        <div className="tasks-empty-state">
-          <div className="empty-icon">✨</div>
-          <h3 className="empty-title">All clear!</h3>
-          <p className="empty-subtitle">No tasks to show</p>
+      {/* Stats Footer */}
+      {tasks.length > 0 && (
+        <div className="tasks-stats-footer">
+          <div className="stats-row">
+            <div className="stat-item">
+              <div className="stat-number" style={{ color: '#64748b' }}>{stats.todo}</div>
+              <div className="stat-label">To Do</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number" style={{ color: '#007aff' }}>{stats.active}</div>
+              <div className="stat-label">Active</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number" style={{ color: '#34c759' }}>{stats.done}</div>
+              <div className="stat-label">Done</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number" style={{ color: '#1e293b' }}>{stats.total}</div>
+              <div className="stat-label">Total</div>
+            </div>
+          </div>
+          
+          <div className="stats-progress-section">
+            <div className="progress-label">Weekly Progress</div>
+            <div className="progress-percentage">{progressPercentage}%</div>
+          </div>
+          
+          <div className="progress-bar-container">
+            <div className="progress-bar" style={{ width: `${progressPercentage}%` }} />
+          </div>
         </div>
       )}
     </div>

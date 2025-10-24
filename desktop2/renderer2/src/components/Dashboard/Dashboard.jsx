@@ -1,0 +1,153 @@
+import { useState } from 'react';
+import KPICard from './KPICard';
+import Widget from './Widget';
+import useDashboardMetrics from '../../hooks/useDashboardMetrics';
+import './Dashboard.css';
+
+/**
+ * Dashboard - Main dashboard view with KPIs and sticky notes
+ * Shown in MissionControl when no task is selected
+ * 
+ * @param {Object} user - Current user object
+ */
+export default function Dashboard({ user }) {
+  const { metrics, loading } = useDashboardMetrics(user?.id, 7);
+  
+  // Widgets state (renamed from sticky notes)
+  const [widgets, setWidgets] = useState(() => {
+    const stored = localStorage.getItem('dashboardWidgets');
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  const handleAddWidget = (e) => {
+    // Only create if clicking on dashboard background
+    if (e.target.classList.contains('dashboard-content') || 
+        e.target.classList.contains('widgets-container')) {
+      // Get the dashboard-content element's bounding box
+      const dashboardContent = e.currentTarget.querySelector('.dashboard-content') || e.currentTarget;
+      const rect = dashboardContent.getBoundingClientRect();
+      
+      // Calculate position relative to dashboard-content
+      const newWidget = {
+        id: Date.now(),
+        x: e.clientX - rect.left, // Exact click position
+        y: e.clientY - rect.top,
+        content: '',
+        type: 'note',
+        color: getRandomColor(),
+        createdAt: new Date().toISOString()
+      };
+      
+      const updated = [...widgets, newWidget];
+      setWidgets(updated);
+      localStorage.setItem('dashboardWidgets', JSON.stringify(updated));
+    }
+  };
+
+  const handleUpdateWidget = (id, updates) => {
+    const updated = widgets.map(widget => 
+      widget.id === id ? { ...widget, ...updates } : widget
+    );
+    setWidgets(updated);
+    localStorage.setItem('dashboardWidgets', JSON.stringify(updated));
+  };
+
+  const handleDeleteWidget = (id) => {
+    const updated = widgets.filter(widget => widget.id !== id);
+    setWidgets(updated);
+    localStorage.setItem('dashboardWidgets', JSON.stringify(updated));
+  };
+
+  const getTimeOfDay = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'morning';
+    if (hour < 18) return 'afternoon';
+    return 'evening';
+  };
+
+  if (loading) {
+    return (
+      <div className="dashboard-loading">
+        <div className="loading-spinner"></div>
+        <p>Loading your dashboard...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dashboard-view" onClick={handleAddWidget}>
+      {/* Jarvis Avatar */}
+      <div className="empty-icon-wrapper">
+        <img src="/Jarvis.png" alt="Jarvis AI" className="empty-icon" />
+      </div>
+
+      {/* Welcome Header */}
+      <div className="dashboard-header">
+        <h2>Good {getTimeOfDay()}, {user?.name || 'there'}</h2>
+        <p className="dashboard-subtitle">Here's your overview</p>
+      </div>
+
+      {/* Dashboard Content - Simplified */}
+      <div className="dashboard-content">
+        {/* Only 4 KPI Cards - Single Row */}
+        <div className="kpi-cards-grid-simple">
+          <KPICard
+            value="40%"
+            label="Progress This Week"
+            trend={{ direction: 'up', value: '12%' }}
+            source="View signals breakdown"
+          />
+          <KPICard
+            value="87%"
+            label="Team Progress"
+            trend={{ direction: 'up', value: '5%' }}
+            source="View team metrics"
+          />
+          <KPICard
+            value="12.5h"
+            label="Hours Saved"
+            trend={{ direction: 'up', value: '2.3h' }}
+            source="View time analytics"
+          />
+          <KPICard
+            value={metrics?.criticalAlerts || 3}
+            label="New Items Today"
+            trend={null}
+            source="View new signals"
+          />
+        </div>
+
+        {/* Widgets Hint */}
+        {widgets.length === 0 && (
+          <div className="sticky-notes-hint">
+            <em>Click anywhere to add a widget. Try /track or /notify commands</em>
+          </div>
+        )}
+
+        {/* Widgets Container */}
+        <div className="widgets-container">
+          {widgets.map(widget => (
+            <Widget
+              key={widget.id}
+              widget={widget}
+              onUpdate={handleUpdateWidget}
+              onDelete={handleDeleteWidget}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getRandomColor() {
+  const colors = [
+    'rgb(254, 243, 199)', // Yellow
+    'rgb(219, 234, 254)', // Blue
+    'rgb(252, 231, 243)', // Pink
+    'rgb(220, 252, 231)', // Green
+    'rgb(243, 232, 255)', // Purple
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+

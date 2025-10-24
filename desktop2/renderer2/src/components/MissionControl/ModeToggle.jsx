@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ModeToggle.css';
 
 /**
@@ -6,7 +7,9 @@ import './ModeToggle.css';
  * Personal: Individual work (Tasks page)
  * Team: Team collaboration (Team Chat)
  */
-export default function ModeToggle({ user, mode, onModeChange, selectedTeam, onTeamChange, teams, loading }) {
+export default function ModeToggle({ user, mode, onModeChange, selectedTeam, onTeamChange, teams, loading, panelVisibility, onTogglePanel }) {
+  const navigate = useNavigate();
+
   const handleToggleMode = () => {
     const newMode = mode === 'personal' ? 'team' : 'personal';
     onModeChange(newMode);
@@ -18,6 +21,22 @@ export default function ModeToggle({ user, mode, onModeChange, selectedTeam, onT
     if (team) {
       onTeamChange(team);
     }
+  };
+
+  const handleSettingsClick = () => {
+    navigate('/settings');
+  };
+
+  const handleToggleLeftPanel = () => {
+    onTogglePanel('left');
+  };
+
+  const handleToggleMiddlePanel = () => {
+    onTogglePanel('middle');
+  };
+
+  const handleToggleRightPanel = () => {
+    onTogglePanel('right');
   };
 
   // Keyboard shortcut: Cmd+T / Ctrl+T
@@ -36,6 +55,13 @@ export default function ModeToggle({ user, mode, onModeChange, selectedTeam, onT
   return (
     <div className="mode-toggle-container">
       <div className="mode-toggle-left">
+        <div className="mode-user-info">
+          <div className="mode-user-avatar">
+            {user?.name?.[0]?.toUpperCase() || 'U'}
+          </div>
+          <span className="mode-user-name">{user?.name || 'User'}</span>
+        </div>
+
         {mode === 'personal' ? (
           <>
             <div className={`mode-badge mode-badge-personal`}>
@@ -90,15 +116,50 @@ export default function ModeToggle({ user, mode, onModeChange, selectedTeam, onT
       </div>
 
       <div className="mode-toggle-right">
-        <div className="mode-user-info">
-          <div className="mode-user-avatar">
-            {user?.name?.[0]?.toUpperCase() || 'U'}
-          </div>
-          <span className="mode-user-name">{user?.name || 'User'}</span>
+        <button className="mode-settings-button" title="Settings" onClick={handleSettingsClick}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+
+        {/* Panel Toggle Buttons */}
+        <div className="panel-toggle-buttons">
+          <button 
+            className={`panel-toggle-btn ${panelVisibility?.left ? 'active' : ''}`}
+            title={panelVisibility?.left ? 'Hide left panel (Tasks)' : 'Show left panel (Tasks)'}
+            onClick={handleToggleLeftPanel}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="3" width="8" height="18" rx="1" ry="1" opacity="0.6"/>
+              <rect x="13" y="3" width="8" height="18" rx="1" ry="1" opacity="0.3"/>
+            </svg>
+          </button>
+
+          <button 
+            className={`panel-toggle-btn ${panelVisibility?.middle ? 'active' : ''}`}
+            title={panelVisibility?.middle ? 'Hide middle panel (Chat)' : 'Show middle panel (Chat)'}
+            onClick={handleToggleMiddlePanel}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="3" width="6" height="18" rx="1" ry="1" opacity="0.3"/>
+              <rect x="11" y="3" width="6" height="18" rx="1" ry="1" opacity="0.6"/>
+              <rect x="19" y="3" width="2" height="18" rx="1" ry="1" opacity="0.3"/>
+            </svg>
+          </button>
+
+          <button 
+            className={`panel-toggle-btn ${panelVisibility?.right ? 'active' : ''}`}
+            title={panelVisibility?.right ? 'Hide right panel (Calendar)' : 'Show right panel (Calendar)'}
+            onClick={handleToggleRightPanel}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="3" width="8" height="18" rx="1" ry="1" opacity="0.3"/>
+              <rect x="13" y="3" width="8" height="18" rx="1" ry="1" opacity="0.6"/>
+            </svg>
+          </button>
         </div>
-        <div className="mode-shortcut-hint" title="Toggle mode">
-          <kbd>⌘</kbd>+<kbd>T</kbd>
-        </div>
+        {/* Removed custom window controls - using native macOS traffic lights */}
       </div>
     </div>
   );

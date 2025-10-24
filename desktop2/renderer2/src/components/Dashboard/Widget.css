@@ -1,0 +1,313 @@
+/* Widget Styles - Enhanced Modern Look */
+.widget {
+  position: absolute;
+  width: 240px;
+  min-height: 180px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow: hidden;
+}
+
+.widget:hover {
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.widget.dragging {
+  cursor: move;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  transform: scale(1.02);
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: move;
+  user-select: none;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.widget-type-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  line-height: 1;
+}
+
+.widget-delete {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  color: #94a3b8;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.widget-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+.widget-content {
+  flex: 1;
+  padding: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Widget Editor */
+.widget-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.widget-editor textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 100px;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1e293b;
+  font-family: inherit;
+  outline: none;
+}
+
+.widget-editor textarea::placeholder {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* Widget Actions (Save/Cancel) */
+.widget-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.widget-save-btn,
+.widget-cancel-btn {
+  flex: 1;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.widget-save-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.widget-save-btn:hover {
+  background: #2563eb;
+}
+
+.widget-cancel-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #64748b;
+}
+
+.widget-cancel-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.widget-note-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1e293b;
+  min-height: 100px;
+  cursor: text;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.widget-note-text:empty::before {
+  content: 'Click to edit...';
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.widget-timestamp {
+  padding: 6px 12px;
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  text-align: right;
+}
+
+/* Tracker Widget Styles */
+.widget-tracker {
+  cursor: pointer;
+  min-height: 100px;
+}
+
+.tracker-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.tracker-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: 600;
+}
+
+.tracker-target {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.tracker-source {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.tracker-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #10b981;
+}
+
+.status-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.status-indicator.active {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Notifier Widget Styles */
+.widget-notifier {
+  cursor: pointer;
+  min-height: 100px;
+}
+
+.notifier-header {
+  margin-bottom: 8px;
+}
+
+.notifier-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: 600;
+}
+
+.notifier-topic {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.notifier-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.notification-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Color variations */
+.widget[style*="rgb(254, 243, 199)"] {
+  /* Yellow */
+  border-left: 3px solid #fbbf24;
+}
+
+.widget[style*="rgb(219, 234, 254)"] {
+  /* Blue */
+  border-left: 3px solid #60a5fa;
+}
+
+.widget[style*="rgb(252, 231, 243)"] {
+  /* Pink */
+  border-left: 3px solid #f472b6;
+}
+
+.widget[style*="rgb(220, 252, 231)"] {
+  /* Green */
+  border-left: 3px solid #34d399;
+}
+
+.widget[style*="rgb(243, 232, 255)"] {
+  /* Purple */
+  border-left: 3px solid #a78bfa;
+}
+
+/* Widget type specific colors */
+.widget-tracker {
+  border-left-color: #3b82f6 !important;
+}
+
+.widget-notifier {
+  border-left-color: #f59e0b !important;
+}
+

@@ -1,0 +1,291 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    MISSION CONTROL - DUAL MODE ARCHITECTURE                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         MISSION CONTROL PAGE                                 │
+│  Route: /mission-control                                                     │
+│  Component: MissionControl.jsx (144 lines - clean implementation)            │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                          DRAGGABLE HEADER                                    │
+│  Window controls (minimize, maximize, close)                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           MODE TOGGLE HEADER                                 │
+│  Component: ModeToggle.jsx                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │ [🔵 Personal]                    [Switch to Team →]  [@User]           ││
+│  │                                                       Cmd+T              ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                              OR                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │ [← Back to Personal]    Team: [▼ Engineering Team]         [@User]     ││
+│  │                                                             Cmd+T        ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+└──────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                    ┌─────────────────┴─────────────────┐
+                    │                                   │
+         mode === 'personal'                 mode === 'team'
+                    │                                   │
+                    ▼                                   ▼
+    ┌───────────────────────────────┐   ┌────────────────────────────────┐
+    │     PERSONAL MODE             │   │       TEAM MODE                │
+    │                               │   │                                │
+    │  if user.role === 'developer' │   │   <TeamChat user={user} />     │
+    │    <TasksDeveloper />         │   │                                │
+    │  else                         │   │   - Team chat interface        │
+    │    <Tasks />                  │   │   - Context panel              │
+    │                               │   │   - Message history            │
+    │  - Individual tasks           │   │   - AI responses               │
+    │  - JIRA integration           │   │   - Team collaboration         │
+    │  - GitHub PRs                 │   │                                │
+    │  - Personal calendar          │   │                                │
+    └───────────────────────────────┘   └────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           STATE MANAGEMENT                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+React State:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ mode: 'personal' | 'team'                  (current mode)                  │
+│ teams: Array<Team>                          (available teams)              │
+│ selectedTeam: Team | null                   (current team)                 │
+│ teamsLoading: boolean                       (loading state)                │
+└────────────────────────────────────────────────────────────────────────────┘
+
+URL Parameters:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ /mission-control                            → Personal mode (default)      │
+│ /mission-control?mode=personal              → Personal mode                │
+│ /mission-control?mode=team                  → Team mode (first team)       │
+│ /mission-control?mode=team&teamId=abc123    → Team mode (specific team)   │
+└────────────────────────────────────────────────────────────────────────────┘
+
+localStorage:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ missionControlMode: 'personal' | 'team'     (persisted mode)              │
+│ missionControlTeamId: string                (persisted team ID)            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          USER INTERACTIONS                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+1. Toggle Mode:
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │ Click "Switch to Team" button  →  handleModeChange('team')            │
+   │ Click "Back to Personal" button →  handleModeChange('personal')       │
+   │ Press Cmd+T / Ctrl+T           →  Toggles between modes               │
+   └────────────────────────────────────────────────────────────────────────┘
+
+2. Select Team:
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │ Change team dropdown  →  handleTeamChange(selectedTeam)                │
+   │                       →  Updates URL and localStorage                  │
+   │                       →  TeamChat component re-renders with new team   │
+   └────────────────────────────────────────────────────────────────────────┘
+
+3. Persistence:
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │ Page refresh  →  Reads mode from URL or localStorage                   │
+   │               →  Restores team from URL or localStorage                │
+   │               →  Returns user to last known state                       │
+   └────────────────────────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          COMPONENT PROPS                                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+MissionControl:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ { user: Object }                                                           │
+│   - user.role: 'developer' | 'sales'                                       │
+│   - user.id: string                                                        │
+│   - user.name: string                                                      │
+└────────────────────────────────────────────────────────────────────────────┘
+
+ModeToggle:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ {                                                                          │
+│   user: Object,              // Current user                               │
+│   mode: String,              // 'personal' | 'team'                        │
+│   onModeChange: Function,    // (newMode) => void                          │
+│   selectedTeam: Object,      // { id, name, description }                  │
+│   onTeamChange: Function,    // (team) => void                             │
+│   teams: Array,              // Array of team objects                      │
+│   loading: Boolean           // Teams loading state                        │
+│ }                                                                          │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          ELECTRON IPC FLOW                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Frontend (Renderer) → Preload Bridge → Backend (Main Process) → Database
+    │                      │                    │                    │
+    │                      │                    │                    │
+MissionControl.jsx  →  preload.js  →  team-chat-handlers.js  →  Supabase
+    │                      │                    │                    │
+    │ loadTeams()          │                    │                    │
+    │─────────────────────>│                    │                    │
+    │                      │ invoke(            │                    │
+    │                      │ 'team-chat:        │                    │
+    │                      │  load-teams')      │                    │
+    │                      │───────────────────>│                    │
+    │                      │                    │ Query              │
+    │                      │                    │ app_team_members   │
+    │                      │                    │───────────────────>│
+    │                      │                    │<─────��─────────────│
+    │                      │<───────────────────│ Return teams       │
+    │<─────────────────────│                    │                    │
+    │ { success: true,     │                    │                    │
+    │   teams: [...] }     │                    │                    │
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            FILE STRUCTURE                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+desktop2/
+├── renderer2/src/
+│   ├── pages/
+│   │   ├── MissionControl.jsx          (Main component - 144 lines ACTIVE)
+│   │   ├── MissionControl.css          (Existing styles)
+│   │   ├── Tasks.jsx                   (Sales tasks - reused)
+│   │   ├── TasksDeveloper.jsx          (Developer tasks - reused)
+│   │   └── TeamChat.jsx                (Team chat - reused)
+│   └── components/
+│       └── MissionControl/
+│           ├── ModeToggle.jsx          (NEW - 105 lines)
+│           └── ModeToggle.css          (NEW - 221 lines)
+├── bridge/
+│   └── preload.js                      (Already has teamChat API)
+└── main/
+    └── ipc/
+        └── team-chat-handlers.js       (Already exists)
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          STYLING THEME                                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Personal Mode:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Primary Color:  #60a5fa (blue)                                             │
+│ Badge:          Blue gradient with blue border                             │
+│ Button:         Blue gradient background                                   │
+│ Hover Effect:   Brighter blue + slide right animation                      │
+└────────────────────────────────────────────────────────────────────────────┘
+
+Team Mode:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Primary Color:  #a78bfa (purple)                                           │
+│ Badge:          Purple gradient with purple border                         │
+│ Button:         Purple gradient background                                 │
+│ Dropdown:       Purple border with custom SVG arrow                        │
+│ Hover Effect:   Brighter purple + slide left animation                     │
+└────────────────────────────────────────────────────────────────────────────┘
+
+Common:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Background:     rgba(15, 23, 42, 0.95) - Dark blue with transparency      │
+│ Border:         rgba(255, 255, 255, 0.1) - Subtle white border            │
+│ Text:           #e2e8f0 - Light gray                                       │
+│ Backdrop:       blur(10px) - Frosted glass effect                          │
+│ Position:       Sticky top with z-index: 100                               │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          IMPLEMENTATION STATS                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Files Modified:     1 (MissionControl.jsx)
+Files Created:      2 (ModeToggle.jsx, ModeToggle.css)
+Lines Added:        ~326 lines
+Lines Removed:      443 lines (legacy calendar/email code)
+Net Change:         -117 lines (cleaner codebase!)
+
+Active Code:        144 lines (MissionControl.jsx without legacy code)
+Component Code:     105 lines (ModeToggle.jsx)
+Styling Code:       221 lines (ModeToggle.css)
+
+Build Status:       ✅ Passes (Vite build successful)
+Syntax Check:       ✅ Valid React/JSX
+Dependencies:       ✅ All imports available
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                             TESTING PLAN                                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Step 1: Start Application
+    $ cd /Users/jarvis/Code/HeyJarvis/desktop2
+    $ npm run dev
+
+Step 2: Basic Toggle Test
+    ✓ Open Mission Control
+    ✓ Verify "Personal" badge visible
+    ✓ Click "Switch to Team"
+    ✓ Verify URL changes to ?mode=team
+    ✓ Verify team selector appears
+    ✓ Click "Back to Personal"
+    ✓ Verify returns to Tasks view
+
+Step 3: Team Selection Test
+    ✓ Switch to Team mode
+    ✓ Verify teams dropdown populated
+    ✓ Select different team
+    ✓ Verify TeamChat updates
+    ✓ Verify URL includes teamId parameter
+
+Step 4: Persistence Test
+    ✓ Switch to Team mode, select a team
+    ✓ Refresh browser (Cmd+R)
+    ✓ Verify returns to Team mode with same team
+    ✓ Switch to Personal mode
+    ✓ Refresh browser
+    ✓ Verify returns to Personal mode
+
+Step 5: Keyboard Shortcut Test
+    ✓ Press Cmd+T (Mac) or Ctrl+T (Windows)
+    ✓ Verify mode toggles
+    ✓ Press Cmd+T again
+    ✓ Verify toggles back
+
+Step 6: Role Test
+    ✓ Test with user.role = 'developer'
+    ✓ Verify TasksDeveloper component renders in Personal mode
+    ✓ Test with user.role = 'sales'
+    ✓ Verify Tasks component renders in Personal mode
+
+Step 7: Direct URL Test
+    ✓ Navigate to /mission-control?mode=team&teamId=xyz
+    ✓ Verify loads in Team mode with specified team
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            SUCCESS CRITERIA                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+✅ Mode toggle button works in both directions
+✅ Keyboard shortcut (Cmd+T / Ctrl+T) toggles modes
+✅ Team selector dropdown populates with user's teams
+✅ Selecting team updates TeamChat component
+✅ URL parameters persist mode and teamId
+✅ localStorage persists preferences across sessions
+✅ Works for both Developer and Sales roles
+✅ Clean codebase with legacy code removed
+✅ Build passes without errors
+✅ No console errors during mode switching

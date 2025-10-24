@@ -25,11 +25,28 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
   
+  // Orb visibility state - hide when Mission Control is open
+  const [showOrb, setShowOrb] = useState(true);
+  
   // Onboarding state - REMOVED, now handled in LoginFlow
 
   useEffect(() => {
     initializeApp();
     checkAuthStatus();
+  }, []);
+
+  // Listen for secondary window (Mission Control) state changes
+  useEffect(() => {
+    if (window.electronAPI?.window?.onSecondaryWindowChange) {
+      const cleanup = window.electronAPI.window.onSecondaryWindowChange((isOpen, route) => {
+        // Hide orb when Mission Control window is open, show when closed
+        const shouldHideOrb = isOpen && route === '/mission-control';
+        setShowOrb(!shouldHideOrb);
+        console.log(`🪟 Secondary window ${isOpen ? 'opened' : 'closed'}: ${route}, Orb visible: ${!shouldHideOrb}`);
+      });
+      
+      return cleanup;
+    }
   }, []);
 
   // Force mouse forwarding state based on auth and collapsed state
@@ -234,16 +251,9 @@ function App() {
     }
   };
 
-  // Show loading while checking auth
+  // Show loading while checking auth - return nothing (silent load)
   if (authLoading) {
-    return (
-      <div className="app" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🤖</div>
-          <div style={{ fontSize: '16px', color: '#6b7280' }}>Loading...</div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // Show login if not authenticated (includes LoginFlow with role selection)
@@ -258,14 +268,16 @@ function App() {
   // Check if we're in the orb window or secondary window based on hash
   const isOrbWindow = !window.location.hash || window.location.hash === '#/';
 
-  // If this is the orb window, show Arc Reactor only
+  // If this is the orb window, show Arc Reactor only (but hide when Mission Control is open)
   if (isOrbWindow) {
     return (
       <div className="app app-collapsed">
-        <ArcReactor
-          isCollapsed={true}
-          onNavigate={handleArcReactorNavigate}
-        />
+        {showOrb && (
+          <ArcReactor
+            isCollapsed={true}
+            onNavigate={handleArcReactorNavigate}
+          />
+        )}
       </div>
     );
   }

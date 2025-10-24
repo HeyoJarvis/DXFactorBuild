@@ -9,6 +9,7 @@
   user-select: none;
   transition: none;
   pointer-events: auto !important; /* Ensure orb receives clicks */
+  overflow: visible; /* Allow notification badge to overflow */
 }
 
 .arc-reactor-orb.dragging {
@@ -140,22 +141,73 @@
   animation-delay: 2.25s;
 }
 
-/* Role indicator badge */
-.orb-role-indicator {
+/* Notification message badge */
+.orb-notification-message {
   position: absolute;
-  bottom: -5px;
-  right: -5px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
+  right: -105px; /* Move even further to the right */
+  top: -30px; /* Position above with slight overlap */
+  transform: none;
+  margin-left: 0;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 2px solid var(--orb-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 0 20px var(--orb-glow),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  /* Text styling */
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  
+  /* Animation */
+  animation: slide-in-badge 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none; /* Don't interfere with orb dragging */
+  user-select: none;
+  z-index: 10001;
+}
+
+/* Slide in animation for new messages */
+@keyframes slide-in-badge {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Pulse the badge gently */
+.orb-notification-message::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  border: 2px solid var(--orb-color);
+  opacity: 0;
+  animation: pulse-badge-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge-border {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
 }
 
 /* Animations */

@@ -2,27 +2,73 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  background: rgba(15, 23, 42, 0.95);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  position: sticky;
+  padding: 8px 20px 8px 16px; /* Reduced left padding to bring profile to edge */
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.18) 0%,
+    rgba(96, 165, 250, 0.14) 50%,
+    rgba(147, 197, 253, 0.18) 100%
+  );
+  backdrop-filter: blur(120px) saturate(200%) brightness(1.15);
+  -webkit-backdrop-filter: blur(120px) saturate(200%) brightness(1.15);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.35);
+  position: fixed;
   top: 0;
-  z-index: 100;
-  -webkit-app-region: drag; /* Make header draggable */
+  left: 0;
+  right: 0;
+  z-index: 9999; /* CRITICAL: Must be above all other content to stay visible */
+  -webkit-app-region: drag;
   cursor: move;
+  box-shadow:
+    0 0 0 0.5px rgba(147, 197, 253, 0.3) inset,
+    0 0 30px rgba(59, 130, 246, 0.15),
+    0 4px 20px rgba(96, 165, 250, 0.1);
+  height: 56px;
+  min-height: 56px;
+  flex-wrap: nowrap;
+  overflow: visible;
+}
+
+.mode-toggle-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(105deg,
+      transparent 40%,
+      rgba(96, 165, 250, 0.15) 50%,
+      rgba(147, 197, 253, 0.25) 52%,
+      rgba(59, 130, 246, 0.15) 58%,
+      transparent 60%
+    );
+  animation: holographic-sweep 8s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+@keyframes holographic-sweep {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(200%); }
 }
 
 .mode-toggle-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px; /* Reduced gap between avatar and name */
+  flex-shrink: 1;
+  min-width: 0;
+  margin-left: 0; /* Ensure it starts at left edge */
 }
 
 .mode-toggle-right {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Mode Badge */
@@ -30,48 +76,60 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mode-badge-personal {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.15));
-  color: #60a5fa;
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(96, 165, 250, 0.10));
+  color: #000000;
+  border: 1px solid rgba(96, 165, 250, 0.25);
 }
 
 .mode-badge svg {
   flex-shrink: 0;
+  width: 14px;
+  height: 14px;
 }
 
 /* Switch Button */
 .mode-switch-button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 8px 14px;
-  background: rgba(96, 165, 250, 0.1);
-  border: 1px solid rgba(96, 165, 250, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(96, 165, 250, 0.25);
   border-radius: 8px;
-  color: #60a5fa;
+  color: #000000;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  -webkit-app-region: no-drag; /* Keep button clickable */
+  -webkit-app-region: no-drag;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 2px 6px rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mode-switch-button:hover {
-  background: rgba(96, 165, 250, 0.15);
+  background: rgba(96, 165, 250, 0.18);
   border-color: rgba(96, 165, 250, 0.4);
   transform: translateX(2px);
 }
 
 .mode-switch-button svg {
   flex-shrink: 0;
+  width: 14px;
+  height: 14px;
   transition: transform 0.2s;
 }
 
@@ -83,17 +141,19 @@
 .mode-back-button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 8px 14px;
   background: rgba(167, 139, 250, 0.1);
   border: 1px solid rgba(167, 139, 250, 0.2);
   border-radius: 8px;
-  color: #a78bfa;
+  color: #000000;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  -webkit-app-region: no-drag; /* Keep button clickable */
+  -webkit-app-region: no-drag;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mode-back-button:hover {
@@ -104,6 +164,8 @@
 
 .mode-back-button svg {
   flex-shrink: 0;
+  width: 14px;
+  height: 14px;
   transition: transform 0.2s;
 }
 
@@ -160,6 +222,132 @@
   font-style: italic;
 }
 
+/* Settings Button */
+.mode-settings-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-app-region: no-drag;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.mode-settings-button:hover {
+  background: rgba(96, 165, 250, 0.15);
+  color: #000000;
+  transform: scale(1.08);
+}
+
+.mode-settings-button svg {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  width: 18px;
+  height: 18px;
+}
+
+/* Panel Toggle Buttons */
+.panel-toggle-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+.panel-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+.panel-toggle-btn:hover {
+  background: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.3);
+  color: #3b82f6;
+  transform: scale(1.05);
+}
+
+.panel-toggle-btn.active {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #007aff;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.panel-toggle-btn svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  transition: all 0.2s;
+}
+
+.panel-toggle-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Window Controls */
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+  padding-left: 14px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-right: 4px;
+  flex-shrink: 0;
+}
+
+.window-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.window-control-button:hover {
+  background: rgba(96, 165, 250, 0.15);
+  color: #000000;
+}
+
+.window-control-button.close:hover {
+  background: rgba(239, 68, 68, 0.18);
+  color: #000000;
+}
+
+.window-control-button svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
 /* User Info */
 .mode-user-info {
   display: flex;
@@ -168,22 +356,28 @@
 }
 
 .mode-user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: linear-gradient(135deg, #60a5fa, #a78bfa);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 700;
+  font-size: 14px;
   color: white;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.2);
+  flex-shrink: 0;
 }
 
 .mode-user-name {
-  font-size: 13px;
-  color: #cbd5e1;
-  font-weight: 500;
+  font-size: 15px;
+  color: #000000;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 200px; /* Increased from 120px to show full name */
 }
 
 /* Keyboard Shortcut Hint */

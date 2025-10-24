@@ -66,9 +66,73 @@ function registerTeamChatHandlers(services, logger) {
   });
 
   /**
+   * Add repository to team
+   */
+  ipcMain.handle('team-chat:add-repository-to-team', async (_event, teamId, owner, name, branch, url) => {
+    try {
+      logger.info('Adding repository to team', { teamId, owner, name, branch });
+
+      const userId = services.auth?.currentUser?.id;
+      if (!userId) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      const { data, error } = await dbAdapter.supabase
+        .from('team_repositories')
+        .insert({
+          team_id: teamId,
+          repository_owner: owner,
+          repository_name: name,
+          repository_branch: branch || 'main',
+          repository_url: url,
+          created_by: userId,
+          indexed_at: new Date().toISOString(),
+          is_active: true
+        })
+        .select()
+        .single();
+
+      if (error) {
+        // Check if it's a duplicate error (repository already exists)
+        if (error.code === '23505') {
+          // Update existing record to be active
+          const { data: updated, error: updateError } = await dbAdapter.supabase
+            .from('team_repositories')
+            .update({
+              is_active: true,
+              indexed_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('team_id', teamId)
+            .eq('repository_owner', owner)
+            .eq('repository_name', name)
+            .eq('repository_branch', branch || 'main')
+            .select()
+            .single();
+
+          if (updateError) {
+            throw updateError;
+          }
+
+          logger.info('Repository already existed, reactivated', { teamId, owner, name });
+          return { success: true, data: updated };
+        }
+        throw error;
+      }
+
+      logger.info('✅ Repository added to team successfully', { id: data.id });
+      return { success: true, data };
+
+    } catch (error) {
+      logger.error('Failed to add repository to team', { error: error.message });
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
    * Load team context (meetings, tasks, code repos) without chat history
    */
-  ipcMain.handle('team-chat:load-team-context', async (event, teamId) => {
+  ipcMain.handle('team-chat:load-team-context', async (_event, teamId) => {
     try {
       logger.info('📋 Loading team context', { teamId });
 
@@ -493,44 +557,87 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
 
     // Get code repos from GitHub if enabled
     if (contextSettings.include_code) {
-      // Get unique repos from code_embeddings (GitHub indexed repos)
-      const { data: codeFiles, error: codeError } = await dbAdapter.supabase
-        .from('code_embeddings')
-        .select('repository_owner, repository_name, repository_branch')
-        .limit(1000);
+      // First, get team-specific repositories from team_repositories table
+      const { data: teamRepos, error: teamReposError } = await dbAdapter.supabase
+        .from('team_repositories')
+        .select('repository_owner, repository_name, repository_branch, indexed_at')
+        .eq('team_id', teamId)
+        .eq('is_active', true);
 
-      if (!codeError && codeFiles) {
-        // Group by repository (owner/name)
+      if (!teamReposError && teamRepos && teamRepos.length > 0) {
+        logger.info('Loading team-specific repositories', { count: teamRepos.length });
+
+        // For each team repo, get file counts from code_embeddings
         const repoMap = new Map();
-        codeFiles.forEach(file => {
-          const repoOwner = file.repository_owner || 'Unknown';
-          const repoName = file.repository_name || 'Unknown';
-          const repoBranch = file.repository_branch || 'main';
-          const repoPath = `${repoOwner}/${repoName}`;
 
-          if (!repoMap.has(repoPath)) {
+        for (const teamRepo of teamRepos) {
+          const repoPath = `${teamRepo.repository_owner}/${teamRepo.repository_name}`;
+
+          // Count files for this specific repository
+          const { count, error: countError } = await dbAdapter.supabase
+            .from('code_embeddings')
+            .select('*', { count: 'exact', head: true })
+            .eq('repository_owner', teamRepo.repository_owner)
+            .eq('repository_name', teamRepo.repository_name)
+            .eq('repository_branch', teamRepo.repository_branch);
+
+          if (!countError) {
             repoMap.set(repoPath, {
               path: repoPath,
-              name: repoName,
-              owner: repoOwner,
-              branch: repoBranch,
-              file_count: 0,
-              source: 'github', // Explicitly mark as GitHub source
-              selected: !contextSettings.selected_repo_paths ||
-                        contextSettings.selected_repo_paths.length === 0 ||
-                        contextSettings.selected_repo_paths.includes(repoPath)
+              name: teamRepo.repository_name,
+              owner: teamRepo.repository_owner,
+              branch: teamRepo.repository_branch,
+              file_count: count || 0,
+              indexed_at: teamRepo.indexed_at,
+              source: 'github',
+              selected: true // Team repos are always selected by default
             });
           }
-          repoMap.get(repoPath).file_count++;
+        }
+
+        contextDetails.code_repos = Array.from(repoMap.values());
+        context.code_files_count = contextDetails.code_repos.reduce((sum, r) => sum + r.file_count, 0);
+        logger.info('Loaded team repositories', {
+          repos: contextDetails.code_repos.length,
+          total_files: context.code_files_count
         });
+      } else {
+        // Fallback: If no team-specific repos, show all indexed repos (old behavior)
+        logger.info('No team-specific repos, loading all indexed repositories');
 
-        // Get all repos with their selection state
-        const allRepos = Array.from(repoMap.values());
-        contextDetails.code_repos = allRepos;
+        const { data: codeFiles, error: codeError } = await dbAdapter.supabase
+          .from('code_embeddings')
+          .select('repository_owner, repository_name, repository_branch')
+          .limit(1000);
 
-        // Count only selected repos
-        const selectedRepos = allRepos.filter(r => r.selected);
-        context.code_files_count = selectedRepos.reduce((sum, r) => sum + r.file_count, 0);
+        if (!codeError && codeFiles) {
+          const repoMap = new Map();
+          codeFiles.forEach(file => {
+            const repoOwner = file.repository_owner || 'Unknown';
+            const repoName = file.repository_name || 'Unknown';
+            const repoBranch = file.repository_branch || 'main';
+            const repoPath = `${repoOwner}/${repoName}`;
+
+            if (!repoMap.has(repoPath)) {
+              repoMap.set(repoPath, {
+                path: repoPath,
+                name: repoName,
+                owner: repoOwner,
+                branch: repoBranch,
+                file_count: 0,
+                source: 'github',
+                selected: !contextSettings.selected_repo_paths ||
+                          contextSettings.selected_repo_paths.length === 0 ||
+                          contextSettings.selected_repo_paths.includes(repoPath)
+              });
+            }
+            repoMap.get(repoPath).file_count++;
+          });
+
+          contextDetails.code_repos = Array.from(repoMap.values());
+          const selectedRepos = contextDetails.code_repos.filter(r => r.selected);
+          context.code_files_count = selectedRepos.reduce((sum, r) => sum + r.file_count, 0);
+        }
       }
     }
 

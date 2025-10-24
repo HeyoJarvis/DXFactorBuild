@@ -18,10 +18,16 @@ export default function TeamChat({ user }) {
   });
   const [isSavingContext, setIsSavingContext] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
   // Auto-scroll to bottom when messages change
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'auto' });
+    } else {
+      messagesEndRef.current?.scrollIntoView({ block: 'nearest' });
+    }
   };
 
   useEffect(() => {
@@ -288,7 +294,7 @@ export default function TeamChat({ user }) {
           ) : (
             <>
               {/* Messages List */}
-              <div className="team-chat-messages">
+              <div className="team-chat-messages" ref={messagesContainerRef}>
                 {messages.length === 0 && (
                   <div className="team-chat-welcome">
                     <h3>Welcome to {selectedTeam.name} Chat</h3>

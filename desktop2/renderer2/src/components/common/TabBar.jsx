@@ -155,6 +155,12 @@ export default function TabBar({ userRole, user, onLogout }) {
                 </div>
               )}
             </button>
+            
+            {/* Profile Name */}
+            <div className="tab-bar-profile-info">
+              <div className="tab-bar-profile-name">{user?.name || 'User'}</div>
+              <div className="tab-bar-profile-role">{userRole === 'developer' ? 'Developer' : 'Sales'}</div>
+            </div>
 
             {/* Dropdown Menu */}
             {showDropdown && (

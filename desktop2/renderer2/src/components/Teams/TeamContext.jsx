@@ -89,7 +89,7 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
     }
   };
 
-  // Index a repository
+  // Index a repository and add it to the team
   const handleIndexRepository = async (repo) => {
     if (!window.electronAPI?.codeIndexer?.indexRepository) {
       console.error('Code Indexer API not available');
@@ -110,8 +110,26 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
 
       if (response.success) {
         console.log('✅ Repository indexed successfully:', repo.full_name);
+
+        // Add repository to team
+        console.log('🔗 Adding repository to team:', selectedTeam.id);
+        const addResult = await window.electronAPI.teamChat.addRepositoryToTeam(
+          selectedTeam.id,
+          owner,
+          name,
+          repo.default_branch || 'main',
+          repo.html_url
+        );
+
+        if (addResult.success) {
+          console.log('✅ Repository added to team successfully');
+        } else {
+          console.warn('⚠️ Repository indexed but failed to add to team:', addResult.error);
+        }
+
         // Reload team context to show the new repo
         await loadTeamContext(selectedTeam.id);
+        setShowRepoSelector(false);
       } else {
         console.error('Failed to index repository:', response.error);
         alert(`Failed to index ${repo.full_name}: ${response.error}`);

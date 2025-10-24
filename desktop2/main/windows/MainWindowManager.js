@@ -18,8 +18,7 @@ class MainWindowManager {
       width: 800,
       height: 70,
       minWidth: 600,
-      minHeight: 70,
-      maxHeight: 70
+      minHeight: 70
     };
     
     // Full chat window settings

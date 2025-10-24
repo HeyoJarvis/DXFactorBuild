@@ -642,7 +642,8 @@ function createWindows() {
   appState.windows.main.create();
 
   // Create secondary window manager (for Tasks/Copilot UI)
-  appState.windows.secondary = new SecondaryWindowManager(logger);
+  // Pass main window reference for notifications
+  appState.windows.secondary = new SecondaryWindowManager(logger, appState.windows.main.getWindow());
   // Don't create yet - will be created on demand when user clicks menu
 
   // Create copilot overlay manager
