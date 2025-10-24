@@ -92,7 +92,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     minimize: () => ipcRenderer.send('window:minimize'),
     maximize: () => ipcRenderer.send('window:maximize'),
     toggleMaximize: () => ipcRenderer.send('window:toggleMaximize'),
-    close: () => ipcRenderer.send('window:close')
+    close: () => ipcRenderer.send('window:close'),
+    // Event listeners
+    onSecondaryWindowChange: (callback) => {
+      const listener = (event, isOpen, route) => callback(isOpen, route);
+      ipcRenderer.on('window:secondaryWindowChange', listener);
+      return () => ipcRenderer.removeListener('window:secondaryWindowChange', listener);
+    }
   },
 
   // Code Indexer APIs

@@ -61,6 +61,10 @@ function registerWindowHandlers(windows, logger) {
         return { success: false, error: 'Secondary window not available' };
       }
 
+      // Hide the main window (Arc Reactor orb) when secondary window opens
+      windows.main?.hide();
+      logger.info('Main window hidden for secondary window');
+
       // Create or show the secondary window
       windows.secondary.create(route);
       logger.info('Secondary window opened', { route });

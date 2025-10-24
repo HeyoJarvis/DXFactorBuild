@@ -55,6 +55,14 @@ export default function MissionControl({ user }) {
     }
   }, [mode]);
 
+  // Track initial load
+  const [isInitializing, setIsInitializing] = useState(true);
+  useEffect(() => {
+    // Show loading for a brief moment on initial load
+    const timer = setTimeout(() => setIsInitializing(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Persist mode to localStorage and URL
   useEffect(() => {
     localStorage.setItem('missionControlMode', mode);
@@ -133,6 +141,16 @@ export default function MissionControl({ user }) {
   // Render mode toggle header
   return (
     <div className="mission-control-page">
+      {/* Loading screen with orb animation */}
+      {isInitializing && (
+        <div className="mission-control-morph">
+          <div className="morph-orb"></div>
+          <div className="morph-text">Mission Control</div>
+        </div>
+      )}
+      
+      {!isInitializing && (
+        <>
       {/* Mode Toggle Header */}
       <ModeToggle
         user={user}
@@ -249,6 +267,8 @@ export default function MissionControl({ user }) {
           )}
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

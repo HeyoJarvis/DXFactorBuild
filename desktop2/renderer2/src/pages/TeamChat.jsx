@@ -321,14 +321,32 @@ export default function TeamChat({ user, selectedTeam }) {
               {/* Messages List */}
               <div className="team-chat-messages">
                 {messages.length === 0 && (
-                  <div className="team-chat-welcome">
-                    <h3>Welcome to {selectedTeam.name} Chat</h3>
-                    <p>Start a conversation! I have context from:</p>
-                    <ul>
-                      <li>Recent team meetings and discussions</li>
-                      <li>JIRA tickets assigned to this team</li>
-                      <li>Codebase files related to your projects</li>
-                    </ul>
+                  <div className="team-chat-welcome-container">
+                    <div className="welcome-icon-wrapper">
+                      <div className="icon-glow"></div>
+                      <img src="/Jarvis.png" alt="Jarvis" className="welcome-icon" />
+                    </div>
+
+                    <div className="welcome-chat-section">
+                      <div className="welcome-chat-prompt">What would you like to discuss with {selectedTeam.name}?</div>
+                    </div>
+
+                    <div className="welcome-context-items">
+                      <div className="welcome-context-card">
+                        <div className="context-check">✓</div>
+                        <div className="context-label">Recent team meetings and discussions</div>
+                      </div>
+
+                      <div className="welcome-context-card">
+                        <div className="context-check">✓</div>
+                        <div className="context-label">JIRA tickets assigned to this team</div>
+                      </div>
+
+                      <div className="welcome-context-card">
+                        <div className="context-check">✓</div>
+                        <div className="context-label">Codebase files related to your projects</div>
+                      </div>
+                    </div>
                   </div>
                 )}
 

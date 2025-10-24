@@ -18,6 +18,7 @@ function App() {
   const [isCollapsed, setIsCollapsed] = useState(true); // Start collapsed (Arc Reactor only)
   const [systemStatus, setSystemStatus] = useState(null);
   const [initialChatMessage, setInitialChatMessage] = useState(null);
+  const [showOrb, setShowOrb] = useState(true); // Track if Arc Reactor orb should be visible
   
   // Auth state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -30,6 +31,26 @@ function App() {
   useEffect(() => {
     initializeApp();
     checkAuthStatus();
+  }, []);
+
+  // Listen for secondary window (Mission Control or Team Chat) state changes
+  useEffect(() => {
+    if (window.electronAPI?.window?.onSecondaryWindowChange) {
+      const cleanup = window.electronAPI.window.onSecondaryWindowChange(
+        (isOpen, route) => {
+          // Hide orb when Mission Control or Team Chat window is open, show when closed
+          const shouldHideOrb = isOpen && (route === '/mission-control' || route === '/team-chat');
+          setShowOrb(!shouldHideOrb);
+          
+          console.log(
+            `🪟 Secondary window ${isOpen ? 'opened' : 'closed'}: ${route}, ` +
+            `Orb visible: ${!shouldHideOrb}`
+          );
+        }
+      );
+      
+      return cleanup;  // Cleanup listener on unmount
+    }
   }, []);
 
   // Force mouse forwarding state based on auth and collapsed state
@@ -262,10 +283,12 @@ function App() {
   if (isOrbWindow) {
     return (
       <div className="app app-collapsed">
-        <ArcReactor
-          isCollapsed={true}
-          onNavigate={handleArcReactorNavigate}
-        />
+        {showOrb && (
+          <ArcReactor
+            isCollapsed={true}
+            onNavigate={handleArcReactorNavigate}
+          />
+        )}
       </div>
     );
   }

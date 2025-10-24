@@ -99,25 +99,13 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
   };
 
   const handleMenuToggle = async () => {
-    const newState = !isMenuOpen;
-    console.log('🔄 [ARCREACTOR] Menu toggle:', newState ? 'OPEN' : 'CLOSE');
+    console.log('🎯 [ARCREACTOR] Orb clicked - opening Mission Control directly');
     
-    // CRITICAL: Disable mouse forwarding BEFORE opening menu
-    if (newState && window.electronAPI?.window?.setMouseForward) {
-      await window.electronAPI.window.setMouseForward(false);
-      console.log('🖱️ [ARCREACTOR] DISABLED mouse forwarding for menu');
+    // Open Mission Control directly (no menu)
+    if (window.electronAPI?.window?.openSecondary) {
+      await window.electronAPI.window.openSecondary('/mission-control');
+      console.log('🪟 [ARCREACTOR] Mission Control window opened');
     }
-    
-    // Resize window to accommodate menu
-    if (window.electronAPI?.window?.resizeForMenu) {
-      await window.electronAPI.window.resizeForMenu(newState);
-    }
-    
-    setIsMenuOpen(newState);
-    
-    // DON'T re-enable forwarding here!
-    // Let ArcReactorOrb handle it via mouse leave
-    console.log('🖱️ [ARCREACTOR] Menu closed - letting orb control forwarding');
   };
 
   const handleMenuItemClick = async (itemId) => {

@@ -7,9 +7,11 @@ const { BrowserWindow } = require('electron');
 const path = require('path');
 
 class SecondaryWindowManager {
-  constructor(logger) {
+  constructor(logger, mainWindowManager = null, ipcMain = null) {
     this.logger = logger;
     this.window = null;
+    this.mainWindowManager = mainWindowManager;
+    this.ipcMain = ipcMain;
     this.currentRoute = '/tasks'; // Default route
   }
 
@@ -88,9 +90,22 @@ class SecondaryWindowManager {
       // Setup enhanced always-on-top behavior (same as Arc Reactor)
       this.setupEnhancedAlwaysOnTop();
       
-      if (isDev) {
-        this.window.webContents.openDevTools({ mode: 'detached' });
+      // Emit window state change event (secondary window is open)
+      if (this.ipcMain) {
+        this.ipcMain.emit('window:secondaryWindowChange', true, route);
+        this.logger.info('Emitted secondary window open event', { route });
       }
+      
+      // Also send to main window renderer if available
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', true, route);
+        this.logger.info('Sent secondary window open event to main window renderer', { route });
+      }
+      
+      // Don't open dev tools for secondary window in production
+      // if (isDev) {
+      //   this.window.webContents.openDevTools({ mode: 'detached' });
+      // }
     });
 
     // Handle window close
@@ -104,6 +119,24 @@ class SecondaryWindowManager {
       if (this.window) {
         e.preventDefault();
         this.window.hide();
+        
+        // Emit window state change event (secondary window is closed)
+        if (this.ipcMain) {
+          this.ipcMain.emit('window:secondaryWindowChange', false, null);
+          this.logger.info('Emitted secondary window close event');
+        }
+        
+        // Also send to main window renderer if available
+        if (this.mainWindowManager?.getWindow()?.webContents) {
+          this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', false, null);
+          this.logger.info('Sent secondary window close event to main window renderer');
+        }
+        
+        // Show the main window (Arc Reactor) when secondary window closes
+        if (this.mainWindowManager) {
+          this.mainWindowManager.show();
+          this.logger.info('Main window shown when secondary window closed');
+        }
       }
     });
 
