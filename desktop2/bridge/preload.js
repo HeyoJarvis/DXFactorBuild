@@ -141,6 +141,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   microsoft: {
     checkConnection: () => ipcRenderer.invoke('microsoft:checkConnection'),
     authenticate: () => ipcRenderer.invoke('microsoft:authenticate'),
+    disconnect: () => ipcRenderer.invoke('microsoft:disconnect'),
     createEvent: (eventData) => ipcRenderer.invoke('microsoft:createEvent', eventData),
     sendEmail: (emailData) => ipcRenderer.invoke('microsoft:sendEmail', emailData),
     getUpcomingEvents: (options) => ipcRenderer.invoke('microsoft:getUpcomingEvents', options),
@@ -156,6 +157,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   google: {
     checkConnection: () => ipcRenderer.invoke('google:checkConnection'),
     authenticate: () => ipcRenderer.invoke('google:authenticate'),
+    disconnect: () => ipcRenderer.invoke('google:disconnect'),
     createEvent: (eventData) => ipcRenderer.invoke('google:createEvent', eventData),
     sendEmail: (emailData) => ipcRenderer.invoke('google:sendEmail', emailData),
     getUpcomingEvents: (options) => ipcRenderer.invoke('google:getUpcomingEvents', options),

@@ -9,10 +9,18 @@ const fetch = require('node-fetch');
 const SemanticParserService = require('../services/SemanticParserService');
 
 class CodeIndexerHandlers {
-  constructor(logger) {
+  constructor(logger, services = {}) {
     this.logger = logger;
+    this.services = services;
     this.API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
     this.semanticParser = new SemanticParserService(logger);
+    
+    // Debug: Log what services we received
+    this.logger.info('🔍 CodeIndexerHandlers created', {
+      hasServices: !!services,
+      serviceKeys: services ? Object.keys(services) : [],
+      hasGithub: !!services?.github
+    });
   }
 
   /**
@@ -135,43 +143,58 @@ class CodeIndexerHandlers {
       try {
         const { org, affiliation, per_page, page, q } = params;
         
-        this.logger.info('📚 Listing GitHub repositories');
+        this.logger.info('📚 Listing GitHub repositories directly', { 
+          hasServices: !!this.services,
+          hasGithub: !!this.services?.github,
+          servicesKeys: this.services ? Object.keys(this.services) : []
+        });
 
-        const queryParams = new URLSearchParams();
-        if (org) queryParams.append('org', org);
-        if (affiliation) queryParams.append('affiliation', affiliation);
-        if (per_page) queryParams.append('per_page', per_page);
-        if (page) queryParams.append('page', page);
-        if (q) queryParams.append('q', q);
-
-        const response = await fetch(
-          `${this.API_BASE_URL}/api/engineering/repos?${queryParams}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `HTTP ${response.status}`);
+        // Use the GitHub service from the services object
+        const githubService = this.services?.github;
+        
+        if (!githubService) {
+          this.logger.error('❌ GitHub service not found', {
+            hasServices: !!this.services,
+            availableServices: this.services ? Object.keys(this.services) : []
+          });
+          throw new Error('GitHub service not initialized');
         }
 
-        const data = await response.json();
-        
-        this.logger.info('✅ Listed repositories', { 
-          count: data.count 
+        // Initialize if not already done
+        if (!githubService.isInitialized) {
+          const initResult = await githubService.initialize();
+          if (!initResult.success) {
+            throw new Error(initResult.error || 'Failed to initialize GitHub service');
+          }
+        }
+
+        // Use search if query provided
+        if (q) {
+          const searchResult = await githubService.searchRepositories(q, { per_page, page });
+          return {
+            success: searchResult.success,
+            repositories: searchResult.repositories || [],
+            count: searchResult.repositories?.length || 0,
+            total_count: searchResult.total_count,
+            error: searchResult.error
+          };
+        }
+
+        // Otherwise list all accessible repos
+        const result = await githubService.listRepositories({
+          org,
+          affiliation,
+          per_page,
+          page
         });
         
-        return {
-          success: true,
-          repositories: data.repositories,
-          count: data.count,
-          page: data.page,
-          per_page: data.per_page
-        };
+        if (result.success) {
+          this.logger.info('✅ Listed repositories directly', { 
+            count: result.count 
+          });
+        }
+        
+        return result;
 
       } catch (error) {
         this.logger.error('❌ Failed to list repositories', { 

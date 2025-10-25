@@ -106,6 +106,16 @@ function Settings({ user }) {
         };
       }
 
+      // Check GitHub (via code indexer)
+      if (window.electronAPI?.codeIndexer?.getStatus) {
+        const githubStatus = await window.electronAPI.codeIndexer.getStatus();
+        console.log('GitHub status:', githubStatus);
+        statuses.github = {
+          connected: githubStatus.success && githubStatus.configured || false,
+          enabled: githubStatus.success && githubStatus.configured || false
+        };
+      }
+
       // Check CRM (from system status)
       if (window.electronAPI?.system?.getStatus) {
         const systemStatus = await window.electronAPI.system.getStatus();
@@ -278,11 +288,36 @@ function Settings({ user }) {
     try {
       console.log(`🔌 Disconnecting from ${integrationKey}...`);
 
+      // Set loading state
+      setIntegrations(prev => ({
+        ...prev,
+        [integrationKey]: {
+          ...prev[integrationKey],
+          loading: true
+        }
+      }));
+
+      let result;
       switch (integrationKey) {
         case 'jira':
           if (window.electronAPI?.jira?.disconnect) {
-            await window.electronAPI.jira.disconnect();
-            console.log('✅ JIRA disconnected');
+            result = await window.electronAPI.jira.disconnect();
+            console.log('✅ JIRA disconnected', result);
+          }
+          break;
+
+        case 'google':
+          if (window.electronAPI?.google?.disconnect) {
+            result = await window.electronAPI.google.disconnect();
+            console.log('✅ Google disconnected', result);
+          }
+          break;
+
+        case 'teams':
+          // Microsoft/Teams OAuth uses the same backend
+          if (window.electronAPI?.microsoft?.disconnect) {
+            result = await window.electronAPI.microsoft.disconnect();
+            console.log('✅ Microsoft/Teams disconnected', result);
           }
           break;
 
@@ -290,11 +325,36 @@ function Settings({ user }) {
           console.log(`Disconnect for ${integrationKey} not yet implemented`);
       }
 
+      // Clear loading state
+      setIntegrations(prev => ({
+        ...prev,
+        [integrationKey]: {
+          ...prev[integrationKey],
+          loading: false
+        }
+      }));
+
+      // Show success/error message
+      if (result && !result.success) {
+        alert(`Failed to disconnect from ${integrationKey}: ${result.error || 'Unknown error'}`);
+      }
+
       // Refresh statuses
       setTimeout(() => checkIntegrationStatuses(), 1000);
 
     } catch (error) {
       console.error(`Error disconnecting from ${integrationKey}:`, error);
+      
+      // Clear loading state on error
+      setIntegrations(prev => ({
+        ...prev,
+        [integrationKey]: {
+          ...prev[integrationKey],
+          loading: false
+        }
+      }));
+      
+      alert(`Failed to disconnect from ${integrationKey}: ${error.message}`);
     }
   }
 

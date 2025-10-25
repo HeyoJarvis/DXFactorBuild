@@ -524,6 +524,7 @@ async function initializeServices() {
     const JIRAService = require('./services/JIRAService');
     const GoogleService = require('./services/GoogleService');
     const MicrosoftService = require('./services/MicrosoftService');
+    const GitHubService = require('./services/GitHubService');
     
     appState.services.jira = new JIRAService({ 
       logger, 
@@ -538,6 +539,19 @@ async function initializeServices() {
     appState.services.microsoft = new MicrosoftService({
       logger,
       supabaseAdapter: appState.services.dbAdapter
+    });
+    
+    appState.services.github = new GitHubService({
+      logger,
+      supabaseAdapter: appState.services.dbAdapter
+    });
+    
+    logger.info('✅ Integration services created', {
+      serviceKeys: Object.keys(appState.services),
+      hasGithub: !!appState.services.github,
+      hasJira: !!appState.services.jira,
+      hasGoogle: !!appState.services.google,
+      hasMicrosoft: !!appState.services.microsoft
     });
 
     // Start core services
@@ -628,7 +642,7 @@ function setupIPC() {
   registerTeamHandlers(appState.services, logger);
 
   // Setup code indexer handlers
-  const codeIndexerHandlers = new CodeIndexerHandlers(logger);
+  const codeIndexerHandlers = new CodeIndexerHandlers(logger, appState.services);
   codeIndexerHandlers.setup();
 
   logger.info('IPC handlers registered');

@@ -104,6 +104,20 @@ class GoogleService extends EventEmitter {
   }
 
   /**
+   * Disconnect and clear Google service
+   */
+  disconnect() {
+    this.logger.info('Disconnecting Google service');
+    
+    // Clear all service state
+    this.gmailService = null;
+    this.oauthHandler = null;
+    this.isInitialized = false;
+    
+    this.logger.info('Google service disconnected');
+  }
+
+  /**
    * Save tokens to Supabase
    */
   async saveTokens(userId, tokens) {
