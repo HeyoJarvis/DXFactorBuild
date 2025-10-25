@@ -18,7 +18,6 @@ function App() {
   const [isCollapsed, setIsCollapsed] = useState(true); // Start collapsed (Arc Reactor only)
   const [systemStatus, setSystemStatus] = useState(null);
   const [initialChatMessage, setInitialChatMessage] = useState(null);
-  const [showOrb, setShowOrb] = useState(true); // Track if Arc Reactor orb should be visible
   
   // Auth state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -26,7 +25,7 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
   
-  // Orb visibility state - hide when Mission Control is open
+  // Orb visibility state - hide when Mission Control or Team Chat is open
   const [showOrb, setShowOrb] = useState(true);
   
   // Onboarding state - REMOVED, now handled in LoginFlow
@@ -36,19 +35,6 @@ function App() {
     checkAuthStatus();
   }, []);
 
-<<<<<<< HEAD
-  // Listen for secondary window (Mission Control) state changes
-  useEffect(() => {
-    if (window.electronAPI?.window?.onSecondaryWindowChange) {
-      const cleanup = window.electronAPI.window.onSecondaryWindowChange((isOpen, route) => {
-        // Hide orb when Mission Control window is open, show when closed
-        const shouldHideOrb = isOpen && route === '/mission-control';
-        setShowOrb(!shouldHideOrb);
-        console.log(`🪟 Secondary window ${isOpen ? 'opened' : 'closed'}: ${route}, Orb visible: ${!shouldHideOrb}`);
-      });
-      
-      return cleanup;
-=======
   // Listen for secondary window (Mission Control or Team Chat) state changes
   useEffect(() => {
     if (window.electronAPI?.window?.onSecondaryWindowChange) {
@@ -66,7 +52,6 @@ function App() {
       );
       
       return cleanup;  // Cleanup listener on unmount
->>>>>>> origin/Combinations/all
     }
   }, []);
 

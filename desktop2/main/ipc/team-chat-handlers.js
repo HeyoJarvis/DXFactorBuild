@@ -796,20 +796,12 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
 
     // Get code repos from GitHub if enabled
     if (contextSettings.include_code) {
-<<<<<<< HEAD
       // First, get team-specific repositories from team_repositories table
       const { data: teamRepos, error: teamReposError } = await dbAdapter.supabase
         .from('team_repositories')
         .select('repository_owner, repository_name, repository_branch, indexed_at')
         .eq('team_id', teamId)
         .eq('is_active', true);
-=======
-      // Get unique repos from code_chunks (GitHub indexed repos)
-      const { data: codeFiles, error: codeError } = await dbAdapter.supabase
-        .from('code_chunks')
-        .select('repository_owner, repository_name, repository_branch')
-        .limit(1000);
->>>>>>> origin/Combinations/all
 
       if (!teamReposError && teamRepos && teamRepos.length > 0) {
         logger.info('Loading team-specific repositories', { count: teamRepos.length });
