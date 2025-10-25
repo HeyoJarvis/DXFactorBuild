@@ -9,11 +9,46 @@ function registerTeamChatHandlers(services, logger) {
   const { dbAdapter, ai } = services;
 
   /**
+   * Get upcoming meetings for a team
+   */
+  async function getUpcomingMeetings(teamId) {
+    try {
+      logger.info('📅 Getting upcoming meetings for team', { teamId });
+
+      const now = new Date().toISOString();
+
+      const { data: meetings, error } = await dbAdapter.supabase
+        .from('team_meetings')
+        .select('id, title, start_time, end_time, attendees, metadata, is_important')
+        .eq('team_id', teamId)
+        .gte('start_time', now) // Only future meetings
+        .order('start_time', { ascending: true })
+        .limit(20);
+
+      if (error) {
+        logger.error('❌ Error fetching upcoming meetings', { error: error.message, teamId });
+        return { success: false, error: error.message };
+      }
+
+      logger.info(`✅ Found ${meetings?.length || 0} upcoming meetings for team`, { teamId, count: meetings?.length });
+
+      return {
+        success: true,
+        meetings: meetings || []
+      };
+    } catch (error) {
+      logger.error('❌ Error in getUpcomingMeetings', { error: error.message, teamId });
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
    * Load user's teams
+   * ALL users can see ALL teams (cross-team collaboration enabled)
    */
   ipcMain.handle('team-chat:load-teams', async (event) => {
     try {
-      logger.info('📋 Loading teams for user');
+      logger.info('📋 Loading ALL teams for cross-team collaboration');
 
       // Get current user from auth service
       const userId = services.auth?.currentUser?.id;
@@ -23,37 +58,22 @@ function registerTeamChatHandlers(services, logger) {
         return { success: false, error: 'User not authenticated' };
       }
 
-      // Query teams directly with a join
-      const { data: teamMemberships, error } = await dbAdapter.supabase
-        .from('team_members')
-        .select(`
-          team_id,
-          teams (
-            id,
-            name,
-            description,
-            slug
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('is_active', true);
+      // Fetch ALL teams (cross-team access enabled)
+      const { data: allTeams, error } = await dbAdapter.supabase
+        .from('teams')
+        .select('id, name, description, slug')
+        .order('name');
 
       if (error) {
         logger.error('Failed to load teams', { error: error.message });
         return { success: false, error: error.message };
       }
 
-      // Transform to simpler format
-      const teams = (teamMemberships || [])
-        .filter(tm => tm.teams) // Filter out any null teams
-        .map(tm => ({
-          id: tm.teams.id,
-          name: tm.teams.name,
-          description: tm.teams.description || '',
-          slug: tm.teams.slug
-        }));
+      const teams = allTeams || [];
 
-      logger.info(`✅ Loaded ${teams.length} teams`, { teams: teams.map(t => t.name) });
+      logger.info(`✅ Loaded ${teams.length} teams (all visible to all users)`, { 
+        teams: teams.map(t => t.name)
+      });
 
       return {
         success: true,
@@ -164,6 +184,13 @@ function registerTeamChatHandlers(services, logger) {
       logger.error('Error loading team context', { error: error.message });
       return { success: false, error: error.message };
     }
+  });
+
+  /**
+   * Get upcoming meetings for a team
+   */
+  ipcMain.handle('team-chat:get-upcoming-meetings', async (event, teamId) => {
+    return await getUpcomingMeetings(teamId);
   });
 
   /**
@@ -301,40 +328,145 @@ function registerTeamChatHandlers(services, logger) {
       // Build context for AI
       const { context, contextDetails } = await buildTeamContext(teamId, userId, dbAdapter, logger);
 
-      // Build system prompt with detailed context
-      let systemPrompt = `You are an AI assistant helping a team member with their work. You have access to the team's context:
+      // Perform semantic code search if repos are indexed
+      let codeSearchResults = null;
+      let searchedRepoOwner = null;
+      let searchedRepoName = null;
+      
+      if (contextDetails.code_repos && contextDetails.code_repos.length > 0) {
+        try {
+          logger.info('🔍 Performing semantic code search for team chat');
+          const fetch = require('node-fetch');
+          const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 
-**Team Context:**
-${context.summary || 'No context available'}`;
+          // Try to search BeachBaby repo first, or use first available repo
+          const primaryRepo = contextDetails.code_repos.find(r => r.name.includes('BeachBaby')) || contextDetails.code_repos[0];
+          const owner = primaryRepo.owner;
+          const repo = primaryRepo.name;
+          searchedRepoOwner = owner;
+          searchedRepoName = repo;
+
+          logger.info('🔎 Querying code for repository', { owner, repo, query: message.substring(0, 50) });
+
+          const response = await fetch(`${API_BASE_URL}/api/engineering/query`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              query: message,
+              repository: { owner, repo }
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            codeSearchResults = data.result; // API returns { result: { sources, answer, confidence } }
+            logger.info('✅ Code search results obtained', {
+              sourcesFound: codeSearchResults?.sources?.length || 0,
+              hasAnswer: !!codeSearchResults?.answer,
+              confidence: codeSearchResults?.confidence || 'unknown',
+              answerPreview: codeSearchResults?.answer?.substring(0, 100)
+            });
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            logger.warn('Code search API returned error', { 
+              status: response.status,
+              error: errorData.error || 'Unknown error'
+            });
+          }
+        } catch (error) {
+          logger.warn('Code search failed', { error: error.message });
+        }
+      }
+
+      // Build system prompt with detailed context (similar to task-chat-handlers.js)
+      let systemPrompt = `You are HeyJarvis, an AI assistant for team collaboration and project management.
+
+TEAM CONTEXT - CURRENT ACTIVE WORK:
+`;
+
+      // Add detailed tasks if available - MAKE THIS PROMINENT
+      if (contextDetails.tasks && contextDetails.tasks.length > 0) {
+        systemPrompt += `The team currently has ${contextDetails.tasks.length} active tasks:\n\n`;
+        contextDetails.tasks.slice(0, 10).forEach((t, idx) => {
+          systemPrompt += `${idx + 1}. "${t.title}" [${t.external_key || 'N/A'}]\n`;
+          if (t.assignee) systemPrompt += `   - Assigned to: ${t.assignee}\n`;
+          if (t.description) systemPrompt += `   - Description: ${t.description.substring(0, 150)}...\n`;
+          if (t.source) systemPrompt += `   - Source: ${t.source.toUpperCase()}\n`;
+          systemPrompt += `\n`;
+        });
+      } else {
+        systemPrompt += `No active tasks assigned to this team yet.\n\n`;
+      }
 
       // Add detailed meetings if available
       if (contextDetails.meetings && contextDetails.meetings.length > 0) {
-        systemPrompt += `\n\n**Recent Meetings:**\n`;
-        contextDetails.meetings.slice(0, 5).forEach(m => {
-          systemPrompt += `- ${m.title} (${new Date(m.meeting_date).toLocaleDateString()})\n`;
-          if (m.summary) systemPrompt += `  ${m.summary.substring(0, 100)}...\n`;
-        });
-      }
-
-      // Add detailed tasks if available
-      if (contextDetails.tasks && contextDetails.tasks.length > 0) {
-        systemPrompt += `\n\n**Active Tasks:**\n`;
-        contextDetails.tasks.slice(0, 10).forEach(t => {
-          systemPrompt += `- ${t.title}`;
-          if (t.external_key) systemPrompt += ` (${t.external_key})`;
-          systemPrompt += `\n`;
+        systemPrompt += `\n📅 RECENT TEAM MEETINGS (${contextDetails.meetings.length}):\n\n`;
+        contextDetails.meetings.slice(0, 3).forEach((m, idx) => {
+          systemPrompt += `${idx + 1}. **${m.title}** (${new Date(m.meeting_date).toLocaleDateString()})\n`;
+          if (m.summary) {
+            systemPrompt += `\n${m.summary}\n\n`;
+            systemPrompt += `---\n\n`;
+          }
         });
       }
 
       // Add code repos if available
       if (contextDetails.code_repos && contextDetails.code_repos.length > 0) {
-        systemPrompt += `\n\n**Code Repositories:**\n`;
+        systemPrompt += `\nCODE REPOSITORIES:\n`;
         contextDetails.code_repos.forEach(r => {
           systemPrompt += `- ${r.name}: ${r.file_count} files indexed\n`;
         });
+        systemPrompt += `\n`;
       }
 
-      systemPrompt += `\n\nUse this context to provide relevant, helpful responses. Reference specific meetings, tasks, or code when relevant.`;
+      // Add code search results to system prompt if available
+      if (codeSearchResults && codeSearchResults.sources && codeSearchResults.sources.length > 0) {
+        const repoPath = searchedRepoOwner && searchedRepoName ? `${searchedRepoOwner}/${searchedRepoName}` : 'repository';
+        systemPrompt += `\n💻 RELEVANT CODE CONTEXT (from semantic search of ${repoPath}):\n\n`;
+        
+        // Add AI analysis first if available
+        if (codeSearchResults.answer) {
+          systemPrompt += `Code Analysis:\n${codeSearchResults.answer}\n\n`;
+        }
+        
+        systemPrompt += `Relevant Code Files (${codeSearchResults.sources.length} found):\n\n`;
+        
+        codeSearchResults.sources.forEach((source, idx) => {
+          systemPrompt += `${idx + 1}. ${source.file_path || source.file}`;
+          if (source.start_line) {
+            systemPrompt += ` (lines ${source.start_line}-${source.end_line || source.start_line})`;
+          }
+          systemPrompt += `\n`;
+          
+          if (source.code || source.snippet) {
+            systemPrompt += `\`\`\`${source.language || ''}\n${source.code || source.snippet}\n\`\`\`\n`;
+          }
+          
+          if (source.explanation || source.summary) {
+            systemPrompt += `Context: ${source.explanation || source.summary}\n`;
+          }
+          systemPrompt += `\n`;
+        });
+
+        systemPrompt += `Use the above code analysis and file references to provide accurate, code-aware answers.\n\n`;
+      } else if (contextDetails.code_repos && contextDetails.code_repos.length > 0) {
+        systemPrompt += `\n💻 CODE NOTE: The team has indexed repositories, but no code was found directly relevant to this specific question.\n\n`;
+      }
+
+      systemPrompt += `\nWhen the user asks about team progress, recent work, or project updates, reference the specific tasks listed above by name and ticket number. Provide actionable insights based on the task list.
+
+Be concise, practical, and focused on helping the team track their work.`;
+
+      // Log the context being sent to AI
+      logger.info(`🤖 Sending context to AI for team ${teamId}:`, {
+        tasksCount: contextDetails.tasks?.length || 0,
+        meetingsCount: contextDetails.meetings?.length || 0,
+        reposCount: contextDetails.code_repos?.length || 0,
+        systemPromptLength: systemPrompt.length
+      });
+      logger.info('📝 Full system prompt:', { systemPrompt });
 
       // Get conversation history
       const { data: historyMessages, error: historyError } = await dbAdapter.supabase
@@ -348,7 +480,7 @@ ${context.summary || 'No context available'}`;
         logger.warn('Failed to load history', { error: historyError.message });
       }
 
-      // Get AI response using the last user message
+      // Get AI response with full context
       logger.info('🤖 Requesting AI response');
       const aiResponse = await ai.sendMessage(message, { systemPrompt });
 
@@ -457,18 +589,31 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
       code_repos: []
     };
 
-    // Get recent team meetings if enabled
+    // Get PAST team meetings with transcripts/context (for historical reference)
+    // Upcoming meetings are shown in the calendar on the right side
     if (contextSettings.include_meetings) {
-      const { data: meetings, error: meetingsError } = await dbAdapter.supabase
+      const now = new Date().toISOString();
+      
+      const { data: meetings, error: meetingsError} = await dbAdapter.supabase
         .from('team_meetings')
-        .select('id, title, summary, meeting_date')
+        .select('id, title, ai_summary, start_time')
         .eq('team_id', teamId)
-        .order('meeting_date', { ascending: false })
+        .lt('start_time', now) // Only past meetings with context
+        .not('ai_summary', 'is', null) // Only meetings with transcripts/summaries
+        .order('start_time', { ascending: false })
         .limit(10);
 
       if (!meetingsError && meetings) {
         context.meetings_count = meetings.length;
-        contextDetails.meetings = meetings;
+        // Map ai_summary to summary for compatibility
+        contextDetails.meetings = meetings.map(m => ({
+          id: m.id,
+          title: m.title,
+          summary: m.ai_summary,
+          meeting_date: m.start_time
+        }));
+        
+        logger.info(`✅ Loaded ${meetings.length} past meetings with context for team`, { teamId });
       }
     }
 
@@ -481,42 +626,72 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
         .eq('team_id', teamId)
         .eq('is_active', true);
 
+      logger.info(`🔍 Team member lookup for teamId: ${teamId}`, {
+        found: teamMembers?.length || 0,
+        memberIds: teamMembers?.map(m => m.user_id) || [],
+        teamIdUsedInQuery: teamId
+      });
+
+      // DIAGNOSTIC: Log if we have no members or all members
+      if (!teamMembers || teamMembers.length === 0) {
+        logger.warn(`⚠️ NO team members found for team ${teamId}. This means NO tasks will be shown.`);
+      } else {
+        logger.info(`✅ Found ${teamMembers.length} team member(s) for team ${teamId}`);
+      }
+
       if (!membersError && teamMembers && teamMembers.length > 0) {
         const allTasks = [];
+        const teamMemberIds = teamMembers.map(m => m.user_id);
 
-        // Try to get JIRA issues for the current user
-        // Note: JIRA integration is per-user, so we get the requesting user's JIRA tickets
+        logger.info(`📊 Fetching tasks for ${teamMemberIds.length} team members of team ${teamId}`);
+
+        // Try to get JIRA issues for ALL team members
+        // Note: JIRA integration is per-user, so we check each team member
         try {
-          const { data: userData } = await dbAdapter.supabase
+          const { data: usersData } = await dbAdapter.supabase
             .from('users')
-            .select('integration_settings')
-            .eq('id', userId)
-            .single();
+            .select('id, email, integration_settings')
+            .in('id', teamMemberIds);
 
-          if (userData?.integration_settings?.jira?.access_token) {
-            // User has JIRA connected - use JIRA service
+          if (usersData && usersData.length > 0) {
             const JIRAService = require('../services/JIRAService');
-            const jiraService = new JIRAService({
-              logger,
-              supabaseAdapter: dbAdapter
-            });
+            
+            // Fetch JIRA tasks for each team member who has JIRA connected
+            for (const teamUser of usersData) {
+              if (teamUser?.integration_settings?.jira?.access_token) {
+                try {
+                  const jiraService = new JIRAService({
+                    logger,
+                    supabaseAdapter: dbAdapter
+                  });
 
-            const initResult = await jiraService.initialize(userId);
-            if (initResult.connected) {
-              const issuesResult = await jiraService.getMyIssues({
-                maxResults: 20,
-                status: 'In Progress,To Do,Code Review,In Review'
-              });
+                  const initResult = await jiraService.initialize(teamUser.id);
+                  if (initResult.connected) {
+                    const issuesResult = await jiraService.getMyIssues({
+                      maxResults: 50,
+                      status: 'In Progress,To Do,Code Review,In Review'
+                    });
 
-              if (issuesResult.success && issuesResult.issues) {
-                // Add JIRA tasks to allTasks
-                allTasks.push(...issuesResult.issues.map(issue => ({
-                  id: issue.key,
-                  title: issue.summary,
-                  external_key: issue.key,
-                  status: issue.status,
-                  source: 'jira'
-                })));
+                    if (issuesResult.success && issuesResult.issues) {
+                      // Add JIRA tasks to allTasks (avoid duplicates by key)
+                      issuesResult.issues.forEach(issue => {
+                        if (!allTasks.find(t => t.external_key === issue.key)) {
+                          allTasks.push({
+                            id: issue.key,
+                            title: issue.summary,
+                            external_key: issue.key,
+                            status: issue.status,
+                            source: 'jira',
+                            assignee: issue.assignee?.displayName || teamUser.email || 'Unassigned'
+                          });
+                        }
+                      });
+                      logger.info(`✅ Loaded ${issuesResult.issues.length} JIRA tasks for ${teamUser.email}`);
+                    }
+                  }
+                } catch (userJiraError) {
+                  logger.warn(`Could not load JIRA for user ${teamUser.email}`, { error: userJiraError.message });
+                }
               }
             }
           }
@@ -524,16 +699,69 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
           logger.warn('Could not load JIRA tickets', { error: jiraError.message });
         }
 
-        // Get Slack tasks from the database
+        // Get ALL tasks from database (assigned to team members) - any source
+        try {
+          const { data: dbTasks, error: dbTasksError } = await dbAdapter.supabase
+            .from('tasks')
+            .select('id, title, status, external_id, external_source, external_url, assigned_to, metadata')
+            .in('status', ['pending', 'in_progress'])
+            .in('assigned_to', teamMemberIds)  // Get tasks assigned to team members
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+          if (!dbTasksError && dbTasks && dbTasks.length > 0) {
+            // Get assignee names
+            const { data: assigneeUsers } = await dbAdapter.supabase
+              .from('users')
+              .select('id, name, email')
+              .in('id', teamMemberIds);
+            
+            const userMap = {};
+            assigneeUsers?.forEach(u => {
+              userMap[u.id] = u.name || u.email;
+            });
+
+            // Add database tasks to allTasks (avoid duplicates from live JIRA)
+            dbTasks.forEach(task => {
+              const existingKey = task.metadata?.jira_key || task.external_id || task.id;
+              if (!allTasks.find(t => t.external_key === existingKey)) {
+                allTasks.push({
+                  id: task.id,
+                  title: task.title,
+                  external_key: existingKey,
+                  status: task.status,
+                  source: task.external_source || 'unknown',
+                  assignee: task.metadata?.assigned_engineer || userMap[task.assigned_to] || 'Unassigned',
+                  description: task.metadata?.jira_type || task.metadata?.priority || ''
+                });
+              }
+            });
+            
+            // Log by source
+            const bySource = {};
+            dbTasks.forEach(t => {
+              const src = t.external_source || 'unknown';
+              bySource[src] = (bySource[src] || 0) + 1;
+            });
+            
+            logger.info(`✅ Loaded ${dbTasks.length} tasks from database for team`, {
+              sources: bySource
+            });
+          }
+        } catch (dbTasksError) {
+          logger.warn('Could not load tasks from database', { error: dbTasksError.message });
+        }
+
+        // Get Slack tasks from the database for ALL team members
         try {
           const { data: slackTasks, error: slackError } = await dbAdapter.supabase
             .from('tasks')
-            .select('id, title, status, external_id, external_source')
+            .select('id, title, status, external_id, external_source, assigned_to, created_by')
             .eq('external_source', 'slack')
             .in('status', ['pending', 'in_progress'])
-            .eq('created_by', userId)
+            .in('created_by', teamMemberIds)  // Get tasks created by ANY team member
             .order('created_at', { ascending: false })
-            .limit(20);
+            .limit(50);
 
           if (!slackError && slackTasks && slackTasks.length > 0) {
             // Add Slack tasks to allTasks
@@ -542,8 +770,10 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
               title: task.title,
               external_key: task.external_id || task.id,
               status: task.status,
-              source: 'slack'
+              source: 'slack',
+              assignee: task.assigned_to || 'Unassigned'
             })));
+            logger.info(`✅ Loaded ${slackTasks.length} Slack tasks for team`);
           }
         } catch (slackError) {
           logger.warn('Could not load Slack tasks', { error: slackError.message });
@@ -552,17 +782,34 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
         // Update context with combined tasks
         context.tasks_count = allTasks.length;
         contextDetails.tasks = allTasks;
+        logger.info(`📋 Total team tasks loaded for team ${teamId}: ${allTasks.length}`, {
+          jiraTasks: allTasks.filter(t => t.source === 'jira').length,
+          slackTasks: allTasks.filter(t => t.source === 'slack').length,
+          taskTitles: allTasks.map(t => `${t.source}: ${t.title}`).slice(0, 5)
+        });
+      } else {
+        logger.info(`⚠️ No team members found for team ${teamId}, showing 0 tasks`);
+        contextDetails.tasks = [];
+        context.tasks_count = 0;
       }
     }
 
     // Get code repos from GitHub if enabled
     if (contextSettings.include_code) {
+<<<<<<< HEAD
       // First, get team-specific repositories from team_repositories table
       const { data: teamRepos, error: teamReposError } = await dbAdapter.supabase
         .from('team_repositories')
         .select('repository_owner, repository_name, repository_branch, indexed_at')
         .eq('team_id', teamId)
         .eq('is_active', true);
+=======
+      // Get unique repos from code_chunks (GitHub indexed repos)
+      const { data: codeFiles, error: codeError } = await dbAdapter.supabase
+        .from('code_chunks')
+        .select('repository_owner, repository_name, repository_branch')
+        .limit(1000);
+>>>>>>> origin/Combinations/all
 
       if (!teamReposError && teamRepos && teamRepos.length > 0) {
         logger.info('Loading team-specific repositories', { count: teamRepos.length });

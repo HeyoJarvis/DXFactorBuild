@@ -7,11 +7,12 @@ const { BrowserWindow } = require('electron');
 const path = require('path');
 
 class SecondaryWindowManager {
-  constructor(logger, mainWindow = null) {
+  constructor(logger, mainWindowManager = null, ipcMain = null) {
     this.logger = logger;
     this.window = null;
+    this.mainWindowManager = mainWindowManager;
+    this.ipcMain = ipcMain;
     this.currentRoute = '/tasks'; // Default route
-    this.mainWindow = mainWindow; // Reference to main window for notifications
   }
 
   /**
@@ -39,16 +40,14 @@ class SecondaryWindowManager {
       height: 820,
       show: false,
       backgroundColor: '#fafafa', // Light background
-      frame: true, // CHANGED: Use native frame with traffic lights
+      frame: true, // Native window frame with title bar and controls
       resizable: true, // Allow window resizing
       movable: true, // Allow window dragging
       center: true, // Center the window on screen
-      title: 'HeyJarvis - Mission Control', // Window title
-      enableLargerThanScreen: true, // CRITICAL: Allow window to be larger than screen (for true full-screen)
+      title: 'HeyJarvis', // Window title
       ...(process.platform === 'darwin' ? {
-        titleBarStyle: 'hiddenInset', // macOS: Show traffic lights, hide title text, inset style
-        roundedCorners: true,
-        trafficLightPosition: { x: 20, y: 20 } // Position traffic lights in top-left
+        titleBarStyle: 'hiddenInset', // macOS: Hide title bar but keep traffic lights
+        roundedCorners: true
       } : {}),
       ...(process.platform === 'win32' ? {
         backgroundMaterial: 'acrylic' // Windows 11 native acrylic effect
@@ -81,21 +80,32 @@ class SecondaryWindowManager {
       
       this.window.show();
       
-      // Use NATIVE maximize for proper OS integration
-      // This ensures the OS knows the window is maximized and can show it correctly
-      // on different desktops/spaces, and the orb visibility logic works properly
+      // Maximize the window to fill the screen (like a normal desktop app)
       this.window.maximize();
-      this.logger.info('Secondary window maximized using native OS maximize');
+      this.logger.info('Secondary window maximized');
       
-      // NOTE: Removed setupMaximumVisibility() and setupEnhancedAlwaysOnTop()
-      // Mission Control should behave like a normal desktop window:
-      // - Can be closed
-      // - Can be minimized
-      // - Stays on the desktop/window it was opened on
-      // - Doesn't float above everything
-      // - Uses native maximize state for proper OS integration
-      this.logger.info('Secondary window configured as normal desktop window (not always-on-top)');
+      // Setup maximum visibility (same as Arc Reactor)
+      this.setupMaximumVisibility();
       
+      // Setup enhanced always-on-top behavior (same as Arc Reactor)
+      this.setupEnhancedAlwaysOnTop();
+      
+      // Emit window state change event (secondary window is open)
+      if (this.ipcMain) {
+        this.ipcMain.emit('window:secondaryWindowChange', true, route);
+        this.logger.info('Emitted secondary window open event', { route });
+      }
+      
+      // Also send to main window renderer if available
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', true, route);
+        this.logger.info('Sent secondary window open event to main window renderer', { route });
+      }
+      
+      // Don't open dev tools for secondary window in production
+      // if (isDev) {
+      //   this.window.webContents.openDevTools({ mode: 'detached' });
+      // }
     });
 
     // Handle window close
@@ -110,51 +120,23 @@ class SecondaryWindowManager {
         e.preventDefault();
         this.window.hide();
         
-        // Notify main window that secondary window closed
-        if (this.mainWindow) {
-          this.mainWindow.webContents.send('secondary-window:changed', false, null);
-          this.logger.debug('Notified main window: secondary closed');
+        // Emit window state change event (secondary window is closed)
+        if (this.ipcMain) {
+          this.ipcMain.emit('window:secondaryWindowChange', false, null);
+          this.logger.info('Emitted secondary window close event');
         }
-      }
-    });
-
-    // Handle window blur (user switched to different window)
-    this.window.on('blur', () => {
-      this.logger.debug('Secondary window lost focus (blur)');
-      // Notify main window that user switched away - show orb
-      if (this.mainWindow) {
-        this.mainWindow.webContents.send('secondary-window:changed', false, null);
-        this.logger.debug('Notified main window: secondary blurred (show orb)');
-      }
-    });
-
-    // Handle window focus (user switched back to Mission Control)
-    this.window.on('focus', () => {
-      this.logger.debug('Secondary window gained focus');
-      // Notify main window that user is back - hide orb
-      if (this.mainWindow) {
-        this.mainWindow.webContents.send('secondary-window:changed', true, this.currentRoute);
-        this.logger.debug('Notified main window: secondary focused (hide orb)');
-      }
-    });
-
-    // Handle window minimize
-    this.window.on('minimize', () => {
-      this.logger.debug('Secondary window minimized');
-      // Show orb when minimized
-      if (this.mainWindow) {
-        this.mainWindow.webContents.send('secondary-window:changed', false, null);
-        this.logger.debug('Notified main window: secondary minimized (show orb)');
-      }
-    });
-
-    // Handle window restore (from minimize)
-    this.window.on('restore', () => {
-      this.logger.debug('Secondary window restored');
-      // Hide orb when restored
-      if (this.mainWindow) {
-        this.mainWindow.webContents.send('secondary-window:changed', true, this.currentRoute);
-        this.logger.debug('Notified main window: secondary restored (hide orb)');
+        
+        // Also send to main window renderer if available
+        if (this.mainWindowManager?.getWindow()?.webContents) {
+          this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', false, null);
+          this.logger.info('Sent secondary window close event to main window renderer');
+        }
+        
+        // Show the main window (Arc Reactor) when secondary window closes
+        if (this.mainWindowManager) {
+          this.mainWindowManager.show();
+          this.logger.info('Main window shown when secondary window closed');
+        }
       }
     });
 
@@ -162,8 +144,93 @@ class SecondaryWindowManager {
     return this.window;
   }
 
-  // REMOVED: setupMaximumVisibility() and setupEnhancedAlwaysOnTop()
-  // Mission Control should behave like a normal desktop window, not always-on-top
+  /**
+   * Setup maximum visibility (copied from MainWindowManager)
+   */
+  setupMaximumVisibility() {
+    if (!this.window || this.window.isDestroyed()) return;
+    
+    this.logger.info('Setting up maximum visibility for secondary window');
+    
+    // Set to screen-saver level (highest visibility level)
+    this.window.setAlwaysOnTop(true, 'screen-saver');
+    this.window.moveTop();
+    
+    // For macOS, set additional flags
+    if (process.platform === 'darwin') {
+      try {
+        this.window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+        this.logger.info('macOS: Set visible on all workspaces with fullscreen visibility');
+      } catch (error) {
+        this.logger.warn('Some macOS-specific features unavailable:', error.message);
+      }
+    }
+    
+    // For Windows, set topmost flag
+    if (process.platform === 'win32') {
+      this.window.setAlwaysOnTop(true, 'pop-up-menu');
+    }
+    
+    this.logger.info('Maximum visibility configured');
+  }
+
+  /**
+   * Enhanced always-on-top behavior (copied from MainWindowManager)
+   */
+  setupEnhancedAlwaysOnTop() {
+    if (!this.window || this.window.isDestroyed()) return;
+    
+    this.logger.info('Setting up enhanced always-on-top for secondary window');
+    
+    // Aggressively maintain always-on-top status
+    const maintainAlwaysOnTop = () => {
+      if (this.window && !this.window.isDestroyed()) {
+        this.window.setAlwaysOnTop(true, 'screen-saver');
+        
+        // CRITICAL: Ensure mouse events stay enabled (this is NOT the Arc Reactor orb)
+        this.window.setIgnoreMouseEvents(false);
+        
+        // Additional visibility enforcement
+        if (this.window.isVisible() && !this.window.isFocused()) {
+          setTimeout(() => {
+            if (this.window && !this.window.isDestroyed()) {
+              this.window.moveTop();
+            }
+          }, 50);
+        }
+      }
+    };
+    
+    // Run every 5 seconds to maintain visibility
+    this.alwaysOnTopInterval = setInterval(maintainAlwaysOnTop, 5000);
+    
+    // Handle window events
+    this.window.on('blur', () => {
+      setTimeout(() => {
+        if (this.window && !this.window.isDestroyed()) {
+          this.window.setAlwaysOnTop(true, 'screen-saver');
+          this.window.setIgnoreMouseEvents(false); // Keep clickable
+          this.window.moveTop();
+        }
+      }, 100);
+    });
+
+    this.window.on('focus', () => {
+      if (this.window && !this.window.isDestroyed()) {
+        this.window.setAlwaysOnTop(true, 'screen-saver');
+        this.window.setIgnoreMouseEvents(false); // Keep clickable
+      }
+    });
+    
+    // Clean up interval on window destroy
+    this.window.on('closed', () => {
+      if (this.alwaysOnTopInterval) {
+        clearInterval(this.alwaysOnTopInterval);
+      }
+    });
+    
+    this.logger.info('Enhanced always-on-top configured');
+  }
 
   /**
    * Navigate to a different route in the secondary window
@@ -200,13 +267,6 @@ class SecondaryWindowManager {
     }
     
     this.window.focus();
-    
-    // Notify main window that secondary is now visible and focused
-    if (this.mainWindow) {
-      this.mainWindow.webContents.send('secondary-window:changed', true, this.currentRoute);
-      this.logger.debug('Notified main window: secondary shown (hide orb)');
-    }
-    
     this.logger.info('Secondary window shown and maximized with mouse events enabled');
   }
 
@@ -216,13 +276,6 @@ class SecondaryWindowManager {
   hide() {
     if (this.window) {
       this.window.hide();
-      
-      // Notify main window that secondary is hidden - show orb
-      if (this.mainWindow) {
-        this.mainWindow.webContents.send('secondary-window:changed', false, null);
-        this.logger.debug('Notified main window: secondary hidden (show orb)');
-      }
-      
       this.logger.info('Secondary window hidden');
     }
   }

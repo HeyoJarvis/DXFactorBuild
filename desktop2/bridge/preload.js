@@ -93,11 +93,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     maximize: () => ipcRenderer.send('window:maximize'),
     toggleMaximize: () => ipcRenderer.send('window:toggleMaximize'),
     close: () => ipcRenderer.send('window:close'),
-    // Secondary window state tracking
+    // Event listeners
     onSecondaryWindowChange: (callback) => {
       const listener = (event, isOpen, route) => callback(isOpen, route);
-      ipcRenderer.on('secondary-window:changed', listener);
-      return () => ipcRenderer.removeListener('secondary-window:changed', listener);
+      ipcRenderer.on('window:secondaryWindowChange', listener);
+      return () => ipcRenderer.removeListener('window:secondaryWindowChange', listener);
     }
   },
   
@@ -188,7 +188,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getHistory: (teamId) => ipcRenderer.invoke('team-chat:get-history', teamId),
     sendMessage: (teamId, message) => ipcRenderer.invoke('team-chat:send-message', teamId, message),
     saveContextSettings: (teamId, settings) => ipcRenderer.invoke('team-chat:save-context-settings', teamId, settings),
-    addRepositoryToTeam: (teamId, owner, name, branch, url) => ipcRenderer.invoke('team-chat:add-repository-to-team', teamId, owner, name, branch, url)
+    addRepositoryToTeam: (teamId, owner, name, branch, url) => ipcRenderer.invoke('team-chat:add-repository-to-team', teamId, owner, name, branch, url),
+    getUpcomingMeetings: (teamId) => ipcRenderer.invoke('team-chat:get-upcoming-meetings', teamId)
   },
 
   // AI APIs

@@ -5,7 +5,7 @@
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '..', '.env') });
 
-const { app, globalShortcut } = require('electron');
+const { app, globalShortcut, ipcMain } = require('electron');
 const path = require('path');
 const winston = require('winston');
 
@@ -645,8 +645,8 @@ function createWindows() {
   appState.windows.main.create();
 
   // Create secondary window manager (for Tasks/Copilot UI)
-  // Pass main window reference for notifications
-  appState.windows.secondary = new SecondaryWindowManager(logger, appState.windows.main.getWindow());
+  // Pass main window manager and ipcMain for communication
+  appState.windows.secondary = new SecondaryWindowManager(logger, appState.windows.main, ipcMain);
   // Don't create yet - will be created on demand when user clicks menu
 
   // Create copilot overlay manager

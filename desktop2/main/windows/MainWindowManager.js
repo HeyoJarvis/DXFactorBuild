@@ -543,8 +543,16 @@ class MainWindowManager {
    */
   show() {
     if (this.window) {
+      // Re-setup always-on-top when showing (clear old interval first)
+      if (this.alwaysOnTopInterval) {
+        clearInterval(this.alwaysOnTopInterval);
+        this.alwaysOnTopInterval = null;
+      }
       this.window.show();
       this.window.focus();
+      this.window.setAlwaysOnTop(true, 'screen-saver');
+      // Re-enable the interval
+      this.setupEnhancedAlwaysOnTop();
     }
   }
 
@@ -553,6 +561,12 @@ class MainWindowManager {
    */
   hide() {
     if (this.window) {
+      // Clear the always-on-top interval when hiding
+      if (this.alwaysOnTopInterval) {
+        clearInterval(this.alwaysOnTopInterval);
+        this.alwaysOnTopInterval = null;
+      }
+      this.window.setAlwaysOnTop(false);
       this.window.hide();
     }
   }
