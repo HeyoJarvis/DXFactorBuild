@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import useWidgetData from '../../hooks/useWidgetData';
 import './Widget.css';
 
 /**
@@ -13,24 +14,43 @@ import './Widget.css';
  * @param {Function} onDelete - Callback when widget is deleted
  */
 export default function Widget({ widget, onUpdate, onDelete }) {
+  const { data, loading, error, refresh } = useWidgetData(widget);
   const [isDragging, setIsDragging] = useState(false);
   const [isEditing, setIsEditing] = useState(!widget.content);
   const [tempContent, setTempContent] = useState(widget.content || '');
+  const [dragStartPos, setDragStartPos] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const widgetRef = useRef(null);
+  const hasDragged = useRef(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
-      if (isDragging) {
+      if (isDragging && dragStartPos) {
+        hasDragged.current = true;
+        
         const newX = e.clientX - dragOffset.current.x;
         const newY = e.clientY - dragOffset.current.y;
         
-        onUpdate(widget.id, { x: newX, y: newY });
+        // Constrain to viewport bounds with padding
+        const padding = 20;
+        const maxX = window.innerWidth - widgetRef.current?.offsetWidth - padding;
+        const maxY = window.innerHeight - widgetRef.current?.offsetHeight - padding;
+        
+        const constrainedX = Math.max(padding, Math.min(newX, maxX));
+        const constrainedY = Math.max(padding, Math.min(newY, maxY));
+        
+        onUpdate(widget.id, { x: constrainedX, y: constrainedY });
       }
     };
 
     const handleMouseUp = () => {
       setIsDragging(false);
+      setDragStartPos(null);
+      
+      // Reset drag flag after a short delay to prevent accidental clicks
+      setTimeout(() => {
+        hasDragged.current = false;
+      }, 100);
     };
 
     if (isDragging) {
@@ -42,11 +62,14 @@ export default function Widget({ widget, onUpdate, onDelete }) {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, widget.id, onUpdate]);
+  }, [isDragging, dragStartPos, widget.id, onUpdate]);
 
   const handleMouseDown = (e) => {
-    if (e.target.closest('.widget-header')) {
+    // Only start drag from header, but not from delete button
+    if (e.target.closest('.widget-header') && !e.target.closest('.widget-delete')) {
+      e.preventDefault();
       setIsDragging(true);
+      setDragStartPos({ x: e.clientX, y: e.clientY });
       dragOffset.current = {
         x: e.clientX - widget.x,
         y: e.clientY - widget.y
@@ -89,7 +112,8 @@ export default function Widget({ widget, onUpdate, onDelete }) {
     setTempContent(e.target.value);
   };
 
-  const handleSave = () => {
+  const handleSave = (e) => {
+    e?.stopPropagation();
     const command = parseSlashCommand(tempContent);
     
     if (command) {
@@ -109,26 +133,32 @@ export default function Widget({ widget, onUpdate, onDelete }) {
     setIsEditing(false);
   };
 
-  const handleCancel = () => {
+  const handleCancel = (e) => {
+    e?.stopPropagation();
     setTempContent(widget.content || '');
     setIsEditing(false);
   };
 
-  const handleTextClick = () => {
-    if (!isDragging) {
-      setTempContent(widget.content || '');
-      setIsEditing(true);
+  const handleTextClick = (e) => {
+    // Prevent editing if we just dragged
+    if (hasDragged.current || isDragging) {
+      return;
     }
+    
+    e.stopPropagation();
+    setTempContent(widget.content || '');
+    setIsEditing(true);
   };
 
   const renderWidgetContent = () => {
     // If editing, show textarea with save/cancel buttons
     if (isEditing) {
       return (
-        <div className="widget-editor">
+        <div className="widget-editor" onClick={(e) => e.stopPropagation()}>
           <textarea
             value={tempContent}
             onChange={handleContentChange}
+            onClick={(e) => e.stopPropagation()}
             placeholder="Type a note or use /track or /notify commands..."
             autoFocus
           />
@@ -154,10 +184,56 @@ export default function Widget({ widget, onUpdate, onDelete }) {
               <span className="tracker-target">{widget.metadata?.target}</span>
             </div>
             <div className="tracker-source">from {widget.metadata?.source}</div>
-            <div className="tracker-status">
-              <div className="status-indicator active"></div>
-              <span>Monitoring...</span>
-            </div>
+            
+            {loading && (
+              <div className="tracker-loading">
+                <div className="mini-spinner"></div>
+                <span>Loading...</span>
+              </div>
+            )}
+            
+            {error && (
+              <div className="tracker-error">
+                <span>⚠️ {error}</span>
+              </div>
+            )}
+            
+            {!loading && !error && data && (
+              <>
+                <div className="tracker-count">
+                  <span className="count-badge">{data.count}</span>
+                  <span>items found</span>
+                </div>
+                
+                {data.items && data.items.length > 0 && (
+                  <div className="tracker-items">
+                    {data.items.slice(0, 3).map((item, idx) => (
+                      <div key={idx} className="tracker-item">
+                        <div className="item-title">{item.key || item.name || item.title || item.summary}</div>
+                        <div className="item-meta">
+                          {item.status && <span className="item-status">{item.status}</span>}
+                          {item.from && <span className="item-from">from {item.from}</span>}
+                        </div>
+                      </div>
+                    ))}
+                    {data.items.length > 3 && (
+                      <div className="tracker-more">+{data.items.length - 3} more</div>
+                    )}
+                  </div>
+                )}
+                
+                <button 
+                  className="tracker-refresh"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    refresh();
+                  }}
+                  title="Refresh data"
+                >
+                  ↻
+                </button>
+              </>
+            )}
           </div>
         );
 
@@ -168,10 +244,58 @@ export default function Widget({ widget, onUpdate, onDelete }) {
               <span className="notifier-label">Notifications</span>
             </div>
             <div className="notifier-topic">{widget.metadata?.topic}</div>
-            <div className="notifier-count">
-              <span className="notification-badge">0</span>
-              <span>new items</span>
-            </div>
+            
+            {loading && (
+              <div className="notifier-loading">
+                <div className="mini-spinner"></div>
+              </div>
+            )}
+            
+            {error && (
+              <div className="notifier-error">
+                <span>⚠️ {error}</span>
+              </div>
+            )}
+            
+            {!loading && !error && data && (
+              <>
+                <div className="notifier-count">
+                  <span className={`notification-badge ${data.count > 0 ? 'has-items' : ''}`}>
+                    {data.count}
+                  </span>
+                  <span>new items</span>
+                </div>
+                
+                {data.items && data.items.length > 0 && (
+                  <div className="notifier-items">
+                    {data.items.slice(0, 3).map((item, idx) => (
+                      <div key={item.id || idx} className="notifier-item">
+                        <div className="notifier-item-header">
+                          <span className="source-tag">{item.source}</span>
+                          {item.from && <span className="item-from-small">{item.from}</span>}
+                        </div>
+                        <div className="item-title">{item.title}</div>
+                        {item.status && <div className="item-status-small">{item.status}</div>}
+                      </div>
+                    ))}
+                    {data.items.length > 3 && (
+                      <div className="notifier-more">+{data.items.length - 3} more</div>
+                    )}
+                  </div>
+                )}
+                
+                <button 
+                  className="notifier-refresh"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    refresh();
+                  }}
+                  title="Refresh notifications"
+                >
+                  ↻
+                </button>
+              </>
+            )}
           </div>
         );
 
@@ -199,6 +323,22 @@ export default function Widget({ widget, onUpdate, onDelete }) {
     }
   };
 
+  const getSourceBadge = () => {
+    const source = widget.source || widget.metadata?.source;
+    if (!source) return null;
+    
+    const sourceMap = {
+      jira: { color: '#0052CC', label: 'JIRA' },
+      slack: { color: '#4A154B', label: 'Slack' },
+      email: { color: '#EA4335', label: 'Email' },
+      github: { color: '#24292e', label: 'GitHub' },
+      tasks: { color: '#10b981', label: 'Tasks' }
+    };
+    return sourceMap[source.toLowerCase()] || null;
+  };
+
+  const sourceBadge = getSourceBadge();
+
   return (
     <div
       ref={widgetRef}
@@ -212,13 +352,28 @@ export default function Widget({ widget, onUpdate, onDelete }) {
     >
       <div className="widget-header">
         <span className="widget-type-label">{getWidgetLabel()}</span>
-        <button 
-          className="widget-delete"
-          onClick={() => onDelete(widget.id)}
-          title="Delete widget"
-        >
-          ×
-        </button>
+        <div className="widget-header-right">
+          {sourceBadge && (
+            <span 
+              className="widget-source-badge" 
+              style={{ backgroundColor: sourceBadge.color }}
+              title={`Data from ${sourceBadge.label}`}
+            >
+              {sourceBadge.label}
+            </span>
+          )}
+          <button 
+            className="widget-delete"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(widget.id);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            title="Delete widget"
+          >
+            ×
+          </button>
+        </div>
       </div>
       
       <div className="widget-content">

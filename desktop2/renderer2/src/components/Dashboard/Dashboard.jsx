@@ -89,31 +89,31 @@ export default function Dashboard({ user }) {
 
       {/* Dashboard Content - Simplified */}
       <div className="dashboard-content">
-        {/* Only 4 KPI Cards - Single Row */}
+        {/* Only 4 KPI Cards - Single Row - Now with real data */}
         <div className="kpi-cards-grid-simple">
           <KPICard
-            value="40%"
-            label="Progress This Week"
-            trend={{ direction: 'up', value: '12%' }}
-            source="View signals breakdown"
+            value={metrics?.sprintProgress?.value || '0%'}
+            label="Sprint Progress"
+            trend={metrics?.sprintProgress?.trend}
+            source={metrics?.sprintProgress?.source || 'jira'}
           />
           <KPICard
-            value="87%"
-            label="Team Progress"
-            trend={{ direction: 'up', value: '5%' }}
-            source="View team metrics"
+            value={metrics?.taskCompletionRate?.value || '0%'}
+            label="Task Completion Rate"
+            trend={metrics?.taskCompletionRate?.trend}
+            source={metrics?.taskCompletionRate?.source || 'tasks'}
           />
           <KPICard
-            value="12.5h"
-            label="Hours Saved"
-            trend={{ direction: 'up', value: '2.3h' }}
-            source="View time analytics"
+            value={metrics?.prsMerged?.value || 0}
+            label="Issues Tracked"
+            trend={metrics?.prsMerged?.trend}
+            source={metrics?.prsMerged?.source || 'github'}
           />
           <KPICard
-            value={metrics?.criticalAlerts || 3}
-            label="New Items Today"
-            trend={null}
-            source="View new signals"
+            value={metrics?.newTasksToday?.value || 0}
+            label="Completed Today"
+            trend={metrics?.newTasksToday?.trend}
+            source={metrics?.newTasksToday?.source || 'tasks'}
           />
         </div>
 

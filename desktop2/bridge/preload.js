@@ -130,6 +130,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     healthCheck: () => ipcRenderer.invoke('jira:healthCheck')
   },
 
+  // Slack APIs
+  slack: {
+    getRecentMessages: (limit) => ipcRenderer.invoke('slack:getRecentMessages', limit),
+    getUserMentions: () => ipcRenderer.invoke('slack:getUserMentions'),
+    getStatus: () => ipcRenderer.invoke('slack:getStatus')
+  },
+
   // Microsoft 365 APIs
   microsoft: {
     checkConnection: () => ipcRenderer.invoke('microsoft:checkConnection'),

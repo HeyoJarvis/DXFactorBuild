@@ -513,7 +513,10 @@ async function initializeServices() {
     await startOAuthServer();
 
     // Initialize core services
-    appState.services.slack = new SlackService({ logger });
+    appState.services.slack = new SlackService({ 
+      logger, 
+      supabaseAdapter: appState.services.dbAdapter 
+    });
     appState.services.crm = new CRMService({ logger });
     appState.services.ai = new AIService({ logger });
     

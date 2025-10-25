@@ -7,6 +7,98 @@ const { ipcMain } = require('electron');
 
 function registerChatHandlers(services, logger) {
   /**
+   * Get recent Slack messages
+   */
+  ipcMain.handle('slack:getRecentMessages', async (_event, limit = 20) => {
+    try {
+      if (!services.slack?.isInitialized) {
+        return {
+          success: false,
+          error: 'Slack not initialized',
+          messages: []
+        };
+      }
+
+      const messages = await services.slack.getRecentMessages(limit);
+      
+      logger.info('Slack recent messages fetched', { count: messages.length });
+      
+      return {
+        success: true,
+        messages
+      };
+    } catch (error) {
+      logger.error('Failed to get Slack messages', { error: error.message });
+      return {
+        success: false,
+        error: error.message,
+        messages: []
+      };
+    }
+  });
+
+  /**
+   * Get Slack mentions
+   */
+  ipcMain.handle('slack:getUserMentions', async () => {
+    try {
+      if (!services.slack?.isInitialized) {
+        return {
+          success: false,
+          error: 'Slack not initialized',
+          mentions: []
+        };
+      }
+
+      const mentions = await services.slack.getUserMentions();
+      
+      logger.info('Slack mentions fetched', { count: mentions.length });
+      
+      return {
+        success: true,
+        mentions
+      };
+    } catch (error) {
+      logger.error('Failed to get Slack mentions', { error: error.message });
+      return {
+        success: false,
+        error: error.message,
+        mentions: []
+      };
+    }
+  });
+
+  /**
+   * Get Slack status
+   */
+  ipcMain.handle('slack:getStatus', async () => {
+    try {
+      if (!services.slack) {
+        return {
+          success: false,
+          connected: false,
+          initialized: false
+        };
+      }
+
+      const status = services.slack.getStatus();
+      
+      return {
+        success: true,
+        ...status
+      };
+    } catch (error) {
+      logger.error('Failed to get Slack status', { error: error.message });
+      return {
+        success: false,
+        connected: false,
+        initialized: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
    * Send a chat message
    */
   ipcMain.handle('chat:send', async (event, message) => {

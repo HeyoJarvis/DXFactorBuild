@@ -7,9 +7,10 @@ const { App } = require('@slack/bolt');
 const { EventEmitter } = require('events');
 
 class SlackService extends EventEmitter {
-  constructor({ logger }) {
+  constructor({ logger, supabaseAdapter }) {
     super();
     this.logger = logger;
+    this.supabaseAdapter = supabaseAdapter;
     this.app = null;
     this.isInitialized = false;
     this.recentMessages = [];
@@ -272,12 +273,28 @@ class SlackService extends EventEmitter {
   }
 
   /**
-   * Get recent messages from cache
+   * Get recent messages from cache (or load from database if cache is empty)
    */
   async getRecentMessages(limit = 20) {
     if (!this.isInitialized) {
       this.logger.warn('Slack Service not initialized');
       return [];
+    }
+
+    // If cache is empty, try to load from Supabase
+    if (this.recentMessages.length === 0 && this.supabaseAdapter) {
+      try {
+        this.logger.info('Cache empty, loading recent Slack messages from database...');
+        const result = await this.supabaseAdapter.getRecentSlackMessages(limit);
+        
+        if (result.success && result.messages) {
+          this.logger.info(`Loaded ${result.messages.length} messages from database`);
+          // Add to cache
+          this.recentMessages = result.messages;
+        }
+      } catch (error) {
+        this.logger.error('Failed to load messages from database', { error: error.message });
+      }
     }
 
     // Return cached messages
