@@ -61,7 +61,7 @@ function registerTeamChatHandlers(services, logger) {
       // Fetch ALL teams (cross-team access enabled)
       const { data: allTeams, error } = await dbAdapter.supabase
         .from('teams')
-        .select('id, name, description, slug')
+        .select('id, name, description, slug, department')
         .order('name');
 
       if (error) {

@@ -8,6 +8,7 @@ import Indexer from './pages/Indexer';
 import MissionControl from './pages/MissionControl';
 import TeamChat from './pages/TeamChat';
 import Settings from './pages/Settings';
+import Admin from './pages/Admin';
 import Login from './pages/Login';
 import LoginFlow from './pages/LoginFlow';
 import DiagnosticMicrosoft from './pages/DiagnosticMicrosoft';
@@ -305,6 +306,7 @@ function App() {
           <Route path="/mission-control" element={<MissionControl user={currentUser} />} />
           <Route path="/team-chat" element={<TeamChat user={currentUser} />} />
           <Route path="/settings" element={<Settings user={currentUser} />} />
+          <Route path="/admin" element={<Admin user={currentUser} />} />
           <Route path="/diagnostic-microsoft" element={<DiagnosticMicrosoft />} />
         </Routes>
       </div>

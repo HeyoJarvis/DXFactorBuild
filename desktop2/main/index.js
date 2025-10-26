@@ -34,6 +34,7 @@ const registerJIRAHandlers = require('./ipc/jira-handlers');
 const registerMissionControlHandlers = require('./ipc/mission-control-handlers');
 const registerOnboardingHandlers = require('./ipc/onboarding-handlers');
 const registerTeamHandlers = require('./ipc/team-handlers');
+const registerAdminHandlers = require('./ipc/admin-handlers');
 const CodeIndexerHandlers = require('./ipc/code-indexer-handlers');
 
 // Setup logger (console only at startup, file transport added after app ready)
@@ -640,6 +641,7 @@ function setupIPC() {
   registerMissionControlHandlers(appState.services, logger);
   registerOnboardingHandlers(appState.services, logger);
   registerTeamHandlers(appState.services, logger);
+  registerAdminHandlers(appState.services, logger);
 
   // Setup code indexer handlers
   const codeIndexerHandlers = new CodeIndexerHandlers(logger, appState.services);

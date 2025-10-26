@@ -197,7 +197,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // AI APIs
   ai: {
     generateEmailDraft: (prompt) => ipcRenderer.invoke('ai:generateEmailDraft', prompt)
-  }
+  },
+
+    // Admin APIs
+    admin: {
+      createOrUpdateTeam: (teamData) => ipcRenderer.invoke('admin:createOrUpdateTeam', teamData),
+      deleteTeam: (teamId) => ipcRenderer.invoke('admin:deleteTeam', teamId),
+      getAllTeams: () => ipcRenderer.invoke('admin:getAllTeams'),
+      // User management
+      getAllUsers: () => ipcRenderer.invoke('admin:getAllUsers'),
+      getUserTeams: (userId) => ipcRenderer.invoke('admin:getUserTeams', userId),
+      addUserToTeam: (userId, teamId) => ipcRenderer.invoke('admin:addUserToTeam', userId, teamId),
+      removeUserFromTeam: (userId, teamId) => ipcRenderer.invoke('admin:removeUserFromTeam', userId, teamId),
+      updateUserRole: (userId, newRole, leadTeamIds) => ipcRenderer.invoke('admin:updateUserRole', userId, newRole, leadTeamIds),
+      getUserLeadTeams: (userId) => ipcRenderer.invoke('admin:getUserLeadTeams', userId),
+      getTeamMembers: (teamId) => ipcRenderer.invoke('admin:getTeamMembers', teamId),
+      // Capabilities
+      getCapabilities: () => ipcRenderer.invoke('admin:getCapabilities')
+    }
 });
 
 // Log that preload is loaded

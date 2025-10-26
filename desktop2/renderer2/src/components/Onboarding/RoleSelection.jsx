@@ -8,22 +8,9 @@ export default function RoleSelection({ onComplete, onSkip }) {
 
   const roles = [
     {
-      id: 'sales',
-      name: 'Sales & Business',
-      description: 'Perfect for sales teams, business development, and customer success',
-      features: [
-        'CRM integrations (HubSpot, Salesforce)',
-        'Email and calendar management',
-        'Task management from Slack',
-        'Sales pipeline tracking',
-        'Meeting scheduling'
-      ],
-      icon: '📊'
-    },
-    {
       id: 'developer',
-      name: 'Engineering & Dev',
-      description: 'Optimized for developers, engineers, and technical teams',
+      name: 'Developer',
+      description: 'Code analysis, architecture diagrams, Jira integration',
       features: [
         'JIRA integration',
         'GitHub pull requests',
@@ -31,7 +18,64 @@ export default function RoleSelection({ onComplete, onSkip }) {
         'Architecture diagrams',
         'Sprint planning'
       ],
-      icon: '⚡'
+      icon: '💻',
+      department: 'Engineering'
+    },
+    {
+      id: 'sales',
+      name: 'Sales',
+      description: 'CRM integration, deal tracking, customer communications',
+      features: [
+        'CRM integrations (HubSpot, Salesforce)',
+        'Email and calendar management',
+        'Task management from Slack',
+        'Sales pipeline tracking',
+        'Meeting scheduling'
+      ],
+      icon: '📊',
+      department: 'Sales'
+    },
+    {
+      id: 'unit_lead',
+      name: 'Unit Lead',
+      description: 'Manage team members within your units',
+      features: [
+        'Assign team members to your units',
+        'View team member activity',
+        'Manage unit communications',
+        'Team member onboarding',
+        'Unit-level reporting'
+      ],
+      icon: '👥',
+      department: 'Management'
+    },
+    {
+      id: 'team_lead',
+      name: 'Team Lead',
+      description: 'Create and manage teams within your department',
+      features: [
+        'Create new units in your department',
+        'Manage all department teams',
+        'Assign team members across units',
+        'Department-wide analytics',
+        'Team structure planning'
+      ],
+      icon: '🎯',
+      department: 'Management'
+    },
+    {
+      id: 'admin',
+      name: 'Admin',
+      description: 'Team management, settings, integrations, analytics',
+      features: [
+        'Full system administration',
+        'Create departments and teams',
+        'Manage all users and roles',
+        'System-wide analytics',
+        'Integration management'
+      ],
+      icon: '⚙️',
+      department: 'Admin'
     }
   ];
 
