@@ -137,13 +137,19 @@ function registerAdminHandlers(services, logger) {
         // Team leads can only create units in their department
         if (userRole === 'team_lead') {
           const userDept = await getUserDepartment();
-          if (teamData.department && teamData.department !== userDept) {
+          
+          // Normalize department values for comparison (null, empty string, and undefined all represent "General")
+          const normalizeDept = (dept) => (!dept || dept === '') ? null : dept;
+          const normalizedUserDept = normalizeDept(userDept);
+          const normalizedTeamDept = normalizeDept(teamData.department);
+          
+          if (normalizedTeamDept !== null && normalizedTeamDept !== normalizedUserDept) {
             logger.warn('Team lead tried to create unit in different department', { 
               userId, 
               attemptedDept: teamData.department,
               userDept 
             });
-            return { success: false, error: `You can only create units in your department (${userDept})` };
+            return { success: false, error: `You can only create units in your department (${userDept || 'General'})` };
           }
           // Set department to user's department if not specified
           teamData.department = teamData.department || userDept;
@@ -376,11 +382,20 @@ function registerAdminHandlers(services, logger) {
         // Team leads see all teams in their department
         const userDept = await getUserDepartment();
         
-        const { data, error } = await dbAdapter.supabase
+        // Handle null/empty department (represents "General")
+        let query = dbAdapter.supabase
           .from('teams')
-          .select('*')
-          .eq('department', userDept)
-          .order('name', { ascending: true });
+          .select('*');
+        
+        if (!userDept || userDept === '') {
+          // For General department, find teams with null or empty department
+          query = query.or('department.is.null,department.eq.');
+        } else {
+          // For specific departments, match exactly
+          query = query.eq('department', userDept);
+        }
+        
+        const { data, error } = await query.order('name', { ascending: true });
 
         if (error) throw error;
         teams = data || [];
@@ -553,9 +568,14 @@ function registerAdminHandlers(services, logger) {
         if (userRole === 'team_lead') {
           // Team leads see only teams in their department
           const userDept = await getUserDepartment();
-          filteredMemberships = filteredMemberships.filter(m => 
-            m.teams?.department === userDept
-          );
+          filteredMemberships = filteredMemberships.filter(m => {
+            const teamDept = m.teams?.department;
+            // Handle null/empty department matching (both represent "General")
+            if ((!userDept || userDept === '') && (!teamDept || teamDept === '')) {
+              return true;
+            }
+            return teamDept === userDept;
+          });
         } else {
           // Unit leads see only teams they manage
           const managedTeams = await getManagedTeams();
@@ -746,32 +766,118 @@ function registerAdminHandlers(services, logger) {
 
       // If unit_lead or team_lead, manage their lead assignments
       if (newRole === 'unit_lead' || newRole === 'team_lead') {
-        // First, remove all existing lead assignments
-        const { error: removeError } = await dbAdapter.supabase
-          .from('team_members')
-          .delete()
-          .eq('user_id', targetUserId)
-          .in('role', ['unit_lead', 'team_lead']);
-
-        if (removeError) throw removeError;
-
         // Then add new lead assignments
         if (leadTeamIds && leadTeamIds.length > 0) {
-          const leadAssignments = leadTeamIds.map(teamId => ({
-            user_id: targetUserId,
-            team_id: teamId,
-            role: newRole,
-            joined_at: new Date().toISOString()
-          }));
+          let teamIdsToAssign = leadTeamIds;
 
-          const { error: assignError } = await dbAdapter.supabase
+          // For team_lead, if leadTeamIds[0] is a department name (string), get all teams in that department
+          if (newRole === 'team_lead' && typeof leadTeamIds[0] === 'string' && !leadTeamIds[0].match(/^[0-9a-f-]{36}$/i)) {
+            const departmentName = leadTeamIds[0];
+            logger.info('Team lead assigned to department, fetching all units', { departmentName });
+
+            // Get all teams in this department
+            // Handle "General" as a special case - it represents null/empty department in DB
+            let deptTeams;
+            if (departmentName === 'General') {
+              const { data, error: teamsError } = await dbAdapter.supabase
+                .from('teams')
+                .select('id')
+                .or('department.is.null,department.eq.');
+
+              if (teamsError) throw teamsError;
+              deptTeams = data;
+            } else {
+              const { data, error: teamsError } = await dbAdapter.supabase
+                .from('teams')
+                .select('id')
+                .eq('department', departmentName);
+
+              if (teamsError) throw teamsError;
+              deptTeams = data;
+            }
+
+            if (!deptTeams || deptTeams.length === 0) {
+              logger.warn('No teams found in department', { departmentName });
+              return { success: false, error: `No units found in department: ${departmentName}` };
+            }
+
+            teamIdsToAssign = deptTeams.map(t => t.id);
+            logger.info('Team lead will manage all units in department', { 
+              departmentName, 
+              unitCount: teamIdsToAssign.length 
+            });
+          }
+
+          // Get existing team memberships for this user
+          const { data: existingMemberships, error: existingError } = await dbAdapter.supabase
             .from('team_members')
-            .insert(leadAssignments);
+            .select('team_id, id')
+            .eq('user_id', targetUserId);
 
-          if (assignError) throw assignError;
+          if (existingError) throw existingError;
+
+          const existingTeamIds = new Set((existingMemberships || []).map(m => m.team_id));
+          
+          // Separate teams into: already a member vs. new teams
+          const teamsToUpdate = teamIdsToAssign.filter(tid => existingTeamIds.has(tid));
+          const teamsToInsert = teamIdsToAssign.filter(tid => !existingTeamIds.has(tid));
+
+          logger.info('Processing lead assignments', { 
+            totalTeams: teamIdsToAssign.length,
+            toUpdate: teamsToUpdate.length, 
+            toInsert: teamsToInsert.length 
+          });
+
+          // Update existing memberships to the new lead role
+          if (teamsToUpdate.length > 0) {
+            const { error: updateError } = await dbAdapter.supabase
+              .from('team_members')
+              .update({ role: newRole })
+              .eq('user_id', targetUserId)
+              .in('team_id', teamsToUpdate);
+
+            if (updateError) throw updateError;
+            logger.info('Updated existing memberships', { count: teamsToUpdate.length });
+          }
+
+          // Insert new team memberships with lead role
+          if (teamsToInsert.length > 0) {
+            const leadAssignments = teamsToInsert.map(teamId => ({
+              user_id: targetUserId,
+              team_id: teamId,
+              role: newRole,
+              joined_at: new Date().toISOString()
+            }));
+
+            const { error: insertError } = await dbAdapter.supabase
+              .from('team_members')
+              .insert(leadAssignments);
+
+            if (insertError) throw insertError;
+            logger.info('Inserted new lead assignments', { count: teamsToInsert.length });
+          }
+
+          // Remove lead role from teams not in the new assignment
+          const { error: removeOtherLeadsError } = await dbAdapter.supabase
+            .from('team_members')
+            .delete()
+            .eq('user_id', targetUserId)
+            .in('role', ['unit_lead', 'team_lead'])
+            .not('team_id', 'in', `(${teamIdsToAssign.join(',')})`);
+
+          if (removeOtherLeadsError) throw removeOtherLeadsError;
+        } else {
+          // No teams specified, remove all lead assignments
+          const { error: removeError } = await dbAdapter.supabase
+            .from('team_members')
+            .delete()
+            .eq('user_id', targetUserId)
+            .in('role', ['unit_lead', 'team_lead']);
+
+          if (removeError) throw removeError;
         }
       } else {
-        // For non-management roles, remove any lead assignments
+        // For non-management roles, remove any lead assignments (but keep regular memberships)
         const { error: removeError } = await dbAdapter.supabase
           .from('team_members')
           .delete()

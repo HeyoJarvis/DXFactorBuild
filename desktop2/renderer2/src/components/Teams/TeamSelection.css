@@ -192,8 +192,9 @@
 /* Card Stats */
 .team-card-stats {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 16px;
-  flex-wrap: wrap;
 }
 
 .team-stat {
@@ -211,33 +212,62 @@
   color: #94a3b8;
 }
 
-/* Card Arrow */
-.team-card-arrow {
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(59, 130, 246, 0.08);
+/* Card Actions - Button Group */
+.team-card-actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #3b82f6;
+  gap: 8px;
   opacity: 0;
   transform: translateX(-10px);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.team-card:hover .team-card-arrow {
+.team-card:hover .team-card-actions {
   opacity: 1;
   transform: translateX(0);
-  background: rgba(59, 130, 246, 0.15);
 }
 
-.team-card-arrow svg {
-  width: 20px;
-  height: 20px;
+.team-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  border: 1.5px solid;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+  border-color: rgba(139, 92, 246, 0.2);
+  color: #7c3aed;
+}
+
+.team-action-button:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
+  border-color: rgba(139, 92, 246, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+/* Arrow button - blue theme */
+.team-arrow-button {
+  background: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+  color: #3b82f6 !important;
+}
+
+.team-arrow-button:hover {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+}
+
+.team-action-button:active {
+  transform: translateY(0);
+}
+
+.team-action-button svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* Loading State */

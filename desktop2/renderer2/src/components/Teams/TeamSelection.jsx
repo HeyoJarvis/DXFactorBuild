@@ -5,8 +5,15 @@ import './TeamSelection.css';
  * TeamSelection - Display departments/big teams as clickable cards
  * First level of selection before showing units
  */
-export default function TeamSelection({ teams, loading, onTeamSelect }) {
+export default function TeamSelection({ teams, loading, onTeamSelect, onDepartmentChat }) {
   const [hoveredTeam, setHoveredTeam] = useState(null);
+
+  const handleChatClick = (e, dept) => {
+    e.stopPropagation(); // Prevent card click
+    if (onDepartmentChat) {
+      onDepartmentChat(dept);
+    }
+  };
 
   // Group teams by department to create the top-level "Teams"
   const departmentGroups = useMemo(() => {
@@ -17,10 +24,12 @@ export default function TeamSelection({ teams, loading, onTeamSelect }) {
       const dept = team.department || 'General';
       if (!groups[dept]) {
         groups[dept] = {
+          id: `dept-${dept.toLowerCase().replace(/\s+/g, '-')}`, // Synthetic ID for department
           name: dept,
           description: `${dept} department teams and units`,
           units: [],
-          totalMembers: 0
+          totalMembers: 0,
+          isDepartment: true // Flag to indicate this is a department, not a unit
         };
       }
       groups[dept].units.push(team);
@@ -110,14 +119,34 @@ export default function TeamSelection({ teams, loading, onTeamSelect }) {
                   </svg>
                   <span>{dept.units.length} {dept.units.length === 1 ? 'unit' : 'units'}</span>
                 </div>
-              </div>
-            </div>
 
-            <div className="team-card-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
+                <div className="team-card-actions">
+                  {onDepartmentChat && (
+                    <button
+                      className="team-action-button"
+                      onClick={(e) => handleChatClick(e, dept)}
+                      title="Department Chat"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </button>
+                  )}
+                  <button
+                    className="team-action-button team-arrow-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTeamSelect(dept);
+                    }}
+                    title="View units"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         ))}

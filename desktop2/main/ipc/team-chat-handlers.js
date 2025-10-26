@@ -295,9 +295,13 @@ function registerTeamChatHandlers(services, logger) {
   /**
    * Send a message in team chat
    */
-  ipcMain.handle('team-chat:send-message', async (event, teamId, message) => {
+  ipcMain.handle('team-chat:send-message', async (event, teamId, message, chatContext = null) => {
     try {
-      logger.info('💬 Sending team chat message', { teamId, message: message.substring(0, 50) });
+      logger.info('💬 Sending team chat message', { 
+        teamId, 
+        message: message.substring(0, 50),
+        isDepartment: chatContext?.isDepartment || false
+      });
 
       // Get current user from auth service
       const userId = services.auth?.currentUser?.id;
@@ -307,26 +311,130 @@ function registerTeamChatHandlers(services, logger) {
         return { success: false, error: 'User not authenticated' };
       }
 
-      // Find conversation session for this team
-      const { data: sessions, error: sessionFindError } = await dbAdapter.supabase
-        .from('conversation_sessions')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('workflow_type', 'team_chat')
-        .eq('workflow_id', teamId)
-        .limit(1);
+      // For department chats, create/find session differently
+      const isDepartmentChat = chatContext?.isDepartment || teamId.startsWith('dept-');
+      let sessionId;
 
-      if (sessionFindError || !sessions || sessions.length === 0) {
-        throw new Error('Chat session not found. Please load chat history first.');
+      if (isDepartmentChat) {
+        // For department chats, use the department ID directly as workflow_id
+        logger.info('🏢 Department chat mode', { 
+          departmentName: chatContext?.departmentName,
+          unitCount: chatContext?.unitIds?.length || 0
+        });
+
+        // Find or create department chat session
+        const { data: sessions, error: sessionFindError } = await dbAdapter.supabase
+          .from('conversation_sessions')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('workflow_type', 'department_chat')
+          .eq('workflow_id', teamId)
+          .limit(1);
+
+        if (sessionFindError) {
+          logger.error('Error finding department chat session', { error: sessionFindError.message });
+        }
+
+        if (!sessions || sessions.length === 0) {
+          // Create new department chat session
+          logger.info('Creating new department chat session', { teamId, userId });
+          const { data: newSession, error: createError } = await dbAdapter.supabase
+            .from('conversation_sessions')
+            .insert({
+              user_id: userId,
+              workflow_type: 'department_chat',
+              workflow_id: teamId,
+              metadata: {
+                department_name: chatContext?.departmentName,
+                unit_ids: chatContext?.unitIds || []
+              }
+            })
+            .select('id')
+            .single();
+
+          if (createError || !newSession) {
+            throw new Error(`Failed to create department chat session: ${createError?.message || 'Unknown error'}`);
+          }
+
+          sessionId = newSession.id;
+        } else {
+          sessionId = sessions[0].id;
+        }
+      } else {
+        // Regular team chat - find existing session
+        const { data: sessions, error: sessionFindError } = await dbAdapter.supabase
+          .from('conversation_sessions')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('workflow_type', 'team_chat')
+          .eq('workflow_id', teamId)
+          .limit(1);
+
+        if (sessionFindError || !sessions || sessions.length === 0) {
+          throw new Error('Chat session not found. Please load chat history first.');
+        }
+
+        sessionId = sessions[0].id;
       }
-
-      const sessionId = sessions[0].id;
 
       // Save user message
       await dbAdapter.saveMessageToSession(sessionId, message, 'user', {}, userId);
 
       // Build context for AI
-      const { context, contextDetails } = await buildTeamContext(teamId, userId, dbAdapter, logger);
+      let context, contextDetails;
+      
+      if (isDepartmentChat && chatContext?.unitIds && chatContext.unitIds.length > 0) {
+        // Build combined context from all units in the department
+        logger.info('🏢 Building department-wide context from multiple units', { 
+          departmentName: chatContext.departmentName,
+          unitCount: chatContext.unitIds.length,
+          unitIds: chatContext.unitIds
+        });
+        
+        // Aggregate context from all units
+        const allContexts = [];
+        for (const unitId of chatContext.unitIds) {
+          try {
+            logger.info(`📦 Building context for unit: ${unitId}`);
+            const unitContext = await buildTeamContext(unitId, userId, dbAdapter, logger);
+            allContexts.push(unitContext);
+            logger.info(`✅ Context built for unit ${unitId}:`, {
+              tasksCount: unitContext.contextDetails.tasks?.length || 0,
+              meetingsCount: unitContext.contextDetails.meetings?.length || 0
+            });
+          } catch (error) {
+            logger.warn('Failed to build context for unit', { unitId, error: error.message });
+          }
+        }
+
+        // Combine all contexts
+        context = allContexts.map(c => c.context).join('\n\n---NEXT UNIT---\n\n');
+        contextDetails = {
+          tasks: allContexts.flatMap(c => c.contextDetails.tasks || []),
+          meetings: allContexts.flatMap(c => c.contextDetails.meetings || []),
+          code_repos: [...new Set(allContexts.flatMap(c => c.contextDetails.code_repos || []))],
+          isDepartment: true,
+          departmentName: chatContext.departmentName,
+          unitCount: chatContext.unitIds.length
+        };
+      } else if (isDepartmentChat) {
+        // Department chat but no units provided - this is an error condition
+        logger.error('❌ Department chat requested but no unit IDs provided', { 
+          teamId,
+          chatContext,
+          isDepartmentChat
+        });
+        
+        return {
+          success: true,
+          response: `I'm in department chat mode for "${chatContext?.departmentName || 'this department'}", but I don't have access to any units yet. This might be because:\n\n1. No units have been created in this department yet\n2. The department data isn't loading correctly\n3. You need to add teams to this department in the Admin panel\n\nPlease check the Admin panel to ensure units exist in this department.`
+        };
+      } else {
+        // Regular team context
+        const teamContext = await buildTeamContext(teamId, userId, dbAdapter, logger);
+        context = teamContext.context;
+        contextDetails = teamContext.contextDetails;
+      }
 
       // Perform semantic code search if repos are indexed
       let codeSearchResults = null;
@@ -383,12 +491,17 @@ function registerTeamChatHandlers(services, logger) {
       // Build system prompt with detailed context (similar to task-chat-handlers.js)
       let systemPrompt = `You are HeyJarvis, an AI assistant for team collaboration and project management.
 
-TEAM CONTEXT - CURRENT ACTIVE WORK:
+${isDepartmentChat ? `DEPARTMENT-WIDE CONTEXT - ${chatContext?.departmentName || 'Department'} (${contextDetails.unitCount || 0} units):` : 'TEAM CONTEXT - CURRENT ACTIVE WORK:'}
 `;
+
+      if (isDepartmentChat) {
+        systemPrompt += `You are chatting at the department level with context from ALL units in ${chatContext?.departmentName || 'this department'}.
+This includes tasks, meetings, and code from across ${contextDetails.unitCount || 0} different teams.\n\n`;
+      }
 
       // Add detailed tasks if available - MAKE THIS PROMINENT
       if (contextDetails.tasks && contextDetails.tasks.length > 0) {
-        systemPrompt += `The team currently has ${contextDetails.tasks.length} active tasks:\n\n`;
+        systemPrompt += `${isDepartmentChat ? 'The department' : 'The team'} currently has ${contextDetails.tasks.length} active tasks:\n\n`;
         contextDetails.tasks.slice(0, 10).forEach((t, idx) => {
           systemPrompt += `${idx + 1}. "${t.title}" [${t.external_key || 'N/A'}]\n`;
           if (t.assignee) systemPrompt += `   - Assigned to: ${t.assignee}\n`;
@@ -397,7 +510,7 @@ TEAM CONTEXT - CURRENT ACTIVE WORK:
           systemPrompt += `\n`;
         });
       } else {
-        systemPrompt += `No active tasks assigned to this team yet.\n\n`;
+        systemPrompt += `No active tasks assigned to ${isDepartmentChat ? 'this department' : 'this team'} yet.\n\n`;
       }
 
       // Add detailed meetings if available

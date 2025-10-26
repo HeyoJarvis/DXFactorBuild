@@ -38,6 +38,7 @@ export default function Admin({ user }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [memberSearchQuery, setMemberSearchQuery] = useState('');
   const [teamMembers, setTeamMembers] = useState([]);
+  const [showNewDeptInput, setShowNewDeptInput] = useState(false);
   
   // Form states
   const [formData, setFormData] = useState({
@@ -117,7 +118,7 @@ export default function Admin({ user }) {
     setFormData({
       name: '',
       slug: '',
-      department: '',
+      department: 'General', // Default to General
       description: ''
     });
     setShowCreateTeamModal(true);
@@ -127,7 +128,7 @@ export default function Admin({ user }) {
     setFormData({
       name: '',
       slug: '',
-      department: departments[0] || '',
+      department: 'General', // Default to General
       description: ''
     });
     setShowCreateUnitModal(true);
@@ -135,12 +136,20 @@ export default function Admin({ user }) {
 
   const handleEdit = async (item) => {
     setSelectedItem(item);
+    const itemDept = item.department || 'General';
+    
+    // Check if the item's department exists in our list
+    const deptExists = departments.includes(itemDept);
+    
     setFormData({
       name: item.name,
       slug: item.slug,
-      department: item.department || '',
+      department: itemDept,
       description: item.description || ''
     });
+    
+    // If department doesn't exist in list, show new dept input
+    setShowNewDeptInput(!deptExists && itemDept !== 'General');
     
     // Load team members
     try {
@@ -228,11 +237,27 @@ export default function Admin({ user }) {
     // Load teams where user is a lead
     try {
       const result = await window.electronAPI.admin.getUserLeadTeams(user.id);
-      if (result.success) {
-        setSelectedLeadTeams(result.teams.map(t => t.team_id));
+      if (result.success && result.teams && result.teams.length > 0) {
+        // For team_lead, if all teams are in same department, show that department
+        if (user.user_role === 'team_lead') {
+          const departments = [...new Set(result.teams.map(t => t.teams?.department).filter(Boolean))];
+          if (departments.length === 1) {
+            // Team lead of a single department - store department name
+            setSelectedLeadTeams([departments[0]]);
+          } else {
+            // Legacy: team lead with mixed or specific units
+            setSelectedLeadTeams(result.teams.map(t => t.team_id));
+          }
+        } else {
+          // Unit lead - store team IDs
+          setSelectedLeadTeams(result.teams.map(t => t.team_id));
+        }
+      } else {
+        setSelectedLeadTeams([]);
       }
     } catch (error) {
       console.error('Error loading user lead teams:', error);
+      setSelectedLeadTeams([]);
     }
     
     setShowChangeRoleModal(true);
@@ -242,12 +267,19 @@ export default function Admin({ user }) {
     if (!selectedUser || !selectedRole) return;
     
     // Validate management role assignments
-    if ((selectedRole === 'unit_lead' || selectedRole === 'team_lead') && selectedLeadTeams.length === 0) {
-      alert('Please select at least one unit to manage for this role');
+    if (selectedRole === 'unit_lead' && selectedLeadTeams.length === 0) {
+      alert('Please select at least one unit to manage');
+      return;
+    }
+    
+    if (selectedRole === 'team_lead' && selectedLeadTeams.length === 0) {
+      alert('Please select a department to lead');
       return;
     }
     
     try {
+      // For team_lead, selectedLeadTeams[0] is the department name
+      // Backend will handle assigning all units in that department
       const result = await window.electronAPI.admin.updateUserRole(selectedUser.id, selectedRole, selectedLeadTeams);
       
       if (result.success) {
@@ -305,6 +337,7 @@ export default function Admin({ user }) {
     setSelectedLeadTeams([]);
     setMemberSearchQuery('');
     setTeamMembers([]);
+    setShowNewDeptInput(false);
     setFormData({
       name: '',
       slug: '',
@@ -573,7 +606,7 @@ export default function Admin({ user }) {
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                   </svg>
-                  New {capabilities.isAdmin ? 'Department' : 'Unit'}
+                  New Unit
                 </button>
               )}
             </div>
@@ -618,6 +651,10 @@ export default function Admin({ user }) {
           <div className="admin-units-view">
             <div className="admin-section-header">
               <h2>All Units</h2>
+              <div className="unit-stats">
+                <span className="stat-badge">{teams.length} total units</span>
+                <span className="stat-badge">{departments.length} departments</span>
+              </div>
               {capabilities?.canCreateTeams && (
                 <button className="admin-create-button" onClick={handleCreateUnit}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -629,43 +666,125 @@ export default function Admin({ user }) {
               )}
             </div>
 
-            <div className="admin-units-grid">
-              {teams.map(unit => (
-                <div key={unit.id} className="admin-unit-card">
-                  <div className="unit-card-header">
-                    <h3>{unit.name}</h3>
-                    <span className="unit-department-badge">{unit.department || 'General'}</span>
-                  </div>
-                  {unit.description && (
-                    <p className="unit-description">{unit.description}</p>
-                  )}
-                  {unit.slug && (
-                    <div className="unit-slug-display">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                      </svg>
-                      /{unit.slug}
-                    </div>
-                  )}
-                  <div className="unit-card-actions">
-                    <button className="unit-edit-button" onClick={() => handleEdit(unit)}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                      </svg>
-                      Edit
-                    </button>
-                    <button className="unit-delete-button" onClick={() => handleDeleteTeam(unit.id)}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      </svg>
-                      Delete
-                    </button>
-                  </div>
+            {/* Search Bar */}
+            <div className="admin-search-bar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search units by name, department, or slug..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button className="clear-search" onClick={() => setSearchQuery('')}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Units Table */}
+            <div className="admin-units-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Unit Name</th>
+                    <th>Department</th>
+                    <th>Slug</th>
+                    <th>Description</th>
+                    <th style={{ textAlign: 'center' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teams
+                    .filter(unit => {
+                      if (!searchQuery) return true;
+                      const query = searchQuery.toLowerCase();
+                      return (
+                        unit.name?.toLowerCase().includes(query) ||
+                        unit.department?.toLowerCase().includes(query) ||
+                        unit.slug?.toLowerCase().includes(query) ||
+                        'general'.includes(query) && !unit.department
+                      );
+                    })
+                    .map(unit => (
+                      <tr key={unit.id}>
+                        <td>
+                          <div className="unit-name-cell">
+                            <strong>{unit.name}</strong>
+                          </div>
+                        </td>
+                        <td>
+                          <span className="unit-department-badge">
+                            {unit.department || 'General'}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="unit-slug-cell">
+                            {unit.slug ? `/${unit.slug}` : '-'}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="unit-description-cell">
+                            {unit.description || '-'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="unit-table-actions">
+                            <button 
+                              className="table-action-btn edit-btn" 
+                              onClick={() => handleEdit(unit)}
+                              title="Edit unit & manage members"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                              </svg>
+                              Edit
+                            </button>
+                            {capabilities?.canDeleteTeams && (
+                              <button 
+                                className="table-action-btn delete-btn" 
+                                onClick={() => handleDeleteTeam(unit.id)}
+                                title="Delete unit"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="3 6 5 6 21 6"></polyline>
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+              
+              {teams.filter(unit => {
+                if (!searchQuery) return true;
+                const query = searchQuery.toLowerCase();
+                return (
+                  unit.name?.toLowerCase().includes(query) ||
+                  unit.department?.toLowerCase().includes(query) ||
+                  unit.slug?.toLowerCase().includes(query) ||
+                  'general'.includes(query) && !unit.department
+                );
+              }).length === 0 && (
+                <div className="empty-state">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                  </svg>
+                  <p>{searchQuery ? 'No units found matching your search' : 'No units yet'}</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         ) : (
@@ -897,16 +1016,40 @@ export default function Admin({ user }) {
                 </div>
               </div>
 
-              {/* Team/Unit Selection for Management Roles */}
-              {(selectedRole === 'unit_lead' || selectedRole === 'team_lead') && (
+              {/* Team Lead: Select Department */}
+              {selectedRole === 'team_lead' && (
                 <div className="form-group" style={{ marginTop: '20px' }}>
-                  <label>
-                    {selectedRole === 'unit_lead' ? 'Select Units to Manage *' : 'Select Department Units to Manage *'}
-                  </label>
+                  <label>Select Department to Lead *</label>
                   <p className="role-help-text">
-                    {selectedRole === 'unit_lead' 
-                      ? 'Choose which specific units this user will lead'
-                      : 'Choose which units in their department this user will manage'}
+                    Team Lead will manage ALL units within this department
+                  </p>
+                  <select
+                    value={selectedLeadTeams[0] || ''}
+                    onChange={(e) => setSelectedLeadTeams(e.target.value ? [e.target.value] : [])}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      border: '2px solid rgba(139, 92, 246, 0.2)',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      background: 'white',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="">-- Select Department --</option>
+                    {departments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Unit Lead: Select Specific Units */}
+              {selectedRole === 'unit_lead' && (
+                <div className="form-group" style={{ marginTop: '20px' }}>
+                  <label>Select Units to Manage *</label>
+                  <p className="role-help-text">
+                    Choose which specific units this user will lead
                   </p>
                   <div className="lead-teams-selection">
                     {Object.keys(teamsByDepartment).sort().map(dept => (
@@ -958,7 +1101,7 @@ export default function Admin({ user }) {
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>
-                {showEditModal ? 'Edit Unit' : showCreateTeamModal ? 'Create Department' : 'Create Unit'}
+                {showEditModal ? 'Edit Unit' : 'Create New Unit'}
               </h2>
               <button className="modal-close" onClick={closeModals}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -975,28 +1118,84 @@ export default function Admin({ user }) {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., Engineering, Sales, eng-desktop-team"
+                  placeholder="e.g., eng-desktop-team, sales-east-coast"
                 />
               </div>
 
               <div className="form-group">
                 <label>Department *</label>
-                {showCreateTeamModal ? (
-                  <input
-                    type="text"
-                    value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    placeholder="e.g., Engineering, Sales, Product"
-                  />
+                <p className="form-help-text">
+                  {showEditModal 
+                    ? 'Select an existing department or create a new one to move this unit'
+                    : 'Select which department this unit belongs to'
+                  }
+                </p>
+                {!showNewDeptInput ? (
+                  <>
+                    <select
+                      value={formData.department}
+                      onChange={(e) => {
+                        if (e.target.value === '__new__') {
+                          setShowNewDeptInput(true);
+                          setFormData({ ...formData, department: '' });
+                        } else {
+                          setFormData({ ...formData, department: e.target.value });
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        border: '2px solid rgba(139, 92, 246, 0.2)',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        background: 'white',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {departments.map(dept => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                      <option value="__new__" style={{ fontWeight: 'bold', color: '#8b5cf6' }}>
+                        ➕ Create New Department...
+                      </option>
+                    </select>
+                  </>
                 ) : (
-                  <select
-                    value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  >
-                    {departments.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                  </select>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      value={formData.department}
+                      onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                      placeholder="e.g., Engineering, Marketing, Product"
+                      autoFocus
+                      style={{
+                        flex: 1,
+                        padding: '10px 14px',
+                        border: '2px solid rgba(139, 92, 246, 0.3)',
+                        borderRadius: '8px',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowNewDeptInput(false);
+                        setFormData({ ...formData, department: departments[0] || 'General' });
+                      }}
+                      style={{
+                        padding: '10px 14px',
+                        background: '#f1f5f9',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        color: '#64748b'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -1029,6 +1228,9 @@ export default function Admin({ user }) {
                     <h3 className="section-title">
                       Team Members ({teamMembers.length})
                     </h3>
+                    <p className="form-help-text" style={{ marginTop: '-8px', marginBottom: '12px' }}>
+                      Member changes are saved instantly. Click "Save Changes" to update unit details above.
+                    </p>
                     
                     {teamMembers.length > 0 ? (
                       <div className="members-list">
@@ -1135,17 +1337,14 @@ export default function Admin({ user }) {
             </div>
 
             <div className="modal-footer">
-              {!showEditModal && (
-                <button className="modal-cancel-button" onClick={closeModals}>
-                  Cancel
-                </button>
-              )}
+              <button className="modal-cancel-button" onClick={closeModals}>
+                Cancel
+              </button>
               <button 
                 className="modal-save-button" 
-                onClick={showEditModal ? closeModals : handleSaveTeam}
-                style={showEditModal ? { flex: 1 } : {}}
+                onClick={handleSaveTeam}
               >
-                {showEditModal ? 'Done' : 'Create'}
+                {showEditModal ? 'Save Changes' : 'Create Unit'}
               </button>
             </div>
           </div>

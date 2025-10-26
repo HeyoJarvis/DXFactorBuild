@@ -188,7 +188,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     loadTeams: () => ipcRenderer.invoke('team-chat:load-teams'),
     loadTeamContext: (teamId) => ipcRenderer.invoke('team-chat:load-team-context', teamId),
     getHistory: (teamId) => ipcRenderer.invoke('team-chat:get-history', teamId),
-    sendMessage: (teamId, message) => ipcRenderer.invoke('team-chat:send-message', teamId, message),
+    sendMessage: (teamId, message, chatContext) => ipcRenderer.invoke('team-chat:send-message', teamId, message, chatContext),
     saveContextSettings: (teamId, settings) => ipcRenderer.invoke('team-chat:save-context-settings', teamId, settings),
     addRepositoryToTeam: (teamId, owner, name, branch, url) => ipcRenderer.invoke('team-chat:add-repository-to-team', teamId, owner, name, branch, url),
     getUpcomingMeetings: (teamId) => ipcRenderer.invoke('team-chat:get-upcoming-meetings', teamId)

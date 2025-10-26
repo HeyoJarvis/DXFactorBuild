@@ -37,6 +37,7 @@ export default function MissionControl({ user }) {
   const [selectedTeam, setSelectedTeam] = useState(null); // Department/big team (grouped units)
   const [selectedUnit, setSelectedUnit] = useState(null); // Actual working unit
   const [teamsLoading, setTeamsLoading] = useState(false);
+  const [departmentChatMode, setDepartmentChatMode] = useState(false); // Department-level chat mode
 
   // Selected task for Personal mode chat
   const [selectedTask, setSelectedTask] = useState(null);
@@ -222,23 +223,35 @@ export default function MissionControl({ user }) {
   const handleTeamChange = (team) => {
     setSelectedTeam(team);
     setSelectedUnit(null); // Reset unit when team changes
+    setDepartmentChatMode(false); // Exit department chat mode
   };
 
   // Handle unit selection (second level)
   const handleUnitChange = (unit) => {
     setSelectedUnit(unit);
+    setDepartmentChatMode(false); // Exit department chat mode
+  };
+
+  // Handle department chat button click
+  const handleDepartmentChat = (department) => {
+    setSelectedTeam(department);
+    setSelectedUnit(null);
+    setDepartmentChatMode(true); // Enter department chat mode
+    setMode('team'); // Ensure we're in team mode
   };
 
   // Handle back to team selection (from unit selection)
   const handleBackToTeamSelection = () => {
     setSelectedTeam(null);
     setSelectedUnit(null);
+    setDepartmentChatMode(false);
     localStorage.removeItem('missionControlUnitId');
   };
 
   // Handle back to unit selection (from workspace)
   const handleBackToUnitSelection = () => {
     setSelectedUnit(null);
+    setDepartmentChatMode(false);
     localStorage.removeItem('missionControlUnitId');
   };
 
@@ -319,7 +332,17 @@ export default function MissionControl({ user }) {
           teams={teams} 
           loading={teamsLoading}
           onTeamSelect={handleTeamChange}
+          onDepartmentChat={handleDepartmentChat}
         />
+      ) : mode === 'team' && selectedTeam && departmentChatMode ? (
+        // Department Chat Mode: Show chat with all units context
+        <div className="department-chat-container">
+          <TeamChat 
+            user={user} 
+            selectedTeam={selectedTeam}
+            departmentMode={true}
+          />
+        </div>
       ) : mode === 'team' && selectedTeam && !selectedUnit ? (
         // Level 2: Show units within selected team
         <UnitSelection
