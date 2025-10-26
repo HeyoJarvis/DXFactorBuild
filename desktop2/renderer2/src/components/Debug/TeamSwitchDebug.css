@@ -1,0 +1,147 @@
+.team-switch-debug {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 400px;
+  max-height: 600px;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  color: #e2e8f0;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 12px;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.debug-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.debug-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #93c5fd;
+}
+
+.debug-test-button {
+  padding: 6px 12px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 6px;
+  color: #93c5fd;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.debug-test-button:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+.debug-section {
+  margin-bottom: 16px;
+}
+
+.debug-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.debug-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.debug-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 6px;
+}
+
+.debug-label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.debug-value {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.debug-value.success {
+  color: #34d399;
+}
+
+.debug-value.error {
+  color: #f87171;
+}
+
+.debug-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.debug-list-item {
+  padding: 8px 10px;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 6px;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.debug-list-item strong {
+  color: #93c5fd;
+}
+
+.debug-list-meta {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.debug-test-result {
+  padding: 10px;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.debug-test-name {
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 4px;
+}
+
+.debug-test-status {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.debug-test-details {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+
