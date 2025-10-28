@@ -209,6 +209,69 @@ class CodeIndexerHandlers {
       }
     });
 
+    // List indexed repositories from database
+    ipcMain.handle('codeIndexer:listIndexedRepositories', async (event) => {
+      try {
+        this.logger.info('📚 Listing indexed repositories from database');
+
+        const dbAdapter = this.services?.dbAdapter;
+        if (!dbAdapter) {
+          throw new Error('Supabase adapter not initialized');
+        }
+
+        // Query unique repositories from code_chunks table
+        const { data, error } = await dbAdapter.supabase
+          .from('code_chunks')
+          .select('repository_owner, repository_name')
+          .limit(10000);
+
+        if (error) {
+          throw new Error(`Database query failed: ${error.message}`);
+        }
+
+        // Get unique repositories with chunk counts
+        const repoMap = new Map();
+        data.forEach(chunk => {
+          const key = `${chunk.repository_owner}/${chunk.repository_name}`;
+          repoMap.set(key, (repoMap.get(key) || 0) + 1);
+        });
+
+        // Convert to array of repository objects
+        const repositories = Array.from(repoMap.entries()).map(([fullName, chunkCount]) => {
+          const [owner, name] = fullName.split('/');
+          return {
+            owner,
+            name,
+            full_name: fullName,
+            chunk_count: chunkCount,
+            indexed: true
+          };
+        });
+
+        this.logger.info('✅ Listed indexed repositories', {
+          count: repositories.length,
+          repositories: repositories.map(r => r.full_name)
+        });
+
+        return {
+          success: true,
+          repositories,
+          count: repositories.length
+        };
+
+      } catch (error) {
+        this.logger.error('❌ Failed to list indexed repositories', {
+          error: error.message
+        });
+
+        return {
+          success: false,
+          error: error.message,
+          repositories: []
+        };
+      }
+    });
+
     // Get indexer status
     ipcMain.handle('codeIndexer:getStatus', async (event) => {
       try {

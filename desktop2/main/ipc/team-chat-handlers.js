@@ -102,15 +102,9 @@ function registerTeamChatHandlers(services, logger) {
         .insert({
           team_id: teamId,
           repository_owner: owner,
-          repository_name: name,
-          repository_branch: branch || 'main',
-          repository_url: url,
-          created_by: userId,
-          indexed_at: new Date().toISOString(),
-          is_active: true
+          repository_name: name
         })
-        .select()
-        .single();
+        .select();
 
       if (error) {
         // Check if it's a duplicate error (repository already exists)
@@ -118,30 +112,25 @@ function registerTeamChatHandlers(services, logger) {
           // Update existing record to be active
           const { data: updated, error: updateError } = await dbAdapter.supabase
             .from('team_repositories')
-            .update({
-              is_active: true,
-              indexed_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
+            .update({})
             .eq('team_id', teamId)
             .eq('repository_owner', owner)
             .eq('repository_name', name)
-            .eq('repository_branch', branch || 'main')
-            .select()
-            .single();
+            .select();
 
           if (updateError) {
             throw updateError;
           }
 
           logger.info('Repository already existed, reactivated', { teamId, owner, name });
-          return { success: true, data: updated };
+          return { success: true, data: updated?.[0] || updated };
         }
         throw error;
       }
 
-      logger.info('✅ Repository added to team successfully', { id: data.id });
-      return { success: true, data };
+      const repoData = Array.isArray(data) ? data[0] : data;
+      logger.info('✅ Repository added to team successfully', { id: repoData?.id });
+      return { success: true, data: repoData };
 
     } catch (error) {
       logger.error('Failed to add repository to team', { error: error.message });
@@ -440,6 +429,12 @@ function registerTeamChatHandlers(services, logger) {
       let codeSearchResults = null;
       let searchedRepoOwner = null;
       let searchedRepoName = null;
+      
+      logger.info('🔍 Code repos check', {
+        hasRepos: !!contextDetails.code_repos,
+        repoCount: contextDetails.code_repos?.length || 0,
+        repos: contextDetails.code_repos?.map(r => `${r.owner}/${r.name}`)
+      });
       
       if (contextDetails.code_repos && contextDetails.code_repos.length > 0) {
         try {
@@ -912,9 +907,8 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
       // First, get team-specific repositories from team_repositories table
       const { data: teamRepos, error: teamReposError } = await dbAdapter.supabase
         .from('team_repositories')
-        .select('repository_owner, repository_name, repository_branch, indexed_at')
-        .eq('team_id', teamId)
-        .eq('is_active', true);
+        .select('repository_owner, repository_name')
+        .eq('team_id', teamId);
 
       if (!teamReposError && teamRepos && teamRepos.length > 0) {
         logger.info('Loading team-specific repositories', { count: teamRepos.length });
@@ -925,22 +919,22 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
         for (const teamRepo of teamRepos) {
           const repoPath = `${teamRepo.repository_owner}/${teamRepo.repository_name}`;
 
-          // Count files for this specific repository
+          // Count files for this specific repository (default to main branch)
           const { count, error: countError } = await dbAdapter.supabase
             .from('code_embeddings')
             .select('*', { count: 'exact', head: true })
             .eq('repository_owner', teamRepo.repository_owner)
             .eq('repository_name', teamRepo.repository_name)
-            .eq('repository_branch', teamRepo.repository_branch);
+            .eq('repository_branch', 'main');
 
           if (!countError) {
             repoMap.set(repoPath, {
               path: repoPath,
               name: teamRepo.repository_name,
               owner: teamRepo.repository_owner,
-              branch: teamRepo.repository_branch,
+              branch: 'main',
               file_count: count || 0,
-              indexed_at: teamRepo.indexed_at,
+              indexed_at: null,
               source: 'github',
               selected: true // Team repos are always selected by default
             });

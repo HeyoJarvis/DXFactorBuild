@@ -112,6 +112,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   codeIndexer: {
     query: (params) => ipcRenderer.invoke('codeIndexer:query', params),
     listRepositories: (params) => ipcRenderer.invoke('codeIndexer:listRepositories', params),
+    listIndexedRepositories: () => ipcRenderer.invoke('codeIndexer:listIndexedRepositories'),
     indexRepository: (params) => ipcRenderer.invoke('codeIndexer:indexRepository', params),
     getIndexingStatus: (params) => ipcRenderer.invoke('codeIndexer:getIndexingStatus', params),
     getStatus: () => ipcRenderer.invoke('codeIndexer:getStatus'),

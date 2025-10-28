@@ -19,8 +19,10 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
   // Repository management state
   const [showRepoSelector, setShowRepoSelector] = useState(false);
   const [availableRepositories, setAvailableRepositories] = useState([]);
+  const [indexedRepositories, setIndexedRepositories] = useState([]);
   const [loadingRepos, setLoadingRepos] = useState(false);
   const [indexingRepo, setIndexingRepo] = useState(null);
+  const [selectedIndexedRepos, setSelectedIndexedRepos] = useState(new Set());
 
   // Load team context when team changes
   useEffect(() => {
@@ -30,8 +32,46 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
       setContextDetails(null);
       setContextSummary(null);
       loadTeamContext(selectedTeam.id);
+      loadIndexedRepositories(); // Load indexed repos
     }
   }, [selectedTeam]);
+
+  // Load indexed repositories from database
+  const loadIndexedRepositories = async () => {
+    try {
+      if (!window.electronAPI?.codeIndexer?.listIndexedRepositories) {
+        return;
+      }
+
+      const response = await window.electronAPI.codeIndexer.listIndexedRepositories();
+      
+      if (response.success && response.repositories) {
+        const repos = response.repositories.map(repo => ({
+          id: repo.full_name,
+          name: repo.name,
+          full_name: repo.full_name,
+          owner: repo.owner,
+          chunk_count: repo.chunk_count,
+          indexed: true
+        }));
+        setIndexedRepositories(repos);
+        
+        // Auto-select repos that are connected to this team
+        const connectedRepoNames = new Set(
+          contextDetails?.code_repos?.map(r => r.path || `${r.owner}/${r.name}`) || []
+        );
+        const selected = new Set();
+        repos.forEach((repo, idx) => {
+          if (connectedRepoNames.has(repo.full_name)) {
+            selected.add(idx);
+          }
+        });
+        setSelectedIndexedRepos(selected);
+      }
+    } catch (error) {
+      console.error('Failed to load indexed repositories:', error);
+    }
+  };
 
   const loadTeamContext = async (teamId) => {
     try {
@@ -125,8 +165,8 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
     onContextChange?.({ meetings: selectedMeetings, tasks: selectedTasks, repos: newSelected });
   };
 
-  // Load available GitHub repositories
-  const loadAvailableRepositories = async () => {
+  // Load GitHub repositories for indexing
+  const loadGitHubRepositories = async () => {
     if (!window.electronAPI?.codeIndexer?.listRepositories) {
       console.error('❌ Code Indexer API not available');
       alert('Code Indexer API not available. Please restart the app.');
@@ -140,11 +180,9 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
         per_page: 100
       });
 
-      console.log('📦 Repository response:', response);
-
       if (response.success && response.repositories) {
         setAvailableRepositories(response.repositories);
-        console.log('✅ Loaded', response.repositories.length, 'repositories:', response.repositories.map(r => r.full_name));
+        console.log('✅ Loaded', response.repositories.length, 'GitHub repositories');
       } else {
         console.error('❌ Failed to load repositories:', response.error);
         alert(`Failed to load repositories: ${response.error || 'Unknown error'}`);
@@ -154,6 +192,76 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
       alert(`Error loading repositories: ${error.message}`);
     } finally {
       setLoadingRepos(false);
+    }
+  };
+
+  // Toggle indexed repo selection and connect/disconnect from team
+  const toggleIndexedRepoSelection = async (idx) => {
+    const repo = indexedRepositories[idx];
+    const isCurrentlySelected = selectedIndexedRepos.has(idx);
+    
+    try {
+      if (isCurrentlySelected) {
+        // Disconnect repo from team
+        console.log('🔌 Disconnecting repo from team:', repo.full_name);
+        // TODO: Add disconnect API call if needed
+        const newSelected = new Set(selectedIndexedRepos);
+        newSelected.delete(idx);
+        setSelectedIndexedRepos(newSelected);
+      } else {
+        // Connect repo to team
+        console.log('🔗 Connecting repo to team:', repo.full_name, 'Team:', selectedTeam.id);
+        const [owner, name] = repo.full_name.split('/');
+        
+        const addResult = await window.electronAPI.teamChat.addRepositoryToTeam(
+          selectedTeam.id,
+          owner,
+          name,
+          'main',
+          `https://github.com/${repo.full_name}`
+        );
+        
+        if (addResult.success) {
+          console.log('✅ Repository connected to team successfully');
+          const newSelected = new Set(selectedIndexedRepos);
+          newSelected.add(idx);
+          setSelectedIndexedRepos(newSelected);
+          
+          // Reload team context to reflect the change
+          await loadTeamContext(selectedTeam.id);
+        } else {
+          console.error('❌ Failed to connect repository:', addResult.error);
+          alert(`Failed to connect repository: ${addResult.error}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling repository:', error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  // Connect selected indexed repos to team
+  const handleConnectSelectedRepos = async () => {
+    try {
+      const selectedReposList = Array.from(selectedIndexedRepos).map(idx => indexedRepositories[idx]);
+      
+      for (const repo of selectedReposList) {
+        const [owner, name] = repo.full_name.split('/');
+        await window.electronAPI.teamChat.addRepositoryToTeam(
+          selectedTeam.id,
+          owner,
+          name,
+          'main',
+          `https://github.com/${repo.full_name}`
+        );
+      }
+      
+      // Reload team context
+      await loadTeamContext(selectedTeam.id);
+      console.log('✅ Connected repos to team');
+    } catch (error) {
+      console.error('Failed to connect repos:', error);
+      alert(`Failed to connect repositories: ${error.message}`);
     }
   };
 
@@ -210,10 +318,10 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
     }
   };
 
-  // Open repository selector
-  const handleAddRepository = () => {
+  // Open repository selector for indexing new repos
+  const handleIndexMoreRepositories = () => {
     setShowRepoSelector(true);
-    loadAvailableRepositories();
+    loadGitHubRepositories();
   };
 
   if (!selectedTeam) {
@@ -354,19 +462,17 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
           )}
         </div>
 
-        {/* Codebase Section */}
+        {/* Indexed Repositories Section */}
         <div className="context-section">
           <div 
             className="context-section-header"
             onClick={() => toggleSection('codebase')}
           >
             <div className="context-header-left">
-              <span className="context-label">Connected Repositories</span>
+              <span className="context-label">Indexed Repositories</span>
             </div>
             <div className="context-header-right">
-              {contextDetails?.code_repos && Array.isArray(contextDetails.code_repos) && (
-                <span className="context-count">{contextDetails.code_repos.length}</span>
-              )}
+              <span className="context-count">{indexedRepositories.length}</span>
               <svg
                 className={`chevron-icon ${expandedSections.codebase ? 'expanded' : ''}`}
                 width="16"
@@ -380,34 +486,37 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
               </svg>
             </div>
           </div>
-          {expandedSections.codebase && contextDetails?.code_repos && (
+          {expandedSections.codebase && (
             <div className="context-items-list">
-              {Array.isArray(contextDetails.code_repos) && contextDetails.code_repos.length > 0 ? (
+              {indexedRepositories.length > 0 ? (
                 <>
-                  {contextDetails.code_repos.map((repo, idx) => (
-                    <div key={idx} className={`repo-card ${selectedRepos.has(idx) ? 'selected' : ''}`} onClick={() => toggleRepoSelection(idx)}>
+                  {indexedRepositories.map((repo, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`repo-card ${selectedIndexedRepos.has(idx) ? 'selected' : ''}`} 
+                      onClick={() => toggleIndexedRepoSelection(idx)}
+                    >
                       <input
                         type="checkbox"
                         className="context-checkbox"
-                        checked={selectedRepos.has(idx)}
+                        checked={selectedIndexedRepos.has(idx)}
                         onChange={(e) => {
                           e.stopPropagation();
-                          toggleRepoSelection(idx);
+                          toggleIndexedRepoSelection(idx);
                         }}
                       />
                       <div className="card-content">
-                        <div className="card-title">{String(repo?.name || repo?.path || 'Unknown Repo')}</div>
+                        <div className="card-title">{repo.full_name}</div>
                         <div className="card-meta">
-                          <span>{repo?.file_count || 0} files</span>
+                          <span>{repo.chunk_count} code chunks</span>
                           <span>•</span>
-                          <span>{String(repo?.branch || 'main')}</span>
+                          <span className="repo-status indexed">Indexed</span>
                         </div>
-                        <span className="repo-status indexed">Indexed</span>
                       </div>
                     </div>
                   ))}
-                  <button className="add-repo-button" onClick={handleAddRepository}>
-                    + Add Repository
+                  <button className="add-repo-button" onClick={handleIndexMoreRepositories}>
+                    Index More Repositories
                   </button>
                 </>
               ) : (
@@ -415,7 +524,7 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
                   <div className="context-empty-message">
                     No repositories indexed yet
                   </div>
-                  <button className="add-repo-button primary" onClick={handleAddRepository}>
+                  <button className="add-repo-button primary" onClick={handleIndexMoreRepositories}>
                     Index Your First Repository
                   </button>
                 </div>
@@ -430,21 +539,19 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
         <div className="repo-selector-modal-overlay" onClick={() => setShowRepoSelector(false)}>
           <div className="repo-selector-modal" onClick={(e) => e.stopPropagation()}>
             <div className="repo-selector-header">
-              <h3>Select Repository to Index</h3>
+              <h3>Index New Repository</h3>
               <button className="close-button" onClick={() => setShowRepoSelector(false)}>×</button>
             </div>
             <div className="repo-selector-body">
               {loadingRepos ? (
                 <div className="loading-repos">
                   <div className="spinner"></div>
-                  <p>Loading repositories from GitHub...</p>
+                  <p>Loading GitHub repositories...</p>
                 </div>
               ) : availableRepositories.length > 0 ? (
                 <div className="repo-list">
                   {availableRepositories.map((repo) => {
-                    const isIndexed = contextDetails?.code_repos?.some(r =>
-                      r.path === repo.full_name || r.name === repo.name
-                    );
+                    const isAlreadyIndexed = indexedRepositories.some(r => r.full_name === repo.full_name);
                     const isIndexing = indexingRepo === repo.full_name;
 
                     return (
@@ -457,8 +564,8 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
                             )}
                           </div>
                         </div>
-                        {isIndexed ? (
-                          <span className="repo-badge indexed">Indexed</span>
+                        {isAlreadyIndexed ? (
+                          <span className="repo-badge indexed">✓ Already Indexed</span>
                         ) : (
                           <button
                             className="index-button"
@@ -471,7 +578,7 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
                                 Indexing...
                               </>
                             ) : (
-                              'Index'
+                              'Index Repository'
                             )}
                           </button>
                         )}

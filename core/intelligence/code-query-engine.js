@@ -20,7 +20,7 @@ class CodeQueryEngine {
   constructor(options = {}) {
     this.options = {
       anthropicApiKey: options.anthropicApiKey || process.env.ANTHROPIC_API_KEY,
-      model: options.model || 'claude-3-5-sonnet-20241022',
+      model: options.model || 'claude-3-haiku-20240307',
       maxTokens: options.maxTokens || 4096,
       temperature: options.temperature || 0.3,
       searchThreshold: options.searchThreshold || 0.20,  // Lowered from 0.5 to 0.20 based on actual similarity scores
