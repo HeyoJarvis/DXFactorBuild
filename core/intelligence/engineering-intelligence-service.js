@@ -994,6 +994,100 @@ When discussing features:
   }
 
   /**
+   * Infer connections between components based on types and technologies
+   * @private
+   */
+  _inferConnections(components, technologies) {
+    const connections = [];
+    
+    // Find components by type
+    const frontends = components.filter(c => c.type === 'frontend' || c.type === 'desktop');
+    const backends = components.filter(c => c.type === 'backend' || c.type === 'service');
+    const databases = components.filter(c => c.type === 'database');
+    const libraries = components.filter(c => c.type === 'library');
+    
+    // Check for database technologies
+    const hasDatabaseTech = technologies.some(t => 
+      ['database', 'cache', 'search'].includes(t.type)
+    );
+    
+    // Frontend -> Backend connections
+    frontends.forEach(frontend => {
+      backends.forEach(backend => {
+        connections.push({
+          from: frontend.name,
+          to: backend.name,
+          type: 'api-call',
+          description: 'API communication'
+        });
+      });
+    });
+    
+    // Backend -> Database connections
+    if (hasDatabaseTech) {
+      backends.forEach(backend => {
+        connections.push({
+          from: backend.name,
+          to: 'Database',
+          type: 'data-access',
+          description: 'Data persistence'
+        });
+      });
+      
+      // Add virtual database component if not explicitly present
+      if (databases.length === 0) {
+        components.push({
+          name: 'Database',
+          type: 'database',
+          displayName: technologies.find(t => t.type === 'database')?.name || 'Database',
+          virtual: true
+        });
+      }
+    }
+    
+    // Library connections (libraries are used by other components)
+    libraries.forEach(lib => {
+      [...frontends, ...backends].forEach(comp => {
+        connections.push({
+          from: comp.name,
+          to: lib.name,
+          type: 'dependency',
+          description: 'Shared code'
+        });
+      });
+    });
+    
+    // Integration connections (external services)
+    const integrations = technologies.filter(t => t.type === 'integration');
+    if (integrations.length > 0) {
+      backends.forEach(backend => {
+        integrations.forEach(integration => {
+          connections.push({
+            from: backend.name,
+            to: integration.name,
+            type: 'integration',
+            description: 'External API'
+          });
+        });
+      });
+      
+      // Add virtual integration components
+      integrations.forEach(integration => {
+        if (!components.find(c => c.name === integration.name)) {
+          components.push({
+            name: integration.name,
+            type: 'integration',
+            displayName: integration.name,
+            virtual: true
+          });
+        }
+      });
+    }
+    
+    return connections;
+  }
+
+  /**
    * Get sprint summary
    */
   async getSprintSummary(sprintNumber, context = {}) {
@@ -1089,6 +1183,222 @@ When discussing features:
         github: 'disconnected',
         error: error.message
       };
+    }
+  }
+
+  /**
+   * Analyze repository architecture
+   * Detects technologies, frameworks, and system components
+   * 
+   * @param {Object} repository - Repository info { owner, repo, branch }
+   * @returns {Promise<Object>} Architecture analysis result
+   */
+  async analyzeArchitecture(repository) {
+    try {
+      const { owner, repo, branch = 'main', path = '' } = repository;
+      
+      this.logger.info('Analyzing repository architecture', { owner, repo, branch, path: path || '(root)' });
+
+      const octokit = await this._getOctokit();
+
+      // Get repository contents at specified path (or root)
+      const { data: contents } = await octokit.repos.getContent({
+        owner,
+        repo,
+        path: path || '',
+        ref: branch
+      });
+
+      // Detect technologies from files
+      const technologies = new Map(); // Use Map to avoid duplicates
+      const components = [];
+
+      // Helper function to analyze a package.json file
+      const analyzePackageJson = async (path) => {
+        try {
+          const { data: pkgData } = await octokit.repos.getContent({
+            owner,
+            repo,
+            path
+          });
+          const pkgContent = JSON.parse(Buffer.from(pkgData.content, 'base64').toString());
+          
+          // Extract dependencies
+          const allDeps = {
+            ...pkgContent.dependencies,
+            ...pkgContent.devDependencies
+          };
+
+          // Detect frameworks and libraries
+          if (allDeps.react) technologies.set('React', { name: 'React', version: allDeps.react, type: 'frontend' });
+          if (allDeps.vue) technologies.set('Vue', { name: 'Vue', version: allDeps.vue, type: 'frontend' });
+          if (allDeps.angular || allDeps['@angular/core']) technologies.set('Angular', { name: 'Angular', type: 'frontend' });
+          if (allDeps['next']) technologies.set('Next.js', { name: 'Next.js', version: allDeps['next'], type: 'frontend' });
+          if (allDeps.vite) technologies.set('Vite', { name: 'Vite', version: allDeps.vite, type: 'build-tool' });
+          if (allDeps.electron) technologies.set('Electron', { name: 'Electron', version: allDeps.electron, type: 'desktop' });
+          if (allDeps.express) technologies.set('Express', { name: 'Express', version: allDeps.express, type: 'backend' });
+          if (allDeps.fastify) technologies.set('Fastify', { name: 'Fastify', version: allDeps.fastify, type: 'backend' });
+          if (allDeps['@nestjs/core']) technologies.set('NestJS', { name: 'NestJS', type: 'backend' });
+          if (allDeps.mongodb || allDeps.mongoose) technologies.set('MongoDB', { name: 'MongoDB', type: 'database' });
+          if (allDeps.pg || allDeps['@supabase/supabase-js']) technologies.set('Supabase', { name: 'Supabase/PostgreSQL', type: 'database' });
+          if (allDeps.mysql || allDeps.mysql2) technologies.set('MySQL', { name: 'MySQL', type: 'database' });
+          if (allDeps.redis || allDeps['redis']) technologies.set('Redis', { name: 'Redis', type: 'cache' });
+          if (allDeps.elasticsearch || allDeps['@elastic/elasticsearch']) technologies.set('Elasticsearch', { name: 'Elasticsearch', type: 'search' });
+          
+          // AI/ML libraries
+          if (allDeps['@anthropic-ai/sdk']) technologies.set('Anthropic Claude', { name: 'Anthropic Claude', type: 'ai' });
+          if (allDeps['openai']) technologies.set('OpenAI', { name: 'OpenAI', type: 'ai' });
+          
+          // State management
+          if (allDeps['redux'] || allDeps['@reduxjs/toolkit']) technologies.set('Redux', { name: 'Redux', type: 'state-management' });
+          if (allDeps['zustand']) technologies.set('Zustand', { name: 'Zustand', type: 'state-management' });
+          
+          // Testing
+          if (allDeps['jest']) technologies.set('Jest', { name: 'Jest', type: 'testing' });
+          if (allDeps['vitest']) technologies.set('Vitest', { name: 'Vitest', type: 'testing' });
+          
+          // Integration platforms
+          if (allDeps['@slack/bolt'] || allDeps['@slack/web-api']) technologies.set('Slack', { name: 'Slack Integration', type: 'integration' });
+          if (allDeps['@microsoft/microsoft-graph-client']) technologies.set('Microsoft 365', { name: 'Microsoft 365', type: 'integration' });
+          if (allDeps['jira-client']) technologies.set('Jira', { name: 'Jira Integration', type: 'integration' });
+          
+          return pkgContent.name || null;
+        } catch (e) {
+          this.logger.warn('Failed to parse package.json', { path, error: e.message });
+          return null;
+        }
+      };
+
+      // Check root package.json
+      const rootPackageJson = contents.find(f => f.name === 'package.json');
+      if (rootPackageJson) {
+        await analyzePackageJson('package.json');
+      }
+
+      // Scan subdirectories for more package.json files (monorepo detection)
+      const dirs = contents.filter(f => f.type === 'dir');
+      const subdirScans = dirs.map(async (dir) => {
+        try {
+          const { data: subContents } = await octokit.repos.getContent({
+            owner,
+            repo,
+            path: dir.path
+          });
+          
+          const subPackageJson = Array.isArray(subContents) ? subContents.find(f => f.name === 'package.json') : null;
+          if (subPackageJson) {
+            const pkgName = await analyzePackageJson(`${dir.path}/package.json`);
+            
+            // Create component entry
+            const name = dir.name.toLowerCase();
+            let type = 'service';
+            if (['frontend', 'client', 'web', 'ui', 'renderer', 'app'].some(n => name.includes(n))) {
+              type = 'frontend';
+            } else if (['backend', 'server', 'api', 'service', 'main'].some(n => name.includes(n))) {
+              type = 'backend';
+            } else if (['core', 'lib', 'shared', 'common'].some(n => name.includes(n))) {
+              type = 'library';
+            } else if (['desktop', 'electron'].some(n => name.includes(n))) {
+              type = 'desktop';
+            } else if (['database', 'db', 'data'].some(n => name.includes(n))) {
+              type = 'database';
+            }
+            
+            components.push({ 
+              name: pkgName || dir.name, 
+              path: dir.path, 
+              type,
+              displayName: dir.name
+            });
+          }
+        } catch (e) {
+          // Directory might not be accessible or too large
+          this.logger.debug('Could not scan subdirectory', { path: dir.path, error: e.message });
+        }
+      });
+      
+      // Wait for all subdirectory scans (with timeout)
+      await Promise.race([
+        Promise.allSettled(subdirScans),
+        new Promise(resolve => setTimeout(resolve, 5000)) // 5 second timeout
+      ]);
+
+      // Check for requirements.txt (Python)
+      const requirementsTxt = contents.find(f => f.name === 'requirements.txt');
+      if (requirementsTxt) {
+        technologies.set('Python', { name: 'Python', type: 'backend' });
+      }
+
+      // Check for Pipfile (Python)
+      const pipfile = contents.find(f => f.name === 'Pipfile');
+      if (pipfile) {
+        technologies.set('Python', { name: 'Python', type: 'backend' });
+      }
+
+      // Check for pom.xml or build.gradle (Java)
+      if (contents.find(f => f.name === 'pom.xml' || f.name === 'build.gradle')) {
+        technologies.set('Java', { name: 'Java', type: 'backend' });
+      }
+
+      // Check for go.mod (Go)
+      if (contents.find(f => f.name === 'go.mod')) {
+        technologies.set('Go', { name: 'Go', type: 'backend' });
+      }
+
+      // Check for Gemfile (Ruby)
+      if (contents.find(f => f.name === 'Gemfile')) {
+        technologies.set('Ruby', { name: 'Ruby', type: 'backend' });
+      }
+
+      // Check for composer.json (PHP)
+      if (contents.find(f => f.name === 'composer.json')) {
+        technologies.set('PHP', { name: 'PHP', type: 'backend' });
+      }
+
+      // Check for Dockerfile
+      if (contents.find(f => f.name === 'Dockerfile' || f.name.includes('docker'))) {
+        technologies.set('Docker', { name: 'Docker', type: 'infrastructure' });
+      }
+
+      // Check for docker-compose
+      if (contents.find(f => f.name === 'docker-compose.yml' || f.name === 'docker-compose.yaml')) {
+        technologies.set('Docker Compose', { name: 'Docker Compose', type: 'infrastructure' });
+      }
+
+      // Check for kubernetes
+      if (contents.find(f => f.name.includes('k8s') || f.name.includes('kubernetes'))) {
+        technologies.set('Kubernetes', { name: 'Kubernetes', type: 'infrastructure' });
+      }
+
+      // Convert Map to Array
+      const technologiesArray = Array.from(technologies.values());
+
+      // Analyze connections between components
+      const connections = this._inferConnections(components, technologiesArray);
+
+      this.logger.info('Architecture analysis complete', {
+        owner,
+        repo,
+        technologiesFound: technologiesArray.length,
+        componentsFound: components.length,
+        connectionsFound: connections.length
+      });
+
+      return {
+        repository: `${owner}/${repo}`,
+        branch,
+        technologies: technologiesArray,
+        components,
+        connections,
+        analyzedAt: new Date().toISOString()
+      };
+
+    } catch (error) {
+      this.logger.error('Architecture analysis failed', {
+        error: error.message,
+        repository
+      });
+      throw error;
     }
   }
 }

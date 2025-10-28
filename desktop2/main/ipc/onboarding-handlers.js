@@ -72,10 +72,10 @@ function registerOnboardingHandlers(services, logger) {
       }
 
       // Validate role
-      if (!['sales', 'developer'].includes(role)) {
+      if (!['sales', 'developer', 'admin', 'unit_lead', 'team_lead'].includes(role)) {
         return {
           success: false,
-          error: 'Invalid role. Must be "sales" or "developer"'
+          error: 'Invalid role. Must be "sales", "developer", "admin", "unit_lead", or "team_lead"'
         };
       }
 
@@ -236,10 +236,10 @@ function registerOnboardingHandlers(services, logger) {
       }
 
       // Validate role
-      if (!['sales', 'developer', 'admin'].includes(role)) {
+      if (!['sales', 'developer', 'admin', 'unit_lead', 'team_lead'].includes(role)) {
         return {
           success: false,
-          error: 'Invalid role. Must be "sales", "developer", or "admin"'
+          error: 'Invalid role. Must be "sales", "developer", "admin", "unit_lead", or "team_lead"'
         };
       }
 

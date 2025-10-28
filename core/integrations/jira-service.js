@@ -32,6 +32,13 @@ class JIRAService extends EventEmitter {
         'read:jira-work',
         'write:jira-work',
         'read:jira-user',
+        'read:space:confluence',
+        'read:content:confluence',
+        'read:space-details:confluence',
+        'read:content.metadata:confluence',
+        'write:content:confluence',
+        'write:page:confluence',
+        'write:space:confluence',
         'offline_access'
       ],
       logLevel: options.logLevel || 'info',

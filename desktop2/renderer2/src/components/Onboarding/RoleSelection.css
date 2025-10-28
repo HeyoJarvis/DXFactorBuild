@@ -38,7 +38,7 @@
 }
 
 .role-selection-container {
-  max-width: 960px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   padding: 64px 48px;
@@ -66,7 +66,7 @@
 .role-header {
   text-align: left;
   width: 100%;
-  max-width: 800px;
+  max-width: 1100px;
   margin-bottom: 48px;
   color: white;
   flex-shrink: 0;
@@ -93,10 +93,10 @@
 
 .role-cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
   width: 100%;
-  max-width: 800px;
+  max-width: 1100px;
   flex-shrink: 0;
 }
 
@@ -104,7 +104,7 @@
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(12px);
   border-radius: 16px;
-  padding: 48px 36px;
+  padding: 36px 28px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -114,7 +114,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
   overflow: hidden;
-  min-height: 380px;
+  min-height: 340px;
   pointer-events: auto !important;
 }
 
@@ -157,8 +157,8 @@
 }
 
 .role-icon {
-  font-size: 72px;
-  margin-bottom: 24px;
+  font-size: 56px;
+  margin-bottom: 20px;
   filter: drop-shadow(0 4px 16px rgba(168, 85, 247, 0.4));
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -184,9 +184,9 @@
 }
 
 .role-name {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 600;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
   color: #FFFFFF;
   letter-spacing: -0.02em;
   position: relative;
@@ -194,10 +194,10 @@
 }
 
 .role-description {
-  font-size: 16px;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
-  margin: 0 0 24px 0;
+  line-height: 1.5;
+  margin: 0 0 20px 0;
   position: relative;
   z-index: 1;
 }
@@ -213,12 +213,12 @@
 }
 
 .role-features li {
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 10px;
-  padding-left: 24px;
+  margin-bottom: 8px;
+  padding-left: 22px;
   position: relative;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .role-features li::before {
@@ -273,7 +273,7 @@
   flex-shrink: 0;
   pointer-events: auto !important;
   width: 100%;
-  max-width: 800px;
+  max-width: 1100px;
 }
 
 .continue-button {

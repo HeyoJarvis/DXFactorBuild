@@ -115,7 +115,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     indexRepository: (params) => ipcRenderer.invoke('codeIndexer:indexRepository', params),
     getIndexingStatus: (params) => ipcRenderer.invoke('codeIndexer:getIndexingStatus', params),
     getStatus: () => ipcRenderer.invoke('codeIndexer:getStatus'),
-    checkAvailability: () => ipcRenderer.invoke('codeIndexer:checkAvailability')
+    checkAvailability: () => ipcRenderer.invoke('codeIndexer:checkAvailability'),
+    analyzeArchitecture: (params) => ipcRenderer.invoke('codeIndexer:analyzeArchitecture', params)
   },
 
   // JIRA APIs
@@ -130,6 +131,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     healthCheck: () => ipcRenderer.invoke('jira:healthCheck')
   },
 
+  // Confluence APIs (uses JIRA OAuth)
+  confluence: {
+    checkConnection: () => ipcRenderer.invoke('confluence:checkConnection'),
+    getSpaces: () => ipcRenderer.invoke('confluence:getSpaces'),
+    createPage: (params) => ipcRenderer.invoke('confluence:createPage', params),
+    updatePage: (params) => ipcRenderer.invoke('confluence:updatePage', params),
+    searchPages: (params) => ipcRenderer.invoke('confluence:searchPages', params),
+    getPage: (params) => ipcRenderer.invoke('confluence:getPage', params)
+  },
+
   // Slack APIs
   slack: {
     getRecentMessages: (limit) => ipcRenderer.invoke('slack:getRecentMessages', limit),
@@ -141,6 +152,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   microsoft: {
     checkConnection: () => ipcRenderer.invoke('microsoft:checkConnection'),
     authenticate: () => ipcRenderer.invoke('microsoft:authenticate'),
+    disconnect: () => ipcRenderer.invoke('microsoft:disconnect'),
     createEvent: (eventData) => ipcRenderer.invoke('microsoft:createEvent', eventData),
     sendEmail: (emailData) => ipcRenderer.invoke('microsoft:sendEmail', emailData),
     getUpcomingEvents: (options) => ipcRenderer.invoke('microsoft:getUpcomingEvents', options),
@@ -156,6 +168,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   google: {
     checkConnection: () => ipcRenderer.invoke('google:checkConnection'),
     authenticate: () => ipcRenderer.invoke('google:authenticate'),
+    disconnect: () => ipcRenderer.invoke('google:disconnect'),
     createEvent: (eventData) => ipcRenderer.invoke('google:createEvent', eventData),
     sendEmail: (emailData) => ipcRenderer.invoke('google:sendEmail', emailData),
     getUpcomingEvents: (options) => ipcRenderer.invoke('google:getUpcomingEvents', options),
@@ -186,7 +199,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     loadTeams: () => ipcRenderer.invoke('team-chat:load-teams'),
     loadTeamContext: (teamId) => ipcRenderer.invoke('team-chat:load-team-context', teamId),
     getHistory: (teamId) => ipcRenderer.invoke('team-chat:get-history', teamId),
-    sendMessage: (teamId, message) => ipcRenderer.invoke('team-chat:send-message', teamId, message),
+    sendMessage: (teamId, message, chatContext) => ipcRenderer.invoke('team-chat:send-message', teamId, message, chatContext),
     saveContextSettings: (teamId, settings) => ipcRenderer.invoke('team-chat:save-context-settings', teamId, settings),
     addRepositoryToTeam: (teamId, owner, name, branch, url) => ipcRenderer.invoke('team-chat:add-repository-to-team', teamId, owner, name, branch, url),
     getUpcomingMeetings: (teamId) => ipcRenderer.invoke('team-chat:get-upcoming-meetings', teamId)
@@ -195,7 +208,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // AI APIs
   ai: {
     generateEmailDraft: (prompt) => ipcRenderer.invoke('ai:generateEmailDraft', prompt)
-  }
+  },
+
+    // Admin APIs
+    admin: {
+      createOrUpdateTeam: (teamData) => ipcRenderer.invoke('admin:createOrUpdateTeam', teamData),
+      deleteTeam: (teamId) => ipcRenderer.invoke('admin:deleteTeam', teamId),
+      getAllTeams: () => ipcRenderer.invoke('admin:getAllTeams'),
+      // User management
+      getAllUsers: () => ipcRenderer.invoke('admin:getAllUsers'),
+      getUserTeams: (userId) => ipcRenderer.invoke('admin:getUserTeams', userId),
+      addUserToTeam: (userId, teamId) => ipcRenderer.invoke('admin:addUserToTeam', userId, teamId),
+      removeUserFromTeam: (userId, teamId) => ipcRenderer.invoke('admin:removeUserFromTeam', userId, teamId),
+      updateUserRole: (userId, newRole, leadTeamIds) => ipcRenderer.invoke('admin:updateUserRole', userId, newRole, leadTeamIds),
+      getUserLeadTeams: (userId) => ipcRenderer.invoke('admin:getUserLeadTeams', userId),
+      getTeamMembers: (teamId) => ipcRenderer.invoke('admin:getTeamMembers', teamId),
+      // Capabilities
+      getCapabilities: () => ipcRenderer.invoke('admin:getCapabilities')
+    }
 });
 
 // Log that preload is loaded

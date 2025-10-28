@@ -263,31 +263,30 @@ export default function LoginFlow({ onLoginSuccess }) {
   // ROLE SELECTION HANDLERS
   // ============================================
 
-  const handleSelectRole = async (role) => {
+  const handleSelectRole = (role) => {
     setSelectedRole(role);
+  };
+
+  const handleContinueWithRole = async () => {
+    if (!selectedRole) return;
 
     // Save role to backend and complete onboarding
     try {
-      console.log(`🎯 Saving role: ${role}`);
+      console.log(`🎯 Saving role: ${selectedRole}`);
 
       if (window.electronAPI?.onboarding?.saveRole) {
-        const result = await window.electronAPI.onboarding.saveRole(role);
+        const result = await window.electronAPI.onboarding.saveRole(selectedRole);
 
         if (result.success) {
-          console.log(`✅ Role saved: ${role}, user:`, result.user);
+          console.log(`✅ Role saved: ${selectedRole}, user:`, result.user);
 
-          // Immediately change flow state to hide role selection
-          setFlowState(FLOW_STATES.SUCCESS);
+          // Mark onboarding as complete
+          if (window.electronAPI?.onboarding?.complete) {
+            await window.electronAPI.onboarding.complete();
+          }
 
-          // Small delay before showing animation
-          setTimeout(() => {
-            setShowMorphAnimation(true);
-          }, 100);
-
-          // Wait for animation to complete (3.2s)
-          setTimeout(async () => {
-            await handleOpenMissionControl();
-          }, 3300);
+          // Go straight to Mission Control
+          await handleOpenMissionControl();
         } else {
           throw new Error(result.error || 'Failed to save role');
         }
@@ -613,6 +612,38 @@ export default function LoginFlow({ onLoginSuccess }) {
         </div>
 
         <div
+          className={`login-flow-workspace-item ${selectedRole === 'unit_lead' ? 'selected' : ''}`}
+          onClick={() => handleSelectRole('unit_lead')}
+          role="radio"
+          aria-checked={selectedRole === 'unit_lead'}
+          tabIndex={0}
+        >
+          <div className="login-flow-workspace-info">
+            <div className="login-flow-workspace-name">Unit Lead</div>
+            <div className="login-flow-workspace-meta">
+              Manage team members within your units
+            </div>
+          </div>
+          <span className="login-flow-workspace-badge">Management</span>
+        </div>
+
+        <div
+          className={`login-flow-workspace-item ${selectedRole === 'team_lead' ? 'selected' : ''}`}
+          onClick={() => handleSelectRole('team_lead')}
+          role="radio"
+          aria-checked={selectedRole === 'team_lead'}
+          tabIndex={0}
+        >
+          <div className="login-flow-workspace-info">
+            <div className="login-flow-workspace-name">Team Lead</div>
+            <div className="login-flow-workspace-meta">
+              Create and manage teams within your department
+            </div>
+          </div>
+          <span className="login-flow-workspace-badge">Management</span>
+        </div>
+
+        <div
           className={`login-flow-workspace-item ${selectedRole === 'admin' ? 'selected' : ''}`}
           onClick={() => handleSelectRole('admin')}
           role="radio"
@@ -627,6 +658,17 @@ export default function LoginFlow({ onLoginSuccess }) {
           </div>
           <span className="login-flow-workspace-badge">Admin</span>
         </div>
+      </div>
+
+      <div className="login-flow-button-group-horizontal login-flow-mt-lg">
+        <button
+          className="login-flow-button login-flow-button-primary"
+          onClick={handleContinueWithRole}
+          disabled={!selectedRole}
+        >
+          <span className="button-shimmer"></span>
+          Continue
+        </button>
       </div>
 
       <p className="login-flow-caption login-flow-text-center login-flow-mt-md">

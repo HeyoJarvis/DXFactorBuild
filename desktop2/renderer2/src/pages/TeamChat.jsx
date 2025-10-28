@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import './TeamChat.css';
 
-export default function TeamChat({ user, selectedTeam }) {
+export default function TeamChat({ user, selectedTeam, departmentMode = false }) {
   // selectedTeam now comes from MissionControl dropdown - just react to it changing
+  // departmentMode = true when chatting at the department level with all units
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,13 +37,23 @@ export default function TeamChat({ user, selectedTeam }) {
   // Load chat history when selectedTeam changes from parent (MissionControl dropdown)
   useEffect(() => {
     if (selectedTeam?.id) {
-      console.log('💬 TeamChat: Loading chat for team', selectedTeam.name, '(ID:', selectedTeam.id, ')');
-      loadChatHistory(selectedTeam.id);
+      // For department mode, don't load history yet (backend needs to be updated)
+      if (departmentMode || selectedTeam.isDepartment) {
+        console.log('💬 Department Chat: Starting fresh conversation for', selectedTeam.name);
+        console.log('💬 Department object:', selectedTeam);
+        console.log('💬 Units in department:', selectedTeam.units);
+        console.log('💬 Unit IDs:', selectedTeam.units?.map(u => ({ id: u.id, name: u.name })));
+        setMessages([]);
+        setIsLoading(false);
+      } else {
+        console.log('💬 TeamChat: Loading chat for team', selectedTeam.name, '(ID:', selectedTeam.id, ')');
+        loadChatHistory(selectedTeam.id);
+      }
     } else {
       // Clear messages if no team selected
       setMessages([]);
     }
-  }, [selectedTeam?.id]); // React to selectedTeam.id changes
+  }, [selectedTeam?.id, departmentMode]); // React to selectedTeam.id and departmentMode changes
 
   const loadChatHistory = async (teamId) => {
     try {
@@ -153,9 +164,25 @@ export default function TeamChat({ user, selectedTeam }) {
 
       console.log('💬 Sending message to team:', selectedTeam.name, '(ID:', selectedTeam.id, ')');
 
+      // For department mode, pass department info with all unit IDs
+      const chatContext = departmentMode || selectedTeam.isDepartment ? {
+        isDepartment: true,
+        departmentName: selectedTeam.name,
+        unitIds: selectedTeam.units?.map(u => u.id) || []
+      } : null;
+
+      console.log('💬 Department Chat Context:', {
+        isDepartment: chatContext?.isDepartment,
+        departmentName: chatContext?.departmentName,
+        unitCount: selectedTeam.units?.length,
+        unitIds: chatContext?.unitIds,
+        selectedTeam: selectedTeam
+      });
+
       const result = await window.electronAPI.teamChat.sendMessage(
         selectedTeam.id,
-        userMessage
+        userMessage,
+        chatContext
       );
 
       if (result.success) {
@@ -296,9 +323,14 @@ export default function TeamChat({ user, selectedTeam }) {
       {/* Header */}
       <div className="team-chat-header">
         <div className="team-chat-header-left">
-          <h1 className="team-chat-title">Team Chat</h1>
+          <h1 className="team-chat-title">
+            {departmentMode ? 'Department Chat' : 'Team Chat'}
+          </h1>
           <p className="team-chat-subtitle">
-            Context-aware conversations powered by team knowledge
+            {departmentMode 
+              ? `Chat with context from all units in ${selectedTeam?.name || 'this department'}`
+              : 'Context-aware conversations powered by team knowledge'
+            }
           </p>
         </div>
 
@@ -334,24 +366,46 @@ export default function TeamChat({ user, selectedTeam }) {
                     </div>
 
                     <div className="welcome-chat-section">
-                      <div className="welcome-chat-prompt">What would you like to discuss with {selectedTeam.name}?</div>
+                      <div className="welcome-chat-prompt">
+                        {departmentMode 
+                          ? `What would you like to discuss about the ${selectedTeam.name} department?`
+                          : `What would you like to discuss with ${selectedTeam.name}?`
+                        }
+                      </div>
                     </div>
 
                     <div className="welcome-context-items">
-                      <div className="welcome-context-card">
-                        <div className="context-check">✓</div>
-                        <div className="context-label">Recent team meetings and discussions</div>
-                      </div>
-
-                      <div className="welcome-context-card">
-                        <div className="context-check">✓</div>
-                        <div className="context-label">JIRA tickets assigned to this team</div>
-                      </div>
-
-                      <div className="welcome-context-card">
-                        <div className="context-check">✓</div>
-                        <div className="context-label">Codebase files related to your projects</div>
-                      </div>
+                      {departmentMode ? (
+                        <>
+                          <div className="welcome-context-card">
+                            <div className="context-check">✓</div>
+                            <div className="context-label">All units in {selectedTeam.name} ({selectedTeam.units?.length || 0} teams)</div>
+                          </div>
+                          <div className="welcome-context-card">
+                            <div className="context-check">✓</div>
+                            <div className="context-label">Cross-team meetings and department-wide discussions</div>
+                          </div>
+                          <div className="welcome-context-card">
+                            <div className="context-check">✓</div>
+                            <div className="context-label">Department-wide JIRA tickets and shared projects</div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="welcome-context-card">
+                            <div className="context-check">✓</div>
+                            <div className="context-label">Recent team meetings and discussions</div>
+                          </div>
+                          <div className="welcome-context-card">
+                            <div className="context-check">✓</div>
+                            <div className="context-label">JIRA tickets assigned to this team</div>
+                          </div>
+                          <div className="welcome-context-card">
+                            <div className="context-check">✓</div>
+                            <div className="context-label">Codebase files related to your projects</div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
@@ -405,7 +459,10 @@ export default function TeamChat({ user, selectedTeam }) {
                 <input
                   type="text"
                   className="team-chat-input"
-                  placeholder={`Message ${selectedTeam.name}...`}
+                  placeholder={departmentMode 
+                    ? `Ask about ${selectedTeam.name} department...`
+                    : `Message ${selectedTeam.name}...`
+                  }
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   disabled={isSending}

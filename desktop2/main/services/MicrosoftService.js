@@ -102,6 +102,20 @@ class MicrosoftService extends EventEmitter {
   }
 
   /**
+   * Disconnect and clear Microsoft service
+   */
+  disconnect() {
+    this.logger.info('Disconnecting Microsoft service');
+    
+    // Clear all service state
+    this.graphService = null;
+    this.oauthHandler = null;
+    this.isInitialized = false;
+    
+    this.logger.info('Microsoft service disconnected');
+  }
+
+  /**
    * Save tokens to Supabase
    */
   async saveTokens(userId, tokens) {

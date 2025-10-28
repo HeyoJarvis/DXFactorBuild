@@ -7,6 +7,8 @@ import ModeToggle from '../components/MissionControl/ModeToggle';
 import GroupedActionList from '../components/Tasks/GroupedActionList';
 import TaskChat from '../components/Tasks/TaskChat';
 import TeamChat from './TeamChat';
+import TeamSelection from '../components/Teams/TeamSelection';
+import UnitSelection from '../components/Teams/UnitSelection';
 import TeamContext from '../components/Teams/TeamContext';
 import CalendarEmail from '../components/MissionControl/CalendarEmail';
 import MissionControlLoader from '../components/LoadingScreen/MissionControlLoader';
@@ -30,10 +32,12 @@ export default function MissionControl({ user }) {
     return localStorage.getItem('missionControlMode') || 'personal';
   });
 
-  // Team state for team mode
-  const [teams, setTeams] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState(null);
+  // Team state for team mode (two-level hierarchy)
+  const [teams, setTeams] = useState([]); // All units loaded from DB
+  const [selectedTeam, setSelectedTeam] = useState(null); // Department/big team (grouped units)
+  const [selectedUnit, setSelectedUnit] = useState(null); // Actual working unit
   const [teamsLoading, setTeamsLoading] = useState(false);
+  const [departmentChatMode, setDepartmentChatMode] = useState(false); // Department-level chat mode
 
   // Selected task for Personal mode chat
   const [selectedTask, setSelectedTask] = useState(null);
@@ -140,40 +144,52 @@ export default function MissionControl({ user }) {
     localStorage.setItem('missionControlMode', mode);
     const newParams = new URLSearchParams(searchParams);
     newParams.set('mode', mode);
-    if (mode === 'team' && selectedTeam) {
-      newParams.set('teamId', selectedTeam.id);
+    if (mode === 'team' && selectedUnit) {
+      newParams.set('unitId', selectedUnit.id);
+      if (selectedTeam) {
+        newParams.set('team', selectedTeam.name);
+      }
     } else {
-      newParams.delete('teamId');
+      newParams.delete('unitId');
+      newParams.delete('team');
     }
     setSearchParams(newParams, { replace: true });
-  }, [mode, selectedTeam]);
+  }, [mode, selectedUnit, selectedTeam]);
 
-  // Try to restore selected team from URL or localStorage
+  // Try to restore selected unit from URL or localStorage
+  // BUT don't auto-select - let user choose from selection screens
   useEffect(() => {
-    if (mode === 'team' && teams.length > 0 && !selectedTeam) {
-      const urlTeamId = searchParams.get('teamId');
-      const savedTeamId = localStorage.getItem('missionControlTeamId');
-      const teamId = urlTeamId || savedTeamId;
+    if (mode === 'team' && teams.length > 0 && !selectedUnit) {
+      const urlUnitId = searchParams.get('unitId');
+      const savedUnitId = localStorage.getItem('missionControlUnitId');
+      const unitId = urlUnitId || savedUnitId;
 
-      if (teamId) {
-        const team = teams.find(t => t.id === teamId);
-        if (team) {
-          setSelectedTeam(team);
+      if (unitId) {
+        const unit = teams.find(t => t.id === unitId);
+        if (unit) {
+          setSelectedUnit(unit);
+          // Also restore the team/department
+          const dept = unit.department || 'General';
+          const teamGroup = {
+            name: dept,
+            description: `${dept} department teams and units`,
+            units: teams.filter(t => (t.department || 'General') === dept)
+          };
+          setSelectedTeam(teamGroup);
           return;
         }
       }
 
-      // Default to first team
-      setSelectedTeam(teams[0]);
+      // DON'T auto-select - show TeamSelection instead
     }
   }, [mode, teams]);
 
-  // Persist selected team
+  // Persist selected unit
   useEffect(() => {
-    if (selectedTeam) {
-      localStorage.setItem('missionControlTeamId', selectedTeam.id);
+    if (selectedUnit) {
+      localStorage.setItem('missionControlUnitId', selectedUnit.id);
     }
-  }, [selectedTeam]);
+  }, [selectedUnit]);
 
   // Load teams from database
   const loadTeams = async () => {
@@ -203,9 +219,40 @@ export default function MissionControl({ user }) {
     setMode(newMode);
   };
 
-  // Handle team change
+  // Handle team/department selection (first level)
   const handleTeamChange = (team) => {
     setSelectedTeam(team);
+    setSelectedUnit(null); // Reset unit when team changes
+    setDepartmentChatMode(false); // Exit department chat mode
+  };
+
+  // Handle unit selection (second level)
+  const handleUnitChange = (unit) => {
+    setSelectedUnit(unit);
+    setDepartmentChatMode(false); // Exit department chat mode
+  };
+
+  // Handle department chat button click
+  const handleDepartmentChat = (department) => {
+    setSelectedTeam(department);
+    setSelectedUnit(null);
+    setDepartmentChatMode(true); // Enter department chat mode
+    setMode('team'); // Ensure we're in team mode
+  };
+
+  // Handle back to team selection (from unit selection)
+  const handleBackToTeamSelection = () => {
+    setSelectedTeam(null);
+    setSelectedUnit(null);
+    setDepartmentChatMode(false);
+    localStorage.removeItem('missionControlUnitId');
+  };
+
+  // Handle back to unit selection (from workspace)
+  const handleBackToUnitSelection = () => {
+    setSelectedUnit(null);
+    setDepartmentChatMode(false);
+    localStorage.removeItem('missionControlUnitId');
   };
 
   // Task filtering and search state
@@ -268,13 +315,44 @@ export default function MissionControl({ user }) {
         mode={mode}
         onModeChange={handleModeChange}
         selectedTeam={selectedTeam}
+        selectedUnit={selectedUnit}
         onTeamChange={handleTeamChange}
+        onBackToTeamSelection={handleBackToTeamSelection}
+        onBackToUnitSelection={handleBackToUnitSelection}
         teams={teams}
         loading={teamsLoading}
         panelVisibility={panelVisibility}
         onTogglePanel={handleTogglePanel}
       />
 
+      {/* Three-level selection flow for team mode */}
+      {mode === 'team' && !selectedTeam ? (
+        // Level 1: Show departments/big teams
+        <TeamSelection 
+          teams={teams} 
+          loading={teamsLoading}
+          onTeamSelect={handleTeamChange}
+          onDepartmentChat={handleDepartmentChat}
+        />
+      ) : mode === 'team' && selectedTeam && departmentChatMode ? (
+        // Department Chat Mode: Show chat with all units context
+        <div className="department-chat-container">
+          <TeamChat 
+            user={user} 
+            selectedTeam={selectedTeam}
+            departmentMode={true}
+          />
+        </div>
+      ) : mode === 'team' && selectedTeam && !selectedUnit ? (
+        // Level 2: Show units within selected team
+        <UnitSelection
+          selectedTeam={selectedTeam}
+          onUnitSelect={handleUnitChange}
+          onBack={handleBackToTeamSelection}
+        />
+      ) : (
+        // Level 3: Show workspace panels
+        <>
       {/* 3-Panel Grid Layout */}
       <div 
         className="mission-control-grid"
@@ -346,9 +424,9 @@ export default function MissionControl({ user }) {
               )}
             </div>
           ) : (
-            // Team Mode: Team context (meetings, tasks, code)
+            // Team Mode: Unit context (meetings, tasks, code)
             <div className="team-context-panel">
-              <TeamContext selectedTeam={selectedTeam} />
+              <TeamContext selectedTeam={selectedUnit} />
             </div>
           )}
 
@@ -376,8 +454,8 @@ export default function MissionControl({ user }) {
               <Dashboard user={user} />
             )
           ) : (
-            // Team Mode: Team-wide chat with shared context
-            <TeamChat user={user} selectedTeam={selectedTeam} />
+            // Team Mode: Unit-wide chat with shared context
+            <TeamChat user={user} selectedTeam={selectedUnit} />
           )}
         </div>
         )}
@@ -407,6 +485,8 @@ export default function MissionControl({ user }) {
         </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -16,7 +16,7 @@ function registerJIRAHandlers(services, logger) {
     clientId: process.env.JIRA_CLIENT_ID,
     clientSecret: process.env.JIRA_CLIENT_SECRET,
     redirectUri: process.env.JIRA_REDIRECT_URI || 'http://localhost:8892/auth/jira/callback',
-    port: 8892, // JIRA uses port 8892
+    port: 8894, // JIRA uses port 8894
     logger
   });
 

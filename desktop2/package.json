@@ -19,6 +19,9 @@
   "dependencies": {
     "@heyjarvis/core": "file:../core",
     "@heyjarvis/data": "file:../data",
+    "@octokit/app": "^16.1.1",
+    "@octokit/auth-app": "^8.1.1",
+    "@octokit/rest": "^22.0.0",
     "@slack/bolt": "^4.4.0",
     "@slack/web-api": "^7.10.0",
     "axios": "^1.6.7",
@@ -65,16 +68,25 @@
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "assets/icon.icns",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
       "icon": "assets/icon.ico",
-      "target": ["nsis", "portable"]
+      "target": [
+        "nsis",
+        "portable"
+      ]
     },
     "linux": {
       "icon": "assets/icon.png",
       "category": "Office",
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "executableName": "heyjarvis",
       "synopsis": "AI-powered competitive intelligence platform",
       "description": "HeyJarvis Desktop - Your AI assistant for competitive intelligence and workflow automation",

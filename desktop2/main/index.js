@@ -31,9 +31,11 @@ const registerSystemHandlers = require('./ipc/system-handlers');
 const registerWindowHandlers = require('./ipc/window-handlers');
 const registerArcReactorHandlers = require('./ipc/arc-reactor-handlers');
 const registerJIRAHandlers = require('./ipc/jira-handlers');
+const { registerConfluenceHandlers } = require('./ipc/confluence-handlers');
 const registerMissionControlHandlers = require('./ipc/mission-control-handlers');
 const registerOnboardingHandlers = require('./ipc/onboarding-handlers');
 const registerTeamHandlers = require('./ipc/team-handlers');
+const registerAdminHandlers = require('./ipc/admin-handlers');
 const CodeIndexerHandlers = require('./ipc/code-indexer-handlers');
 
 // Setup logger (console only at startup, file transport added after app ready)
@@ -524,6 +526,7 @@ async function initializeServices() {
     const JIRAService = require('./services/JIRAService');
     const GoogleService = require('./services/GoogleService');
     const MicrosoftService = require('./services/MicrosoftService');
+    const GitHubService = require('./services/GitHubService');
     
     appState.services.jira = new JIRAService({ 
       logger, 
@@ -538,6 +541,19 @@ async function initializeServices() {
     appState.services.microsoft = new MicrosoftService({
       logger,
       supabaseAdapter: appState.services.dbAdapter
+    });
+    
+    appState.services.github = new GitHubService({
+      logger,
+      supabaseAdapter: appState.services.dbAdapter
+    });
+    
+    logger.info('✅ Integration services created', {
+      serviceKeys: Object.keys(appState.services),
+      hasGithub: !!appState.services.github,
+      hasJira: !!appState.services.jira,
+      hasGoogle: !!appState.services.google,
+      hasMicrosoft: !!appState.services.microsoft
     });
 
     // Start core services
@@ -623,12 +639,14 @@ function setupIPC() {
   registerWindowHandlers(appState.windows, logger);
   registerArcReactorHandlers(appState.services, logger);
   registerJIRAHandlers(appState.services, logger);
+  registerConfluenceHandlers(appState.services, logger);
   registerMissionControlHandlers(appState.services, logger);
   registerOnboardingHandlers(appState.services, logger);
   registerTeamHandlers(appState.services, logger);
+  registerAdminHandlers(appState.services, logger);
 
   // Setup code indexer handlers
-  const codeIndexerHandlers = new CodeIndexerHandlers(logger);
+  const codeIndexerHandlers = new CodeIndexerHandlers(logger, appState.services);
   codeIndexerHandlers.setup();
 
   logger.info('IPC handlers registered');

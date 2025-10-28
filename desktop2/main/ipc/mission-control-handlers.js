@@ -245,6 +245,64 @@ function registerMissionControlHandlers(services, logger) {
   });
 
   /**
+   * Disconnect Microsoft
+   */
+  ipcMain.handle('microsoft:disconnect', async () => {
+    try {
+      logger.info('🔵 Microsoft disconnect requested');
+      
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      logger.info('Removing Microsoft tokens from database', { userId });
+
+      // Remove Microsoft tokens from Supabase
+      const { data: currentUser } = await services.dbAdapter.supabase
+        .from('users')
+        .select('integration_settings')
+        .eq('id', userId)
+        .single();
+
+      const integrationSettings = currentUser?.integration_settings || {};
+      const hadMicrosoft = !!integrationSettings.microsoft;
+      delete integrationSettings.microsoft;
+
+      await services.dbAdapter.supabase
+        .from('users')
+        .update({ integration_settings: integrationSettings })
+        .eq('id', userId);
+
+      logger.info('Microsoft tokens removed from database', { userId, hadMicrosoft });
+
+      // Clear Microsoft service instance using the service's disconnect method
+      const microsoftService = services.microsoft;
+      if (microsoftService) {
+        logger.info('Calling Microsoft service disconnect method');
+        microsoftService.disconnect();
+        logger.info('Microsoft service disconnect method completed');
+      } else {
+        logger.warn('Microsoft service not found in services object');
+      }
+
+      logger.info('✅ Microsoft disconnected successfully', { userId });
+
+      return {
+        success: true
+      };
+
+    } catch (error) {
+      logger.error('❌ Microsoft disconnect error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
    * Create Microsoft calendar event
    */
   ipcMain.handle('microsoft:createEvent', async (_event, eventData) => {
@@ -612,6 +670,64 @@ function registerMissionControlHandlers(services, logger) {
 
     } catch (error) {
       logger.error('Google authentication error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Disconnect Google
+   */
+  ipcMain.handle('google:disconnect', async () => {
+    try {
+      logger.info('🔴 Google disconnect requested');
+      
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      logger.info('Removing Google tokens from database', { userId });
+
+      // Remove Google tokens from Supabase
+      const { data: currentUser } = await services.dbAdapter.supabase
+        .from('users')
+        .select('integration_settings')
+        .eq('id', userId)
+        .single();
+
+      const integrationSettings = currentUser?.integration_settings || {};
+      const hadGoogle = !!integrationSettings.google;
+      delete integrationSettings.google;
+
+      await services.dbAdapter.supabase
+        .from('users')
+        .update({ integration_settings: integrationSettings })
+        .eq('id', userId);
+
+      logger.info('Google tokens removed from database', { userId, hadGoogle });
+
+      // Clear Google service instance using the service's disconnect method
+      const googleService = services.google;
+      if (googleService) {
+        logger.info('Calling Google service disconnect method');
+        googleService.disconnect();
+        logger.info('Google service disconnect method completed');
+      } else {
+        logger.warn('Google service not found in services object');
+      }
+
+      logger.info('✅ Google disconnected successfully', { userId });
+
+      return {
+        success: true
+      };
+
+    } catch (error) {
+      logger.error('❌ Google disconnect error:', error);
       return {
         success: false,
         error: error.message

@@ -173,6 +173,161 @@
   transform: translateX(-2px);
 }
 
+/* Team Badge (when team is selected) */
+.team-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.12));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000000;
+  white-space: nowrap;
+  flex-shrink: 0;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-badge svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: #3b82f6;
+}
+
+/* Team Change Button */
+.team-change-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 8px;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-app-region: no-drag;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 2px 6px rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.team-change-button:hover {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: scale(1.02);
+}
+
+.team-change-button svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: #3b82f6;
+}
+
+/* Team Selection Hint */
+.team-selection-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  font-style: italic;
+  white-space: nowrap;
+  flex-shrink: 0;
+  animation: pulseHint 2s ease-in-out infinite;
+}
+
+@keyframes pulseHint {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.team-selection-hint svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+}
+
+/* Breadcrumb Navigation */
+.team-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  -webkit-app-region: no-drag;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 500px;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  background: transparent;
+  border: none;
+  cursor: default;
+  transition: all 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.breadcrumb-item.clickable {
+  cursor: pointer;
+}
+
+.breadcrumb-item.clickable:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.breadcrumb-item svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: #3b82f6;
+}
+
+.breadcrumb-separator {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: #cbd5e1;
+}
+
 /* Team Selector */
 .team-selector {
   display: flex;
@@ -220,6 +375,53 @@
   font-size: 13px;
   color: #64748b;
   font-style: italic;
+}
+
+/* Admin Button */
+.mode-admin-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-app-region: no-drag;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.mode-admin-button:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+  transform: scale(1.08);
+}
+
+.mode-admin-button svg {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  width: 18px;
+  height: 18px;
+}
+
+.mode-admin-button:hover svg {
+  animation: layerPulse 0.6s ease-in-out;
+}
+
+@keyframes layerPulse {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  33% {
+    transform: translateY(-2px);
+  }
+  66% {
+    transform: translateY(2px);
+  }
 }
 
 /* Settings Button */
