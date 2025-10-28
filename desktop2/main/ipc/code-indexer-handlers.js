@@ -251,6 +251,93 @@ class CodeIndexerHandlers {
       return this.setup.codeIndexer.getStatus(event);
     });
 
+    // Analyze repository architecture
+    ipcMain.handle('codeIndexer:analyzeArchitecture', async (_event, params) => {
+      try {
+        const { owner, repo, branch = 'main', path = '' } = params;
+
+        if (!owner || !repo) {
+          throw new Error('Owner and repo are required');
+        }
+
+        this.logger.info('🏗️ Analyzing repository architecture', {
+          owner,
+          repo,
+          branch,
+          path: path || '(root)'
+        });
+
+        // Try using API first, fall back to direct GitHub access
+        try {
+          const response = await fetch(`${this.API_BASE_URL}/api/engineering/analyze-architecture`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              owner,
+              repo,
+              branch,
+              path: path || ''
+            }),
+            timeout: 5000
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            this.logger.info('✅ Architecture analysis complete (via API)', {
+              repository: `${owner}/${repo}`,
+              path: path || '(root)',
+              componentsFound: data.components?.length || 0
+            });
+
+            return {
+              success: true,
+              ...data
+            };
+          }
+        } catch (apiError) {
+          this.logger.warn('⚠️ API call failed, using direct GitHub access', {
+            error: apiError.message
+          });
+        }
+
+        // Fallback: Use GitHub API directly through engineering intelligence service
+        const EngineeringIntelligenceService = require('../../../core/intelligence/engineering-intelligence-service');
+        const engineeringService = new EngineeringIntelligenceService({
+          logLevel: 'info'
+        });
+
+        const data = await engineeringService.analyzeArchitecture({
+          owner,
+          repo,
+          branch,
+          path: path || ''
+        });
+
+        this.logger.info('✅ Architecture analysis complete (direct)', {
+          repository: `${owner}/${repo}`,
+          path: path || '(root)',
+          componentsFound: data.components?.length || 0
+        });
+
+        return {
+          success: true,
+          ...data
+        };
+
+      } catch (error) {
+        this.logger.error('❌ Failed to analyze architecture', {
+          error: error.message
+        });
+
+        return {
+          success: false,
+          error: error.message
+        };
+      }
+    });
+
     // Index a repository
     ipcMain.handle('codeIndexer:indexRepository', async (event, params) => {
       try {

@@ -115,7 +115,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     indexRepository: (params) => ipcRenderer.invoke('codeIndexer:indexRepository', params),
     getIndexingStatus: (params) => ipcRenderer.invoke('codeIndexer:getIndexingStatus', params),
     getStatus: () => ipcRenderer.invoke('codeIndexer:getStatus'),
-    checkAvailability: () => ipcRenderer.invoke('codeIndexer:checkAvailability')
+    checkAvailability: () => ipcRenderer.invoke('codeIndexer:checkAvailability'),
+    analyzeArchitecture: (params) => ipcRenderer.invoke('codeIndexer:analyzeArchitecture', params)
   },
 
   // JIRA APIs
@@ -128,6 +129,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     updateIssue: (issueKey, updateData) => ipcRenderer.invoke('jira:updateIssue', issueKey, updateData),
     transitionIssue: (issueKey, transitionName) => ipcRenderer.invoke('jira:transitionIssue', issueKey, transitionName),
     healthCheck: () => ipcRenderer.invoke('jira:healthCheck')
+  },
+
+  // Confluence APIs (uses JIRA OAuth)
+  confluence: {
+    checkConnection: () => ipcRenderer.invoke('confluence:checkConnection'),
+    getSpaces: () => ipcRenderer.invoke('confluence:getSpaces'),
+    createPage: (params) => ipcRenderer.invoke('confluence:createPage', params),
+    updatePage: (params) => ipcRenderer.invoke('confluence:updatePage', params),
+    searchPages: (params) => ipcRenderer.invoke('confluence:searchPages', params),
+    getPage: (params) => ipcRenderer.invoke('confluence:getPage', params)
   },
 
   // Slack APIs
