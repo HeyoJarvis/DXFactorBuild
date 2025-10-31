@@ -9,6 +9,7 @@ import MissionControl from './pages/MissionControl';
 import TeamChat from './pages/TeamChat';
 import Settings from './pages/Settings';
 import Admin from './pages/Admin';
+import UserProductivityChat from './pages/UserProductivityChat';
 import Login from './pages/Login';
 import LoginFlow from './pages/LoginFlow';
 import DiagnosticMicrosoft from './pages/DiagnosticMicrosoft';
@@ -307,6 +308,7 @@ function App() {
           <Route path="/team-chat" element={<TeamChat user={currentUser} />} />
           <Route path="/settings" element={<Settings user={currentUser} />} />
           <Route path="/admin" element={<Admin user={currentUser} />} />
+          <Route path="/user-productivity-chat/:userId" element={<UserProductivityChat user={currentUser} />} />
           <Route path="/diagnostic-microsoft" element={<DiagnosticMicrosoft />} />
         </Routes>
       </div>

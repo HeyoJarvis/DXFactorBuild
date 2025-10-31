@@ -27,6 +27,7 @@ const registerChatHandlers = require('./ipc/chat-handlers');
 const registerTaskHandlers = require('./ipc/task-handlers');
 const registerTaskChatHandlers = require('./ipc/task-chat-handlers');
 const registerTeamChatHandlers = require('./ipc/team-chat-handlers');
+const registerUserChatHandlers = require('./ipc/user-chat-handlers');
 const registerSystemHandlers = require('./ipc/system-handlers');
 const registerWindowHandlers = require('./ipc/window-handlers');
 const registerArcReactorHandlers = require('./ipc/arc-reactor-handlers');
@@ -635,6 +636,7 @@ function setupIPC() {
   registerTaskHandlers(appState.services, logger);
   registerTaskChatHandlers(appState.services, logger);
   registerTeamChatHandlers(appState.services, logger);
+  registerUserChatHandlers(appState.services, logger);
   registerSystemHandlers(appState.services, logger);
   registerWindowHandlers(appState.windows, logger);
   registerArcReactorHandlers(appState.services, logger);

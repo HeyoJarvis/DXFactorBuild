@@ -230,6 +230,11 @@ export default function Admin({ user }) {
     setShowUserTeamsModal(true);
   };
 
+  const handleOpenUserChat = (user) => {
+    // Navigate to user productivity chat page
+    navigate(`/user-productivity-chat/${user.id}`);
+  };
+
   const handleChangeRole = async (user) => {
     setSelectedUser(user);
     setSelectedRole(user.user_role);
@@ -881,6 +886,15 @@ export default function Admin({ user }) {
                           <line x1="9" y1="3" x2="9" y2="21"></line>
                         </svg>
                         Manage Teams
+                      </button>
+                      <button 
+                        className="user-chat-button" 
+                        onClick={() => handleOpenUserChat(user)}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Productivity Chat
                       </button>
                       {capabilities?.isAdmin && (
                         <button 

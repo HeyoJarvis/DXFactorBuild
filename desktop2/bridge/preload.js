@@ -206,6 +206,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getUpcomingMeetings: (teamId) => ipcRenderer.invoke('team-chat:get-upcoming-meetings', teamId)
   },
 
+  // User Productivity Chat APIs
+  userChat: {
+    getUserInfo: (userId) => ipcRenderer.invoke('user-chat:get-user-info', userId),
+    loadContext: (userId) => ipcRenderer.invoke('user-chat:load-context', userId),
+    getHistory: (userId) => ipcRenderer.invoke('user-chat:get-history', userId),
+    sendMessage: (userId, message) => ipcRenderer.invoke('user-chat:send-message', userId, message)
+  },
+
   // AI APIs
   ai: {
     generateEmailDraft: (prompt) => ipcRenderer.invoke('ai:generateEmailDraft', prompt)

@@ -921,7 +921,7 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
 
           // Count files for this specific repository (default to main branch)
           const { count, error: countError } = await dbAdapter.supabase
-            .from('code_embeddings')
+            .from('code_chunks')
             .select('*', { count: 'exact', head: true })
             .eq('repository_owner', teamRepo.repository_owner)
             .eq('repository_name', teamRepo.repository_name)
@@ -952,7 +952,7 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
         logger.info('No team-specific repos, loading all indexed repositories');
 
         const { data: codeFiles, error: codeError } = await dbAdapter.supabase
-          .from('code_embeddings')
+          .from('code_chunks')
           .select('repository_owner, repository_name, repository_branch')
           .limit(1000);
 
