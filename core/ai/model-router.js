@@ -57,27 +57,27 @@ class ModelRouter extends EventEmitter {
     this.routingRules = {
       code_query: { 
         provider: 'anthropic', 
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20240620',
         fallback: []
       },
       ticket_classification: { 
         provider: 'anthropic', 
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20240620',
         fallback: []
       },
       documentation: { 
         provider: 'anthropic', 
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20240620',
         fallback: []
       },
       sprint_summary: { 
         provider: 'anthropic', 
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20240620',
         fallback: []
       },
       general: { 
         provider: 'anthropic', 
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20240620',
         fallback: []
       }
     };
@@ -269,7 +269,7 @@ class ModelRouter extends EventEmitter {
       const systemPrompt = context.systemPrompt || this._buildSystemPrompt(context);
 
       const response = await this.providers.anthropic.client.messages.create({
-        model: model || 'claude-3-5-sonnet-20241022',
+        model: model || 'claude-3-haiku-20240307',
         max_tokens: context.maxTokens || 4096,
         temperature: context.temperature || 0.7,
         system: systemPrompt,

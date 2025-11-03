@@ -522,7 +522,7 @@ export default function TeamContext({ selectedTeam, onContextChange }) {
               ) : (
                 <div className="context-empty-state">
                   <div className="context-empty-message">
-                    No repositories indexed yet
+                    No repositories found in your GitHub account
                   </div>
                   <button className="add-repo-button primary" onClick={handleIndexMoreRepositories}>
                     Index Your First Repository

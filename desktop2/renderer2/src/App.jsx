@@ -280,12 +280,20 @@ function App() {
   if (isOrbWindow) {
     return (
       <div className="app app-collapsed">
-        {showOrb && (
+        <div 
+          style={{ 
+            display: showOrb ? 'block' : 'none',
+            pointerEvents: showOrb ? 'auto' : 'none',
+            visibility: showOrb ? 'visible' : 'hidden',
+            position: 'absolute',
+            inset: 0
+          }}
+        >
           <ArcReactor
             isCollapsed={true}
             onNavigate={handleArcReactorNavigate}
           />
-        )}
+        </div>
       </div>
     );
   }

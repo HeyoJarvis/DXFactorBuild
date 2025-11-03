@@ -326,6 +326,69 @@
   border: 1px solid rgba(52, 199, 89, 0.15);
 }
 
+.repo-status.indexing {
+  background: rgba(0, 122, 255, 0.1);
+  color: #007aff;
+  border: 1px solid rgba(0, 122, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.repo-status.not-indexed-badge {
+  background: rgba(255, 149, 0, 0.1);
+  color: #ff9500;
+  border: 1px solid rgba(255, 149, 0, 0.15);
+}
+
+.repo-card.not-indexed {
+  opacity: 0.7;
+  border-style: dashed;
+}
+
+.repo-card.not-indexed:hover {
+  opacity: 1;
+  border-style: solid;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 245, 235, 0.5) 100%);
+  border-color: rgba(255, 149, 0, 0.2);
+}
+
+.repo-card.indexing {
+  opacity: 0.6;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(230, 240, 255, 0.8) 100%);
+  border-color: rgba(0, 122, 255, 0.3);
+  border-style: solid;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.checkbox-placeholder {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.spinner-tiny {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(0, 122, 255, 0.25);
+  border-top-color: #007aff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
 .context-empty-message {
   padding: 20px;
   text-align: center;

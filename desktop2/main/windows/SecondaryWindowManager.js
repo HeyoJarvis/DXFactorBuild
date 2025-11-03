@@ -84,11 +84,18 @@ class SecondaryWindowManager {
       this.window.maximize();
       this.logger.info('Secondary window maximized');
       
-      // Setup maximum visibility (same as Arc Reactor)
-      this.setupMaximumVisibility();
+      // NOTE: Secondary window should behave like a NORMAL desktop window
+      // - NOT always-on-top (removed setupMaximumVisibility and setupEnhancedAlwaysOnTop)
+      // - Can be closed with traffic lights
+      // - Can be minimized
+      // - Stays on the desktop/workspace it was opened on
+      // - Doesn't float above everything
+      this.logger.info('Secondary window configured as normal desktop window (not always-on-top)');
       
-      // Setup enhanced always-on-top behavior (same as Arc Reactor)
-      this.setupEnhancedAlwaysOnTop();
+      // Hide the orb when secondary window opens
+      if (this.mainWindowManager) {
+        this.mainWindowManager.setOrbVisibility(false);
+      }
       
       // Emit window state change event (secondary window is open)
       if (this.ipcMain) {
@@ -108,35 +115,138 @@ class SecondaryWindowManager {
       // }
     });
 
-    // Handle window close
+    // Handle window close - ACTUALLY close the window (don't prevent default)
+    this.window.on('close', () => {
+      this.logger.info('Secondary window closing (user clicked traffic lights or close button)');
+      
+      // Clean up always-on-top interval if it exists
+      if (this.alwaysOnTopInterval) {
+        clearInterval(this.alwaysOnTopInterval);
+        this.alwaysOnTopInterval = null;
+        this.logger.info('Cleared always-on-top interval');
+      }
+      
+      // Make orb visible and clickable again
+      if (this.mainWindowManager) {
+        this.mainWindowManager.setOrbVisibility(true);
+        this.mainWindowManager.show();
+        this.logger.info('Main window shown when secondary window closed');
+      }
+      
+      // Emit window state change event (secondary window is closed)
+      if (this.ipcMain) {
+        this.ipcMain.emit('window:secondaryWindowChange', false, null);
+        this.logger.info('Emitted secondary window close event');
+      }
+      
+      // Also send to main window renderer if available
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', false, null);
+        this.logger.info('Sent secondary window close event to main window renderer');
+      }
+    });
+
+    // Handle window closed (after close completes)
     this.window.on('closed', () => {
-      this.logger.info('Secondary window closed');
+      this.logger.info('Secondary window closed (destroyed)');
       this.window = null;
     });
 
-    // Prevent window from being destroyed, just hide it
-    this.window.on('close', (e) => {
-      if (this.window) {
-        e.preventDefault();
-        this.window.hide();
-        
-        // Emit window state change event (secondary window is closed)
-        if (this.ipcMain) {
-          this.ipcMain.emit('window:secondaryWindowChange', false, null);
-          this.logger.info('Emitted secondary window close event');
-        }
-        
-        // Also send to main window renderer if available
-        if (this.mainWindowManager?.getWindow()?.webContents) {
-          this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', false, null);
-          this.logger.info('Sent secondary window close event to main window renderer');
-        }
-        
-        // Show the main window (Arc Reactor) when secondary window closes
-        if (this.mainWindowManager) {
-          this.mainWindowManager.show();
-          this.logger.info('Main window shown when secondary window closed');
-        }
+    // Handle window blur (user switched to different window/screen)
+    this.window.on('blur', () => {
+      this.logger.info('Secondary window lost focus (user switched away)');
+      
+      // Make orb visible and clickable
+      if (this.mainWindowManager) {
+        this.mainWindowManager.setOrbVisibility(true);
+      }
+      
+      // Notify main window that user switched away - show orb
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', false, null);
+        this.logger.info('Sent secondary window blur event to main window renderer (show orb)');
+      }
+    });
+
+    // Handle window focus (user switched back to this window)
+    this.window.on('focus', () => {
+      this.logger.info('Secondary window gained focus (user switched back)');
+      
+      // Make orb invisible and non-clickable
+      if (this.mainWindowManager) {
+        this.mainWindowManager.setOrbVisibility(false);
+      }
+      
+      // Notify main window that user is back - hide orb
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', true, this.currentRoute);
+        this.logger.info('Sent secondary window focus event to main window renderer (hide orb)');
+      }
+    });
+
+    // Handle window minimize
+    this.window.on('minimize', () => {
+      this.logger.info('Secondary window minimized');
+      
+      // Make orb visible and clickable
+      if (this.mainWindowManager) {
+        this.mainWindowManager.setOrbVisibility(true);
+      }
+      
+      // Show orb when minimized
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', false, null);
+        this.logger.info('Sent secondary window minimize event to main window renderer (show orb)');
+      }
+    });
+
+    // Handle window restore (from minimize)
+    this.window.on('restore', () => {
+      this.logger.info('Secondary window restored from minimize');
+      
+      // Make orb invisible and non-clickable
+      if (this.mainWindowManager) {
+        this.mainWindowManager.setOrbVisibility(false);
+      }
+      
+      // Hide orb when restored
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', true, this.currentRoute);
+        this.logger.info('Sent secondary window restore event to main window renderer (hide orb)');
+      }
+    });
+
+    // Handle entering fullscreen
+    this.window.on('enter-full-screen', () => {
+      this.logger.info('Secondary window entered fullscreen');
+      
+      // Make orb invisible and non-clickable
+      if (this.mainWindowManager) {
+        this.mainWindowManager.setOrbVisibility(false);
+      }
+      
+      // Hide orb when in fullscreen
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', true, this.currentRoute);
+        this.logger.info('Sent secondary window fullscreen event to main window renderer (hide orb)');
+      }
+    });
+
+    // Handle leaving fullscreen
+    this.window.on('leave-full-screen', () => {
+      this.logger.info('Secondary window left fullscreen');
+      
+      // Check if window still has focus - if yes, keep orb hidden; if no, show orb
+      const hasFocus = this.window && this.window.isFocused();
+      
+      // Update orb visibility based on focus
+      if (this.mainWindowManager) {
+        this.mainWindowManager.setOrbVisibility(!hasFocus);
+      }
+      
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', hasFocus, hasFocus ? this.currentRoute : null);
+        this.logger.info(`Sent secondary window leave-fullscreen event to main window renderer (orb ${hasFocus ? 'hidden' : 'visible'})`);
       }
     });
 
@@ -145,92 +255,17 @@ class SecondaryWindowManager {
   }
 
   /**
-   * Setup maximum visibility (copied from MainWindowManager)
+   * NOTE: setupMaximumVisibility() and setupEnhancedAlwaysOnTop() have been REMOVED
+   * 
+   * The secondary window should behave like a NORMAL desktop window:
+   * - NOT always-on-top
+   * - Can be closed with traffic lights (macOS) or X button (Windows)
+   * - Can be minimized
+   * - Stays on the desktop/workspace it was opened on
+   * - Doesn't float above everything
+   * 
+   * Only the main window (Arc Reactor orb) should have always-on-top behavior.
    */
-  setupMaximumVisibility() {
-    if (!this.window || this.window.isDestroyed()) return;
-    
-    this.logger.info('Setting up maximum visibility for secondary window');
-    
-    // Set to screen-saver level (highest visibility level)
-    this.window.setAlwaysOnTop(true, 'screen-saver');
-    this.window.moveTop();
-    
-    // For macOS, set additional flags
-    if (process.platform === 'darwin') {
-      try {
-        this.window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-        this.logger.info('macOS: Set visible on all workspaces with fullscreen visibility');
-      } catch (error) {
-        this.logger.warn('Some macOS-specific features unavailable:', error.message);
-      }
-    }
-    
-    // For Windows, set topmost flag
-    if (process.platform === 'win32') {
-      this.window.setAlwaysOnTop(true, 'pop-up-menu');
-    }
-    
-    this.logger.info('Maximum visibility configured');
-  }
-
-  /**
-   * Enhanced always-on-top behavior (copied from MainWindowManager)
-   */
-  setupEnhancedAlwaysOnTop() {
-    if (!this.window || this.window.isDestroyed()) return;
-    
-    this.logger.info('Setting up enhanced always-on-top for secondary window');
-    
-    // Aggressively maintain always-on-top status
-    const maintainAlwaysOnTop = () => {
-      if (this.window && !this.window.isDestroyed()) {
-        this.window.setAlwaysOnTop(true, 'screen-saver');
-        
-        // CRITICAL: Ensure mouse events stay enabled (this is NOT the Arc Reactor orb)
-        this.window.setIgnoreMouseEvents(false);
-        
-        // Additional visibility enforcement
-        if (this.window.isVisible() && !this.window.isFocused()) {
-          setTimeout(() => {
-            if (this.window && !this.window.isDestroyed()) {
-              this.window.moveTop();
-            }
-          }, 50);
-        }
-      }
-    };
-    
-    // Run every 5 seconds to maintain visibility
-    this.alwaysOnTopInterval = setInterval(maintainAlwaysOnTop, 5000);
-    
-    // Handle window events
-    this.window.on('blur', () => {
-      setTimeout(() => {
-        if (this.window && !this.window.isDestroyed()) {
-          this.window.setAlwaysOnTop(true, 'screen-saver');
-          this.window.setIgnoreMouseEvents(false); // Keep clickable
-          this.window.moveTop();
-        }
-      }, 100);
-    });
-
-    this.window.on('focus', () => {
-      if (this.window && !this.window.isDestroyed()) {
-        this.window.setAlwaysOnTop(true, 'screen-saver');
-        this.window.setIgnoreMouseEvents(false); // Keep clickable
-      }
-    });
-    
-    // Clean up interval on window destroy
-    this.window.on('closed', () => {
-      if (this.alwaysOnTopInterval) {
-        clearInterval(this.alwaysOnTopInterval);
-      }
-    });
-    
-    this.logger.info('Enhanced always-on-top configured');
-  }
 
   /**
    * Navigate to a different route in the secondary window
@@ -268,6 +303,12 @@ class SecondaryWindowManager {
     
     this.window.focus();
     this.logger.info('Secondary window shown and maximized with mouse events enabled');
+    
+    // Notify main window that secondary is now visible and focused - hide orb
+    if (this.mainWindowManager?.getWindow()?.webContents) {
+      this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', true, this.currentRoute);
+      this.logger.info('Sent secondary window show event to main window renderer (hide orb)');
+    }
   }
 
   /**
@@ -277,6 +318,12 @@ class SecondaryWindowManager {
     if (this.window) {
       this.window.hide();
       this.logger.info('Secondary window hidden');
+      
+      // Notify main window that secondary is hidden - show orb
+      if (this.mainWindowManager?.getWindow()?.webContents) {
+        this.mainWindowManager.getWindow().webContents.send('window:secondaryWindowChange', false, null);
+        this.logger.info('Sent secondary window hide event to main window renderer (show orb)');
+      }
     }
   }
 

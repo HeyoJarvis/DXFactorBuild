@@ -331,6 +331,33 @@ class MainWindowManager {
   }
 
   /**
+   * Control always-on-top behavior (for hiding orb when secondary window is active)
+   */
+  setOrbVisibility(shouldBeVisible) {
+    if (!this.window || this.window.isDestroyed()) return;
+    
+    if (shouldBeVisible) {
+      // Make orb visible and clickable
+      this.window.setIgnoreMouseEvents(false);
+      this.window.setAlwaysOnTop(true, 'screen-saver');
+      this.window.setOpacity(1);
+      console.log('👁️ Orb set to VISIBLE (clickable, always-on-top enabled)');
+      this.logger.info('Orb visibility enabled');
+    } else {
+      // Make orb completely non-interactive but keep it alive in background
+      // 1. Disable always-on-top so it goes behind other windows
+      this.window.setAlwaysOnTop(false);
+      // 2. Make window completely transparent (invisible but still exists)
+      this.window.setOpacity(0);
+      // 3. Ignore ALL mouse events (clicks pass through to windows behind)
+      this.window.setIgnoreMouseEvents(true, { forward: true });
+      // DON'T hide() - that causes focus issues. Just make it transparent and non-interactive.
+      console.log('👁️ Orb set to HIDDEN (transparent, non-clickable, behind other windows)');
+      this.logger.info('Orb visibility disabled');
+    }
+  }
+
+  /**
    * Position window on the current screen (where cursor is) - DISABLED to preserve user positioning
    */
   positionOnCurrentScreen() {

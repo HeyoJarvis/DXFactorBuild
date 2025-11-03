@@ -19,7 +19,7 @@ class CodeChunker {
     this.options = {
       logLevel: options.logLevel || 'info',
       minChunkSize: options.minChunkSize || 100, // tokens
-      maxChunkSize: options.maxChunkSize || 1000, // tokens
+      maxChunkSize: options.maxChunkSize || 500, // tokens (reduced from 1000 to stay well under 8192 limit)
       overlapSize: options.overlapSize || 50, // tokens
       ...options
     };

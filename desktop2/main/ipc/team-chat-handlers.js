@@ -913,7 +913,7 @@ async function buildTeamContext(teamId, userId, dbAdapter, logger) {
       if (!teamReposError && teamRepos && teamRepos.length > 0) {
         logger.info('Loading team-specific repositories', { count: teamRepos.length });
 
-        // For each team repo, get file counts from code_embeddings
+        // For each team repo, get file counts from code_chunks
         const repoMap = new Map();
 
         for (const teamRepo of teamRepos) {

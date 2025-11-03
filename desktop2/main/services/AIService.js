@@ -85,7 +85,7 @@ class AIService {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-3-haiku-20240307',
+          model: 'claude-3-haiku-20240307',  // Fast, universally available model
           max_tokens: 4096,
           system: systemPrompt,
           messages: this.conversationHistory.slice(-10).map(msg => ({
@@ -96,7 +96,20 @@ class AIService {
       });
 
       if (!response.ok) {
-        throw new Error(`Claude API error: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || response.statusText;
+        const errorType = errorData.error?.type || 'unknown';
+        
+        this.logger.error('Claude API error', {
+          status: response.status,
+          statusText: response.statusText,
+          errorType,
+          errorMessage,
+          hasApiKey: !!this.apiKey,
+          apiKeyPrefix: this.apiKey ? this.apiKey.substring(0, 10) + '...' : 'none'
+        });
+        
+        throw new Error(`Claude API error (${response.status}): ${errorMessage}`);
       }
 
       const data = await response.json();

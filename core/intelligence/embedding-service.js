@@ -160,6 +160,27 @@ class EmbeddingService {
    * @param {Array<string>} texts - Array of texts to embed
    * @returns {Promise<Array>} Array of embedding vectors
    */
+  /**
+   * Truncate text to stay within token limit
+   * @private
+   */
+  _truncateText(text, maxTokens = 8000) {
+    // Rough estimate: 4 chars per token
+    const maxChars = maxTokens * 4;
+    if (text.length <= maxChars) {
+      return text;
+    }
+    
+    this.logger.warn('Text exceeds token limit, truncating', {
+      originalLength: text.length,
+      truncatedLength: maxChars,
+      estimatedOriginalTokens: Math.ceil(text.length / 4),
+      maxTokens
+    });
+    
+    return text.substring(0, maxChars);
+  }
+
   async generateEmbeddings(texts) {
     this.logger.info('Generating embeddings in batches', {
       totalTexts: texts.length,
@@ -169,18 +190,20 @@ class EmbeddingService {
     const embeddings = [];
     const startTime = Date.now();
 
-    // Check cache first
+    // Check cache first and truncate texts that are too long
     const uncachedTexts = [];
     const uncachedIndices = [];
 
     for (let i = 0; i < texts.length; i++) {
-      const cacheKey = this._getCacheKey(texts[i]);
+      // Truncate text if it's too long (safety check)
+      const truncatedText = this._truncateText(texts[i]);
+      const cacheKey = this._getCacheKey(truncatedText);
       
       if (this.embeddingCache.has(cacheKey)) {
         embeddings[i] = this.embeddingCache.get(cacheKey);
         this.stats.cacheHits++;
       } else {
-        uncachedTexts.push(texts[i]);
+        uncachedTexts.push(truncatedText);
         uncachedIndices.push(i);
       }
     }
