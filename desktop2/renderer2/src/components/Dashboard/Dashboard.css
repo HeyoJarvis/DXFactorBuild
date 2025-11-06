@@ -134,6 +134,34 @@
 }
 
 
+/* Add Widget Button */
+.add-widget-button {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  padding: 12px 24px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.add-widget-button:hover {
+  background: #2563eb;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.add-widget-button:active {
+  transform: translateY(0);
+}
+
 /* Widgets Container */
 .widgets-container {
   position: absolute;

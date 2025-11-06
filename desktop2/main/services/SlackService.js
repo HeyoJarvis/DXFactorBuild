@@ -14,6 +14,7 @@ class SlackService extends EventEmitter {
     this.app = null;
     this.isInitialized = false;
     this.recentMessages = [];
+    this.userCache = new Map(); // Cache for Slack user info
     this.botToken = process.env.SLACK_BOT_TOKEN;
     this.signingSecret = process.env.SLACK_SIGNING_SECRET;
     this.appToken = process.env.SLACK_APP_TOKEN;
@@ -60,20 +61,26 @@ class SlackService extends EventEmitter {
     // Handle mentions
     this.app.event('app_mention', async ({ event }) => {
       try {
+        // Fetch user info to get real name
+        const userInfo = await this.getUserInfo(event.user);
+
         const message = {
           id: `mention_${Date.now()}`,
           type: 'mention',
           user: event.user,
+          user_name: userInfo?.name || event.user,
+          user_real_name: userInfo?.real_name || null,
+          user_display_name: userInfo?.display_name || null,
           channel: event.channel,
           text: event.text,
           timestamp: new Date(event.ts * 1000),
           urgent: event.text.toLowerCase().includes('urgent'),
           raw: event
         };
-        
+
         this.addMessage(message);
         this.emit('mention', message);
-        
+
         // Auto-detect task from mention
         this.detectAndCreateTask(message);
       } catch (error) {
@@ -85,21 +92,38 @@ class SlackService extends EventEmitter {
     this.app.message(async ({ message }) => {
       try {
         // Skip bot messages
-        if (message.subtype === 'bot_message' || message.bot_id) return;
+        if (message.subtype === 'bot_message' || message.bot_id) {
+          this.logger.debug('Skipping bot message');
+          return;
+        }
+
+        // Fetch user info to get real name
+        const userInfo = await this.getUserInfo(message.user);
 
         const msg = {
           id: `msg_${Date.now()}`,
           type: 'message',
           user: message.user,
+          user_name: userInfo?.name || message.user,
+          user_real_name: userInfo?.real_name || null,
+          user_display_name: userInfo?.display_name || null,
           channel: message.channel,
           text: message.text,
           timestamp: new Date(message.ts * 1000),
           raw: message
         };
-        
+
+        this.logger.info('📨 Slack message received', {
+          user: msg.user,
+          real_name: msg.user_real_name,
+          channel: msg.channel,
+          text: msg.text?.substring(0, 50),
+          cacheSize: this.recentMessages.length
+        });
+
         this.addMessage(msg);
         this.emit('message', msg);
-        
+
         // Auto-detect task from message
         this.detectAndCreateTask(msg);
       } catch (error) {
@@ -133,10 +157,11 @@ class SlackService extends EventEmitter {
       
       // Check for imperative action verbs (NEW - matches workflow-analyzer.js)
       const imperativeVerbs = ['schedule', 'set up', 'setup', 'create', 'send', 'draft', 'write',
-                               'call', 'email', 'contact', 'reach out', 'review', 'analyze', 
+                               'call', 'email', 'contact', 'reach out', 'review', 'analyze',
                                'check', 'update', 'complete', 'prepare', 'organize', 'coordinate',
                                'arrange', 'follow up', 'followup', 'respond', 'reply', 'book',
-                               'reserve', 'confirm', 'finalize', 'meeting', 'connect'];
+                               'reserve', 'confirm', 'finalize', 'meeting', 'connect', 'get started',
+                               'start', 'begin', 'work on', 'build', 'implement', 'fix', 'debug'];
       const hasImperativeVerb = imperativeVerbs.some(verb => {
         // Check if message starts with verb (after removing mention)
         const textWithoutMention = text.replace(/<@[uw]\w+(\|\w+)?>/gi, '').trim();
@@ -145,7 +170,7 @@ class SlackService extends EventEmitter {
       
       // Check if mention is immediately followed by imperative verb
       // Pattern: @user schedule, @user send, etc.
-      const mentionImperativePattern = /<@[uw]\w+(?:\|\w+)?>\s+(schedule|set up|setup|create|send|draft|write|call|email|contact|reach out|review|analyze|check|update|complete|prepare|organize|coordinate|arrange|follow up|followup|respond|reply|book|reserve|confirm|finalize|meeting)/i;
+      const mentionImperativePattern = /<@[uw]\w+(?:\|\w+)?>\s+(schedule|set up|setup|create|send|draft|write|call|email|contact|reach out|review|analyze|check|update|complete|prepare|organize|coordinate|arrange|follow up|followup|respond|reply|book|reserve|confirm|finalize|meeting|get started|start|begin|work on|build|implement|fix|debug)/i;
       const hasMentionWithImperative = mentionImperativePattern.test(originalText);
       
       // Task detection: polite keywords OR imperative verbs OR mention+imperative
@@ -198,7 +223,10 @@ class SlackService extends EventEmitter {
       if (isCalendarAction) workType = 'calendar';
       else if (isOutreachAction) workType = 'outreach';
       
-      // Create task data
+      // Create task data with Slack metadata
+      const messageId = message.raw?.ts || message.timestamp?.getTime?.() || Date.now();
+      const channelId = message.channel;
+
       const taskData = {
         title,
         priority,
@@ -208,7 +236,11 @@ class SlackService extends EventEmitter {
         assignee: mentions[0] || null, // Who the task is assigned to (first mentioned user)
         mentionedUsers: mentions, // All mentioned users
         workType: workType,
-        routeTo: shouldRouteToMissionControl ? 'mission-control' : 'tasks-sales'
+        routeTo: shouldRouteToMissionControl ? 'mission-control' : 'tasks-sales',
+        externalSource: 'slack',
+        externalId: `slack_${channelId}_${messageId}`,
+        externalKey: messageId,
+        externalUrl: channelId ? `slack://channel?team=&id=${channelId}` : null
       };
       
       // Emit event for task creation (main process will handle it)
@@ -254,12 +286,61 @@ class SlackService extends EventEmitter {
     const mentions = [];
     const mentionRegex = /<@([UW][A-Z0-9]+)(\|[^>]+)?>/g;
     let match;
-    
+
     while ((match = mentionRegex.exec(text)) !== null) {
       mentions.push(match[1]);
     }
-    
+
     return mentions;
+  }
+
+  /**
+   * Get Slack user info (with caching)
+   */
+  async getUserInfo(userId) {
+    if (!this.isInitialized || !this.app) {
+      return null;
+    }
+
+    // Check cache first
+    if (this.userCache.has(userId)) {
+      return this.userCache.get(userId);
+    }
+
+    try {
+      const result = await this.app.client.users.info({
+        token: this.botToken,
+        user: userId
+      });
+
+      if (result.ok && result.user) {
+        const userInfo = {
+          id: result.user.id,
+          name: result.user.name,
+          real_name: result.user.real_name,
+          display_name: result.user.profile?.display_name || result.user.real_name,
+          email: result.user.profile?.email,
+          image: result.user.profile?.image_72
+        };
+
+        // Cache it
+        this.userCache.set(userId, userInfo);
+
+        this.logger.debug('Fetched Slack user info', {
+          userId,
+          name: userInfo.real_name
+        });
+
+        return userInfo;
+      }
+    } catch (error) {
+      this.logger.error('Failed to fetch Slack user info', {
+        userId,
+        error: error.message
+      });
+    }
+
+    return null;
   }
 
   /**

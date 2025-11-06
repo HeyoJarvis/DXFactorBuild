@@ -1,0 +1,313 @@
+.jira-task-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 80px;
+}
+
+/* Navigation Buttons */
+.carousel-nav-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #e2e8f0;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.carousel-nav-btn:hover:not(:disabled) {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.carousel-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Cards Container */
+.carousel-cards-container {
+  position: relative;
+  flex: 1;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+}
+
+/* Individual Card Wrapper - 3 cards at FULL SIZE, clearly readable */
+.carousel-card-wrapper {
+  position: absolute;
+  width: 380px;
+  height: 280px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+  margin-left: -190px; /* Half of width to center */
+  margin-top: -140px; /* Half of height to center */
+}
+
+/* 3 cards side-by-side with NO overlap - 440px spacing */
+.carousel-card-wrapper:nth-child(1) {
+  transform: translateX(-660px) scale(0.65) !important;
+  opacity: 0.2 !important;
+  z-index: 0 !important;
+  pointer-events: none; /* Can't click on background cards */
+}
+
+.carousel-card-wrapper:nth-child(2) {
+  transform: translateX(-440px) scale(1) !important;
+  opacity: 1 !important;
+  z-index: 2 !important;
+}
+
+.carousel-card-wrapper:nth-child(3) {
+  transform: translateX(0) scale(1) !important;
+  opacity: 1 !important;
+  z-index: 3 !important;
+}
+
+.carousel-card-wrapper:nth-child(4) {
+  transform: translateX(440px) scale(1) !important;
+  opacity: 1 !important;
+  z-index: 2 !important;
+}
+
+.carousel-card-wrapper:nth-child(5) {
+  transform: translateX(660px) scale(0.65) !important;
+  opacity: 0.2 !important;
+  z-index: 0 !important;
+  pointer-events: none; /* Can't click on background cards */
+}
+
+/* JIRA Card - Clean Apple style */
+.jira-card {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Card Header */
+.jira-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.jira-key {
+  font-size: 12px;
+  font-weight: 700;
+  color: #3b82f6;
+  background: #dbeafe;
+  padding: 5px 12px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}
+
+.jira-priority {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.priority-urgent,
+.priority-highest,
+.priority-critical {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.priority-high {
+  background: #fed7aa;
+  color: #ea580c;
+  border: 1px solid #fdba74;
+}
+
+.priority-medium {
+  background: #fef3c7;
+  color: #ca8a04;
+  border: 1px solid #fde047;
+}
+
+.priority-low {
+  background: #d1fae5;
+  color: #059669;
+  border: 1px solid #6ee7b7;
+}
+
+/* Card Title */
+.jira-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Card Meta */
+.jira-card-meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.meta-item svg {
+  opacity: 0.6;
+}
+
+/* Sprint Badge */
+.jira-sprint-badge {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #8b5cf6;
+  background: #f3e8ff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid #e9d5ff;
+}
+
+/* Empty State */
+.jira-carousel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 320px;
+  color: #94a3b8;
+  gap: 16px;
+}
+
+.jira-carousel-empty svg {
+  opacity: 0.4;
+}
+
+.jira-carousel-empty p {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #64748b;
+}
+
+.empty-hint {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+/* Progress Indicator */
+.carousel-progress {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  background: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .carousel-card-wrapper {
+    width: 320px;
+    height: 250px;
+    margin-left: -160px;
+    margin-top: -125px;
+  }
+  
+  /* Adjusted spacing for smaller screens */
+  .carousel-card-wrapper:nth-child(1) {
+    transform: translateX(-240px) scale(0.88) !important;
+  }
+  
+  .carousel-card-wrapper:nth-child(2) {
+    transform: translateX(-120px) scale(0.94) !important;
+  }
+  
+  .carousel-card-wrapper:nth-child(4) {
+    transform: translateX(120px) scale(0.94) !important;
+  }
+  
+  .carousel-card-wrapper:nth-child(5) {
+    transform: translateX(240px) scale(0.88) !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .carousel-card-wrapper {
+    width: 300px;
+    height: 230px;
+    margin-left: -150px;
+    margin-top: -115px;
+  }
+  
+  /* Show only 3 cards on smaller screens */
+  .carousel-card-wrapper:nth-child(1),
+  .carousel-card-wrapper:nth-child(5) {
+    display: none;
+  }
+  
+  .carousel-card-wrapper:nth-child(2) {
+    transform: translateX(-180px) scale(0.92) !important;
+  }
+  
+  .carousel-card-wrapper:nth-child(3) {
+    transform: translateX(0) scale(1) !important;
+  }
+  
+  .carousel-card-wrapper:nth-child(4) {
+    transform: translateX(180px) scale(0.92) !important;
+  }
+}

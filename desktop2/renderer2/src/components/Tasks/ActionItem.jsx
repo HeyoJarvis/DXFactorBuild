@@ -5,9 +5,10 @@ import { useState } from 'react';
  * ActionItem Component - Modern Task Card with Checklists
  * Displays task with progress, metadata, checklists, and action buttons
  */
-export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, onChat }) {
+export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, onChat, onMonitor, isTeamDevView }) {
 
   const [showActions, setShowActions] = useState(false);
+  const [isMonitoring, setIsMonitoring] = useState(false);
 
   // Extract task data
   const {
@@ -22,8 +23,12 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
     category = task.category || 'Development',
     subtasks = task.subtasks || [],
     tags = task.tags || [],
-    user = task.user || {} // Added user property
+    user = task.user || {}, // Added user property
+    workflow_metadata = task.workflow_metadata || {}
   } = task;
+
+  // Check if this is a monitored task
+  const isMonitored = workflow_metadata.monitored === true;
 
   // Get status label and time estimate
   const getStatusLabel = () => {
@@ -116,13 +121,37 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
     }
   };
 
+  // Handle monitor
+  const handleMonitor = async (e) => {
+    e.stopPropagation();
+    if (onMonitor && !isMonitoring) {
+      setIsMonitoring(true);
+      try {
+        await onMonitor(task);
+      } catch (error) {
+        setIsMonitoring(false);
+      }
+    }
+  };
+
   return (
     <div
-      className={`action-item-clean ${status === 'completed' ? 'completed' : ''}`}
+      className={`action-item-clean ${status === 'completed' ? 'completed' : ''} ${isMonitored ? 'monitored' : ''}`}
       onClick={handleCardClick}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
+      {/* Monitored Badge */}
+      {isMonitored && (
+        <div className="monitored-badge" title="Monitoring this JIRA task">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          Monitoring
+        </div>
+      )}
+      
       {/* Top Row - Logo + Full Width Title */}
       <div className="action-top-row">
         <div className="action-logo">
@@ -165,10 +194,36 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
         </div>
       </div>
 
-      {/* Mark Done Button - Bottom Right Corner */}
-      <button className="action-button-mark-done" onClick={(e) => { e.stopPropagation(); handleToggle(); }}>
-        Mark Done
-      </button>
+      {/* Mark Done Button or Monitor Button - Bottom Right Corner */}
+      {isTeamDevView && onMonitor ? (
+        <button 
+          className={`action-button-monitor ${isMonitoring || isMonitored ? 'monitored' : ''}`}
+          onClick={handleMonitor}
+          disabled={isMonitoring || isMonitored}
+        >
+          {isMonitoring || isMonitored ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              Monitoring
+            </>
+          ) : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              Monitor
+            </>
+          )}
+        </button>
+      ) : (
+        <button className="action-button-mark-done" onClick={(e) => { e.stopPropagation(); handleToggle(); }}>
+          Mark Done
+        </button>
+      )}
 
       {/* Progress Bar */}
       {progress > 0 && (

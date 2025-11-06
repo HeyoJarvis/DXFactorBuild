@@ -183,7 +183,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Unified Inbox API
   inbox: {
-    getUnified: (options) => ipcRenderer.invoke('inbox:getUnified', options)
+    getUnified: (options) => ipcRenderer.invoke('inbox:getUnified', options),
+    generateSuggestions: (messages) => ipcRenderer.invoke('inbox:generateSuggestions', messages)
+  },
+
+  // Calendar API
+  calendar: {
+    generateSuggestions: (events) => ipcRenderer.invoke('calendar:generateSuggestions', events)
+  },
+
+  // Mission Control API
+  missionControl: {
+    getCalendar: (options) => ipcRenderer.invoke('missionControl:getCalendar', options)
   },
 
   // Team/Workspace APIs

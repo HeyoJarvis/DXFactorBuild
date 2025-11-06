@@ -892,84 +892,507 @@ function registerMissionControlHandlers(services, logger) {
   // ============================================
 
   /**
-   * Get unified inbox (emails from Gmail, Outlook, and optionally Slack/Teams)
+   * Generate AI suggestions from inbox messages
+   */
+  ipcMain.handle('inbox:generateSuggestions', async (_event, messages) => {
+    try {
+      logger.info('Generating AI suggestions from messages', { count: messages.length });
+
+      if (!messages || messages.length === 0) {
+        return {
+          success: true,
+          suggestions: []
+        };
+      }
+
+      // Analyze top 10 messages with AI
+      const topMessages = messages.slice(0, 10);
+      
+      // Build context for AI analysis
+      const emailContext = topMessages.map((msg, idx) => 
+        `${idx + 1}. From: ${msg.company} (${msg.from})
+   Subject: ${msg.subject}
+   Preview: ${msg.preview}
+   Timestamp: ${msg.timestamp}
+   Tags: ${msg.tags?.join(', ') || 'none'}
+   Status: ${msg.status || 'unread'}`
+      ).join('\n\n');
+
+      const analysisPrompt = `You are an AI assistant analyzing a user's inbox to generate actionable suggestions.
+
+INBOX MESSAGES:
+${emailContext}
+
+TASK: Analyze these emails and generate 3-5 high-value actionable suggestions. Focus on:
+1. Follow-up opportunities (meetings, calls, important conversations)
+2. Urgent responses needed (time-sensitive emails, unanswered important messages)
+3. Lead opportunities (potential sales, partnerships, business opportunities)
+4. Action items (tasks mentioned in emails, deadlines, commitments)
+5. Relationship building (important contacts to engage with)
+
+For each suggestion, provide:
+- type: "follow-up", "response", "lead", "action", or "relationship"
+- priority: "high", "medium", or "low"
+- title: Short actionable title (e.g., "Follow up with TechCorp")
+- description: Brief context (1-2 sentences)
+- action: Action button text (e.g., "Schedule Meeting", "Draft Reply", "Add to CRM")
+- messageIndex: Index of the related message (0-based)
+
+Respond ONLY with valid JSON array (no markdown, no extra text):
+[
+  {
+    "type": "follow-up",
+    "priority": "high",
+    "title": "Follow up with Company Name",
+    "description": "Brief context about why this is important",
+    "action": "Schedule Meeting",
+    "messageIndex": 0
+  }
+]`;
+
+      // Get AI analysis
+      const aiResponse = await services.ai.sendMessage(analysisPrompt, {
+        systemPrompt: 'You are a business intelligence assistant that analyzes emails and generates actionable insights. Always respond with valid JSON only.'
+      });
+
+      // Parse AI response
+      let suggestions = [];
+      try {
+        const responseText = typeof aiResponse === 'string' ? aiResponse : aiResponse.content;
+        // Extract JSON from response (in case AI adds markdown)
+        const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const parsedSuggestions = JSON.parse(jsonMatch[0]);
+          
+          // Map suggestions to include related message data
+          suggestions = parsedSuggestions.map(sug => ({
+            id: `ai-${sug.type}-${sug.messageIndex}`,
+            type: sug.type,
+            priority: sug.priority,
+            title: sug.title,
+            description: sug.description,
+            action: sug.action,
+            relatedMessage: topMessages[sug.messageIndex],
+            icon: getIconForType(sug.type)
+          }));
+        }
+      } catch (parseError) {
+        logger.error('Failed to parse AI suggestions', { error: parseError.message });
+        // Return empty suggestions on parse error
+        suggestions = [];
+      }
+
+      logger.info('AI suggestions generated', { count: suggestions.length });
+
+      return {
+        success: true,
+        suggestions
+      };
+
+    } catch (error) {
+      logger.error('Failed to generate AI suggestions', { error: error.message });
+      return {
+        success: false,
+        error: error.message,
+        suggestions: []
+      };
+    }
+  });
+
+  // Helper function to get icon for suggestion type
+  function getIconForType(type) {
+    const iconMap = {
+      'follow-up': '📅',
+      'response': '✉️',
+      'lead': '🎯',
+      'action': '✅',
+      'relationship': '🤝'
+    };
+    return iconMap[type] || '💡';
+  }
+
+  /**
+   * Get unified calendar events from Google and Outlook
+   */
+  ipcMain.handle('missionControl:getCalendar', async (_event, options = {}) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+
+      if (!userId) {
+        logger.warn('User not authenticated for calendar');
+      }
+
+      const {
+        startDateTime,
+        endDateTime,
+        maxResults = 500 // Fetch up to 500 events (increased from 50)
+      } = options;
+
+      logger.info('Fetching unified calendar', { 
+        userId, 
+        startDateTime, 
+        endDateTime,
+        googleConnected: services.google?.isConnected(),
+        microsoftConnected: services.microsoft?.isConnected()
+      });
+
+      const allEvents = [];
+
+      // Fetch from Google Calendar if connected
+      if (services.google?.isConnected()) {
+        console.log('📅 Calendar: Fetching Google Calendar events...');
+        try {
+          const googleResult = await services.google.gmailService.getUpcomingEvents(
+            startDateTime || new Date().toISOString(),
+            endDateTime || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            maxResults
+          );
+          
+          if (googleResult && Array.isArray(googleResult)) {
+            const transformedEvents = googleResult.map(event => ({
+              ...event,
+              source: 'google',
+              provider: 'google'
+            }));
+            allEvents.push(...transformedEvents);
+            logger.info('Google Calendar events added', { count: googleResult.length });
+            console.log('📅 Calendar: Added', googleResult.length, 'Google events');
+          }
+        } catch (error) {
+          logger.error('Failed to fetch Google Calendar events', { error: error.message });
+          console.error('📅 Calendar: Google fetch error:', error);
+        }
+      } else {
+        console.log('📅 Calendar: Skipping Google - not connected');
+      }
+
+      // Fetch from Outlook Calendar if connected
+      if (services.microsoft?.isConnected()) {
+        console.log('📅 Calendar: Fetching Outlook Calendar events...');
+        try {
+          const outlookResult = await services.microsoft.getCalendarEvents(
+            startDateTime || new Date().toISOString(),
+            endDateTime || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            maxResults
+          );
+          
+          if (outlookResult.success && outlookResult.events) {
+            const transformedEvents = outlookResult.events.map(event => ({
+              ...event,
+              source: 'microsoft',
+              provider: 'outlook'
+            }));
+            allEvents.push(...transformedEvents);
+            logger.info('Outlook Calendar events added', { count: outlookResult.events.length });
+            console.log('📅 Calendar: Added', outlookResult.events.length, 'Outlook events');
+          }
+        } catch (error) {
+          logger.error('Failed to fetch Outlook Calendar events', { error: error.message });
+          console.error('📅 Calendar: Outlook fetch error:', error);
+        }
+      } else {
+        console.log('📅 Calendar: Skipping Outlook - not connected');
+      }
+
+      // Sort all events by start time
+      allEvents.sort((a, b) => {
+        const aTime = new Date(a.start?.dateTime || a.start?.date);
+        const bTime = new Date(b.start?.dateTime || b.start?.date);
+        return aTime - bTime;
+      });
+
+      logger.info('Unified calendar fetched', {
+        userId,
+        totalEvents: allEvents.length
+      });
+
+      console.log('📅 Calendar: Returning', allEvents.length, 'events to frontend');
+
+      return {
+        success: true,
+        events: allEvents,
+        count: allEvents.length
+      };
+
+    } catch (error) {
+      logger.error('Failed to get unified calendar', { error: error.message });
+      return {
+        success: false,
+        error: error.message,
+        events: []
+      };
+    }
+  });
+
+  /**
+   * Generate AI suggestions from calendar events
+   */
+  ipcMain.handle('calendar:generateSuggestions', async (_event, events) => {
+    try {
+      logger.info('Generating AI calendar suggestions from events', { count: events.length });
+
+      if (!events || events.length === 0) {
+        return {
+          success: true,
+          suggestions: []
+        };
+      }
+
+      // Analyze events with AI
+      const eventContext = events.map((evt, idx) => 
+        `${idx + 1}. Event: ${evt.subject || evt.summary}
+   Organizer: ${evt.organizer?.emailAddress?.name || evt.organizer?.email || 'Unknown'}
+   Time: ${new Date(evt.start?.dateTime || evt.start?.date).toLocaleString()}
+   Attendees: ${evt.attendees?.length || 0} people
+   Location: ${evt.location || 'Not specified'}`
+      ).join('\n\n');
+
+      const analysisPrompt = `You are an AI assistant analyzing a user's calendar to generate actionable suggestions.
+
+CALENDAR EVENTS:
+${eventContext}
+
+TASK: Analyze these calendar events and generate 3-5 high-value actionable suggestions. Focus on:
+1. Preparation needed (meetings requiring prep work, materials, or research)
+2. Follow-up actions (meetings that need follow-up emails or tasks)
+3. Scheduling conflicts (overlapping meetings or tight schedules)
+4. Networking opportunities (important attendees to connect with)
+5. Time management (back-to-back meetings, need for breaks)
+
+For each suggestion, provide:
+- type: "preparation", "follow-up", "conflict", "networking", or "time-management"
+- priority: "high", "medium", or "low"
+- title: Short actionable title (e.g., "Prepare materials for TechCorp meeting")
+- description: Brief context (1-2 sentences)
+- action: Action button text (e.g., "Create Agenda", "Schedule Follow-up", "Block Time")
+- eventIndex: Index of the related event (0-based)
+
+Respond ONLY with valid JSON array (no markdown, no extra text):
+[
+  {
+    "type": "preparation",
+    "priority": "high",
+    "title": "Prepare for meeting with Company Name",
+    "description": "Brief context about why preparation is needed",
+    "action": "Create Agenda",
+    "eventIndex": 0
+  }
+]`;
+
+      // Get AI analysis
+      const aiResponse = await services.ai.sendMessage(analysisPrompt, {
+        systemPrompt: 'You are a calendar intelligence assistant that analyzes meetings and generates actionable insights. Always respond with valid JSON only.'
+      });
+
+      // Parse AI response
+      let suggestions = [];
+      try {
+        const responseText = typeof aiResponse === 'string' ? aiResponse : aiResponse.content;
+        // Extract JSON from response (in case AI adds markdown)
+        const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const parsedSuggestions = JSON.parse(jsonMatch[0]);
+          
+          // Map suggestions to include related event data
+          suggestions = parsedSuggestions.map(sug => ({
+            id: `ai-calendar-${sug.type}-${sug.eventIndex}`,
+            type: sug.type,
+            priority: sug.priority,
+            title: sug.title,
+            description: sug.description,
+            action: sug.action,
+            relatedEvent: events[sug.eventIndex],
+            icon: getCalendarIconForType(sug.type)
+          }));
+        }
+      } catch (parseError) {
+        logger.error('Failed to parse AI calendar suggestions', { error: parseError.message });
+        suggestions = [];
+      }
+
+      logger.info('AI calendar suggestions generated', { count: suggestions.length });
+
+      return {
+        success: true,
+        suggestions
+      };
+
+    } catch (error) {
+      logger.error('Failed to generate AI calendar suggestions', { error: error.message });
+      return {
+        success: false,
+        error: error.message,
+        suggestions: []
+      };
+    }
+  });
+
+  // Helper function to get icon for calendar suggestion type
+  function getCalendarIconForType(type) {
+    const iconMap = {
+      'preparation': '📋',
+      'follow-up': '✉️',
+      'conflict': '⚠️',
+      'networking': '🤝',
+      'time-management': '⏰'
+    };
+    return iconMap[type] || '📅';
+  }
+
+  /**
+   * Get unified inbox (emails from Gmail, Outlook, LinkedIn, and optionally Slack/Teams)
    */
   ipcMain.handle('inbox:getUnified', async (_event, options = {}) => {
     try {
       const userId = services.auth?.currentUser?.id;
 
+      // Allow unauthenticated access for demo purposes
       if (!userId) {
-        throw new Error('User not authenticated');
+        logger.warn('User not authenticated, using mock data');
       }
 
       const {
-        maxResults = 50,
-        includeSources = ['gmail', 'outlook'] // Can add 'slack', 'teams' later
+        maxResults = 500, // Fetch up to 500 emails (increased from 50)
+        includeSources = ['email', 'linkedin'] // Can add 'slack', 'teams' later
       } = options;
 
-      logger.info('Fetching unified inbox', { userId, includeSources, maxResults });
+      logger.info('Fetching unified inbox', { 
+        userId, 
+        includeSources, 
+        maxResults,
+        googleConnected: services.google?.isConnected(),
+        microsoftConnected: services.microsoft?.isConnected()
+      });
+      console.log('📧 Unibox: Fetching inbox with sources:', includeSources);
+      console.log('📧 Unibox: Google connected?', services.google?.isConnected());
+      console.log('📧 Unibox: Microsoft connected?', services.microsoft?.isConnected());
 
-      const allEmails = [];
+      const allMessages = [];
 
-      // Fetch from Gmail if connected and included
-      if (includeSources.includes('gmail') && services.google?.isConnected()) {
+      // Fetch from Gmail if email source is included and connected
+      if (includeSources.includes('email') && services.google?.isConnected()) {
+        console.log('📧 Unibox: Fetching Gmail emails...');
         try {
           const gmailResult = await services.google.getUnreadEmails(maxResults);
           if (gmailResult.success && gmailResult.emails) {
-            // Tag each email with source
-            const taggedEmails = gmailResult.emails.map(email => ({
-              ...email,
-              source: 'gmail'
+            // Transform Gmail emails to unified format
+            const transformedEmails = gmailResult.emails.map(email => ({
+              id: email.id,
+              company: email.from?.split('<')[0]?.trim() || 'Unknown',
+              from: email.from,
+              subject: email.subject,
+              preview: email.snippet || email.preview,
+              body: email.body || email.snippet || email.preview,
+              bodyHtml: email.bodyHtml,
+              timestamp: formatTimestamp(email.date || email.receivedDateTime),
+              source: 'email',
+              provider: 'gmail',
+              category: inferCategory(email),
+              tags: inferTags(email),
+              status: email.isRead ? 'replied' : null
             }));
-            allEmails.push(...taggedEmails);
+            allMessages.push(...transformedEmails);
             logger.info('Gmail emails added to unified inbox', { count: gmailResult.emails.length });
+            console.log('📧 Unibox: Added', gmailResult.emails.length, 'Gmail emails');
+            console.log('📧 Unibox: Sample Gmail message:', transformedEmails[0]);
+          } else {
+            console.log('📧 Unibox: Gmail result:', gmailResult);
           }
         } catch (error) {
           logger.error('Failed to fetch Gmail emails for unified inbox', { error: error.message });
+          console.error('📧 Unibox: Gmail fetch error:', error);
         }
+      } else {
+        console.log('📧 Unibox: Skipping Gmail - email in sources?', includeSources.includes('email'), 'connected?', services.google?.isConnected());
       }
 
-      // Fetch from Outlook if connected and included
-      if (includeSources.includes('outlook') && services.microsoft?.isConnected()) {
+      // Fetch from Outlook if email source is included and connected
+      if (includeSources.includes('email') && services.microsoft?.isConnected()) {
+        console.log('📧 Unibox: Fetching Outlook emails...');
         try {
           const outlookResult = await services.microsoft.getEmails('inbox', maxResults);
           if (outlookResult.success && outlookResult.emails) {
-            // Tag each email with source
-            const taggedEmails = outlookResult.emails.map(email => ({
-              ...email,
-              source: 'outlook'
+            // Transform Outlook emails to unified format
+            const transformedEmails = outlookResult.emails.map(email => ({
+              id: email.id,
+              company: email.from?.emailAddress?.name || 'Unknown',
+              from: email.from?.emailAddress?.address,
+              subject: email.subject,
+              preview: email.bodyPreview,
+              body: email.body?.content || email.bodyPreview,
+              bodyHtml: email.body?.contentType === 'html' ? email.body?.content : null,
+              timestamp: formatTimestamp(email.receivedDateTime),
+              source: 'email',
+              provider: 'outlook',
+              category: inferCategory(email),
+              tags: inferTags(email),
+              status: email.isRead ? 'replied' : null
             }));
-            allEmails.push(...taggedEmails);
+            allMessages.push(...transformedEmails);
             logger.info('Outlook emails added to unified inbox', { count: outlookResult.emails.length });
+            console.log('📧 Unibox: Added', outlookResult.emails.length, 'Outlook emails');
+          } else {
+            console.log('📧 Unibox: Outlook result:', outlookResult);
           }
         } catch (error) {
           logger.error('Failed to fetch Outlook emails for unified inbox', { error: error.message });
+          console.error('📧 Unibox: Outlook fetch error:', error);
         }
+      } else {
+        console.log('📧 Unibox: Skipping Outlook - email in sources?', includeSources.includes('email'), 'connected?', services.microsoft?.isConnected());
       }
 
-      // TODO: Add Slack channels if included
-      // TODO: Add Teams channels if included
+      // TODO: Fetch from LinkedIn if included and connected
+      if (includeSources.includes('linkedin')) {
+        logger.info('LinkedIn integration not yet implemented');
+      }
 
-      // Sort all emails by date (most recent first)
-      allEmails.sort((a, b) => {
-        const dateA = a.date || a.receivedDateTime || new Date(0);
-        const dateB = b.date || b.receivedDateTime || new Date(0);
-        return new Date(dateB) - new Date(dateA);
+      // TODO: Fetch from Slack if included and connected
+      if (includeSources.includes('slack')) {
+        logger.info('Slack integration not yet implemented');
+      }
+
+      // TODO: Fetch from Teams if included and connected
+      if (includeSources.includes('teams')) {
+        logger.info('Teams integration not yet implemented');
+      }
+
+      // Log if no messages found
+      if (allMessages.length === 0) {
+        logger.info('No messages found in unified inbox', { 
+          userId: userId || 'unauthenticated',
+          includeSources,
+          gmailConnected: services.google?.isConnected(),
+          outlookConnected: services.microsoft?.isConnected()
+        });
+        console.log('📧 Unibox: No messages found. Total:', allMessages.length);
+      } else {
+        console.log('📧 Unibox: Total messages before sorting:', allMessages.length);
+      }
+
+      // Sort all messages by date (most recent first)
+      allMessages.sort((a, b) => {
+        const dateA = parseTimestamp(a.timestamp);
+        const dateB = parseTimestamp(b.timestamp);
+        return dateB - dateA;
       });
 
       // Limit to maxResults
-      const limitedEmails = allEmails.slice(0, maxResults);
+      const limitedMessages = allMessages.slice(0, maxResults);
 
       logger.info('Unified inbox fetched', {
         userId,
-        totalEmails: limitedEmails.length,
+        totalMessages: limitedMessages.length,
         sources: includeSources
       });
 
+      console.log('📧 Unibox: Returning', limitedMessages.length, 'messages to frontend');
+      console.log('📧 Unibox: First message being returned:', limitedMessages[0]);
+
       return {
         success: true,
-        emails: limitedEmails,
-        count: limitedEmails.length
+        messages: limitedMessages,
+        count: limitedMessages.length
       };
 
     } catch (error) {
@@ -977,10 +1400,63 @@ function registerMissionControlHandlers(services, logger) {
       return {
         success: false,
         error: error.message,
-        emails: []
+        messages: []
       };
     }
   });
+
+  // Helper functions for inbox formatting
+  function formatTimestamp(date) {
+    if (!date) return 'Unknown';
+    const d = new Date(date);
+    const now = new Date();
+    const diffMs = now - d;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return `Today ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    } else if (diffDays === 1) {
+      return `Yesterday ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    } else if (diffDays < 7) {
+      return d.toLocaleDateString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+    } else {
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+  }
+
+  function parseTimestamp(timestamp) {
+    const now = new Date();
+    if (timestamp.startsWith('Today')) {
+      return now;
+    } else if (timestamp.startsWith('Yesterday')) {
+      return new Date(now - 24 * 60 * 60 * 1000);
+    } else {
+      return new Date(timestamp);
+    }
+  }
+
+  function inferCategory(email) {
+    const text = `${email.subject} ${email.preview || email.snippet || ''}`.toLowerCase();
+    if (text.includes('marketing') || text.includes('campaign') || text.includes('design')) {
+      return 'marketing';
+    } else if (text.includes('sales') || text.includes('lead') || text.includes('deal')) {
+      return 'sales';
+    }
+    return 'sales'; // default
+  }
+
+  function inferTags(email) {
+    const tags = [];
+    const text = `${email.subject} ${email.preview || email.snippet || ''}`.toLowerCase();
+    
+    if (text.includes('marketing')) tags.push('Marketing');
+    if (text.includes('sales')) tags.push('Sales');
+    if (text.includes('lead')) tags.push('Lead Generation');
+    if (text.includes('campaign')) tags.push('Campaign Design');
+    if (text.includes('deal') || text.includes('closing')) tags.push('Deal Closing');
+    
+    return tags.length > 0 ? tags : ['Sales'];
+  }
 
   /**
    * Get Gmail emails
@@ -1021,7 +1497,7 @@ function registerMissionControlHandlers(services, logger) {
   /**
    * Get Gmail unread emails
    */
-  ipcMain.handle('google:getUnreadEmails', async (_event, maxResults = 50) => {
+  ipcMain.handle('google:getUnreadEmails', async (_event, maxResults = 500) => {
     try {
       const userId = services.auth?.currentUser?.id;
 
@@ -1126,7 +1602,7 @@ function registerMissionControlHandlers(services, logger) {
   /**
    * Get Outlook emails
    */
-  ipcMain.handle('microsoft:getEmails', async (_event, folderId = 'inbox', maxResults = 50) => {
+  ipcMain.handle('microsoft:getEmails', async (_event, folderId = 'inbox', maxResults = 500) => {
     try {
       const userId = services.auth?.currentUser?.id;
 
@@ -1163,7 +1639,7 @@ function registerMissionControlHandlers(services, logger) {
   /**
    * Get Outlook unread emails
    */
-  ipcMain.handle('microsoft:getUnreadEmails', async (_event, maxResults = 50) => {
+  ipcMain.handle('microsoft:getUnreadEmails', async (_event, maxResults = 500) => {
     try {
       const userId = services.auth?.currentUser?.id;
 

@@ -298,9 +298,17 @@ You are analyzing productivity data for ${userName}. Provide insights, answer qu
       systemPrompt += `- Pull Requests: ${contextDetails.github_activity.filter(a => a.type === 'pull_request' || a.type === 'pr').length}\n`;
       systemPrompt += `\n`;
 
-      systemPrompt += `\nWhen the user asks about productivity, progress, or work status, reference the specific tasks and GitHub activity listed above. Provide actionable insights and help them understand their work patterns.
+      systemPrompt += `\nIMPORTANT RESPONSE GUIDELINES:
+- Be concise and professional - avoid lengthy explanations
+- Use natural language without markdown formatting (no **, __, or emojis)
+- Structure responses with clear sections using simple line breaks
+- Reference specific tasks and data points when relevant
+- Provide actionable insights in 2-3 sentences per point
+- Use numbered lists for steps, bullet points for options
+- Keep responses focused and scannable
+- No chatbot-style greetings or sign-offs
 
-Be concise, data-driven, and focused on helping track and improve productivity.`;
+When the user asks about productivity, progress, or work status, reference the specific tasks and GitHub activity listed above. Be direct, data-driven, and focused on helping track and improve productivity.`;
 
       // Log the context being sent to AI
       logger.info(`🤖 Sending context to AI for user ${targetUserId}:`, {
@@ -330,14 +338,31 @@ Be concise, data-driven, and focused on helping track and improve productivity.`
         throw new Error('AI service returned empty response');
       }
 
-      // Save AI response
-      await dbAdapter.saveMessageToSession(sessionId, aiResponse.content, 'assistant', {}, currentUserId);
+      // Clean up the AI response - remove markdown formatting and emojis
+      let cleanedResponse = aiResponse.content
+        // Remove emoji patterns (including the "Live Slack Context" footer)
+        .replace(/📱\s*\*\*Live Slack Context\*\*.*$/gm, '')
+        .replace(/[📋💻📅📊🤖✅💬🔍📈📉🎯⚡️🚀💡🔔⏰📌🎉👍👎❌✔️]/g, '')
+        // Convert markdown bold to clean text (keep the text, remove **)
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        // Convert markdown italic to clean text
+        .replace(/\*([^*]+)\*/g, '$1')
+        // Clean up any remaining markdown emphasis
+        .replace(/__([^_]+)__/g, '$1')
+        .replace(/_([^_]+)_/g, '$1')
+        // Remove excessive newlines
+        .replace(/\n{3,}/g, '\n\n')
+        // Trim whitespace
+        .trim();
+
+      // Save cleaned AI response
+      await dbAdapter.saveMessageToSession(sessionId, cleanedResponse, 'assistant', {}, currentUserId);
 
       logger.info('✅ User productivity chat message processed successfully');
 
       return {
         success: true,
-        response: aiResponse.content
+        response: cleanedResponse
       };
     } catch (error) {
       logger.error('Error sending user productivity chat message', { error: error.message, stack: error.stack });

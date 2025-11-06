@@ -1,0 +1,43 @@
+.mission-control-refactored {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 40px 0px;
+  overflow: visible;
+}
+
+/* Full-screen mode (Unibox, Calendar) - full height, no padding */
+.carousel-area.fullscreen-mode {
+  padding: 0;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* Very subtle gradient overlay - Apple style (hidden in full-screen mode) */
+.mission-control-refactored::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(249, 250, 251, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+/* Hide gradient overlay when full-screen tabs are active */
+.mission-control-refactored:has(.carousel-area.fullscreen-mode)::before {
+  display: none;
+}
+

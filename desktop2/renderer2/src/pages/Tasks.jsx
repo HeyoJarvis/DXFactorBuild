@@ -10,9 +10,16 @@ export default function Tasks({ user }) {
   const {
     tasks,
     loading,
+    jiraView,
+    setJiraView,
+    jiraConnected,
     updateTask,
     deleteTask,
     toggleTask,
+    linkToJira,
+    unlinkFromJira,
+    monitorTask,
+    unmonitorTask,
     refreshTasks
   } = useSalesTasks(user, assignmentView);
   
@@ -21,6 +28,9 @@ export default function Tasks({ user }) {
   const [viewFilter, setViewFilter] = useState('All');
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [isSyncing, setIsSyncing] = useState(false);
+  const [linkingTask, setLinkingTask] = useState(null);
+  const [jiraKey, setJiraKey] = useState('');
+  const [linkError, setLinkError] = useState('');
 
   // Update last updated timestamp when tasks change
   useEffect(() => {
@@ -65,6 +75,47 @@ export default function Tasks({ user }) {
       console.error('Failed to refresh tasks:', error);
     } finally {
       setTimeout(() => setIsSyncing(false), 1000);
+    }
+  };
+
+  const handleLinkToJira = async () => {
+    if (!jiraKey.trim()) {
+      setLinkError('Please enter a JIRA ticket key');
+      return;
+    }
+
+    try {
+      setLinkError('');
+      await linkToJira(linkingTask, jiraKey.trim().toUpperCase());
+      setLinkingTask(null);
+      setJiraKey('');
+      // Show success message
+      console.log('✅ Successfully linked to JIRA');
+    } catch (error) {
+      console.error('Failed to link:', error);
+      setLinkError(error.message || 'Failed to link to JIRA. Make sure the ticket key is correct.');
+    }
+  };
+
+  const handleUnlinkFromJira = async (taskId) => {
+    if (window.confirm('Are you sure you want to unlink this task from JIRA?')) {
+      try {
+        await unlinkFromJira(taskId);
+      } catch (error) {
+        console.error('Failed to unlink:', error);
+        alert('Failed to unlink from JIRA');
+      }
+    }
+  };
+
+  const handleMonitorTask = async (task) => {
+    try {
+      await monitorTask(task);
+      // Show success feedback
+      console.log('✅ Now monitoring:', task.title || task.session_title);
+    } catch (error) {
+      console.error('Failed to monitor task:', error);
+      alert('Failed to monitor task. Please try again.');
     }
   };
 
@@ -194,6 +245,48 @@ export default function Tasks({ user }) {
         <div className="header-divider"></div>
       </div>
 
+      {/* Task View Toggle */}
+      <div className="view-toggle-container">
+        <div className="view-toggle">
+          <button 
+            className={`toggle-btn ${!jiraView ? 'active' : ''}`}
+            onClick={() => setJiraView(false)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            My Tasks
+          </button>
+          <button 
+            className={`toggle-btn ${jiraView ? 'active' : ''}`}
+            onClick={() => setJiraView(true)}
+            title="View developer JIRA tasks from your team"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Team Dev Tasks
+            {jiraView && tasks.length > 0 && (
+              <span className="toggle-badge">{tasks.length}</span>
+            )}
+          </button>
+        </div>
+        {jiraView && (
+          <div className="jira-status-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Monitor developer JIRA tasks to track progress for clients
+          </div>
+        )}
+      </div>
+
       {/* Intelligence Bar */}
       {(overdueCount > 0 || unassignedCount > 0) && (
         <div className="intelligence-bar">
@@ -241,6 +334,8 @@ export default function Tasks({ user }) {
               onDelete={handleDeleteTask}
               onUpdate={handleUpdateTask}
               onChat={setChatTask}
+              onMonitor={jiraView ? handleMonitorTask : null}
+              isTeamDevView={jiraView}
             />
           </div>
         )}
@@ -257,6 +352,8 @@ export default function Tasks({ user }) {
               onDelete={handleDeleteTask}
               onUpdate={handleUpdateTask}
               onChat={setChatTask}
+              onMonitor={jiraView ? handleMonitorTask : null}
+              isTeamDevView={jiraView}
             />
           </div>
         )}
@@ -278,6 +375,8 @@ export default function Tasks({ user }) {
               onDelete={handleDeleteTask}
               onUpdate={handleUpdateTask}
               onChat={setChatTask}
+              onMonitor={jiraView ? handleMonitorTask : null}
+              isTeamDevView={jiraView}
             />
           </div>
         )}
@@ -297,6 +396,70 @@ export default function Tasks({ user }) {
           task={chatTask} 
           onClose={() => setChatTask(null)} 
         />
+      )}
+
+      {/* Link to JIRA Modal */}
+      {linkingTask && (
+        <div className="modal-overlay" onClick={() => setLinkingTask(null)}>
+          <div className="modal-content jira-link-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Link Task to JIRA</h3>
+              <button className="modal-close" onClick={() => setLinkingTask(null)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-description">
+                Enter the JIRA ticket key (e.g., PROJ-123) to link this task
+              </p>
+              <div className="input-group">
+                <label htmlFor="jira-key-input">JIRA Ticket Key</label>
+                <input
+                  id="jira-key-input"
+                  type="text"
+                  className="jira-key-input"
+                  placeholder="PROJ-123"
+                  value={jiraKey}
+                  onChange={(e) => {
+                    setJiraKey(e.target.value);
+                    setLinkError('');
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleLinkToJira();
+                    }
+                  }}
+                  autoFocus
+                />
+                {linkError && (
+                  <div className="error-message">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    {linkError}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => setLinkingTask(null)}>
+                Cancel
+              </button>
+              <button className="btn-primary" onClick={handleLinkToJira}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                Link to JIRA
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

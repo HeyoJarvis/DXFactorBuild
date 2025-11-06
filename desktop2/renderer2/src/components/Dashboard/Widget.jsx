@@ -3,51 +3,30 @@ import useWidgetData from '../../hooks/useWidgetData';
 import './Widget.css';
 
 /**
- * Widget - Smart draggable widget that can be a note or specialized component
- * Supports slash commands:
- * - /track metrics from [source] - Create a metric tracker widget
- * - /notify [topic] - Create a notification space
- * - Regular text - Simple note widget
- * 
- * @param {Object} widget - Widget data with id, x, y, content, type, color
- * @param {Function} onUpdate - Callback when widget is updated
- * @param {Function} onDelete - Callback when widget is deleted
+ * Widget - Draggable widget component for dashboard
+ * Supports 9 widget types with configuration
  */
 export default function Widget({ widget, onUpdate, onDelete }) {
   const { data, loading, error, refresh } = useWidgetData(widget);
   const [isDragging, setIsDragging] = useState(false);
-  const [isEditing, setIsEditing] = useState(!widget.content);
-  const [tempContent, setTempContent] = useState(widget.content || '');
-  const [dragStartPos, setDragStartPos] = useState(null);
+  const [isConfiguring, setIsConfiguring] = useState(!widget.config || Object.keys(widget.config).length === 0);
+  const [configValue, setConfigValue] = useState('');
   const dragOffset = useRef({ x: 0, y: 0 });
   const widgetRef = useRef(null);
   const hasDragged = useRef(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
-      if (isDragging && dragStartPos) {
+      if (isDragging) {
         hasDragged.current = true;
-        
         const newX = e.clientX - dragOffset.current.x;
         const newY = e.clientY - dragOffset.current.y;
-        
-        // Constrain to viewport bounds with padding
-        const padding = 20;
-        const maxX = window.innerWidth - widgetRef.current?.offsetWidth - padding;
-        const maxY = window.innerHeight - widgetRef.current?.offsetHeight - padding;
-        
-        const constrainedX = Math.max(padding, Math.min(newX, maxX));
-        const constrainedY = Math.max(padding, Math.min(newY, maxY));
-        
-        onUpdate(widget.id, { x: constrainedX, y: constrainedY });
+        onUpdate(widget.id, { x: newX, y: newY });
       }
     };
 
     const handleMouseUp = () => {
       setIsDragging(false);
-      setDragStartPos(null);
-      
-      // Reset drag flag after a short delay to prevent accidental clicks
       setTimeout(() => {
         hasDragged.current = false;
       }, 100);
@@ -62,14 +41,12 @@ export default function Widget({ widget, onUpdate, onDelete }) {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragStartPos, widget.id, onUpdate]);
+  }, [isDragging, widget.id, onUpdate]);
 
   const handleMouseDown = (e) => {
-    // Only start drag from header, but not from delete button
     if (e.target.closest('.widget-header') && !e.target.closest('.widget-delete')) {
       e.preventDefault();
       setIsDragging(true);
-      setDragStartPos({ x: e.clientX, y: e.clientY });
       dragOffset.current = {
         x: e.clientX - widget.x,
         y: e.clientY - widget.y
@@ -77,272 +54,189 @@ export default function Widget({ widget, onUpdate, onDelete }) {
     }
   };
 
-  const parseSlashCommand = (content) => {
-    if (!content.startsWith('/')) return null;
-
-    const trimmed = content.trim();
+  const handleConfigSave = () => {
+    if (!configValue.trim()) return;
     
-    // /track metrics from [source]
-    if (trimmed.startsWith('/track')) {
-      const match = trimmed.match(/\/track\s+(.+?)\s+from\s+(.+)/i);
-      if (match) {
-        return {
-          type: 'tracker',
-          target: match[1].trim(),
-          source: match[2].trim()
-        };
-      }
+    const config = {};
+    switch (widget.type) {
+      case 'jira-by-team':
+        config.team = configValue.trim();
+        break;
+      case 'jira-by-unit':
+        config.unit = configValue.trim();
+        break;
+      case 'jira-by-person':
+        config.person = configValue.trim();
+        break;
+      case 'jira-by-feature':
+        config.feature = configValue.trim();
+        break;
+      case 'feature-progress':
+        config.repo = configValue.trim();
+        break;
+      case 'slack-messages':
+        config.handle = configValue.trim();
+        break;
+      case 'teams-messages':
+        config.handle = configValue.trim();
+        break;
+      case 'email-tracker':
+        config.email = configValue.trim();
+        break;
+      default:
+        break;
     }
     
-    // /notify [topic]
-    if (trimmed.startsWith('/notify')) {
-      const match = trimmed.match(/\/notify\s+(.+)/i);
-      if (match) {
-        return {
-          type: 'notifier',
-          topic: match[1].trim()
-        };
-      }
+    onUpdate(widget.id, { config });
+    setIsConfiguring(false);
+  };
+
+  const handleContentClick = (e) => {
+    if (hasDragged.current || isDragging) return;
+    e.stopPropagation();
+    if (widget.type === 'quick-note') {
+      setIsConfiguring(true);
+    }
+  };
+
+  const handleNoteChange = (e) => {
+    setConfigValue(e.target.value);
+  };
+
+  const handleNoteSave = () => {
+    onUpdate(widget.id, { config: { content: configValue } });
+    setIsConfiguring(false);
+  };
+
+  const getWidgetInfo = () => {
+    const info = {
+      'quick-note': { icon: '📝', label: 'Quick Note' },
+      'jira-by-team': { icon: '👥', label: 'JIRA by Team' },
+      'jira-by-unit': { icon: '🏢', label: 'JIRA by Unit' },
+      'jira-by-person': { icon: '👤', label: 'JIRA by Person' },
+      'jira-by-feature': { icon: '🎯', label: 'JIRA by Feature' },
+      'feature-progress': { icon: '💻', label: 'Feature Progress' },
+      'slack-messages': { icon: '💬', label: 'Slack Messages' },
+      'teams-messages': { icon: '📢', label: 'Teams Messages' },
+      'email-tracker': { icon: '📧', label: 'Email Tracker' }
+    };
+    return info[widget.type] || { icon: '📝', label: 'Widget' };
+  };
+
+  const getConfigPlaceholder = () => {
+    const placeholders = {
+      'jira-by-team': 'Enter team name...',
+      'jira-by-unit': 'Enter unit name...',
+      'jira-by-person': 'Enter person name...',
+      'jira-by-feature': 'Enter feature/epic name...',
+      'feature-progress': 'Enter repository name...',
+      'slack-messages': 'Enter Slack handle (e.g., @username)...',
+      'teams-messages': 'Enter Teams handle...',
+      'email-tracker': 'Enter email address...',
+      'quick-note': 'Type your note...'
+    };
+    return placeholders[widget.type] || 'Enter configuration...';
+  };
+
+  const renderContent = () => {
+    // Configuration UI
+    if (isConfiguring) {
+      return (
+        <div className="widget-config" onClick={(e) => e.stopPropagation()}>
+          <textarea
+            value={configValue}
+            onChange={widget.type === 'quick-note' ? handleNoteChange : (e) => setConfigValue(e.target.value)}
+            placeholder={getConfigPlaceholder()}
+            autoFocus
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button 
+            className="widget-config-save"
+            onClick={widget.type === 'quick-note' ? handleNoteSave : handleConfigSave}
+          >
+            Save
+          </button>
+        </div>
+      );
+    }
+
+    // Quick Note display
+    if (widget.type === 'quick-note') {
+      return (
+        <div className="widget-note-content" onClick={handleContentClick}>
+          {widget.config?.content || 'Click to edit...'}
+        </div>
+      );
+    }
+
+    // Data widgets
+    if (loading) {
+      return (
+        <div className="widget-loading">
+          <div className="widget-spinner"></div>
+          <span>Loading...</span>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="widget-error">
+          <span>⚠️ {error}</span>
+          <button className="widget-retry" onClick={refresh}>Retry</button>
+        </div>
+      );
+    }
+
+    if (data) {
+      return (
+        <div className="widget-data">
+          <div className="widget-data-header">
+            <span className="widget-count">{data.count || 0}</span>
+            <span className="widget-count-label">items</span>
+          </div>
+          
+          {data.items && data.items.length > 0 && (
+            <div className="widget-items">
+              {data.items.slice(0, 3).map((item, idx) => (
+                <div key={idx} className="widget-item">
+                  <div className="widget-item-title">
+                    {item.key || item.title || item.summary || item.subject || 'Item'}
+                  </div>
+                  {item.status && (
+                    <div className="widget-item-status">{item.status}</div>
+                  )}
+                </div>
+              ))}
+              {data.items.length > 3 && (
+                <div className="widget-more">+{data.items.length - 3} more</div>
+              )}
+            </div>
+          )}
+          
+          <button 
+            className="widget-refresh"
+            onClick={(e) => {
+              e.stopPropagation();
+              refresh();
+            }}
+            title="Refresh data"
+          >
+            ↻
+          </button>
+        </div>
+      );
     }
 
     return null;
   };
 
-  const handleContentChange = (e) => {
-    setTempContent(e.target.value);
-  };
-
-  const handleSave = (e) => {
-    e?.stopPropagation();
-    const command = parseSlashCommand(tempContent);
-    
-    if (command) {
-      // Transform widget based on slash command
-      onUpdate(widget.id, { 
-        content: tempContent,
-        type: command.type,
-        metadata: command
-      });
-    } else {
-      // Regular note
-      onUpdate(widget.id, { 
-        content: tempContent,
-        type: 'note'
-      });
-    }
-    setIsEditing(false);
-  };
-
-  const handleCancel = (e) => {
-    e?.stopPropagation();
-    setTempContent(widget.content || '');
-    setIsEditing(false);
-  };
-
-  const handleTextClick = (e) => {
-    // Prevent editing if we just dragged
-    if (hasDragged.current || isDragging) {
-      return;
-    }
-    
-    e.stopPropagation();
-    setTempContent(widget.content || '');
-    setIsEditing(true);
-  };
-
-  const renderWidgetContent = () => {
-    // If editing, show textarea with save/cancel buttons
-    if (isEditing) {
-      return (
-        <div className="widget-editor" onClick={(e) => e.stopPropagation()}>
-          <textarea
-            value={tempContent}
-            onChange={handleContentChange}
-            onClick={(e) => e.stopPropagation()}
-            placeholder="Type a note or use /track or /notify commands..."
-            autoFocus
-          />
-          <div className="widget-actions">
-            <button className="widget-save-btn" onClick={handleSave}>
-              Save
-            </button>
-            <button className="widget-cancel-btn" onClick={handleCancel}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    // Render based on widget type
-    switch (widget.type) {
-      case 'tracker':
-        return (
-          <div className="widget-tracker" onClick={handleTextClick}>
-            <div className="tracker-header">
-              <span className="tracker-label">Tracking</span>
-              <span className="tracker-target">{widget.metadata?.target}</span>
-            </div>
-            <div className="tracker-source">from {widget.metadata?.source}</div>
-            
-            {loading && (
-              <div className="tracker-loading">
-                <div className="mini-spinner"></div>
-                <span>Loading...</span>
-              </div>
-            )}
-            
-            {error && (
-              <div className="tracker-error">
-                <span>⚠️ {error}</span>
-              </div>
-            )}
-            
-            {!loading && !error && data && (
-              <>
-                <div className="tracker-count">
-                  <span className="count-badge">{data.count}</span>
-                  <span>items found</span>
-                </div>
-                
-                {data.items && data.items.length > 0 && (
-                  <div className="tracker-items">
-                    {data.items.slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="tracker-item">
-                        <div className="item-title">{item.key || item.name || item.title || item.summary}</div>
-                        <div className="item-meta">
-                          {item.status && <span className="item-status">{item.status}</span>}
-                          {item.from && <span className="item-from">from {item.from}</span>}
-                        </div>
-                      </div>
-                    ))}
-                    {data.items.length > 3 && (
-                      <div className="tracker-more">+{data.items.length - 3} more</div>
-                    )}
-                  </div>
-                )}
-                
-                <button 
-                  className="tracker-refresh"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    refresh();
-                  }}
-                  title="Refresh data"
-                >
-                  ↻
-                </button>
-              </>
-            )}
-          </div>
-        );
-
-      case 'notifier':
-        return (
-          <div className="widget-notifier" onClick={handleTextClick}>
-            <div className="notifier-header">
-              <span className="notifier-label">Notifications</span>
-            </div>
-            <div className="notifier-topic">{widget.metadata?.topic}</div>
-            
-            {loading && (
-              <div className="notifier-loading">
-                <div className="mini-spinner"></div>
-              </div>
-            )}
-            
-            {error && (
-              <div className="notifier-error">
-                <span>⚠️ {error}</span>
-              </div>
-            )}
-            
-            {!loading && !error && data && (
-              <>
-                <div className="notifier-count">
-                  <span className={`notification-badge ${data.count > 0 ? 'has-items' : ''}`}>
-                    {data.count}
-                  </span>
-                  <span>new items</span>
-                </div>
-                
-                {data.items && data.items.length > 0 && (
-                  <div className="notifier-items">
-                    {data.items.slice(0, 3).map((item, idx) => (
-                      <div key={item.id || idx} className="notifier-item">
-                        <div className="notifier-item-header">
-                          <span className="source-tag">{item.source}</span>
-                          {item.from && <span className="item-from-small">{item.from}</span>}
-                        </div>
-                        <div className="item-title">{item.title}</div>
-                        {item.status && <div className="item-status-small">{item.status}</div>}
-                      </div>
-                    ))}
-                    {data.items.length > 3 && (
-                      <div className="notifier-more">+{data.items.length - 3} more</div>
-                    )}
-                  </div>
-                )}
-                
-                <button 
-                  className="notifier-refresh"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    refresh();
-                  }}
-                  title="Refresh notifications"
-                >
-                  ↻
-                </button>
-              </>
-            )}
-          </div>
-        );
-
-      default:
-        // Regular note
-        return (
-          <div 
-            className="widget-note-text"
-            onClick={handleTextClick}
-          >
-            {widget.content || 'Click to edit...'}
-          </div>
-        );
-    }
-  };
-
-  const getWidgetLabel = () => {
-    switch (widget.type) {
-      case 'tracker':
-        return 'Tracker';
-      case 'notifier':
-        return 'Notifier';
-      default:
-        return 'Note';
-    }
-  };
-
-  const getSourceBadge = () => {
-    const source = widget.source || widget.metadata?.source;
-    if (!source) return null;
-    
-    const sourceMap = {
-      jira: { color: '#0052CC', label: 'JIRA' },
-      slack: { color: '#4A154B', label: 'Slack' },
-      email: { color: '#EA4335', label: 'Email' },
-      github: { color: '#24292e', label: 'GitHub' },
-      tasks: { color: '#10b981', label: 'Tasks' }
-    };
-    return sourceMap[source.toLowerCase()] || null;
-  };
-
-  const sourceBadge = getSourceBadge();
+  const widgetInfo = getWidgetInfo();
 
   return (
     <div
       ref={widgetRef}
-      className={`widget widget-${widget.type || 'note'} ${isDragging ? 'dragging' : ''}`}
+      className={`widget widget-${widget.type} ${isDragging ? 'dragging' : ''}`}
       style={{
         left: `${widget.x}px`,
         top: `${widget.y}px`,
@@ -351,34 +245,32 @@ export default function Widget({ widget, onUpdate, onDelete }) {
       onMouseDown={handleMouseDown}
     >
       <div className="widget-header">
-        <span className="widget-type-label">{getWidgetLabel()}</span>
-        <div className="widget-header-right">
-          {sourceBadge && (
-            <span 
-              className="widget-source-badge" 
-              style={{ backgroundColor: sourceBadge.color }}
-              title={`Data from ${sourceBadge.label}`}
-            >
-              {sourceBadge.label}
-            </span>
-          )}
-          <button 
-            className="widget-delete"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(widget.id);
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            title="Delete widget"
-          >
-            ×
-          </button>
-        </div>
+        <span className="widget-icon">{widgetInfo.icon}</span>
+        <span className="widget-label">{widgetInfo.label}</span>
+        <button 
+          className="widget-delete"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(widget.id);
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          title="Delete widget"
+        >
+          ×
+        </button>
       </div>
       
       <div className="widget-content">
-        {renderWidgetContent()}
+        {renderContent()}
       </div>
+
+      {widget.config && Object.keys(widget.config).length > 0 && widget.type !== 'quick-note' && (
+        <div className="widget-config-display">
+          {widget.config.team || widget.config.unit || widget.config.person || 
+           widget.config.feature || widget.config.repo || widget.config.handle || 
+           widget.config.email}
+        </div>
+      )}
 
       <div className="widget-timestamp">
         {new Date(widget.createdAt).toLocaleDateString()}
@@ -386,4 +278,3 @@ export default function Widget({ widget, onUpdate, onDelete }) {
     </div>
   );
 }
-

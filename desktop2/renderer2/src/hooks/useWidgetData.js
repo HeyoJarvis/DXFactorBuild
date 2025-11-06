@@ -2,347 +2,290 @@ import { useState, useEffect, useCallback } from 'react';
 
 /**
  * useWidgetData - Fetches and manages real-time data for widgets
- * 
- * @param {Object} widget - Widget configuration with type and metadata
- * @returns {Object} { data, loading, error, refresh }
+ * Auto-refreshes every 60 seconds
  */
 export default function useWidgetData(widget) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchTrackerData = useCallback(async (source, target) => {
-    const sourceLower = source.toLowerCase();
-    
+  const fetchJIRAByTeam = useCallback(async (teamName) => {
     try {
-      switch (sourceLower) {
-        case 'jira':
-        case 'jira updates':
-        case 'jira tickets':
-          if (window.electronAPI?.jira?.getMyIssues) {
-            const issues = await window.electronAPI.jira.getMyIssues();
-            const filteredIssues = issues.filter(issue => 
-              issue.fields?.summary?.toLowerCase().includes(target.toLowerCase()) ||
-              issue.fields?.description?.toLowerCase().includes(target.toLowerCase())
-            );
-            
-            return {
-              count: filteredIssues.length,
-              items: filteredIssues.slice(0, 5).map(issue => ({
-                key: issue.key,
-                summary: issue.fields?.summary,
-                status: issue.fields?.status?.name,
-                priority: issue.fields?.priority?.name,
-                from: issue.fields?.reporter?.displayName
-              })),
-              lastUpdate: new Date().toISOString()
-            };
-          }
-          break;
-
-        case 'emails':
-        case 'email':
-        case 'inbox':
-          if (window.electronAPI?.inbox?.getUnified) {
-            const result = await window.electronAPI.inbox.getUnified({ 
-              maxResults: 50,
-              includeSources: ['google', 'microsoft']
-            });
-            
-            if (result.success) {
-              // Filter emails by target keyword or sender
-              const filteredEmails = result.emails.filter(email => {
-                const subject = email.subject?.toLowerCase() || '';
-                const from = email.from?.emailAddress?.address?.toLowerCase() || 
-                            email.from?.toLowerCase() || '';
-                const fromName = email.from?.emailAddress?.name?.toLowerCase() ||
-                               email.from_name?.toLowerCase() || '';
-                const targetLower = target.toLowerCase();
-                
-                return subject.includes(targetLower) || 
-                       from.includes(targetLower) || 
-                       fromName.includes(targetLower);
-              });
-              
-              return {
-                count: filteredEmails.length,
-                items: filteredEmails.slice(0, 5).map(email => ({
-                  key: email.id || email.messageId,
-                  summary: email.subject,
-                  status: email.isRead ? 'Read' : 'Unread',
-                  from: email.from?.emailAddress?.name || 
-                        email.from_name || 
-                        email.from?.emailAddress?.address || 
-                        email.from || 
-                        'Unknown'
-                })),
-                lastUpdate: new Date().toISOString()
-              };
-            }
-          }
-          break;
-
-        case 'slack':
-        case 'slack messages':
-        case 'slack notifications':
-        case 'slack mentions':
-          if (window.electronAPI?.slack?.getRecentMessages) {
-            console.log('🔍 Fetching Slack messages...');
-            const result = await window.electronAPI.slack.getRecentMessages(50);
-            
-            console.log('📊 Slack API result:', result);
-            
-            if (result.success) {
-              console.log(`📨 Got ${result.messages.length} Slack messages`);
-              
-              // Filter messages by target keyword or user
-              const filteredMessages = result.messages.filter(message => {
-                const text = message.text?.toLowerCase() || '';
-                const user = message.user?.toLowerCase() || '';
-                const targetLower = target.toLowerCase();
-                
-                // Special case: if target is 'mentions' or 'tags', show only mentions
-                if (targetLower.includes('mention') || targetLower.includes('tag')) {
-                  return message.type === 'mention';
-                }
-                
-                return text.includes(targetLower) || user.includes(targetLower);
-              });
-              
-              console.log(`✅ Filtered to ${filteredMessages.length} messages for "${target}"`);
-              
-              return {
-                count: filteredMessages.length,
-                items: filteredMessages.slice(0, 5).map(msg => ({
-                  key: msg.id,
-                  summary: msg.text?.substring(0, 100) || 'No text',
-                  status: msg.type === 'mention' ? '@ Mention' : 'Message',
-                  from: msg.user || 'Unknown',
-                  timestamp: msg.timestamp
-                })),
-                lastUpdate: new Date().toISOString()
-              };
-            } else {
-              console.error('❌ Slack fetch failed:', result.error);
-              return {
-                count: 0,
-                items: [],
-                lastUpdate: new Date().toISOString(),
-                message: result.error || 'Slack not available'
-              };
-            }
-          } else {
-            console.warn('⚠️ Slack API not available');
-            return {
-              count: 0,
-              items: [],
-              lastUpdate: new Date().toISOString(),
-              message: 'Slack API not found. Make sure Slack is connected.'
-            };
-          }
-          break;
-
-        case 'github':
-          if (window.electronAPI?.codeIndexer?.listRepositories) {
-            const repos = await window.electronAPI.codeIndexer.listRepositories();
-            const filteredRepos = repos.filter(repo =>
-              repo.name?.toLowerCase().includes(target.toLowerCase()) ||
-              repo.description?.toLowerCase().includes(target.toLowerCase())
-            );
-            
-            return {
-              count: filteredRepos.length,
-              items: filteredRepos.slice(0, 5).map(repo => ({
-                name: repo.name,
-                owner: repo.owner,
-                url: repo.url,
-                lastCommit: repo.lastCommit
-              })),
-              lastUpdate: new Date().toISOString()
-            };
-          }
-          break;
-
-        case 'tasks':
-          if (window.electronAPI?.tasks?.getAll) {
-            const tasks = await window.electronAPI.tasks.getAll();
-            const filteredTasks = tasks.filter(task =>
-              task.title?.toLowerCase().includes(target.toLowerCase()) ||
-              task.description?.toLowerCase().includes(target.toLowerCase())
-            );
-            
-            return {
-              count: filteredTasks.length,
-              items: filteredTasks.slice(0, 5).map(task => ({
-                id: task.id,
-                title: task.title,
-                status: task.is_completed ? 'Done' : 'In Progress',
-                priority: task.priority || 'Medium'
-              })),
-              lastUpdate: new Date().toISOString()
-            };
-          }
-          break;
-
-        default:
-          // Try to handle as a generic source
-          console.warn(`Unknown source: ${source}, attempting generic search`);
-          return {
-            count: 0,
-            items: [],
-            lastUpdate: new Date().toISOString(),
-            message: `Source "${source}" not yet supported. Try: emails, jira, github, or tasks`
-          };
+      if (!window.electronAPI?.jira?.getMyIssues) {
+        throw new Error('JIRA not connected');
       }
-    } catch (err) {
-      console.error(`Error fetching ${source} data:`, err);
-      throw err;
-    }
-    
-    return null;
-  }, []);
 
-  const fetchNotifierData = useCallback(async (topic) => {
-    try {
-      // Check multiple sources for notifications related to the topic
-      const notifications = [];
-      const topicLower = topic.toLowerCase();
+      const result = await window.electronAPI.jira.getMyIssues();
       
-      // Slack notifications
-      if (window.electronAPI?.slack?.getRecentMessages) {
-        try {
-          const result = await window.electronAPI.slack.getRecentMessages(50);
-          
-          if (result.success) {
-            const recentMessages = result.messages.filter(message => {
-              const timestamp = new Date(message.timestamp);
-              const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-              const text = message.text?.toLowerCase() || '';
-              const user = message.user?.toLowerCase() || '';
-              
-              // Special handling for mentions
-              if (topicLower.includes('mention') || topicLower.includes('tag')) {
-                return timestamp > dayAgo && message.type === 'mention';
-              }
-              
-              return timestamp > dayAgo && 
-                     (text.includes(topicLower) || user.includes(topicLower));
-            });
-            
-            notifications.push(...recentMessages.map(msg => ({
-              id: msg.id,
-              title: msg.text?.substring(0, 80) || 'No text',
-              source: msg.type === 'mention' ? 'Slack @' : 'Slack',
-              timestamp: msg.timestamp,
-              type: 'message',
-              from: msg.user
-            })));
-          }
-        } catch (err) {
-          console.warn('Failed to fetch Slack notifications:', err);
-        }
-      }
-      
-      // Email notifications
-      if (window.electronAPI?.inbox?.getUnified) {
-        try {
-          const result = await window.electronAPI.inbox.getUnified({ 
-            maxResults: 50,
-            includeSources: ['google', 'microsoft']
-          });
-          
-          if (result.success) {
-            const recentEmails = result.emails.filter(email => {
-              const date = new Date(email.receivedDateTime || email.date);
-              const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-              const subject = email.subject?.toLowerCase() || '';
-              const from = email.from?.emailAddress?.name?.toLowerCase() || 
-                          email.from_name?.toLowerCase() || '';
-              
-              return date > dayAgo && 
-                     (subject.includes(topicLower) || from.includes(topicLower));
-            });
-            
-            notifications.push(...recentEmails.map(email => ({
-              id: email.id || email.messageId,
-              title: email.subject || 'No subject',
-              source: email.source === 'google' ? 'Gmail' : 'Outlook',
-              timestamp: email.receivedDateTime || email.date,
-              type: 'email',
-              from: email.from?.emailAddress?.name || email.from_name || 'Unknown'
-            })));
-          }
-        } catch (err) {
-          console.warn('Failed to fetch email notifications:', err);
-        }
-      }
-      
-      // JIRA notifications
-      if (window.electronAPI?.jira?.getMyIssues) {
-        try {
-          const issues = await window.electronAPI.jira.getMyIssues();
-          const recentIssues = issues.filter(issue => {
-            const updated = new Date(issue.fields?.updated || issue.fields?.created);
-            const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-            return updated > dayAgo && 
-                   (issue.fields?.summary?.toLowerCase().includes(topicLower) ||
-                    issue.fields?.description?.toLowerCase().includes(topicLower) ||
-                    issue.fields?.status?.name?.toLowerCase().includes(topicLower));
-          });
-          
-          notifications.push(...recentIssues.map(issue => ({
-            id: issue.key,
-            title: issue.fields?.summary,
-            source: 'JIRA',
-            timestamp: issue.fields?.updated || issue.fields?.created,
-            type: 'issue',
-            status: issue.fields?.status?.name
-          })));
-        } catch (err) {
-          console.warn('Failed to fetch JIRA notifications:', err);
-        }
-      }
-
-      // Tasks notifications
-      if (window.electronAPI?.tasks?.getAll) {
-        try {
-          const tasks = await window.electronAPI.tasks.getAll();
-          const recentTasks = tasks.filter(task => {
-            const created = new Date(task.created_at);
-            const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-            return created > dayAgo && 
-                   (task.title?.toLowerCase().includes(topicLower) ||
-                    task.description?.toLowerCase().includes(topicLower));
-          });
-          
-          notifications.push(...recentTasks.map(task => ({
-            id: task.id,
-            title: task.title,
-            source: 'Tasks',
-            timestamp: task.created_at,
-            type: 'task'
-          })));
-        } catch (err) {
-          console.warn('Failed to fetch task notifications:', err);
-        }
-      }
-
-      // Sort by timestamp (newest first)
-      notifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      // Filter by team (assuming team info is in labels or custom field)
+      const filtered = result.issues?.filter(issue => {
+        const labels = issue.fields?.labels || [];
+        const summary = issue.fields?.summary?.toLowerCase() || '';
+        const description = issue.fields?.description?.toLowerCase() || '';
+        const teamLower = teamName.toLowerCase();
+        
+        return labels.some(label => label.toLowerCase().includes(teamLower)) ||
+               summary.includes(teamLower) ||
+               description.includes(teamLower);
+      }) || [];
 
       return {
-        count: notifications.length,
-        items: notifications.slice(0, 10),
-        lastUpdate: new Date().toISOString()
+        count: filtered.length,
+        items: filtered.slice(0, 5).map(issue => ({
+          key: issue.key,
+          title: issue.fields?.summary,
+          status: issue.fields?.status?.name,
+          summary: issue.fields?.summary
+        }))
       };
     } catch (err) {
-      console.error('Error fetching notifications:', err);
-      throw err;
+      throw new Error(err.message || 'Failed to fetch JIRA data');
+    }
+  }, []);
+
+  const fetchJIRAByUnit = useCallback(async (unitName) => {
+    try {
+      if (!window.electronAPI?.jira?.getMyIssues) {
+        throw new Error('JIRA not connected');
+      }
+
+      const result = await window.electronAPI.jira.getMyIssues();
+      
+      // Filter by unit (similar to team)
+      const filtered = result.issues?.filter(issue => {
+        const labels = issue.fields?.labels || [];
+        const components = issue.fields?.components || [];
+        const unitLower = unitName.toLowerCase();
+        
+        return labels.some(label => label.toLowerCase().includes(unitLower)) ||
+               components.some(comp => comp.name?.toLowerCase().includes(unitLower));
+      }) || [];
+
+      return {
+        count: filtered.length,
+        items: filtered.slice(0, 5).map(issue => ({
+          key: issue.key,
+          title: issue.fields?.summary,
+          status: issue.fields?.status?.name,
+          summary: issue.fields?.summary
+        }))
+      };
+    } catch (err) {
+      throw new Error(err.message || 'Failed to fetch JIRA data');
+    }
+  }, []);
+
+  const fetchJIRAByPerson = useCallback(async (personName) => {
+    try {
+      if (!window.electronAPI?.jira?.getMyIssues) {
+        throw new Error('JIRA not connected');
+      }
+
+      const result = await window.electronAPI.jira.getMyIssues();
+      
+      // Filter by assignee
+      const filtered = result.issues?.filter(issue => {
+        const assignee = issue.fields?.assignee?.displayName?.toLowerCase() || '';
+        const reporter = issue.fields?.reporter?.displayName?.toLowerCase() || '';
+        const personLower = personName.toLowerCase();
+        
+        return assignee.includes(personLower) || reporter.includes(personLower);
+      }) || [];
+
+      return {
+        count: filtered.length,
+        items: filtered.slice(0, 5).map(issue => ({
+          key: issue.key,
+          title: issue.fields?.summary,
+          status: issue.fields?.status?.name,
+          summary: issue.fields?.summary
+        }))
+      };
+    } catch (err) {
+      throw new Error(err.message || 'Failed to fetch JIRA data');
+    }
+  }, []);
+
+  const fetchJIRAByFeature = useCallback(async (featureName) => {
+    try {
+      if (!window.electronAPI?.jira?.getMyIssues) {
+        throw new Error('JIRA not connected');
+      }
+
+      const result = await window.electronAPI.jira.getMyIssues();
+      
+      // Filter by feature/epic
+      const filtered = result.issues?.filter(issue => {
+        const summary = issue.fields?.summary?.toLowerCase() || '';
+        const epic = issue.fields?.epic?.name?.toLowerCase() || '';
+        const featureLower = featureName.toLowerCase();
+        
+        return summary.includes(featureLower) || epic.includes(featureLower);
+      }) || [];
+
+      return {
+        count: filtered.length,
+        items: filtered.slice(0, 5).map(issue => ({
+          key: issue.key,
+          title: issue.fields?.summary,
+          status: issue.fields?.status?.name,
+          summary: issue.fields?.summary
+        }))
+      };
+    } catch (err) {
+      throw new Error(err.message || 'Failed to fetch JIRA data');
+    }
+  }, []);
+
+  const fetchFeatureProgress = useCallback(async (repoName) => {
+    try {
+      if (!window.electronAPI?.codeIndexer?.getRepositoryStats) {
+        throw new Error('Code indexer not available');
+      }
+
+      const stats = await window.electronAPI.codeIndexer.getRepositoryStats(repoName);
+      
+      return {
+        count: stats.commits || 0,
+        items: [
+          { key: 'Commits', title: `${stats.commits || 0} commits`, status: 'tracked' },
+          { key: 'PRs', title: `${stats.prs || 0} pull requests`, status: 'merged' },
+          { key: 'Files', title: `${stats.files || 0} files changed`, status: 'modified' }
+        ]
+      };
+    } catch (err) {
+      throw new Error(err.message || 'Failed to fetch codebase data');
+    }
+  }, []);
+
+  const fetchSlackMessages = useCallback(async (handle) => {
+    try {
+      if (!window.electronAPI?.slack?.getRecentMessages) {
+        throw new Error('Slack not connected');
+      }
+
+      const result = await window.electronAPI.slack.getRecentMessages(50);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch Slack messages');
+      }
+
+      const handleLower = handle.toLowerCase().replace('@', '');
+
+      // Filter by handle (from user ID, real name, display name, or mentioning user)
+      const filtered = result.messages.filter(msg => {
+        const user = msg.user?.toLowerCase() || '';
+        const userName = msg.user_name?.toLowerCase() || '';
+        const realName = msg.user_real_name?.toLowerCase() || '';
+        const displayName = msg.user_display_name?.toLowerCase() || '';
+        const text = msg.text?.toLowerCase() || '';
+
+        // Match by user ID, username, real name, display name, or @mention in text
+        return user.includes(handleLower) ||
+               userName.includes(handleLower) ||
+               realName.includes(handleLower) ||
+               displayName.includes(handleLower) ||
+               text.includes(`@${handleLower}`);
+      });
+
+      return {
+        count: filtered.length,
+        items: filtered.slice(0, 5).map(msg => ({
+          key: msg.id,
+          title: `${msg.user_real_name || msg.user_display_name || msg.user}: ${msg.text?.substring(0, 40) || 'Message'}`,
+          status: msg.type === 'mention' ? '@mention' : 'message',
+          summary: msg.text
+        }))
+      };
+    } catch (err) {
+      throw new Error(err.message || 'Failed to fetch Slack messages');
+    }
+  }, []);
+
+  const fetchTeamsMessages = useCallback(async (handle) => {
+    try {
+      if (!window.electronAPI?.teams?.getRecentMessages) {
+        throw new Error('Teams not connected');
+      }
+
+      const result = await window.electronAPI.teams.getRecentMessages(50);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch Teams messages');
+      }
+
+      const handleLower = handle.toLowerCase().replace('@', '');
+      
+      // Filter by handle
+      const filtered = result.messages.filter(msg => {
+        const user = msg.from?.toLowerCase() || '';
+        const text = msg.body?.toLowerCase() || '';
+        
+        return user.includes(handleLower) || text.includes(`@${handleLower}`);
+      });
+
+      return {
+        count: filtered.length,
+        items: filtered.slice(0, 5).map(msg => ({
+          key: msg.id,
+          title: msg.body?.substring(0, 60) || 'Message',
+          status: 'message',
+          summary: msg.body
+        }))
+      };
+    } catch (err) {
+      throw new Error(err.message || 'Failed to fetch Teams messages');
+    }
+  }, []);
+
+  const fetchEmailTracker = useCallback(async (email) => {
+    try {
+      if (!window.electronAPI?.inbox?.getUnified) {
+        throw new Error('Email not connected');
+      }
+
+      const result = await window.electronAPI.inbox.getUnified({ 
+        maxResults: 50,
+        includeSources: ['google', 'microsoft']
+      });
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch emails');
+      }
+
+      const emailLower = email.toLowerCase();
+      
+      // Filter by sender email
+      const filtered = result.emails.filter(msg => {
+        const from = msg.from?.emailAddress?.address?.toLowerCase() || 
+                    msg.from?.toLowerCase() || '';
+        
+        return from.includes(emailLower);
+      });
+
+      return {
+        count: filtered.length,
+        items: filtered.slice(0, 5).map(msg => ({
+          key: msg.id || msg.messageId,
+          title: msg.subject || 'No subject',
+          status: msg.isRead ? 'Read' : 'Unread',
+          summary: msg.subject
+        }))
+      };
+    } catch (err) {
+      throw new Error(err.message || 'Failed to fetch emails');
     }
   }, []);
 
   const fetchData = useCallback(async () => {
-    if (!widget?.type || widget.type === 'note') {
+    // Skip data fetch for quick-note
+    if (!widget?.type || widget.type === 'quick-note') {
+      setLoading(false);
+      return;
+    }
+
+    // Skip if no configuration
+    if (!widget.config || Object.keys(widget.config).length === 0) {
       setLoading(false);
       return;
     }
@@ -353,10 +296,49 @@ export default function useWidgetData(widget) {
     try {
       let result = null;
 
-      if (widget.type === 'tracker' && widget.metadata?.source && widget.metadata?.target) {
-        result = await fetchTrackerData(widget.metadata.source, widget.metadata.target);
-      } else if (widget.type === 'notifier' && widget.metadata?.topic) {
-        result = await fetchNotifierData(widget.metadata.topic);
+      switch (widget.type) {
+        case 'jira-by-team':
+          if (widget.config.team) {
+            result = await fetchJIRAByTeam(widget.config.team);
+          }
+          break;
+        case 'jira-by-unit':
+          if (widget.config.unit) {
+            result = await fetchJIRAByUnit(widget.config.unit);
+          }
+          break;
+        case 'jira-by-person':
+          if (widget.config.person) {
+            result = await fetchJIRAByPerson(widget.config.person);
+          }
+          break;
+        case 'jira-by-feature':
+          if (widget.config.feature) {
+            result = await fetchJIRAByFeature(widget.config.feature);
+          }
+          break;
+        case 'feature-progress':
+          if (widget.config.repo) {
+            result = await fetchFeatureProgress(widget.config.repo);
+          }
+          break;
+        case 'slack-messages':
+          if (widget.config.handle) {
+            result = await fetchSlackMessages(widget.config.handle);
+          }
+          break;
+        case 'teams-messages':
+          if (widget.config.handle) {
+            result = await fetchTeamsMessages(widget.config.handle);
+          }
+          break;
+        case 'email-tracker':
+          if (widget.config.email) {
+            result = await fetchEmailTracker(widget.config.email);
+          }
+          break;
+        default:
+          break;
       }
 
       setData(result);
@@ -366,20 +348,31 @@ export default function useWidgetData(widget) {
     } finally {
       setLoading(false);
     }
-  }, [widget?.type, widget?.metadata?.source, widget?.metadata?.target, widget?.metadata?.topic, fetchTrackerData, fetchNotifierData]);
+  }, [
+    widget?.type, 
+    widget?.config,
+    fetchJIRAByTeam,
+    fetchJIRAByUnit,
+    fetchJIRAByPerson,
+    fetchJIRAByFeature,
+    fetchFeatureProgress,
+    fetchSlackMessages,
+    fetchTeamsMessages,
+    fetchEmailTracker
+  ]);
 
   // Initial fetch
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Auto-refresh every 30 seconds for tracker/notifier widgets
+  // Auto-refresh every 60 seconds (1 minute)
   useEffect(() => {
-    if (widget?.type === 'tracker' || widget?.type === 'notifier') {
-      const interval = setInterval(fetchData, 30000);
+    if (widget?.type && widget.type !== 'quick-note' && widget.config && Object.keys(widget.config).length > 0) {
+      const interval = setInterval(fetchData, 60000); // 60 seconds
       return () => clearInterval(interval);
     }
-  }, [widget?.type, fetchData]);
+  }, [widget?.type, widget?.config, fetchData]);
 
   const refresh = useCallback(() => {
     fetchData();
@@ -387,4 +380,3 @@ export default function useWidgetData(widget) {
 
   return { data, loading, error, refresh };
 }
-

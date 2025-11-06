@@ -235,3 +235,86 @@
   border-color: rgba(59, 130, 246, 0.3);
   box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
 }
+
+/* Monitored Task Styling */
+.action-item-clean.monitored {
+  border-left: 4px solid #34c759;
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.03) 0%, rgba(255, 255, 255, 0.8) 100%);
+}
+
+.action-item-clean.monitored:hover {
+  border-left-color: #2da84a;
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+.monitored-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #34c759 0%, #2da84a 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(52, 199, 89, 0.3);
+  z-index: 10;
+  animation: pulse-monitoring 2s ease-in-out infinite;
+}
+
+.monitored-badge svg {
+  flex-shrink: 0;
+}
+
+@keyframes pulse-monitoring {
+  0%, 100% {
+    box-shadow: 0 2px 6px rgba(52, 199, 89, 0.3);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(52, 199, 89, 0.5);
+  }
+}
+
+/* Monitor Button (Team Dev View) */
+.action-button-monitor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.action-button-monitor:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0051d5 0%, #003d9e 100%);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.action-button-monitor.monitored {
+  background: linear-gradient(135deg, #34c759 0%, #2da84a 100%);
+  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+  cursor: default;
+}
+
+.action-button-monitor:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.action-button-monitor svg {
+  flex-shrink: 0;
+}

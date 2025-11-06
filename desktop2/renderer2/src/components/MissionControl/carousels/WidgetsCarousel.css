@@ -1,0 +1,10 @@
+.widgets-carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

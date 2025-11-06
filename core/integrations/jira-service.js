@@ -974,14 +974,32 @@ class JIRAService extends EventEmitter {
       }
 
       if (updateData.assignee) {
-        payload.fields.assignee = {
-          accountId: updateData.assignee
-        };
+        // If assignee is an object with accountId, use it directly
+        // Otherwise treat it as a name/email and try to find the user
+        if (typeof updateData.assignee === 'object' && updateData.assignee.accountId) {
+          payload.fields.assignee = updateData.assignee;
+        } else {
+          // For now, just pass the name - JIRA will try to resolve it
+          // In production, you'd want to search for the user by name/email first
+          payload.fields.assignee = {
+            name: updateData.assignee
+          };
+        }
+      }
+
+      if (updateData.duedate) {
+        // JIRA expects date in YYYY-MM-DD format
+        payload.fields.duedate = updateData.duedate;
       }
 
       if (updateData.labels) {
         payload.fields.labels = updateData.labels;
       }
+
+      this.logger.info('Sending JIRA update payload', {
+        issueKey,
+        payload: JSON.stringify(payload, null, 2)
+      });
 
       await this._makeRequest(`/rest/api/3/issue/${issueKey}`, {
         method: 'PUT',

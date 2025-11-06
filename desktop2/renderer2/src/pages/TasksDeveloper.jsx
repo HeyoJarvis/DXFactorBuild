@@ -541,7 +541,9 @@ Acceptance Criteria:
       jiraUrl: issue.url,
       external_source: 'jira', // Mark as JIRA task for inline editing
       external_url: issue.url,
-      external_key: issue.key
+      external_key: issue.key,
+      route_to: 'mission-control', // Developer tasks route to mission-control
+      work_type: 'task' // Default work type
     };
   };
 

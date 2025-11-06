@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import KPICard from './KPICard';
 import Widget from './Widget';
+import WidgetPicker from './WidgetPicker';
 import useDashboardMetrics from '../../hooks/useDashboardMetrics';
 import './Dashboard.css';
 
@@ -19,8 +20,12 @@ export default function Dashboard({ user }) {
     return stored ? JSON.parse(stored) : [];
   });
 
+  // Widget picker state
+  const [showPicker, setShowPicker] = useState(false);
+  const [pickerPosition, setPickerPosition] = useState({ x: 0, y: 0 });
+
   const handleAddWidget = (e) => {
-    // Only create if clicking on dashboard background
+    // Only create sticky note if clicking on dashboard background
     if (e.target.classList.contains('dashboard-content') || 
         e.target.classList.contains('widgets-container')) {
       // Get the dashboard-content element's bounding box
@@ -30,10 +35,10 @@ export default function Dashboard({ user }) {
       // Calculate position relative to dashboard-content
       const newWidget = {
         id: Date.now(),
-        x: e.clientX - rect.left, // Exact click position
+        x: e.clientX - rect.left,
         y: e.clientY - rect.top,
-        content: '',
-        type: 'note',
+        type: 'quick-note',
+        config: {},
         color: getRandomColor(),
         createdAt: new Date().toISOString()
       };
@@ -42,6 +47,24 @@ export default function Dashboard({ user }) {
       setWidgets(updated);
       localStorage.setItem('dashboardWidgets', JSON.stringify(updated));
     }
+  };
+
+  const handleWidgetTypeSelected = (type) => {
+    // Create widget at a default position (center-ish)
+    const newWidget = {
+      id: Date.now(),
+      x: 100 + (widgets.length * 30), // Stagger widgets
+      y: 100 + (widgets.length * 30),
+      type: type,
+      config: {},
+      color: getRandomColor(),
+      createdAt: new Date().toISOString()
+    };
+    
+    const updated = [...widgets, newWidget];
+    setWidgets(updated);
+    localStorage.setItem('dashboardWidgets', JSON.stringify(updated));
+    setShowPicker(false);
   };
 
   const handleUpdateWidget = (id, updates) => {
@@ -120,9 +143,21 @@ export default function Dashboard({ user }) {
         {/* Widgets Hint */}
         {widgets.length === 0 && (
           <div className="sticky-notes-hint">
-            <em>Click anywhere to add a widget. Try /track or /notify commands</em>
+            <em>Click anywhere to add a sticky note, or use the + button to add tracking widgets</em>
           </div>
         )}
+
+        {/* Add Widget Button */}
+        <button 
+          className="add-widget-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowPicker(true);
+          }}
+          title="Add tracking widget"
+        >
+          + Add Widget
+        </button>
 
         {/* Widgets Container */}
         <div className="widgets-container">
@@ -136,6 +171,14 @@ export default function Dashboard({ user }) {
           ))}
         </div>
       </div>
+
+      {/* Widget Picker Modal */}
+      {showPicker && (
+        <WidgetPicker
+          onSelect={handleWidgetTypeSelected}
+          onClose={() => setShowPicker(false)}
+        />
+      )}
     </div>
   );
 }

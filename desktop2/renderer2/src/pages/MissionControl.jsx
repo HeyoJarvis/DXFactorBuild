@@ -124,7 +124,17 @@ export default function MissionControl({ user }) {
   // Load tasks for Personal mode
   const isDeveloper = user?.role === 'developer';
   const { tasks: devTasks, loading: devLoading, updateTask: updateDevTask, deleteTask: deleteDevTask, toggleTask: toggleDevTask } = useDeveloperTasks(user, 'all');
-  const { tasks: salesTasks, loading: salesLoading, updateTask: updateSalesTask, deleteTask: deleteSalesTask, toggleTask: toggleSalesTask } = useSalesTasks(user, 'all');
+  const { 
+    tasks: salesTasks, 
+    loading: salesLoading, 
+    updateTask: updateSalesTask, 
+    deleteTask: deleteSalesTask, 
+    toggleTask: toggleSalesTask,
+    jiraView,
+    setJiraView,
+    monitorTask,
+    unmonitorTask
+  } = useSalesTasks(user, 'all');
 
   const tasks = isDeveloper ? devTasks : salesTasks;
   const tasksLoading = isDeveloper ? devLoading : salesLoading;
@@ -373,8 +383,8 @@ export default function MissionControl({ user }) {
               <div className="tasks-list-header">
                 <div className="tasks-header-top">
                   <div className="tasks-header-left">
-                    <h3 className="tasks-list-title">My Tasks</h3>
-                    {getCompletedCount() > 0 && (
+                    <h3 className="tasks-list-title">{jiraView ? 'Team Dev Tasks' : 'My Tasks'}</h3>
+                    {getCompletedCount() > 0 && !jiraView && (
                       <span className="tasks-completion-stats">
                         {getCompletedCount()} of {tasks.length} completed · {Math.round((getCompletedCount() / tasks.length) * 100)}% done
                       </span>
@@ -401,6 +411,24 @@ export default function MissionControl({ user }) {
                   </div>
                 </div>
 
+                {/* Toggle for Sales Users */}
+                {!isDeveloper && (
+                  <div className="tasks-view-toggle">
+                    <button 
+                      className={`toggle-option ${!jiraView ? 'active' : ''}`}
+                      onClick={() => setJiraView(false)}
+                    >
+                      My Tasks
+                    </button>
+                    <button 
+                      className={`toggle-option ${jiraView ? 'active' : ''}`}
+                      onClick={() => setJiraView(true)}
+                    >
+                      Team Dev
+                    </button>
+                  </div>
+                )}
+
                 <div className="tasks-header-filters">
                   <input
                     type="text"
@@ -420,6 +448,8 @@ export default function MissionControl({ user }) {
                   onDelete={deleteTask}
                   onUpdate={updateTask}
                   onChat={setSelectedTask}
+                  onMonitor={jiraView ? monitorTask : null}
+                  isTeamDevView={jiraView}
                 />
               )}
             </div>

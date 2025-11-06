@@ -768,31 +768,101 @@ class DesktopSupabaseAdapter {
         userSlackId
       });
 
-      // Apply user assignment filtering - user must be owner, assignee, assignor, or mentioned
-      tasks = tasks.filter(task => {
-        const isOwner = task.user_id === userId;
-        const isAssignee = userSlackId && task.assignee === userSlackId;
-        const isAssignor = userSlackId && task.assignor === userSlackId;
-        const isMentioned = userSlackId && task.mentioned_users?.includes(userSlackId);
-        
-        const hasAccess = isOwner || isAssignee || isAssignor || isMentioned;
+      // Apply team filtering if requested (for viewing team dev tasks)
+      if (filters.filterByTeam && filters.teamId) {
+        this.logger.info('Applying team filtering', {
+          teamId: filters.teamId,
+          tasksBeforeFilter: tasks.length
+        });
 
-        if (!hasAccess) {
-          this.logger.debug('Task filtered out', {
-            task_id: task.id,
-            task_title: task.title,
-            task_assignee: task.assignee,
-            task_assignor: task.assignor,
-            task_mentioned_users: task.mentioned_users,
-            isOwner,
-            isAssignee,
-            isAssignor,
-            isMentioned
+        // Get all users in the same team
+        const { data: teamMembers, error: teamError } = await this.supabase
+          .from('users')
+          .select('id, slack_user_id')
+          .eq('team_id', filters.teamId);
+
+        if (teamError) {
+          this.logger.warn('Failed to fetch team members', { error: teamError.message });
+        } else {
+          const teamMemberIds = teamMembers.map(member => member.id);
+          const teamMemberSlackIds = teamMembers.map(member => member.slack_user_id).filter(Boolean);
+
+          this.logger.info('Team members found', {
+            teamId: filters.teamId,
+            memberCount: teamMemberIds.length,
+            slackIdCount: teamMemberSlackIds.length
+          });
+
+          // Filter tasks to show team tasks - either created by team members OR assigned to team members
+          tasks = tasks.filter(task => {
+            const isCreatedByTeam = teamMemberIds.includes(task.user_id);
+            const isAssignedToTeam = task.assignee && teamMemberSlackIds.includes(task.assignee);
+            const isAssignedByTeam = task.assignor && teamMemberSlackIds.includes(task.assignor);
+            const hasMentionedTeamMember = task.mentioned_users?.some(userId =>
+              teamMemberSlackIds.includes(userId)
+            );
+
+            const shouldInclude = isCreatedByTeam || isAssignedToTeam || isAssignedByTeam || hasMentionedTeamMember;
+
+            // Log tasks that pass the filter
+            if (shouldInclude) {
+              this.logger.info('✅ Team task INCLUDED', {
+                task_id: task.id,
+                task_title: task.title,
+                external_source: task.external_source,
+                external_key: task.external_key,
+                isCreatedByTeam,
+                isAssignedToTeam,
+                isAssignedByTeam,
+                hasMentionedTeamMember
+              });
+            } else {
+              this.logger.debug('❌ Task EXCLUDED from team view', {
+                task_id: task.id,
+                task_title: task.title,
+                task_user_id: task.user_id,
+                task_assignee: task.assignee,
+                task_assignor: task.assignor,
+                external_source: task.external_source
+              });
+            }
+
+            return shouldInclude;
+          });
+
+          this.logger.info('Tasks after team filtering', {
+            count: tasks.length,
+            teamMemberIds: teamMemberIds.slice(0, 3),
+            teamMemberSlackIds: teamMemberSlackIds.slice(0, 3)
           });
         }
+      } else {
+        // Apply user assignment filtering - user must be owner, assignee, assignor, or mentioned
+        tasks = tasks.filter(task => {
+          const isOwner = task.user_id === userId;
+          const isAssignee = userSlackId && task.assignee === userSlackId;
+          const isAssignor = userSlackId && task.assignor === userSlackId;
+          const isMentioned = userSlackId && task.mentioned_users?.includes(userSlackId);
+          
+          const hasAccess = isOwner || isAssignee || isAssignor || isMentioned;
 
-        return hasAccess;
-      });
+          if (!hasAccess) {
+            this.logger.debug('Task filtered out', {
+              task_id: task.id,
+              task_title: task.title,
+              task_assignee: task.assignee,
+              task_assignor: task.assignor,
+              task_mentioned_users: task.mentioned_users,
+              isOwner,
+              isAssignee,
+              isAssignor,
+              isMentioned
+            });
+          }
+
+          return hasAccess;
+        });
+      }
 
       // Apply assignment view filtering (for "My Tasks", "Assigned by Me", "Assigned to Me" tabs)
       if (filters.assignmentView && userSlackId) {
@@ -820,33 +890,37 @@ class DesktopSupabaseAdapter {
       const userRole = filters.userRole || userData?.user_role || 'sales';
 
       // Apply role-based route filtering
-      if (filters.routeTo) {
-        // Specific route requested
-        tasks = tasks.filter(task => {
-          const isDualRoute = task.work_type === 'calendar' || task.work_type === 'email';
-          if (isDualRoute) {
-            // Dual-route tasks appear in both views
-            return filters.routeTo === 'tasks-sales' || filters.routeTo === 'mission-control';
-          }
-          return task.route_to === filters.routeTo;
-        });
-      } else {
-        // Auto-filter by user role
-        tasks = tasks.filter(task => {
-          const isDualRoute = task.work_type === 'calendar' || task.work_type === 'email';
-          if (isDualRoute) return true; // Always show dual-route tasks
-          
-          if (userRole === 'sales') {
-            return task.route_to === 'tasks-sales';
-          } else if (userRole === 'developer') {
-            return task.route_to === 'mission-control';
-          }
-          return true; // Admin sees all
-        });
+      // SKIP this when viewing team dev tasks (we want to see developer tasks, not filter by sales role)
+      if (!filters.filterByTeam) {
+        if (filters.routeTo) {
+          // Specific route requested
+          tasks = tasks.filter(task => {
+            const isDualRoute = task.work_type === 'calendar' || task.work_type === 'email';
+            if (isDualRoute) {
+              // Dual-route tasks appear in both views
+              return filters.routeTo === 'tasks-sales' || filters.routeTo === 'mission-control';
+            }
+            return task.route_to === filters.routeTo;
+          });
+        } else {
+          // Auto-filter by user role
+          tasks = tasks.filter(task => {
+            const isDualRoute = task.work_type === 'calendar' || task.work_type === 'email';
+            if (isDualRoute) return true; // Always show dual-route tasks
+            
+            if (userRole === 'sales') {
+              return task.route_to === 'tasks-sales';
+            } else if (userRole === 'developer') {
+              return task.route_to === 'mission-control';
+            }
+            return true; // Admin sees all
+          });
+        }
       }
 
       // Apply external source filtering based on user role
-      if (userRole) {
+      // SKIP this filtering when viewing team dev tasks (filterByTeam mode)
+      if (userRole && !filters.filterByTeam) {
         tasks = tasks.filter(task => {
           const externalSource = task.external_source;
 
@@ -864,9 +938,22 @@ class DesktopSupabaseAdapter {
           return true;
         });
       }
+      
+      // When viewing team dev tasks, apply explicit external source filter
+      if (filters.filterByTeam && filters.externalSource) {
+        this.logger.info('Applying external source filter for team dev view', {
+          externalSource: filters.externalSource,
+          tasksBeforeFilter: tasks.length
+        });
+        tasks = tasks.filter(task => task.external_source === filters.externalSource);
+        this.logger.info('Tasks after external source filter', {
+          count: tasks.length
+        });
+      }
 
       // Apply route_to filtering with dual-routing logic
-      if (filters.routeTo) {
+      // SKIP this when viewing team dev tasks (we want to see developer tasks, not sales tasks)
+      if (filters.routeTo && !filters.filterByTeam) {
         tasks = tasks.filter(task => {
           const taskRoute = task.route_to;
           const workType = task.work_type;
@@ -897,6 +984,7 @@ class DesktopSupabaseAdapter {
         workTypeFilter: filters.workType || 'all',
         userRoleFilter: filters.userRole || 'none',
         assignmentViewFilter: filters.assignmentView || 'all',
+        teamFilter: filters.filterByTeam ? filters.teamId : 'none',
         dualRouteTasks: tasks.filter(t => t.work_type === 'calendar' || t.work_type === 'email').length
       });
 

@@ -65,7 +65,10 @@ function registerTaskHandlers(services, logger) {
       logger.info('Fetching tasks', {
         userId,
         isAuthenticated: !!userId,
-        filters
+        filters,
+        filterByTeam: filters.filterByTeam,
+        externalSource: filters.externalSource,
+        routeTo: filters.routeTo
       });
 
       if (!userId) {
@@ -77,12 +80,13 @@ function registerTaskHandlers(services, logger) {
         };
       }
 
-      // Auto-populate slackUserId if not provided in filters
+      // Auto-populate slackUserId and teamId if not provided in filters
       const enrichedFilters = {
         includeCompleted: false,
         ...filters,
         slackUserId: filters.slackUserId || currentUser?.slack_user_id,
-        userRole: filters.userRole || currentUser?.user_role
+        userRole: filters.userRole || currentUser?.user_role,
+        teamId: filters.teamId || currentUser?.team_id
       };
 
       const result = await dbAdapter.getUserTasks(userId, enrichedFilters);
@@ -96,7 +100,9 @@ function registerTaskHandlers(services, logger) {
         count: result.tasks.length,
         userId,
         userRole: enrichedFilters.userRole,
-        slackUserId: enrichedFilters.slackUserId
+        slackUserId: enrichedFilters.slackUserId,
+        teamId: enrichedFilters.teamId,
+        filterByTeam: enrichedFilters.filterByTeam || false
       });
 
       return {

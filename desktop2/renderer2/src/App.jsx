@@ -6,6 +6,7 @@ import TasksDeveloper from './pages/TasksDeveloper';
 import ArchitectureDiagram from './pages/ArchitectureDiagram';
 import Indexer from './pages/Indexer';
 import MissionControl from './pages/MissionControl';
+import MissionControlRefactored from './pages/MissionControlRefactored';
 import TeamChat from './pages/TeamChat';
 import Settings from './pages/Settings';
 import Admin from './pages/Admin';
@@ -13,6 +14,7 @@ import UserProductivityChat from './pages/UserProductivityChat';
 import Login from './pages/Login';
 import LoginFlow from './pages/LoginFlow';
 import DiagnosticMicrosoft from './pages/DiagnosticMicrosoft';
+import Unibox from './pages/Unibox';
 import ArcReactor from './components/ArcReactor/ArcReactor';
 
 function App() {
@@ -43,7 +45,7 @@ function App() {
       const cleanup = window.electronAPI.window.onSecondaryWindowChange(
         (isOpen, route) => {
           // Hide orb when Mission Control or Team Chat window is open, show when closed
-          const shouldHideOrb = isOpen && (route === '/mission-control' || route === '/team-chat');
+          const shouldHideOrb = isOpen && (route === '/mission-control' || route === '/mission-control-v2' || route === '/team-chat');
           setShowOrb(!shouldHideOrb);
           
           console.log(
@@ -212,7 +214,7 @@ function App() {
     // Navigate based on item ID
     const routeMap = {
       'chat': '/copilot',
-      'mission-control': '/mission-control',
+      'mission-control': '/mission-control-v2', // Updated to new carousel-based UI
       'tasks': '/tasks',
       'architecture': '/architecture',
       'indexer': '/indexer',
@@ -313,7 +315,9 @@ function App() {
           <Route path="/architecture" element={<ArchitectureDiagram user={currentUser} />} />
           <Route path="/indexer" element={<Indexer user={currentUser} />} />
           <Route path="/mission-control" element={<MissionControl user={currentUser} />} />
+          <Route path="/mission-control-v2" element={<MissionControlRefactored user={currentUser} />} />
           <Route path="/team-chat" element={<TeamChat user={currentUser} />} />
+          <Route path="/unibox" element={<Unibox user={currentUser} />} />
           <Route path="/settings" element={<Settings user={currentUser} />} />
           <Route path="/admin" element={<Admin user={currentUser} />} />
           <Route path="/user-productivity-chat/:userId" element={<UserProductivityChat user={currentUser} />} />
