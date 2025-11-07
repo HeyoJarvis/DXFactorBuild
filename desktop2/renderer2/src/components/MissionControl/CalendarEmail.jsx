@@ -9,6 +9,7 @@ import './CalendarEmail.css';
  */
 export default function CalendarEmail({ user, tasks = [] }) {
   const [activeTab, setActiveTab] = useState('calendar'); // 'calendar' or 'email'
+  const [calendarView, setCalendarView] = useState('week'); // 'day', 'week', 'month'
   const [events, setEvents] = useState([]);
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -347,6 +348,42 @@ export default function CalendarEmail({ user, tasks = [] }) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
+  // Get events for a specific date
+  const getEventsForDate = (date) => {
+    return events.filter(event => {
+      const eventDate = new Date(event.start?.dateTime || event.start?.date || event.start);
+      return eventDate.toDateString() === date.toDateString();
+    });
+  };
+
+  // Get day events grouped by hour for day view
+  const getDayEventsByHour = () => {
+    const dayEvents = getEventsForDate(selectedDate);
+    const hours = {};
+    for (let i = 9; i <= 18; i++) {
+      hours[i] = [];
+    }
+    dayEvents.forEach(event => {
+      const eventDate = new Date(event.start?.dateTime || event.start?.date);
+      const hour = eventDate.getHours();
+      if (hour >= 9 && hour <= 18) {
+        hours[hour].push(event);
+      }
+    });
+    return hours;
+  };
+
+  // Get all days in month
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    return { daysInMonth, startingDayOfWeek, year, month };
+  };
+
   if (!microsoftConnected && !googleConnected) {
     return (
       <div className="calendar-email-container">
@@ -483,6 +520,30 @@ export default function CalendarEmail({ user, tasks = [] }) {
         </div>
       )}
 
+      {/* Calendar View Selector */}
+      {activeTab === 'calendar' && (
+        <div className="calendar-view-selector">
+          <button
+            className={`view-btn ${calendarView === 'day' ? 'active' : ''}`}
+            onClick={() => setCalendarView('day')}
+          >
+            Day
+          </button>
+          <button
+            className={`view-btn ${calendarView === 'week' ? 'active' : ''}`}
+            onClick={() => setCalendarView('week')}
+          >
+            Week
+          </button>
+          <button
+            className={`view-btn ${calendarView === 'month' ? 'active' : ''}`}
+            onClick={() => setCalendarView('month')}
+          >
+            Month
+          </button>
+        </div>
+      )}
+
       {/* Content Section */}
       <div className="ce-content-section">
         {loading ? (
@@ -492,113 +553,124 @@ export default function CalendarEmail({ user, tasks = [] }) {
           </div>
         ) : activeTab === 'calendar' ? (
           <div className="calendar-content">
-            {/* TODAY Section */}
-            {events.length > 0 && (
-              <div className="calendar-section">
-                <div className="section-label">TODAY</div>
-                <div className="events-list today-events">
-                  {events
-                    .filter(event => {
-                      const eventDate = new Date(event.start?.dateTime || event.start?.date || event.start);
-                      const today = new Date();
-                      return eventDate.toDateString() === today.toDateString();
-                    })
-                    .map((event, index) => (
-                      <div key={index} className="event-card-simple">
-                        <div className="event-card-content">
-                          <div className="event-source-logo">
-                            {event.source === 'microsoft' ? (
-                              <div className="logo-text">O</div>
-                            ) : (
-                              <div className="logo-text">G</div>
-                            )}
-                          </div>
-                          <div className="event-details">
-                            <div className="event-title-simple">{event.subject || event.summary}</div>
-                            <div className="event-time-simple">{formatEventTime(event)}</div>
-                            {event.location && (
-                              <div className="event-location-simple">
-                                📍 {event.location.displayName || event.location}
+            {calendarView === 'day' && (
+              <div className="day-view">
+                <div className="day-view-header">
+                  <h3>{selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
+                </div>
+                <div className="day-timeline">
+                  {Array.from({ length: 10 }, (_, i) => {
+                    const hour = 9 + i;
+                    const hourEvents = getDayEventsByHour()[hour] || [];
+                    const timeStr = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
+                    
+                    return (
+                      <div key={hour} className="hour-slot">
+                        <div className="hour-label">{timeStr}</div>
+                        <div className="hour-content">
+                          {hourEvents.map((event, idx) => (
+                            <div key={idx} className="timeline-event">
+                              <div className="event-time">
+                                {new Date(event.start?.dateTime || event.start?.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                               </div>
-                            )}
-                          </div>
+                              <div className="event-title">{event.subject || event.summary}</div>
+                              {event.location && (
+                                <div className="event-location">
+                                  {event.location.displayName || event.location}
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Week Overview */}
-            <div className="calendar-section">
-              <div className="section-label">WEEK OVERVIEW</div>
-              <div className="week-grid">
-                {[0, 1, 2, 3, 4, 5, 6].map((dayOffset) => {
-                  const date = new Date();
-                  date.setDate(date.getDate() + dayOffset);
-                  const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
-                  const dayNum = date.getDate();
-                  const hasEvents = events.some(event => {
-                    const eventDate = new Date(event.start?.dateTime || event.start?.date || event.start);
-                    return eventDate.toDateString() === date.toDateString();
-                  });
-                  const isToday = new Date().toDateString() === date.toDateString();
-                  const isSelected = selectedDate.toDateString() === date.toDateString();
+            {calendarView === 'week' && (
+              <div className="week-view">
+                <div className="week-grid-full">
+                  {Array.from({ length: 7 }, (_, i) => {
+                    const date = new Date();
+                    date.setDate(date.getDate() + i);
+                    const dayName = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][date.getDay()];
+                    const dayNum = date.getDate();
+                    const dayEvents = getEventsForDate(date);
+                    const isToday = new Date().toDateString() === date.toDateString();
+                    const isSelected = selectedDate.toDateString() === date.toDateString();
 
-                  return (
-                    <div 
-                      key={dayOffset} 
-                      className={`day-cell ${isToday ? 'today' : ''} ${hasEvents ? 'has-events' : ''} ${isSelected ? 'selected' : ''}`}
-                      onClick={() => setSelectedDate(date)}
-                    >
-                      <div className="day-name">{dayName}</div>
-                      <div className="day-num">{dayNum}</div>
-                      {hasEvents && <div className="event-indicator"></div>}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Selected Date Events */}
-            {(() => {
-              const selectedDateEvents = events.filter(event => {
-                const eventDate = new Date(event.start?.dateTime || event.start?.date || event.start);
-                return eventDate.toDateString() === selectedDate.toDateString();
-              });
-              
-              return selectedDateEvents.length > 0 && (
-                <div className="calendar-section">
-                  <div className="section-label">
-                    {selectedDate.toDateString()}
-                  </div>
-                  <div className="events-list today-events">
-                    {selectedDateEvents.map((event, index) => (
-                      <div key={index} className="event-card-simple">
-                        <div className="event-card-content">
-                          <div className="event-source-logo">
-                            {event.source === 'microsoft' ? (
-                              <div className="logo-text">O</div>
-                            ) : (
-                              <div className="logo-text">G</div>
-                            )}
-                          </div>
-                          <div className="event-details">
-                            <div className="event-title-simple">{event.subject || event.summary}</div>
-                            <div className="event-time-simple">{formatEventTime(event)}</div>
-                            {event.location && (
-                              <div className="event-location-simple">
-                                📍 {event.location.displayName || event.location}
-                              </div>
-                            )}
-                          </div>
+                    return (
+                      <div 
+                        key={i} 
+                        className={`week-day-col ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`}
+                        onClick={() => setSelectedDate(date)}
+                      >
+                        <div className="day-header">
+                          <div className="day-name-week">{dayName}</div>
+                          <div className="day-num-week">{dayNum}</div>
+                        </div>
+                        <div className="day-events-week">
+                          {dayEvents.slice(0, 3).map((event, idx) => (
+                            <div key={idx} className="week-event-badge">
+                              {event.subject || event.summary}
+                            </div>
+                          ))}
+                          {dayEvents.length > 3 && (
+                            <div className="week-event-more">+{dayEvents.length - 3} more</div>
+                          )}
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-              );
-            })()}
+              </div>
+            )}
+
+            {calendarView === 'month' && (
+              <div className="month-view">
+                <div className="month-header">
+                  <h3>{selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h3>
+                </div>
+                <div className="month-grid">
+                  {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
+                    <div key={day} className="month-day-header">{day}</div>
+                  ))}
+                  {(() => {
+                    const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(selectedDate);
+                    const days = [];
+                    
+                    for (let i = 0; i < startingDayOfWeek; i++) {
+                      days.push(<div key={`empty-${i}`} className="month-day empty"></div>);
+                    }
+                    
+                    for (let day = 1; day <= daysInMonth; day++) {
+                      const date = new Date(year, month, day);
+                      const dayEvents = getEventsForDate(date);
+                      const isToday = new Date().toDateString() === date.toDateString();
+                      
+                      days.push(
+                        <div 
+                          key={day} 
+                          className={`month-day ${isToday ? 'today' : ''}`}
+                          onClick={() => setSelectedDate(date)}
+                        >
+                          <div className="month-day-num">{day}</div>
+                          <div className="month-day-events">
+                            {dayEvents.slice(0, 2).map((event, idx) => (
+                              <div key={idx} className="month-event-dot"></div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    return days;
+                  })()}
+                </div>
+              </div>
+            )}
 
             {/* Empty State */}
             {events.length === 0 && aiSuggestions.length === 0 && (

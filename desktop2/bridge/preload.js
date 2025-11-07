@@ -187,6 +187,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
     generateSuggestions: (messages) => ipcRenderer.invoke('inbox:generateSuggestions', messages)
   },
 
+  // Email Semantic Search & Indexing APIs
+  email: {
+    index: (data) => ipcRenderer.invoke('email:index', data),
+    indexSingle: (data) => ipcRenderer.invoke('email:index-single', data),
+    query: (data) => ipcRenderer.invoke('email:query', data),
+    stats: (data) => ipcRenderer.invoke('email:stats', data),
+    reindex: (data) => ipcRenderer.invoke('email:reindex', data),
+    findByDate: (data) => ipcRenderer.invoke('email:find-by-date', data),
+    indexingStatus: (data) => ipcRenderer.invoke('email:indexing-status', data)
+  },
+
   // Calendar API
   calendar: {
     generateSuggestions: (events) => ipcRenderer.invoke('calendar:generateSuggestions', events)

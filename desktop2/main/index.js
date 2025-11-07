@@ -38,6 +38,7 @@ const registerOnboardingHandlers = require('./ipc/onboarding-handlers');
 const registerTeamHandlers = require('./ipc/team-handlers');
 const registerAdminHandlers = require('./ipc/admin-handlers');
 const CodeIndexerHandlers = require('./ipc/code-indexer-handlers');
+const EmailHandlers = require('./ipc/email-handlers');
 
 // Setup logger (console only at startup, file transport added after app ready)
 const logger = winston.createLogger({
@@ -650,6 +651,9 @@ function setupIPC() {
   // Setup code indexer handlers
   const codeIndexerHandlers = new CodeIndexerHandlers(logger, appState.services);
   codeIndexerHandlers.setup();
+
+  // Setup email handlers (handlers are registered when module is loaded)
+  EmailHandlers.initializeServices();
 
   logger.info('IPC handlers registered');
 }

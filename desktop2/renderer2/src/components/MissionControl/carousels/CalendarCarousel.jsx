@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './CalendarCarousel.css';
+import SlimHeader from '../common/SlimHeader';
 
 /**
  * CalendarCarousel - Displays unified calendar with AI suggestions
  * Shows events from Google Calendar and Outlook
  */
 export default function CalendarCarousel({ onSelectEvent, user }) {
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -372,8 +375,25 @@ export default function CalendarCarousel({ onSelectEvent, user }) {
     );
   }
 
+  const handleTeamsClick = () => {
+    // Navigate to Mission Control in team mode
+    navigate('/mission-control?mode=team');
+  };
+
+  const handleSettingsClick = () => {
+    // Navigate to Settings page
+    navigate('/settings');
+  };
+
   return (
     <div className="calendar-view">
+      {/* Slim Header Bar */}
+      <SlimHeader
+        title="Calendar"
+        onTeamsClick={handleTeamsClick}
+        onSettingsClick={handleSettingsClick}
+      />
+
       {/* Header */}
       <div className="calendar-header">
         <div className="calendar-header-top">

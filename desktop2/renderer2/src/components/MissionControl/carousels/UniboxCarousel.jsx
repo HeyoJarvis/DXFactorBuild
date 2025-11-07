@@ -15,6 +15,14 @@ export default function UniboxCarousel({ onSelectMessage }) {
   const [showWhitelistModal, setShowWhitelistModal] = useState(false);
   const [newWhitelistEmail, setNewWhitelistEmail] = useState('');
 
+  // AI Search state
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiResult, setAiResult] = useState(null);
+  const [isQuerying, setIsQuerying] = useState(false);
+  const [indexingStatus, setIndexingStatus] = useState('idle'); // idle, indexing, completed
+  const [indexedCount, setIndexedCount] = useState(0);
+  const [showAIModal, setShowAIModal] = useState(false);
+
   useEffect(() => {
     loadMessages();
   }, []);
@@ -23,15 +31,15 @@ export default function UniboxCarousel({ onSelectMessage }) {
     try {
       setLoading(true);
       console.log('📬 UniboxCarousel: Loading messages...');
-      
+
       // Request up to 500 emails (increased from default 50)
       const result = await window.electronAPI.inbox.getUnified({
         maxResults: 500,
         includeSources: ['email', 'linkedin']
       });
-      
+
       console.log('📬 UniboxCarousel: Result:', result);
-      
+
       if (result.success && result.messages) {
         console.log('📬 UniboxCarousel: Loaded', result.messages.length, 'messages');
         console.log('📬 UniboxCarousel: Sample message data:', result.messages[0]);
@@ -42,11 +50,112 @@ export default function UniboxCarousel({ onSelectMessage }) {
           preview: result.messages[0]?.preview
         });
         setMessages(result.messages);
+
+        // Auto-index emails in background
+        indexEmailsInBackground(result.messages);
       }
     } catch (error) {
       console.error('📬 UniboxCarousel: Error loading messages:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Auto-index emails in background for AI search
+  const indexEmailsInBackground = async (emails) => {
+    try {
+      setIndexingStatus('indexing');
+      console.log('🤖 Starting email indexing for AI search...');
+
+      // Get user ID from auth
+      const response = await window.electronAPI.auth.getCurrentUser();
+      console.log('🤖 Auth response:', response);
+
+      if (!response?.success || !response?.user?.id) {
+        console.warn('⚠️ No user logged in, skipping email indexing');
+        setIndexingStatus('idle');
+        return;
+      }
+
+      const userId = response.user.id;
+      console.log('🤖 User ID:', userId);
+
+      // Detect provider from emails (take first email's provider)
+      const provider = emails[0]?.provider || 'gmail';
+
+      const result = await window.electronAPI.email.index({
+        emails,
+        userId,
+        provider
+      });
+
+      if (result.success) {
+        console.log(`✅ Indexed ${result.indexed} emails, skipped ${result.skipped}`);
+        setIndexedCount(result.indexed);
+        setIndexingStatus('completed');
+      } else {
+        console.error('❌ Email indexing failed:', result.error);
+        setIndexingStatus('failed');
+      }
+    } catch (error) {
+      console.error('❌ Failed to index emails:', error);
+      setIndexingStatus('failed');
+    }
+  };
+
+  // Handle AI search query
+  const handleAISearch = async () => {
+    if (!aiQuery.trim()) return;
+
+    setIsQuerying(true);
+    setAiResult(null);
+
+    try {
+      const response = await window.electronAPI.auth.getCurrentUser();
+
+      if (!response?.success || !response?.user?.id) {
+        setAiResult({
+          success: false,
+          answer: 'Please log in to search your emails.',
+          emails: []
+        });
+        setIsQuerying(false);
+        return;
+      }
+
+      const userId = response.user.id;
+
+      const result = await window.electronAPI.email.query({
+        query: aiQuery,
+        userId,
+        filters: {
+          // Add filters as needed
+        }
+      });
+
+      if (result.success) {
+        setAiResult(result);
+        setShowAIModal(true); // Show modal with results
+        console.log('🤖 AI Search Result:', result);
+      } else {
+        console.error('AI search failed:', result.error);
+        setAiResult({
+          success: false,
+          answer: 'Sorry, I encountered an error processing your query.',
+          emails: []
+        });
+        setShowAIModal(true); // Show modal even for errors
+      }
+    } catch (error) {
+      console.error('AI search failed:', error);
+      setAiResult({
+        success: false,
+        answer: 'Sorry, I encountered an error processing your query.',
+        emails: []
+      });
+      setShowAIModal(true); // Show modal even for errors
+    } finally {
+      setIsQuerying(false);
     }
   };
 
@@ -393,12 +502,25 @@ export default function UniboxCarousel({ onSelectMessage }) {
     <div className="unibox-inbox">
       {/* Header */}
       <div className="inbox-header">
-        <div className="inbox-header-top">
-          <h1>Inbox</h1>
-          
+        <div className="inbox-header-row">
+          {/* Left: Wide Search Bar */}
+          <div className="inbox-search-large">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input
+              type="text"
+              placeholder="Search company, subject, purpose..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Right: Action Buttons */}
           <div className="header-actions">
             {/* Whitelist Button */}
-            <button 
+            <button
               className="whitelist-btn"
               onClick={() => setShowWhitelistModal(true)}
               title="Manage allowed senders"
@@ -411,9 +533,9 @@ export default function UniboxCarousel({ onSelectMessage }) {
               </svg>
               Allowed ({whitelistedEmails.length})
             </button>
-            
+
             {/* Marketing Filter Toggle */}
-            <button 
+            <button
               className={`marketing-filter-btn ${hideMarketing ? 'active' : ''}`}
               onClick={() => setHideMarketing(!hideMarketing)}
               title={hideMarketing ? 'Marketing emails hidden' : 'Showing all emails'}
@@ -436,27 +558,6 @@ export default function UniboxCarousel({ onSelectMessage }) {
             </button>
           </div>
         </div>
-        
-        {/* Search */}
-        <div className="inbox-search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          <input
-            type="text"
-            placeholder="Search company, subject, purpose"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {/* Tabs */}
-        <div className="inbox-tabs">
-          <button className="tab-btn active">Inbox</button>
-          <button className="tab-btn">Outcomes</button>
-          <button className="tab-btn">Suggestions</button>
-        </div>
       </div>
 
       {/* Inbox Section Header */}
@@ -465,92 +566,103 @@ export default function UniboxCarousel({ onSelectMessage }) {
         <span className="message-count">{filteredMessages.length} messages</span>
       </div>
 
-      {/* Message List */}
+      {/* Content Area: Scrollable Email List + Fixed Chatbot */}
       <div className="inbox-content">
-        {filteredMessages.length === 0 ? (
-          <div className="inbox-empty">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            <p>No messages found</p>
-            <span>Try adjusting your filters</span>
-          </div>
-        ) : (
-          <div className="message-list">
-            {/* Debug: Log first message structure */}
-            {filteredMessages.length > 0 && console.log('📧 First filtered message:', filteredMessages[0])}
-            {filteredMessages.length > 0 && console.log('📧 Message fields:', {
-              company: filteredMessages[0]?.company,
-              from: filteredMessages[0]?.from,
-              subject: filteredMessages[0]?.subject,
-              preview: filteredMessages[0]?.preview,
-              body: filteredMessages[0]?.body,
-              allKeys: Object.keys(filteredMessages[0])
-            })}
-            {filteredMessages.map((msg) => (
-              <div 
-                key={msg.id} 
-                className="message-item"
+        {/* Scrollable Email List Container */}
+        <div className="email-list-container">
+          {filteredMessages.length === 0 ? (
+            <div className="inbox-empty">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <p>No messages found</p>
+              <span>Try adjusting your filters</span>
+            </div>
+          ) : (
+            <div className="message-list">
+              {/* Debug: Log first message structure */}
+              {filteredMessages.length > 0 && console.log('📧 First filtered message:', filteredMessages[0])}
+              {filteredMessages.length > 0 && console.log('📧 Message fields:', {
+                company: filteredMessages[0]?.company,
+                from: filteredMessages[0]?.from,
+                subject: filteredMessages[0]?.subject,
+                preview: filteredMessages[0]?.preview,
+                body: filteredMessages[0]?.body,
+                allKeys: Object.keys(filteredMessages[0])
+              })}
+              {/* Display all emails - removed slice limit for scrolling */}
+              {filteredMessages.map((msg) => (
+              <div
+                key={msg.id}
+                className="email-card"
                 onClick={() => handleMessageClick(msg)}
               >
-                {/* Avatar Square with Provider Badge */}
-                <div className="message-avatar-wrapper">
-                  <div className="message-avatar-square">
+                {/* Left: Avatar with Provider Badge */}
+                <div className="email-card-avatar">
+                  <div className="avatar-letter">
                     {msg.company?.charAt(0)?.toUpperCase() || '?'}
                   </div>
-                  <div className="avatar-provider-badge">
+                  <div className="provider-badge">
                     {getSourceIcon(msg)}
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="message-content" style={{ position: 'relative', zIndex: 10 }}>
-                  {/* DEBUG VIEW - Remove after fixing */}
-                  <div style={{ 
-                    background: '#fff3cd', 
-                    padding: '8px', 
-                    marginBottom: '8px', 
-                    fontSize: '11px', 
-                    fontFamily: 'monospace',
-                    border: '1px solid #ffc107',
-                    borderRadius: '4px'
-                  }}>
-                    <strong>DEBUG:</strong> company={msg.company || 'NULL'} | 
-                    from={msg.from || 'NULL'} | 
-                    subject={msg.subject || 'NULL'}
-                  </div>
-                  
-                  <div className="message-header">
-                    <div className="message-sender-info">
-                      <span className="message-company" style={{ color: '#000000', fontSize: '16px', fontWeight: '600' }}>
-                        {msg.company || 'Unknown'}
-                      </span>
-                      <span className="message-email" style={{ color: '#000000', fontSize: '13px', opacity: 0.6 }}>
-                        {msg.from || 'No email'}
-                      </span>
-                    </div>
-                    <div className="message-meta-right">
+                {/* Right: Email Info */}
+                <div className="email-card-body">
+                  {/* Top Row: Name on left, Category + Time on right */}
+                  <div className="email-card-top">
+                    <div className="sender-name">{msg.company || 'Unknown'}</div>
+                    <div className="email-meta-top">
                       {msg.tags?.length > 0 && (
-                        <span className="message-category">{msg.tags[0].toUpperCase()}</span>
+                        <span className="email-tag">{msg.tags[0]}</span>
                       )}
-                      <span className="message-timestamp">{msg.timestamp || 'Unknown'}</span>
+                      <span className="email-time">{msg.timestamp || 'Unknown'}</span>
                     </div>
                   </div>
-                  
-                  <div className="message-subject" style={{ color: '#000000', fontSize: '15px', fontWeight: '600' }}>
-                    {msg.subject || 'No subject'}
-                  </div>
-                  
-                  <div className="message-preview" style={{ color: '#000000', fontSize: '14px', opacity: 0.7 }}>
-                    {msg.preview || 'No preview available'}
+                  {/* Bottom Row: Subject */}
+                  <div className="email-card-bottom">
+                    <div className="email-subject">{msg.subject || 'No subject'}</div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
+        </div>
+        {/* End of email-list-container */}
+
+        {/* AI Search Input Bar */}
+        <div className="email-ai-search-bar">
+          <input
+            type="text"
+            className="ai-search-input"
+            placeholder="Ask about your emails... (e.g., 'Find emails about pricing discussions')"
+            value={aiQuery}
+            onChange={(e) => setAiQuery(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleAISearch()}
+            disabled={isQuerying || indexingStatus === 'indexing'}
+          />
+          <button
+            className="ai-search-send-btn"
+            onClick={handleAISearch}
+            disabled={isQuerying || indexingStatus === 'indexing' || !aiQuery.trim()}
+            title={indexingStatus === 'indexing' ? 'Indexing emails...' : 'Search emails with AI'}
+          >
+            {isQuerying ? (
+              <div className="button-spinner"></div>
+            ) : indexingStatus === 'indexing' ? (
+              <div className="indexing-spinner"></div>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
+      {/* End of inbox-content */}
 
       {/* Whitelist Modal */}
       {showWhitelistModal && (
@@ -622,6 +734,78 @@ export default function UniboxCarousel({ onSelectMessage }) {
             <div className="modal-footer">
               <button className="modal-btn-secondary" onClick={() => setShowWhitelistModal(false)}>
                 Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Search Results Modal */}
+      {showAIModal && aiResult && (
+        <div className="modal-overlay" onClick={() => setShowAIModal(false)}>
+          <div className="ai-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="ai-modal-header">
+              <h2>AI Search Results</h2>
+              <button className="modal-close" onClick={() => setShowAIModal(false)}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <div className="ai-modal-body">
+              {/* AI Answer */}
+              <div className="ai-answer">
+                <div className="ai-answer-header">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  <span>AI Answer</span>
+                  {aiResult.confidence && (
+                    <span className={`confidence-badge ${aiResult.confidence}`}>
+                      {aiResult.confidence} confidence
+                    </span>
+                  )}
+                </div>
+                <p className="ai-answer-text">{aiResult.answer}</p>
+              </div>
+
+              {/* Source Emails */}
+              {aiResult.emails && aiResult.emails.length > 0 && (
+                <div className="ai-sources">
+                  <div className="ai-sources-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>Source Emails ({aiResult.emails.length})</span>
+                  </div>
+                  <div className="ai-email-citations">
+                    {aiResult.emails.map((email, idx) => (
+                      <div key={idx} className="citation-card">
+                        <div className="citation-header">
+                          <span className="citation-from">{email.from}</span>
+                          {email.similarity && (
+                            <span className="citation-similarity">
+                              {(email.similarity * 100).toFixed(0)}% match
+                            </span>
+                          )}
+                        </div>
+                        <div className="citation-subject">{email.subject}</div>
+                        {email.preview && (
+                          <div className="citation-preview">{email.preview.substring(0, 150)}...</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="ai-modal-footer">
+              <button className="modal-btn-primary" onClick={() => setShowAIModal(false)}>
+                Close
               </button>
             </div>
           </div>

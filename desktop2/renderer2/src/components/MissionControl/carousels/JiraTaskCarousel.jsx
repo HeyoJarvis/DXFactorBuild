@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './JiraTaskCarousel.css';
+import SlimHeader from '../common/SlimHeader';
 
 /**
  * JiraTaskCarousel - Overlapping card carousel for JIRA tasks
- * 
+ *
  * Features:
  * - 5 overlapping cards visible at once
  * - Left/right navigation
@@ -12,6 +14,17 @@ import './JiraTaskCarousel.css';
  */
 export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
+
+  const handleTeamsClick = () => {
+    // Navigate to Mission Control in team mode
+    navigate('/mission-control?mode=team');
+  };
+
+  const handleSettingsClick = () => {
+    // Navigate to Settings page
+    navigate('/settings');
+  };
 
   // Ensure we have tasks
   const taskList = tasks || [];
@@ -35,14 +48,21 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
 
   if (!taskList || taskList.length === 0) {
     return (
-      <div className="jira-carousel-empty">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="9" y1="9" x2="15" y2="9"></line>
-          <line x1="9" y1="15" x2="15" y2="15"></line>
-        </svg>
-        <p>No JIRA tasks found</p>
-        <span className="empty-hint">Tasks will appear here when assigned</span>
+      <div className="jira-carousel-wrapper">
+        <SlimHeader
+          title="Jira Progress"
+          onTeamsClick={handleTeamsClick}
+          onSettingsClick={handleSettingsClick}
+        />
+        <div className="jira-carousel-empty">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="9" x2="15" y2="9"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+          <p>No JIRA tasks found</p>
+          <span className="empty-hint">Tasks will appear here when assigned</span>
+        </div>
       </div>
     );
   }
@@ -51,7 +71,13 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
   const visibleTasks = taskList.slice(currentIndex, currentIndex + 5);
 
   return (
-    <div className="jira-task-carousel">
+    <div className="jira-carousel-wrapper">
+      <SlimHeader
+        title="Jira Progress"
+        onTeamsClick={handleTeamsClick}
+        onSettingsClick={handleSettingsClick}
+      />
+      <div className="jira-task-carousel">
       {/* Left Navigation */}
       <button 
         onClick={handlePrev} 
@@ -149,6 +175,7 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
           {currentIndex + 1} / {taskList.length}
         </div>
       )}
+      </div>
     </div>
   );
 }

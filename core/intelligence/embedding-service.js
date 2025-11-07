@@ -164,20 +164,21 @@ class EmbeddingService {
    * Truncate text to stay within token limit
    * @private
    */
-  _truncateText(text, maxTokens = 8000) {
-    // Rough estimate: 4 chars per token
+  _truncateText(text, maxTokens = 2000) {
+    // Rough estimate: 4 chars per token (conservative)
+    // Use a lower limit to account for batch processing overhead
     const maxChars = maxTokens * 4;
     if (text.length <= maxChars) {
       return text;
     }
-    
+
     this.logger.warn('Text exceeds token limit, truncating', {
       originalLength: text.length,
       truncatedLength: maxChars,
       estimatedOriginalTokens: Math.ceil(text.length / 4),
       maxTokens
     });
-    
+
     return text.substring(0, maxChars);
   }
 
@@ -328,6 +329,24 @@ class EmbeddingService {
       estimatedCost: 0
     };
     this.logger.info('Statistics reset');
+  }
+
+  /**
+   * Alias for generateEmbedding (for convenience)
+   * @param {string} text - Text to embed
+   * @returns {Promise<Array>} Embedding vector
+   */
+  async embed(text) {
+    return this.generateEmbedding(text);
+  }
+
+  /**
+   * Alias for generateEmbeddings (for convenience)
+   * @param {Array<string>} texts - Array of texts to embed
+   * @returns {Promise<Array>} Array of embedding vectors
+   */
+  async embedBatch(texts) {
+    return this.generateEmbeddings(texts);
   }
 }
 

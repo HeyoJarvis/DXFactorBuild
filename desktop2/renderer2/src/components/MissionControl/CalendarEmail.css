@@ -862,6 +862,319 @@
   background: #3b82f6;
 }
 
+/* ===== CALENDAR VIEW SELECTOR ===== */
+.calendar-view-selector {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.view-btn {
+  padding: 8px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.view-btn:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.05);
+  color: #3b82f6;
+}
+
+.view-btn.active {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  color: white;
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* ===== DAY VIEW ===== */
+.day-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.day-view-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.day-view-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.day-timeline {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
+.hour-slot {
+  display: flex;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  min-height: 80px;
+}
+
+.hour-label {
+  width: 60px;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #94a3b8;
+  text-align: right;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.hour-content {
+  flex: 1;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeline-event {
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.08), rgba(147, 197, 253, 0.08));
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.timeline-event .event-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 4px;
+}
+
+.timeline-event .event-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.timeline-event .event-location {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* ===== WEEK VIEW ===== */
+.week-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+}
+
+.week-grid-full {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  flex: 1;
+}
+
+.week-day-col {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.week-day-col:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.week-day-col.today {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(96, 165, 250, 0.1));
+  border-color: #3b82f6;
+}
+
+.week-day-col.selected {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  border-color: #3b82f6;
+  color: white;
+}
+
+.week-day-col.selected .day-name-week,
+.week-day-col.selected .day-num-week {
+  color: white;
+}
+
+.day-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.week-day-col.selected .day-header {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.day-name-week {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.day-num-week {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.day-events-week {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.week-event-badge {
+  font-size: 11px;
+  padding: 6px 8px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-radius: 6px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.week-day-col.selected .week-event-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.week-event-more {
+  font-size: 11px;
+  padding: 4px 8px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.week-day-col.selected .week-event-more {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== MONTH VIEW ===== */
+.month-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+}
+
+.month-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.month-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  flex: 1;
+}
+
+.month-day-header {
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.month-day {
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 60px;
+}
+
+.month-day:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.month-day.today {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(96, 165, 250, 0.1));
+  border-color: #3b82f6;
+}
+
+.month-day.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.month-day-num {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.month-day-events {
+  display: flex;
+  gap: 3px;
+}
+
+.month-event-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #3b82f6;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1400px) {
   .ce-header-section {
