@@ -18,6 +18,11 @@ export default function CalendarCarousel({ onSelectEvent, user }) {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showNewMeetingModal, setShowNewMeetingModal] = useState(false);
+  const [lastFetchTime, setLastFetchTime] = useState({});
+  const [cachedEvents, setCachedEvents] = useState({});
+
+  // Cache duration: 3 minutes for calendar (shorter since events change more frequently)
+  const CACHE_DURATION = 3 * 60 * 1000;
 
   useEffect(() => {
     loadEvents();
@@ -71,23 +76,39 @@ export default function CalendarCarousel({ onSelectEvent, user }) {
     }
   };
 
-  const loadEvents = async () => {
+  const loadEvents = async (forceRefresh = false) => {
     try {
+      const { startDate, endDate } = getDateRange();
+      const cacheKey = `${viewMode}-${startDate.toISOString()}-${endDate.toISOString()}`;
+
+      // Check cache validity
+      const now = Date.now();
+      const cacheValid = lastFetchTime[cacheKey] && (now - lastFetchTime[cacheKey]) < CACHE_DURATION;
+
+      if (cacheValid && cachedEvents[cacheKey] && !forceRefresh) {
+        console.log('📅 CalendarCarousel: Using cached events for', cacheKey);
+        setEvents(cachedEvents[cacheKey]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       console.log('📅 CalendarCarousel: Loading events for', viewMode, 'view');
-      
-      const { startDate, endDate } = getDateRange();
-      
+
       const result = await window.electronAPI.missionControl.getCalendar({
         startDateTime: startDate.toISOString(),
         endDateTime: endDate.toISOString()
       });
-      
+
       console.log('📅 CalendarCarousel: Result:', result);
-      
+
       if (result.success && result.events) {
         console.log('📅 CalendarCarousel: Loaded', result.events.length, 'events');
         setEvents(result.events);
+
+        // Update cache
+        setCachedEvents(prev => ({ ...prev, [cacheKey]: result.events }));
+        setLastFetchTime(prev => ({ ...prev, [cacheKey]: now }));
       }
     } catch (error) {
       console.error('📅 CalendarCarousel: Error loading events:', error);
@@ -124,6 +145,29 @@ export default function CalendarCarousel({ onSelectEvent, user }) {
     }
 
     return { startDate: start, endDate: end };
+  };
+
+  // Get events for a specific date
+  const getEventsForDate = (date) => {
+    return events.filter(event => {
+      const eventDate = new Date(event.start?.dateTime || event.start?.date);
+      return eventDate.toDateString() === date.toDateString();
+    }).sort((a, b) => {
+      const aTime = new Date(a.start?.dateTime || a.start?.date);
+      const bTime = new Date(b.start?.dateTime || b.start?.date);
+      return aTime - bTime;
+    });
+  };
+
+  // Get all days in month
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    return { daysInMonth, startingDayOfWeek, year, month };
   };
 
   // Filter events based on search query and date range
@@ -407,20 +451,6 @@ export default function CalendarCarousel({ onSelectEvent, user }) {
           </button>
         </div>
         
-        {/* Search */}
-        <div className="calendar-search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          <input
-            type="text"
-            placeholder="Search events"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
         {/* View Mode Toggle */}
         <div className="view-mode-toggle">
           <button 
@@ -507,76 +537,200 @@ export default function CalendarCarousel({ onSelectEvent, user }) {
         </div>
       )}
 
-      {/* Events Section Header */}
-      <div className="calendar-section-header">
-        <h3>Upcoming Events</h3>
-        <span className="event-count">{filteredEvents.length} events</span>
-      </div>
+      {/* Calendar Content - Different Views */}
+      <div className="calendar-content" data-view={viewMode}>
+        {viewMode === 'week' && (
+          <div className="week-grid-view">
+            {Array.from({ length: 7 }, (_, i) => {
+              const date = new Date(currentDate);
+              date.setDate(date.getDate() + i - date.getDay());
+              const dayName = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][date.getDay()];
+              const dayNum = date.getDate();
+              const dayEvents = getEventsForDate(date);
+              const isToday = new Date().toDateString() === date.toDateString();
 
-      {/* Events List */}
-      <div className="calendar-content">
-        {filteredEvents.length === 0 ? (
-          <div className="calendar-empty">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            <p>No events found</p>
-            <span>Try adjusting your filters or date range</span>
-          </div>
-        ) : (
-          <div className="event-list">
-            {filteredEvents.map((event) => (
-              <div 
-                key={event.id} 
-                className="event-item"
-                onClick={() => handleEventClick(event)}
-              >
-                {/* Time indicator */}
-                <div className="event-time-indicator">
-                  <div className="event-date">{formatEventDate(event)}</div>
-                  <div className="event-time">{formatEventTime(event)}</div>
-                </div>
-
-                {/* Provider Icon */}
-                <div className="event-provider-icon">
-                  {getProviderIcon(event)}
-                </div>
-
-                {/* Content */}
-                <div className="event-content">
-                  <div className="event-title">{event.subject || event.summary}</div>
-                  <div className="event-organizer">
-                    {event.organizer?.emailAddress?.name || event.organizer?.email || 'Unknown organizer'}
+              return (
+                <div 
+                  key={i} 
+                  className={`week-day-card ${isToday ? 'today' : ''}`}
+                  onClick={() => setCurrentDate(date)}
+                >
+                  <div className="week-day-header">
+                    <div className="week-day-name">{dayName}</div>
+                    <div className="week-day-number">{dayNum}</div>
                   </div>
-                  {event.location && (
-                    <div className="event-location">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                      {event.location}
+                  <div className="week-day-events">
+                    {dayEvents.slice(0, 2).map((event, idx) => (
+                      <div 
+                        key={idx} 
+                        className="week-event-item"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEventClick(event);
+                        }}
+                      >
+                        {event.subject || event.summary}
+                      </div>
+                    ))}
+                    {dayEvents.length > 2 && (
+                      <div className="week-event-count">+{dayEvents.length - 2} more</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {viewMode === 'month' && (
+          <div className="month-grid-view">
+            <div className="month-calendar-grid">
+              {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
+                <div key={day} className="month-day-header">{day}</div>
+              ))}
+              {(() => {
+                const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentDate);
+                const days = [];
+                
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                  days.push(<div key={`empty-${i}`} className="month-day-cell empty"></div>);
+                }
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                  const date = new Date(year, month, day);
+                  const dayEvents = getEventsForDate(date);
+                  const isToday = new Date().toDateString() === date.toDateString();
+                  
+                  days.push(
+                    <div 
+                      key={day} 
+                      className={`month-day-cell ${isToday ? 'today' : ''}`}
+                      onClick={() => setCurrentDate(date)}
+                    >
+                      <div className="month-day-number">{day}</div>
+                      <div className="month-day-events-list">
+                        {dayEvents.slice(0, 3).map((_, idx) => (
+                          <div key={idx} className="month-event-dot"></div>
+                        ))}
+                      </div>
                     </div>
-                  )}
-                </div>
-
-                {/* Attendees count - removed avatar circles, just showing count */}
-                {event.attendees && event.attendees.length > 0 && (
-                  <div className="event-attendees-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    {event.attendees.length}
-                  </div>
-                )}
-              </div>
-            ))}
+                  );
+                }
+                
+                return days;
+              })()}
+            </div>
           </div>
+        )}
+
+        {viewMode === 'day' && (
+          <div className="day-timeline-view">
+            <div className="day-timeline">
+              <div className="timeline-hours">
+                {Array.from({ length: 10 }, (_, i) => {
+                  const hour = 9 + i;
+                  const timeStr = hour > 12 ? `${hour - 12}P` : hour === 12 ? '12P' : `${hour}A`;
+                  return <div key={hour} className="timeline-hour">{timeStr}</div>;
+                })}
+              </div>
+              <div className="timeline-events">
+                {Array.from({ length: 10 }, (_, i) => {
+                  const hour = 9 + i;
+                  const hourEvents = getEventsForDate(currentDate).filter(event => {
+                    const eventHour = new Date(event.start?.dateTime || event.start?.date).getHours();
+                    return eventHour === hour;
+                  });
+                  
+                  return (
+                    <div key={hour} className="timeline-event-slot">
+                      {hourEvents.map((event, idx) => (
+                        <div 
+                          key={idx}
+                          className="timeline-event-block"
+                          onClick={() => handleEventClick(event)}
+                        >
+                          {event.subject || event.summary}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Fallback: Event List */}
+        {!viewMode || (viewMode !== 'day' && viewMode !== 'week' && viewMode !== 'month') && (
+          <>
+            <div className="calendar-section-header">
+              <h3>Upcoming Events</h3>
+              <span className="event-count">{filteredEvents.length} events</span>
+            </div>
+            {filteredEvents.length === 0 ? (
+              <div className="calendar-empty">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <p>No events found</p>
+                <span>Try adjusting your filters or date range</span>
+              </div>
+            ) : (
+              <div className="event-list">
+                {filteredEvents.map((event) => (
+                  <div 
+                    key={event.id} 
+                    className="event-item"
+                    onClick={() => handleEventClick(event)}
+                  >
+                    {/* Time indicator */}
+                    <div className="event-time-indicator">
+                      <div className="event-date">{formatEventDate(event)}</div>
+                      <div className="event-time">{formatEventTime(event)}</div>
+                    </div>
+
+                    {/* Provider Icon */}
+                    <div className="event-provider-icon">
+                      {getProviderIcon(event)}
+                    </div>
+
+                    {/* Content */}
+                    <div className="event-content">
+                      <div className="event-title">{event.subject || event.summary}</div>
+                      <div className="event-organizer">
+                        {event.organizer?.emailAddress?.name || event.organizer?.email || 'Unknown organizer'}
+                      </div>
+                      {event.location && (
+                        <div className="event-location">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                          </svg>
+                          {event.location}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Attendees count */}
+                    {event.attendees && event.attendees.length > 0 && (
+                      <div className="event-attendees-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="9" cy="7" r="4"></circle>
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        {event.attendees.length}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 

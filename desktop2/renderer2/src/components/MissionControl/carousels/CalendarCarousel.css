@@ -11,7 +11,7 @@
 
 /* Header */
 .calendar-header {
-  padding: 24px 32px 16px;
+  padding: 24px 32px 8px;
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
 }
@@ -20,7 +20,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .calendar-header h1 {
@@ -36,7 +36,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0f172a;
   border: none;
   border-radius: 10px;
   color: #ffffff;
@@ -47,7 +47,7 @@
 }
 
 .new-meeting-btn:hover {
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
   transform: translateY(-1px);
 }
 
@@ -57,9 +57,7 @@
 
 /* Search */
 .calendar-search {
-  position: relative;
-  max-width: 600px;
-  margin-bottom: 20px;
+  display: none;
 }
 
 .calendar-search svg {
@@ -117,10 +115,10 @@
 }
 
 .view-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0f172a;
   border-color: transparent;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
 }
 
 /* Date Navigation */
@@ -129,7 +127,7 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  padding: 16px 32px;
+  padding: 8px 32px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
 }
@@ -215,7 +213,7 @@
   min-width: 24px;
   height: 24px;
   padding: 0 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0f172a;
   color: #ffffff;
   border-radius: 12px;
   font-size: 12px;
@@ -242,8 +240,8 @@
 }
 
 .suggestion-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
   transform: translateY(-2px);
 }
 
@@ -289,7 +287,7 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0f172a;
   border: none;
   border-radius: 8px;
   color: #ffffff;
@@ -301,7 +299,7 @@
 }
 
 .suggestion-action-btn:hover {
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
   transform: translateY(-1px);
 }
 
@@ -311,7 +309,7 @@
 
 /* Calendar Section Header */
 .calendar-section-header {
-  display: flex;
+  display: none;
   justify-content: space-between;
   align-items: center;
   padding: 20px 32px 16px;
@@ -380,18 +378,18 @@
 }
 
 .week-day-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
   transform: translateY(-2px);
 }
 
 .week-day-card.today {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(30, 64, 175, 0.05));
+  border-color: #3b82f6;
 }
 
 .week-day-card.selected {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #0f172a;
   border-color: transparent;
   color: white;
 }
@@ -442,8 +440,8 @@
 .week-event-item {
   font-size: 11px;
   padding: 6px 8px;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
   border-radius: 6px;
   font-weight: 500;
   overflow: hidden;
@@ -509,8 +507,8 @@
 
 .month-day-cell:hover {
   background: #f8fafc;
-  border-color: #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
 }
 
 .month-day-cell.empty {
@@ -520,8 +518,8 @@
 }
 
 .month-day-cell.today {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
-  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(30, 64, 175, 0.05));
+  border-color: #3b82f6;
 }
 
 .month-day-number {
@@ -542,15 +540,15 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #667eea;
+  background: #3b82f6;
   flex-shrink: 0;
 }
 
 .month-event-badge {
   font-size: 9px;
   padding: 2px 4px;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
   border-radius: 3px;
   font-weight: 500;
   overflow: hidden;
@@ -623,9 +621,9 @@
 }
 
 .timeline-event-block {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1));
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-left: 4px solid #667eea;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(30, 64, 175, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-left: 4px solid #3b82f6;
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 11px;
@@ -639,8 +637,8 @@
 }
 
 .timeline-event-block:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(118, 75, 162, 0.15));
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(30, 64, 175, 0.15));
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
 .event-item {
@@ -669,7 +667,7 @@
 .event-date {
   font-size: 13px;
   font-weight: 600;
-  color: #667eea;
+  color: #3b82f6;
 }
 
 .event-time {
@@ -855,13 +853,13 @@
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0f172a;
   border-color: transparent;
   color: #ffffff;
 }
 
 .action-btn.primary:hover {
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
 }
 
 /* Event Detail Content */
@@ -913,7 +911,7 @@
 .event-detail-time svg,
 .event-detail-location svg,
 .event-detail-attendees svg {
-  color: #667eea;
+  color: #3b82f6;
   flex-shrink: 0;
   margin-top: 2px;
 }

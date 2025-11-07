@@ -22,13 +22,26 @@ export default function UniboxCarousel({ onSelectMessage }) {
   const [indexingStatus, setIndexingStatus] = useState('idle'); // idle, indexing, completed
   const [indexedCount, setIndexedCount] = useState(0);
   const [showAIModal, setShowAIModal] = useState(false);
+  const [lastFetchTime, setLastFetchTime] = useState(null);
+
+  // Cache duration: 5 minutes
+  const CACHE_DURATION = 5 * 60 * 1000;
 
   useEffect(() => {
     loadMessages();
   }, []);
 
-  const loadMessages = async () => {
+  const loadMessages = async (forceRefresh = false) => {
     try {
+      // Check cache validity
+      const now = Date.now();
+      const cacheValid = lastFetchTime && (now - lastFetchTime) < CACHE_DURATION;
+
+      if (cacheValid && messages.length > 0 && !forceRefresh) {
+        console.log('📬 UniboxCarousel: Using cached messages');
+        return;
+      }
+
       setLoading(true);
       console.log('📬 UniboxCarousel: Loading messages...');
 
@@ -50,6 +63,7 @@ export default function UniboxCarousel({ onSelectMessage }) {
           preview: result.messages[0]?.preview
         });
         setMessages(result.messages);
+        setLastFetchTime(now);
 
         // Auto-index emails in background
         indexEmailsInBackground(result.messages);
