@@ -769,7 +769,8 @@ class DesktopSupabaseAdapter {
       });
 
       // Apply team filtering if requested (for viewing team dev tasks)
-      if (filters.filterByTeam && filters.teamId) {
+      // SKIP if skipTeamFilter is true (load ALL tasks)
+      if (filters.filterByTeam && filters.teamId && !filters.skipTeamFilter) {
         this.logger.info('Applying team filtering', {
           teamId: filters.teamId,
           tasksBeforeFilter: tasks.length
@@ -924,9 +925,9 @@ class DesktopSupabaseAdapter {
         tasks = tasks.filter(task => {
           const externalSource = task.external_source;
 
-          // Sales users see Slack tasks and manual tasks (no external source)
+          // Sales users see JIRA tasks (team-wide) and manual tasks (no external source)
           if (userRole === 'sales') {
-            return externalSource === 'slack' || externalSource === null || externalSource === 'manual';
+            return externalSource === 'jira' || externalSource === null || externalSource === 'manual';
           }
 
           // Developer users see JIRA tasks and manual tasks
@@ -1007,11 +1008,33 @@ class DesktopSupabaseAdapter {
         sessionUpdate.session_title = updates.title;
       }
       
+      // Handle status updates from both task and kanban formats
       if (updates.status) {
         sessionUpdate.is_completed = updates.status === 'completed';
         if (updates.status === 'completed') {
           sessionUpdate.completed_at = new Date().toISOString();
         }
+      } else if (updates.is_completed !== undefined) {
+        sessionUpdate.is_completed = updates.is_completed;
+        if (updates.is_completed) {
+          sessionUpdate.completed_at = new Date().toISOString();
+        }
+      }
+      
+      // Handle JIRA status
+      if (updates.jira_status) {
+        // Get current metadata first
+        const { data: current, error: fetchError } = await this.supabase
+          .from('conversation_sessions')
+          .select('workflow_metadata')
+          .eq('id', taskId)
+          .single();
+
+        if (fetchError) throw fetchError;
+
+        const metadata = current?.workflow_metadata || {};
+        metadata.jira_status = updates.jira_status;
+        sessionUpdate.workflow_metadata = metadata;
       }
 
       // Update metadata fields
@@ -1025,7 +1048,7 @@ class DesktopSupabaseAdapter {
 
         if (fetchError) throw fetchError;
 
-        const metadata = current.workflow_metadata || {};
+        const metadata = current?.workflow_metadata || {};
         
         if (updates.priority) metadata.priority = updates.priority;
         if (updates.description !== undefined) metadata.description = updates.description;

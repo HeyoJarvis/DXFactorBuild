@@ -5,6 +5,7 @@ import { useSalesTasks } from '../hooks/useSalesTasks';
 import DraggableHeader from '../components/common/DraggableHeader';
 import ModeToggle from '../components/MissionControl/ModeToggle';
 import GroupedActionList from '../components/Tasks/GroupedActionList';
+import KanbanBoard from '../components/Tasks/KanbanBoard';
 import TaskChat from '../components/Tasks/TaskChat';
 import TeamChat from './TeamChat';
 import TeamSelection from '../components/Teams/TeamSelection';
@@ -441,13 +442,20 @@ export default function MissionControl({ user }) {
               </div>
               {tasksLoading ? (
                 <div className="loading-tasks">Loading...</div>
-              ) : (
+              ) : isDeveloper ? (
                 <GroupedActionList
                   tasks={getFilteredTasks()}
                   onToggle={toggleTask}
                   onDelete={deleteTask}
                   onUpdate={updateTask}
                   onChat={setSelectedTask}
+                  onMonitor={jiraView ? monitorTask : null}
+                  isTeamDevView={jiraView}
+                />
+              ) : (
+                <KanbanBoard
+                  tasks={getFilteredTasks()}
+                  onUpdateTask={updateTask}
                   onMonitor={jiraView ? monitorTask : null}
                   isTeamDevView={jiraView}
                 />

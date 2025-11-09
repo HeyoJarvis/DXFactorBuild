@@ -135,11 +135,12 @@ function registerTaskHandlers(services, logger) {
       return {
         success: true,
         data: {
-          id: result.task.id,
-          title: result.task.session_title,
-          priority: result.task.workflow_metadata?.priority,
-          status: result.task.is_completed ? 'completed' : 'todo',
-          updatedAt: result.task.last_message_at
+          id: result.task?.id,
+          title: result.task?.session_title,
+          priority: result.task?.workflow_metadata?.priority,
+          status: result.task?.is_completed ? 'completed' : 'todo',
+          jiraStatus: result.task?.workflow_metadata?.jira_status,
+          updatedAt: result.task?.last_message_at
         }
       };
     } catch (error) {

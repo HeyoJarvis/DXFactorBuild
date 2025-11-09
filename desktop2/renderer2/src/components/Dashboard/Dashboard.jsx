@@ -99,10 +99,6 @@ export default function Dashboard({ user }) {
 
   return (
     <div className="dashboard-view" onClick={handleAddWidget}>
-      {/* Jarvis Avatar */}
-      <div className="empty-icon-wrapper">
-        <img src="/Jarvis.png" alt="Jarvis AI" className="empty-icon" />
-      </div>
 
       {/* Welcome Header */}
       <div className="dashboard-header">

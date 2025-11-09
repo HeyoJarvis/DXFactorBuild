@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDeveloperTasks } from '../hooks/useDeveloperTasks';
-import { useSalesTasks } from '../hooks/useSalesTasks';
+import { usePMTasks } from '../hooks/usePMTasks';
 import TaskCarousel from '../components/MissionControl/TaskCarousel';
 import UniversalChatBar from '../components/MissionControl/UniversalChatBar';
 import TaskDetailView from '../components/MissionControl/TaskDetailView';
@@ -42,13 +42,16 @@ export default function MissionControlRefactored({ user }) {
 
   // Determine user role and load appropriate tasks
   const isDeveloper = user?.user_role === 'developer' || user?.role === 'developer';
-  
+
   // Load JIRA tasks based on role
-  const { tasks: devTasks, loading: devLoading } = useDeveloperTasks(user, 'all');
-  const { tasks: salesTasks, loading: salesLoading } = useSalesTasks(user, 'all');
-  
-  const jiraTasks = isDeveloper ? devTasks : salesTasks;
-  const jiraLoading = isDeveloper ? devLoading : salesLoading;
+  // Developers: their assigned tasks
+  // PM/Functional: all JIRA tasks for their unit
+  const { tasks: devTasks, loading: devLoading, updateTask: updateDevTask } = useDeveloperTasks(user, 'all');
+  const { tasks: pmTasks, loading: pmLoading, updateTask: updatePMTask } = usePMTasks(user, null);
+
+  const jiraTasks = isDeveloper ? devTasks : pmTasks;
+  const jiraLoading = isDeveloper ? devLoading : pmLoading;
+  const updateTask = isDeveloper ? updateDevTask : updatePMTask;
 
   // Pre-fetch all tab data on mount
   useEffect(() => {
@@ -131,6 +134,16 @@ export default function MissionControlRefactored({ user }) {
     setShowDetailView(false);
   };
 
+  // Handle task update (for Kanban drag-and-drop)
+  const handleTaskUpdate = async (taskId, updates) => {
+    try {
+      console.log('🔄 Updating task:', { taskId, updates });
+      await updateTask(taskId, updates);
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    }
+  };
+
   // Check if we're on tabs that should hide logo and chat
   const isFullScreenTab = activeTab === 'unibox' || activeTab === 'calendar';
 
@@ -155,6 +168,7 @@ export default function MissionControlRefactored({ user }) {
               activeTab={activeTab}
               allTabsData={allTabsData}
               onTaskSelect={handleTaskSelect}
+              onUpdateTask={handleTaskUpdate}
               user={user}
             />
           </div>

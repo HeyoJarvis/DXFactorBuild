@@ -48,13 +48,14 @@ export default function UserProfileMenu({ user }) {
 
   return (
     <div className="user-profile-menu" ref={menuRef}>
-      {/* Glow effect behind logo */}
-      <div className="logo-glow"></div>
+      {/* Glow effect behind logo - HIDDEN */}
+      {/* <div className="logo-glow"></div> */}
       
       <button
         className="profile-avatar-btn"
         onClick={() => setShowMenu(!showMenu)}
         title={user?.name || user?.email || 'User'}
+        style={{ display: 'none' }}
       >
         <img src="/Jarvis.png" alt="Jarvis" className="jarvis-logo-img" />
       </button>

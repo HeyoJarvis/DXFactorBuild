@@ -420,6 +420,18 @@ export default function UniboxCarousel({ onSelectMessage }) {
     setSelectedMessage(null);
   };
 
+  // Get avatar color based on sender name
+  const getAvatarColor = (senderName) => {
+    if (!senderName) return 'color-blue';
+    const colors = ['color-blue', 'color-black', 'color-white'];
+    let hash = 0;
+    for (let i = 0; i < senderName.length; i++) {
+      hash = ((hash << 5) - hash) + senderName.charCodeAt(i);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   // If a message is selected, show the email detail view
   if (selectedMessage) {
     console.log('📧 Rendering email detail view for:', selectedMessage.subject);
@@ -614,7 +626,7 @@ export default function UniboxCarousel({ onSelectMessage }) {
               >
                 {/* Left: Avatar with Provider Badge */}
                 <div className="email-card-avatar">
-                  <div className="avatar-letter">
+                  <div className={`avatar-letter ${getAvatarColor(msg.company)}`}>
                     {msg.company?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                   <div className="provider-badge">
