@@ -11,9 +11,12 @@ import SlimHeader from '../common/SlimHeader';
  * - Left/right navigation
  * - Click any card to select and open detail view
  * - Smooth animations and transforms
+ * - Generate Report button on each card
  */
 export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [selectedTaskForReport, setSelectedTaskForReport] = useState(null);
   const navigate = useNavigate();
 
   const handleTeamsClick = () => {
@@ -43,6 +46,39 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
     // Open detail view
     if (onTaskSelect) {
       onTaskSelect(task);
+    }
+  };
+
+  const handleGenerateReport = (e, task) => {
+    e.stopPropagation(); // Prevent card click
+    setSelectedTaskForReport(task);
+    setShowReportModal(true);
+  };
+
+  const handleGenerateReportSubmit = async (reportType) => {
+    if (!selectedTaskForReport) return;
+
+    const entityId = reportType === 'feature' 
+      ? (selectedTaskForReport.external_key || selectedTaskForReport.externalKey)
+      : user?.email || 'user@company.com';
+
+    setShowReportModal(false);
+    const task = selectedTaskForReport;
+    setSelectedTaskForReport(null);
+
+    try {
+      const result = await window.electronAPI.reporting.generateReport(reportType, entityId, {});
+      if (result.success) {
+        // Add the report to the task chat
+        await window.electronAPI.tasks.sendChatMessage(task.id, result.report.summary, 'report');
+        
+        // Open the task detail view (which will load the new report message)
+        onTaskSelect(task);
+      } else {
+        alert(`❌ Failed to generate report: ${result.error}`);
+      }
+    } catch (error) {
+      alert(`❌ Error: ${error.message}`);
     }
   };
 
@@ -152,6 +188,20 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
                   {task.sprint}
                 </div>
               )}
+
+              {/* Generate Report Button */}
+              <button 
+                className="generate-report-card-btn"
+                onClick={(e) => handleGenerateReport(e, task)}
+                title="Generate Report"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                Report
+              </button>
             </div>
           </div>
         ))}
@@ -176,6 +226,27 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
         </div>
       )}
       </div>
+
+      {/* Report Generation Modal */}
+      {showReportModal && (
+        <div className="report-modal-overlay" onClick={() => setShowReportModal(false)}>
+          <div className="report-modal-compact" onClick={(e) => e.stopPropagation()}>
+            <h4>Generate Report</h4>
+            <p className="modal-task-info">
+              {selectedTaskForReport?.external_key || selectedTaskForReport?.externalKey} - {selectedTaskForReport?.title || selectedTaskForReport?.session_title}
+            </p>
+            <div className="report-type-buttons">
+              <button onClick={() => handleGenerateReportSubmit('person')}>
+                👤 Person Report
+              </button>
+              <button onClick={() => handleGenerateReportSubmit('feature')}>
+                🎯 Feature Report
+              </button>
+            </div>
+            <button className="modal-cancel" onClick={() => setShowReportModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

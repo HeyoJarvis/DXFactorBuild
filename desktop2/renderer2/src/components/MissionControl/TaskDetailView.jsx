@@ -27,6 +27,9 @@ export default function TaskDetailView({ task, user, onClose }) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isACEditMode, setIsACEditMode] = useState(false);
   const [editedAC, setEditedAC] = useState([]);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editedMessageContent, setEditedMessageContent] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -727,13 +730,21 @@ export default function TaskDetailView({ task, user, onClose }) {
 
   return (
     <div className={`task-detail-view ${isJiraPanelCollapsed ? 'jira-collapsed' : ''}`}>
-      {/* Header with Back Button */}
+      {/* Header with Back Button and Generate Report */}
       <div className="task-detail-header">
         <button className="back-to-tasks-btn" onClick={onClose}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
           <span>Back to tasks</span>
+        </button>
+        <button className="generate-report-header-btn" onClick={() => setShowReportModal(true)}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Generate Report
         </button>
       </div>
 
@@ -1020,8 +1031,71 @@ export default function TaskDetailView({ task, user, onClose }) {
             </div>
           ) : (
             messages.map((msg, idx) => (
-              <div key={idx} className={`message message-${msg.role}`}>
-                <div className="message-content">{msg.content}</div>
+              <div key={idx} className={`message message-${msg.role} ${msg.isReport ? 'message-report' : ''}`}>
+                {msg.isReport && editingMessageId !== msg.id && (
+                  <div className="message-actions">
+                    <button 
+                      className="edit-message-btn"
+                      onClick={() => {
+                        setEditingMessageId(msg.id);
+                        setEditedMessageContent(msg.content);
+                      }}
+                      title="Edit report"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                )}
+                {editingMessageId === msg.id ? (
+                  <div className="message-edit-container">
+                    <textarea
+                      className="message-edit-textarea"
+                      value={editedMessageContent}
+                      onChange={(e) => setEditedMessageContent(e.target.value)}
+                      rows={15}
+                      autoFocus
+                    />
+                    <div className="message-edit-actions">
+                      <button 
+                        className="save-message-btn"
+                        onClick={async () => {
+                          // Update the message locally
+                          setMessages(prev => prev.map(m => 
+                            m.id === msg.id ? { ...m, content: editedMessageContent } : m
+                          ));
+                          
+                          // Save to backend
+                          try {
+                            await window.electronAPI.tasks.updateChatMessage(task.id, msg.id, editedMessageContent);
+                          } catch (error) {
+                            console.error('Failed to save message:', error);
+                          }
+                          
+                          setEditingMessageId(null);
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Save
+                      </button>
+                      <button 
+                        className="cancel-message-btn"
+                        onClick={() => {
+                          setEditingMessageId(null);
+                          setEditedMessageContent('');
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="message-content">{msg.content}</div>
+                )}
               </div>
             ))
           )}
@@ -1132,6 +1206,107 @@ export default function TaskDetailView({ task, user, onClose }) {
           )}
         </div>
       </div>
+
+      {/* Report Generation Modal */}
+      {showReportModal && (
+        <div className="report-modal-overlay" onClick={() => setShowReportModal(false)}>
+          <div className="report-modal-compact" onClick={(e) => e.stopPropagation()}>
+            <h4>Generate Report</h4>
+            <p className="modal-task-info">
+              {task.external_key || task.id} - {task.title || task.session_title}
+            </p>
+            <div className="report-type-buttons">
+              <button onClick={async () => {
+                const entityId = user?.email || 'user@company.com';
+                setShowReportModal(false);
+                setIsTyping(true);
+                
+                try {
+                  const result = await window.electronAPI.reporting.generateReport('person', entityId, {});
+                  if (result.success) {
+                    // Add report as an assistant message in the chat
+                    const reportMessage = {
+                      id: Date.now(),
+                      role: 'assistant',
+                      content: result.report.summary,
+                      timestamp: new Date().toISOString(),
+                      isReport: true
+                    };
+                    setMessages(prev => [...prev, reportMessage]);
+                    
+                    // Save to backend
+                    await window.electronAPI.tasks.sendChatMessage(task.id, result.report.summary, 'report');
+                  } else {
+                    const errorMessage = {
+                      id: Date.now(),
+                      role: 'assistant',
+                      content: `❌ Failed to generate report: ${result.error}`,
+                      timestamp: new Date().toISOString()
+                    };
+                    setMessages(prev => [...prev, errorMessage]);
+                  }
+                } catch (error) {
+                  const errorMessage = {
+                    id: Date.now(),
+                    role: 'assistant',
+                    content: `❌ Error generating report: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                  };
+                  setMessages(prev => [...prev, errorMessage]);
+                } finally {
+                  setIsTyping(false);
+                }
+              }}>
+                👤 Person Report
+              </button>
+              <button onClick={async () => {
+                const entityId = task.external_key || task.externalKey || task.id;
+                setShowReportModal(false);
+                setIsTyping(true);
+                
+                try {
+                  const result = await window.electronAPI.reporting.generateReport('feature', entityId, {});
+                  if (result.success) {
+                    // Add report as an assistant message in the chat
+                    const reportMessage = {
+                      id: Date.now(),
+                      role: 'assistant',
+                      content: result.report.summary,
+                      timestamp: new Date().toISOString(),
+                      isReport: true
+                    };
+                    setMessages(prev => [...prev, reportMessage]);
+                    
+                    // Save to backend
+                    await window.electronAPI.tasks.sendChatMessage(task.id, result.report.summary, 'report');
+                  } else {
+                    const errorMessage = {
+                      id: Date.now(),
+                      role: 'assistant',
+                      content: `❌ Failed to generate report: ${result.error}`,
+                      timestamp: new Date().toISOString()
+                    };
+                    setMessages(prev => [...prev, errorMessage]);
+                  }
+                } catch (error) {
+                  const errorMessage = {
+                    id: Date.now(),
+                    role: 'assistant',
+                    content: `❌ Error generating report: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                  };
+                  setMessages(prev => [...prev, errorMessage]);
+                } finally {
+                  setIsTyping(false);
+                }
+              }}>
+                🎯 Feature Report
+              </button>
+            </div>
+            <button className="modal-cancel" onClick={() => setShowReportModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

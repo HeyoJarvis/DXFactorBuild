@@ -98,8 +98,19 @@ class ConfluenceService extends EventEmitter {
         endpoint,
         url,
         status: response.status,
-        error: errorText
+        error: errorText,
+        hasAccessToken: !!this.accessToken,
+        tokenPreview: this.accessToken ? this.accessToken.substring(0, 20) + '...' : 'none'
       });
+      
+      // Special handling for 401 Unauthorized
+      if (response.status === 401) {
+        this.logger.error('⚠️  CONFLUENCE 401 UNAUTHORIZED - Token lacks required scopes!', {
+          message: 'Your JIRA OAuth token does not have Confluence read permissions.',
+          solution: 'Disconnect and reconnect JIRA in Settings to get a new token with Confluence scopes.'
+        });
+      }
+      
       throw new Error(`Confluence API error (${response.status}): ${errorText}`);
     }
 
@@ -311,6 +322,36 @@ class ConfluenceService extends EventEmitter {
   /**
    * Get page by ID
    */
+  /**
+   * Extract page ID from various Confluence URL formats
+   * @param {string} url - Confluence page URL
+   * @returns {string|null} Page ID or null if not found
+   */
+  extractPageIdFromUrl(url) {
+    if (!url) return null;
+    
+    // Format 1: /wiki/spaces/SPACE/pages/12345/Title
+    const standardMatch = url.match(/\/pages\/(\d+)/);
+    if (standardMatch) {
+      return standardMatch[1];
+    }
+    
+    // Format 2: /wiki/pages/resumedraft.action?draftId=12345
+    const draftMatch = url.match(/[?&]draftId=(\d+)/);
+    if (draftMatch) {
+      return draftMatch[1];
+    }
+    
+    // Format 3: /wiki/pages/viewpage.action?pageId=12345
+    const pageIdMatch = url.match(/[?&]pageId=(\d+)/);
+    if (pageIdMatch) {
+      return pageIdMatch[1];
+    }
+    
+    this.logger.warn('Could not extract page ID from URL', { url });
+    return null;
+  }
+
   async getPage(pageId) {
     try {
       this.logger.info('Fetching page', { pageId });
@@ -329,6 +370,19 @@ class ConfluenceService extends EventEmitter {
       this.logger.error('Failed to fetch page', { error: error.message, pageId });
       throw error;
     }
+  }
+  
+  /**
+   * Get page content by URL (extracts ID and fetches)
+   * @param {string} url - Confluence page URL
+   * @returns {Promise<Object>} Page data with content
+   */
+  async getPageByUrl(url) {
+    const pageId = this.extractPageIdFromUrl(url);
+    if (!pageId) {
+      throw new Error(`Could not extract page ID from URL: ${url}`);
+    }
+    return this.getPage(pageId);
   }
 
   /**

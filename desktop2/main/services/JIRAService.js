@@ -143,6 +143,36 @@ class JIRAService extends EventEmitter {
   }
 
   /**
+   * Get a single issue by key or ID (proxy to core service)
+   */
+  async getIssueDetails(issueKeyOrId) {
+    if (!this.isConnected()) {
+      throw new Error('JIRA not connected');
+    }
+    return this.jiraCore.getIssueDetails(issueKeyOrId);
+  }
+
+  /**
+   * Get issues by JQL query (proxy to core service)
+   */
+  async getIssuesByJQL(jql, options = {}) {
+    if (!this.isConnected()) {
+      throw new Error('JIRA not connected');
+    }
+    return this.jiraCore.getIssuesByJQL(jql, options);
+  }
+
+  /**
+   * Get remote links (web links) for an issue (proxy to core service)
+   */
+  async getIssueRemoteLinks(issueKeyOrId) {
+    if (!this.isConnected()) {
+      throw new Error('JIRA not connected');
+    }
+    return this.jiraCore.getIssueRemoteLinks(issueKeyOrId);
+  }
+
+  /**
    * Get user's JIRA issues
    */
   async getMyIssues(options = {}) {

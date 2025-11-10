@@ -85,7 +85,7 @@ function registerTaskChatHandlers(services, logger) {
   /**
    * Send message to task-specific AI chat
    */
-  ipcMain.handle('tasks:sendChatMessage', async (event, taskIdOrKey, message, requestContext) => {
+  ipcMain.handle('tasks:sendChatMessage', async (event, taskIdOrKey, message, requestContext, messageType = 'user') => {
     try {
       // Get current authenticated user ID
       const userId = services.auth?.currentUser?.id;
@@ -116,12 +116,58 @@ function registerTaskChatHandlers(services, logger) {
         taskId,
         providedId: taskIdOrKey,
         userId,
+        messageType,
         message: message.substring(0, 50),
         repository: connectedRepo
       });
 
       // Use task from request context, but ensure we have the correct ID
       const task = { ...requestContext.task, id: taskId };
+      
+      // If this is a report message, just save it and return (no AI processing)
+      if (messageType === 'report') {
+        // Get or create task-specific session
+        if (!taskSessionIds[taskId]) {
+          logger.info('Creating new chat session for report', { taskId, userId });
+          
+          const sessionResult = await dbAdapter.getOrCreateActiveSession(userId, {
+            workflow_type: 'task_chat',
+            workflow_id: `task_${taskId}`,
+            task_id: taskId,
+            task_title: task.title,
+            task_priority: task.priority,
+            task_status: task.status,
+            route_to: task.route_to || 'tasks-sales',
+            work_type: task.work_type || 'task'
+          });
+          
+          if (sessionResult.success) {
+            taskSessionIds[taskId] = sessionResult.session.id;
+            logger.info('Task chat session created for report', { 
+              taskId, 
+              sessionId: taskSessionIds[taskId]
+            });
+          }
+        }
+        
+        const taskSessionId = taskSessionIds[taskId];
+        
+        // Save report message with metadata
+        await dbAdapter.saveMessageToSession(taskSessionId, message, 'assistant', {
+          task_id: taskId,
+          task_title: task.title,
+          message_type: 'report',
+          is_report: true
+        }, userId);
+        
+        logger.info('Report message saved to task chat', { taskId, messageLength: message.length });
+        
+        return {
+          success: true,
+          message: message,
+          isReport: true
+        };
+      }
       
       // Get or create task-specific session
       if (!taskSessionIds[taskId]) {
@@ -244,46 +290,144 @@ function registerTaskChatHandlers(services, logger) {
         }
       }
 
-      // Try to get Slack data for context
-      if (services.slack?.isInitialized) {
+      // Try to get JIRA data for context
+      if (services.jira?.isAuthenticated?.()) {
         try {
-          const recentMessages = await services.slack.getRecentMessages(10);
-          const slackStatus = services.slack.getStatus();
+          const JIRAService = require('../../../core/integrations/jira-service');
+          const jiraService = new JIRAService({ logger, supabaseAdapter: dbAdapter });
           
-          aiContext.slackData = {
-            connected: slackStatus.connected,
-            recentMessages: recentMessages,
-            messageCount: recentMessages.length,
-            mentions: await services.slack.getUserMentions()
-          };
+          // Initialize with user's tokens
+          const initResult = await jiraService.initialize(userId);
           
-          logger.info('Added Slack context to task chat', {
-            taskId,
-            messageCount: recentMessages.length,
-            mentions: aiContext.slackData.mentions.length
+          if (initResult.connected) {
+            // Get related JIRA issues (if this task has a JIRA key)
+            const taskJiraKey = dbTask?.workflow_metadata?.external_key || task.external_key;
+            
+            if (taskJiraKey) {
+              // Get the specific JIRA issue details
+              const issueResult = await jiraService.getIssueDetails(taskJiraKey);
+              
+              if (issueResult.success) {
+                aiContext.jiraData = {
+                  connected: true,
+                  currentIssue: {
+                    key: issueResult.issue.key,
+                    summary: issueResult.issue.fields.summary,
+                    description: issueResult.issue.fields.description,
+                    status: issueResult.issue.fields.status.name,
+                    priority: issueResult.issue.fields.priority?.name,
+                    assignee: issueResult.issue.fields.assignee?.displayName,
+                    reporter: issueResult.issue.fields.reporter?.displayName,
+                    created: issueResult.issue.fields.created,
+                    updated: issueResult.issue.fields.updated,
+                    storyPoints: issueResult.issue.fields.customfield_10000,
+                    labels: issueResult.issue.fields.labels,
+                    comments: issueResult.issue.fields.comment?.comments?.slice(-5) || [] // Last 5 comments
+                  }
+                };
+                
+                logger.info('Added JIRA context to task chat', {
+                  taskId,
+                  jiraKey: taskJiraKey,
+                  status: issueResult.issue.fields.status.name
+                });
+              }
+            } else {
+              // No specific JIRA key, get user's recent issues
+              const issuesResult = await jiraService.getMyIssues({
+                maxResults: 5,
+                status: 'In Progress,To Do,Code Review,In Review'
+              });
+              
+              if (issuesResult.success) {
+                aiContext.jiraData = {
+                  connected: true,
+                  recentIssues: issuesResult.issues.map(issue => ({
+                    key: issue.key,
+                    summary: issue.summary,
+                    status: issue.status,
+                    priority: issue.priority
+                  }))
+                };
+                
+                logger.info('Added JIRA recent issues to task chat', {
+                  taskId,
+                  issueCount: issuesResult.issues.length
+                });
+              }
+            }
+          }
+        } catch (jiraError) {
+          logger.warn('Could not fetch JIRA data for task chat', {
+            error: jiraError.message
           });
-        } catch (slackError) {
-          logger.warn('Could not fetch Slack data for task chat', {
-            error: slackError.message
-          });
-          aiContext.slackData = {
+          aiContext.jiraData = {
             connected: false,
-            recentMessages: [],
-            messageCount: 0,
-            mentions: []
+            error: jiraError.message
           };
         }
       }
       
-      // Try to get CRM data for context
-      if (services.crm?.isInitialized) {
+      // Try to get Confluence data for context
+      if (services.jira?.isAuthenticated?.()) {
         try {
-          aiContext.crmData = await services.crm.getData();
-          logger.info('Added CRM context to task chat', { taskId });
-        } catch (crmError) {
-          logger.warn('Could not fetch CRM data for task chat', {
-            error: crmError.message
+          const ConfluenceService = require('../../../core/integrations/confluence-service');
+          const confluenceService = new ConfluenceService({ logger });
+          
+          // Get user's JIRA tokens (Confluence uses same OAuth)
+          const { data: userData } = await dbAdapter.supabase
+            .from('users')
+            .select('integration_settings')
+            .eq('id', userId)
+            .single();
+          
+          const jiraSettings = userData?.integration_settings?.jira;
+          
+          if (jiraSettings?.access_token && jiraSettings?.cloud_id) {
+            confluenceService.setTokens({
+              accessToken: jiraSettings.access_token,
+              cloudId: jiraSettings.cloud_id,
+              siteUrl: jiraSettings.site_url
+            });
+            
+            // Search for relevant documentation
+            const taskTitle = task.title || '';
+            const searchResult = await confluenceService.searchPages({
+              query: taskTitle.substring(0, 50), // Use task title for search
+              limit: 3
+            });
+            
+            if (searchResult.success && searchResult.pages.length > 0) {
+              aiContext.confluenceData = {
+                connected: true,
+                relevantPages: searchResult.pages.map(page => ({
+                  id: page.id,
+                  title: page.title,
+                  excerpt: page.excerpt || page.body?.substring(0, 200),
+                  url: page._links?.webui ? `${jiraSettings.site_url}${page._links.webui}` : null,
+                  lastModified: page.version?.when
+                }))
+              };
+              
+              logger.info('Added Confluence context to task chat', {
+                taskId,
+                pageCount: searchResult.pages.length
+              });
+            } else {
+              aiContext.confluenceData = {
+                connected: true,
+                relevantPages: []
+              };
+            }
+          }
+        } catch (confluenceError) {
+          logger.warn('Could not fetch Confluence data for task chat', {
+            error: confluenceError.message
           });
+          aiContext.confluenceData = {
+            connected: false,
+            error: confluenceError.message
+          };
         }
       }
       
@@ -302,15 +446,15 @@ Your role is to help the user complete this task by:
 - Breaking down the task into manageable steps
 - Answering questions about the task
 - Brainstorming solutions and approaches
-- Offering relevant insights from live Slack/CRM data
+- Offering relevant insights from JIRA issues and Confluence documentation
 - Connecting this task to current team workflows and priorities
 
 SPECIAL INSTRUCTIONS FOR PRODUCT REQUIREMENTS:
 When asked to generate product requirements:
 1. Create a structured table with columns: Requirement | Priority | Source | Status
-2. Mark 2-3 requirements as coming from "Slack" (these will be highlighted in red)
+2. Mark 2-3 requirements as coming from "JIRA Comments" (these will be highlighted in red)
 3. Use realistic requirements based on the task description
-4. Include a mix of sources: Slack, JIRA, and Inferred
+4. Include a mix of sources: JIRA, Confluence, and Inferred
 5. Format as markdown table for clean display
 
 Be concise, practical, and focused on helping complete this specific task.`;
@@ -353,39 +497,69 @@ You are connected to the ${connectedRepo} repository. The code indexer was queri
 You can still provide general guidance about the task and repository.`;
       }
 
-      // Add Slack context to prompt if available
-      if (aiContext.slackData && aiContext.slackData.connected && aiContext.slackData.messageCount > 0) {
-        systemPrompt += `\n\n📱 LIVE SLACK CONTEXT (${aiContext.slackData.messageCount} recent messages):`;
-        
-        // Add recent relevant messages
-        const relevantMessages = aiContext.slackData.recentMessages.slice(0, 5);
-        relevantMessages.forEach(msg => {
-          systemPrompt += `\n- [${msg.type}] ${msg.text?.substring(0, 100) || 'No text'}${msg.urgent ? ' (URGENT)' : ''}`;
-        });
-        
-        if (aiContext.slackData.mentions.length > 0) {
-          systemPrompt += `\n\n⚠️ You have ${aiContext.slackData.mentions.length} mentions requiring attention.`;
+      // Add JIRA context to prompt if available
+      if (aiContext.jiraData && aiContext.jiraData.connected) {
+        if (aiContext.jiraData.currentIssue) {
+          const issue = aiContext.jiraData.currentIssue;
+          systemPrompt += `\n\n🎫 JIRA ISSUE CONTEXT (${issue.key}):`;
+          systemPrompt += `\n- Summary: ${issue.summary}`;
+          systemPrompt += `\n- Status: ${issue.status}`;
+          systemPrompt += `\n- Priority: ${issue.priority || 'Not set'}`;
+          systemPrompt += `\n- Assignee: ${issue.assignee || 'Unassigned'}`;
+          systemPrompt += `\n- Reporter: ${issue.reporter}`;
+          
+          if (issue.storyPoints) {
+            systemPrompt += `\n- Story Points: ${issue.storyPoints}`;
+          }
+          
+          if (issue.labels && issue.labels.length > 0) {
+            systemPrompt += `\n- Labels: ${issue.labels.join(', ')}`;
+          }
+          
+          if (issue.description) {
+            const desc = issue.description.substring(0, 300);
+            systemPrompt += `\n- Description: ${desc}${issue.description.length > 300 ? '...' : ''}`;
+          }
+          
+          if (issue.comments && issue.comments.length > 0) {
+            systemPrompt += `\n\n💬 Recent JIRA Comments (${issue.comments.length}):`;
+            issue.comments.slice(0, 3).forEach(comment => {
+              const author = comment.author?.displayName || 'Unknown';
+              const body = comment.body?.substring(0, 150) || '';
+              systemPrompt += `\n- [${author}] ${body}${comment.body?.length > 150 ? '...' : ''}`;
+            });
+          }
+        } else if (aiContext.jiraData.recentIssues && aiContext.jiraData.recentIssues.length > 0) {
+          systemPrompt += `\n\n🎫 YOUR RECENT JIRA ISSUES (${aiContext.jiraData.recentIssues.length}):`;
+          aiContext.jiraData.recentIssues.forEach(issue => {
+            systemPrompt += `\n- [${issue.key}] ${issue.summary} - ${issue.status} (${issue.priority || 'No priority'})`;
+          });
         }
       }
       
-      // Add CRM context to prompt if available
-      if (aiContext.crmData && aiContext.crmData.success) {
-        if (aiContext.crmData.insights?.length > 0) {
-          systemPrompt += `\n\n💼 CRM INSIGHTS:`;
-          aiContext.crmData.insights.slice(0, 3).forEach(insight => {
-            systemPrompt += `\n- [${insight.type}] ${insight.title}: ${insight.message}`;
+      // Add Confluence context to prompt if available
+      if (aiContext.confluenceData && aiContext.confluenceData.connected) {
+        if (aiContext.confluenceData.relevantPages && aiContext.confluenceData.relevantPages.length > 0) {
+          systemPrompt += `\n\n📚 RELEVANT CONFLUENCE DOCUMENTATION (${aiContext.confluenceData.relevantPages.length} pages):`;
+          
+          aiContext.confluenceData.relevantPages.forEach(page => {
+            systemPrompt += `\n\n**${page.title}**`;
+            if (page.excerpt) {
+              systemPrompt += `\n${page.excerpt}`;
+            }
+            if (page.url) {
+              systemPrompt += `\n🔗 ${page.url}`;
+            }
+            if (page.lastModified) {
+              systemPrompt += `\n📅 Last updated: ${new Date(page.lastModified).toLocaleDateString()}`;
+            }
           });
-        }
-        
-        if (aiContext.crmData.recommendations?.length > 0) {
-          systemPrompt += `\n\nRECOMMENDATIONS:`;
-          aiContext.crmData.recommendations.slice(0, 3).forEach(rec => {
-            systemPrompt += `\n- ${rec.title} (${rec.priority})`;
-          });
+          
+          systemPrompt += `\n\nYou can reference these Confluence pages when providing guidance.`;
         }
       }
       
-      systemPrompt += `\n\nUse this live context to provide intelligent, business-aware assistance with the task.`;
+      systemPrompt += `\n\nUse this JIRA and Confluence context to provide intelligent, business-aware assistance with the task.`;
 
       // Get AI response with full context
       const aiResponse = await ai.sendMessage(message, {
@@ -568,9 +742,11 @@ You can still provide general guidance about the task and repository.`;
         return {
           success: true,
           messages: historyResult.messages.map(msg => ({
+            id: msg.id,
             role: msg.role,
             content: msg.message_text || msg.content || '',  // Support both field names
-            timestamp: msg.created_at || msg.timestamp
+            timestamp: msg.created_at || msg.timestamp,
+            isReport: msg.metadata?.is_report || msg.metadata?.message_type === 'report' || false
           }))
         };
       }
@@ -608,7 +784,7 @@ TASK DETAILS:
 Generate a structured table with these columns:
 - Requirement: Specific, actionable requirement
 - Priority: High/Medium/Low
-- Source: Slack/JIRA/Inferred (mark 2-3 as "Slack" to simulate team discussions)
+- Source: JIRA Comments/Confluence/Inferred (mark 2-3 as "JIRA Comments" to simulate team discussions)
 - Status: To Do/In Progress/Done
 
 Format as a markdown table. Make requirements realistic and relevant to the task.
@@ -616,7 +792,7 @@ Return ONLY the table, no additional text.`;
 
       // Get AI response without saving to chat history
       const aiResponse = await ai.sendMessage(prompt, {
-        systemPrompt: `You are a product requirements analyst. Generate realistic, actionable requirements based on the task provided. Mark 2-3 requirements as coming from "Slack" to indicate they came from team discussions.`,
+        systemPrompt: `You are a product requirements analyst. Generate realistic, actionable requirements based on the task provided. Mark 2-3 requirements as coming from "JIRA Comments" to indicate they came from team discussions in JIRA.`,
         taskContext: taskData
       });
 
@@ -633,6 +809,93 @@ Return ONLY the table, no additional text.`;
       };
     } catch (error) {
       logger.error('Failed to generate product requirements:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Update a chat message (for editing reports)
+   */
+  ipcMain.handle('tasks:updateChatMessage', async (event, taskIdOrKey, messageId, newContent) => {
+    try {
+      // Get current authenticated user ID
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        logger.error('Update chat message: No authenticated user');
+        return {
+          success: false,
+          error: 'User not authenticated'
+        };
+      }
+      
+      // Resolve actual task ID
+      const { taskId } = await resolveTaskId(taskIdOrKey, userId);
+      
+      if (!taskId) {
+        logger.error('Task not found', { taskIdOrKey });
+        return {
+          success: false,
+          error: 'Task not found'
+        };
+      }
+      
+      // Get task session ID
+      let taskSessionId = taskSessionIds[taskId];
+      
+      if (!taskSessionId) {
+        const workflowId = `task_${taskId}`;
+        const { data: sessions } = await dbAdapter.supabase
+          .from('conversation_sessions')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('workflow_type', 'task_chat')
+          .eq('workflow_id', workflowId)
+          .limit(1);
+        
+        if (sessions && sessions.length > 0) {
+          taskSessionId = sessions[0].id;
+          taskSessionIds[taskId] = taskSessionId;
+        }
+      }
+      
+      if (!taskSessionId) {
+        logger.error('Task session not found', { taskId });
+        return {
+          success: false,
+          error: 'Task session not found'
+        };
+      }
+      
+      // Update the message
+      const { error } = await dbAdapter.supabase
+        .from('conversation_messages')
+        .update({ 
+          message_text: newContent,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', messageId)
+        .eq('session_id', taskSessionId);
+      
+      if (error) {
+        logger.error('Failed to update message', { error: error.message, messageId });
+        return {
+          success: false,
+          error: error.message
+        };
+      }
+      
+      logger.info('Message updated successfully', { taskId, messageId, contentLength: newContent.length });
+      
+      return {
+        success: true
+      };
+      
+    } catch (error) {
+      logger.error('Failed to update chat message:', error);
       return {
         success: false,
         error: error.message

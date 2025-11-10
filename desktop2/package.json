@@ -24,6 +24,7 @@
     "@octokit/rest": "^22.0.0",
     "@slack/bolt": "^4.4.0",
     "@slack/web-api": "^7.10.0",
+    "@supabase/supabase-js": "^2.80.0",
     "axios": "^1.6.7",
     "dotenv": "^17.2.2",
     "electron-store": "^8.1.0",

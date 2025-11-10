@@ -22,8 +22,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     delete: (taskId) => ipcRenderer.invoke('tasks:delete', taskId),
     
     // Task chat
-    sendChatMessage: (taskId, message, context) => ipcRenderer.invoke('tasks:sendChatMessage', taskId, message, context),
+    sendChatMessage: (taskId, message, context, messageType) => ipcRenderer.invoke('tasks:sendChatMessage', taskId, message, context, messageType),
     getChatHistory: (taskId) => ipcRenderer.invoke('tasks:getChatHistory', taskId),
+    updateChatMessage: (taskId, messageId, newContent) => ipcRenderer.invoke('tasks:updateChatMessage', taskId, messageId, newContent),
     
     // Product requirements generation (silent, no chat history)
     generateProductRequirements: (taskId, taskData) => ipcRenderer.invoke('tasks:generateProductRequirements', taskId, taskData)
@@ -129,7 +130,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     syncTasks: () => ipcRenderer.invoke('jira:syncTasks'),
     updateIssue: (issueKey, updateData) => ipcRenderer.invoke('jira:updateIssue', issueKey, updateData),
     transitionIssue: (issueKey, transitionName) => ipcRenderer.invoke('jira:transitionIssue', issueKey, transitionName),
-    healthCheck: () => ipcRenderer.invoke('jira:healthCheck')
+    healthCheck: () => ipcRenderer.invoke('jira:healthCheck'),
+    debugTokenScopes: () => ipcRenderer.invoke('jira:debugTokenScopes')
   },
 
   // Confluence APIs (uses JIRA OAuth)
@@ -140,6 +142,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     updatePage: (params) => ipcRenderer.invoke('confluence:updatePage', params),
     searchPages: (params) => ipcRenderer.invoke('confluence:searchPages', params),
     getPage: (params) => ipcRenderer.invoke('confluence:getPage', params)
+  },
+
+  // Reporting APIs
+  reporting: {
+    generateReport: (reportType, entityId, options) => ipcRenderer.invoke('reporting:generateReport', reportType, entityId, options),
+    getPersonReport: (personEmail, options) => ipcRenderer.invoke('reporting:generateReport', 'person', personEmail, options),
+    getTeamReport: (teamProjectKey, options) => ipcRenderer.invoke('reporting:generateReport', 'team', teamProjectKey, options),
+    getUnitReport: (unitProjects, options) => ipcRenderer.invoke('reporting:generateReport', 'unit', unitProjects, options),
+    getFeatureReport: (epicKey, options) => ipcRenderer.invoke('reporting:generateReport', 'feature', epicKey, options)
   },
 
   // Slack APIs

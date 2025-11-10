@@ -445,6 +445,78 @@ function registerJIRAHandlers(services, logger) {
     }
   });
 
+  /**
+   * Debug: Check what scopes the current token has
+   */
+  ipcMain.handle('jira:debugTokenScopes', async (event) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+      
+      if (!userId) {
+        return {
+          success: false,
+          error: 'User not authenticated'
+        };
+      }
+
+      // Get stored JIRA settings
+      const { data: userData } = await services.dbAdapter.supabase
+        .from('users')
+        .select('integration_settings')
+        .eq('id', userId)
+        .single();
+
+      const jiraSettings = userData?.integration_settings?.jira;
+
+      if (!jiraSettings?.access_token) {
+        return {
+          success: false,
+          error: 'No JIRA token found'
+        };
+      }
+
+      // Decode JWT to see scopes (tokens are JWTs)
+      const tokenParts = jiraSettings.access_token.split('.');
+      if (tokenParts.length === 3) {
+        try {
+          const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
+          logger.info('📋 Token scopes decoded:', {
+            scopes: payload.scope || 'none',
+            clientId: payload.aud || payload.client_id,
+            expiry: payload.exp ? new Date(payload.exp * 1000).toISOString() : 'unknown'
+          });
+          
+          return {
+            success: true,
+            scopes: payload.scope ? payload.scope.split(' ') : [],
+            clientId: payload.aud || payload.client_id,
+            expiry: payload.exp ? new Date(payload.exp * 1000).toISOString() : null,
+            hasConfluenceScopes: payload.scope ? payload.scope.includes('confluence') : false
+          };
+        } catch (decodeError) {
+          logger.error('Failed to decode token:', decodeError);
+          return {
+            success: false,
+            error: 'Token is not a valid JWT',
+            tokenPreview: jiraSettings.access_token.substring(0, 30) + '...'
+          };
+        }
+      }
+
+      return {
+        success: false,
+        error: 'Token format not recognized'
+      };
+
+    } catch (error) {
+      logger.error('Debug token scopes error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
   logger.info('JIRA handlers registered');
 }
 

@@ -10,7 +10,7 @@ import './TaskCarousel.css';
  * TaskCarousel - Keeps all carousels mounted but shows/hides based on active tab
  *
  * This approach prevents unmounting/remounting and preserves state:
- * - jira-progress: JIRA tasks (Kanban for sales, Carousel for developers)
+ * - jira-progress: JIRA tasks (Carousel for developers/admins, Kanban for PM/sales)
  * - calendar: Calendar events
  * - unibox: Emails
  * - reports: Reports and metrics
@@ -19,8 +19,9 @@ import './TaskCarousel.css';
 export default function TaskCarousel({ activeTab, allTabsData, onTaskSelect, onUpdateTask, user }) {
   const { jiraTasks, calendarEvents, emails, reports, widgets, loading } = allTabsData;
 
-  // Determine if user is a developer or sales
-  const isDeveloper = user?.user_role === 'developer' || user?.role === 'developer';
+  // Determine if user should see carousel (developers and admins) vs Kanban (PM/sales)
+  const useCarouselView = user?.user_role === 'developer' || user?.role === 'developer' || 
+                          user?.user_role === 'admin' || user?.role === 'admin';
 
   if (loading) {
     return (
@@ -35,7 +36,7 @@ export default function TaskCarousel({ activeTab, allTabsData, onTaskSelect, onU
     <div className="task-carousel-container">
       {/* All carousels stay mounted, just hidden with CSS */}
       <div style={{ display: activeTab === 'jira-progress' ? 'block' : 'none', width: '100%', height: '100%' }}>
-        {isDeveloper ? (
+        {useCarouselView ? (
           <JiraTaskCarousel
             tasks={jiraTasks}
             onTaskSelect={onTaskSelect}

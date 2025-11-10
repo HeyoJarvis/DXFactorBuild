@@ -468,6 +468,68 @@ class JIRAService extends EventEmitter {
   }
 
   /**
+   * Get a single issue by key or ID
+   */
+  async getIssueDetails(issueKeyOrId) {
+    try {
+      this.logger.info('Fetching issue details', { issueKeyOrId });
+
+      const response = await this._makeRequest(`/rest/api/3/issue/${issueKeyOrId}?fields=*all&expand=changelog`);
+
+      this.logger.info('Issue details retrieved', {
+        issueKey: response.key,
+        hasDescription: !!response.fields?.description
+      });
+
+      return response;
+
+    } catch (error) {
+      this.logger.error('Failed to get issue details', {
+        issueKeyOrId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get issues with JQL query (alias for getIssues)
+   */
+  async getIssuesByJQL(jql, options = {}) {
+    return this.getIssues(jql, options);
+  }
+
+  /**
+   * Get remote links (web links) for an issue
+   * @param {string} issueKeyOrId - Issue key (e.g., 'PROJ-123') or ID
+   * @returns {Promise<Array>} Array of remote links
+   */
+  async getIssueRemoteLinks(issueKeyOrId) {
+    try {
+      this.logger.info('Fetching remote links for issue', { issueKeyOrId });
+      
+      const response = await this._makeRequest(
+        `/rest/api/3/issue/${issueKeyOrId}/remotelink`
+      );
+      
+      this.logger.info('Remote links retrieved', {
+        issueKey: issueKeyOrId,
+        linkCount: response?.length || 0
+      });
+      
+      return response || [];
+      
+    } catch (error) {
+      this.logger.error('Failed to get remote links', {
+        issueKeyOrId,
+        error: error.message
+      });
+      // Return empty array instead of throwing - links are optional
+      return [];
+    }
+  }
+
+  /**
    * Get issues with JQL query
    */
   async getIssues(jql, options = {}) {
@@ -475,7 +537,8 @@ class JIRAService extends EventEmitter {
       const {
         startAt = 0,
         maxResults = 50,
-        fields = ['summary', 'status', 'assignee', 'priority', 'created', 'updated', 'description', 'labels', 'issuetype', 'parent', 'customfield_10016'] // customfield_10016 is usually story points
+        fields = ['summary', 'status', 'assignee', 'priority', 'created', 'updated', 'description', 'labels', 'issuetype', 'parent', 'customfield_10016'], // customfield_10016 is usually story points
+        expand = []
       } = options;
 
       this.logger.info('Fetching issues', { jql, startAt, maxResults });
@@ -486,6 +549,10 @@ class JIRAService extends EventEmitter {
         maxResults: maxResults.toString(),
         fields: fields.join(',')
       });
+
+      if (expand.length > 0) {
+        params.append('expand', expand.join(','));
+      }
 
       const response = await this._makeRequest(`/rest/api/3/search/jql?${params.toString()}`);
 

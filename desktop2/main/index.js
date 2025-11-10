@@ -31,6 +31,7 @@ const registerUserChatHandlers = require('./ipc/user-chat-handlers');
 const registerSystemHandlers = require('./ipc/system-handlers');
 const registerWindowHandlers = require('./ipc/window-handlers');
 const registerArcReactorHandlers = require('./ipc/arc-reactor-handlers');
+const { registerReportingHandlers } = require('./ipc/reporting-handlers');
 const registerJIRAHandlers = require('./ipc/jira-handlers');
 const { registerConfluenceHandlers } = require('./ipc/confluence-handlers');
 const registerMissionControlHandlers = require('./ipc/mission-control-handlers');
@@ -641,6 +642,7 @@ function setupIPC() {
   registerSystemHandlers(appState.services, logger);
   registerWindowHandlers(appState.windows, logger);
   registerArcReactorHandlers(appState.services, logger);
+  registerReportingHandlers(appState.services, logger);
   registerJIRAHandlers(appState.services, logger);
   registerConfluenceHandlers(appState.services, logger);
   registerMissionControlHandlers(appState.services, logger);
