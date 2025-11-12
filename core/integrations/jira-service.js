@@ -116,9 +116,12 @@ class JIRAService extends EventEmitter {
 
     const authUrl = `https://auth.atlassian.com/authorize?${params.toString()}`;
     
-    this.logger.info('Authorization URL generated', {
+    this.logger.info('🔐 Authorization URL generated', {
       redirectUri: this.options.redirectUri,
-      scopes: this.options.scopes
+      totalScopes: this.options.scopes.length,
+      scopes: this.options.scopes,
+      confluenceScopes: this.options.scopes.filter(s => s.includes('confluence')),
+      jiraScopes: this.options.scopes.filter(s => s.includes('jira'))
     });
 
     return authUrl;
@@ -160,6 +163,16 @@ class JIRAService extends EventEmitter {
       }
 
       const tokenData = await response.json();
+      
+      // 🔍 LOG THE ACTUAL SCOPES RETURNED BY ATLASSIAN
+      this.logger.info('🔍 TOKEN RESPONSE FROM ATLASSIAN:', {
+        hasAccessToken: !!tokenData.access_token,
+        hasRefreshToken: !!tokenData.refresh_token,
+        expiresIn: tokenData.expires_in,
+        scope: tokenData.scope || 'NO SCOPE FIELD IN RESPONSE',
+        tokenType: tokenData.token_type,
+        allFields: Object.keys(tokenData)
+      });
       
       // Store tokens
       this.accessToken = tokenData.access_token;

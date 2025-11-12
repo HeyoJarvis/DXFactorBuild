@@ -18,6 +18,11 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
   const [showReportModal, setShowReportModal] = useState(false);
   const [selectedTaskForReport, setSelectedTaskForReport] = useState(null);
   const navigate = useNavigate();
+  
+  // Additional context for report generation
+  const [confluenceLinks, setConfluenceLinks] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [confluenceLinkInput, setConfluenceLinkInput] = useState('');
 
   // Teams functionality hidden - no longer used
   // const handleTeamsClick = () => {
@@ -62,6 +67,72 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
     setShowReportModal(true);
   };
 
+  // Handle file upload
+  const handleFileUpload = async (files) => {
+    const fileArray = Array.from(files);
+    
+    const validFiles = [];
+    for (const file of fileArray) {
+      const validTypes = ['.pdf', '.doc', '.docx', '.txt', '.md'];
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      
+      if (!validTypes.includes(ext)) {
+        alert(`Invalid file type: ${file.name}. Allowed: PDF, DOC, DOCX, TXT, MD`);
+        continue;
+      }
+      if (file.size > maxSize) {
+        alert(`File too large: ${file.name} (max 10MB)`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+    
+    const processedFiles = await Promise.all(
+      validFiles.map(file => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          content: e.target.result
+        });
+        reader.readAsDataURL(file);
+      }))
+    );
+    
+    setUploadedFiles([...uploadedFiles, ...processedFiles]);
+  };
+
+  const handleAddConfluenceLink = () => {
+    const link = confluenceLinkInput.trim();
+    if (!link) return;
+    
+    if (!link.includes('atlassian.net/wiki') && !link.includes('confluence')) {
+      alert('Please enter a valid Confluence URL');
+      return;
+    }
+    
+    setConfluenceLinks([...confluenceLinks, link]);
+    setConfluenceLinkInput('');
+  };
+
+  const handleRemoveConfluenceLink = (index) => {
+    setConfluenceLinks(confluenceLinks.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveFile = (index) => {
+    setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+  };
+
+  const handleCloseReportModal = () => {
+    setShowReportModal(false);
+    setSelectedTaskForReport(null);
+    setConfluenceLinks([]);
+    setUploadedFiles([]);
+    setConfluenceLinkInput('');
+  };
+
   const handleGenerateReportSubmit = async (reportType) => {
     if (!selectedTaskForReport) return;
 
@@ -69,12 +140,18 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
       ? (selectedTaskForReport.external_key || selectedTaskForReport.externalKey)
       : user?.email || 'user@company.com';
 
-    setShowReportModal(false);
     const task = selectedTaskForReport;
+    setShowReportModal(false);
     setSelectedTaskForReport(null);
 
     try {
-      const result = await window.electronAPI.reporting.generateReport(reportType, entityId, {});
+      // Include additional context in options
+      const options = {
+        additionalConfluenceLinks: confluenceLinks,
+        uploadedFiles: uploadedFiles
+      };
+      
+      const result = await window.electronAPI.reporting.generateReport(reportType, entityId, options);
       if (result.success) {
         // Add the report to the task chat
         await window.electronAPI.tasks.sendChatMessage(task.id, result.report.summary, 'report');
@@ -86,6 +163,11 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
       }
     } catch (error) {
       alert(`❌ Error: ${error.message}`);
+    } finally {
+      // Clear context after generation
+      setConfluenceLinks([]);
+      setUploadedFiles([]);
+      setConfluenceLinkInput('');
     }
   };
 
@@ -251,21 +333,114 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
 
       {/* Report Generation Modal */}
       {showReportModal && (
-        <div className="report-modal-overlay" onClick={() => setShowReportModal(false)}>
-          <div className="report-modal-compact" onClick={(e) => e.stopPropagation()}>
-            <h4>Generate Report</h4>
-            <p className="modal-task-info">
-              {selectedTaskForReport?.external_key || selectedTaskForReport?.externalKey} - {selectedTaskForReport?.title || selectedTaskForReport?.session_title}
-            </p>
-            <div className="report-type-buttons">
-              <button onClick={() => handleGenerateReportSubmit('person')}>
-                👤 Person Report
-              </button>
-              <button onClick={() => handleGenerateReportSubmit('feature')}>
-                🎯 Feature Report
+        <div className="report-modal-overlay" onClick={handleCloseReportModal}>
+          <div className="report-modal-enhanced" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h4>Generate Report</h4>
+              <button className="close-btn" onClick={handleCloseReportModal}>×</button>
+            </div>
+            
+            <div className="modal-body">
+              <p className="modal-task-info">
+                <strong>{selectedTaskForReport?.external_key || selectedTaskForReport?.externalKey}</strong> - {selectedTaskForReport?.title || selectedTaskForReport?.session_title}
+              </p>
+
+              {/* Report Type Selection - Only Feature Report */}
+              <div className="report-type-section">
+                <label>Generate Feature Report</label>
+                <p className="report-type-description">
+                  Generate a comprehensive report for this epic including progress, timeline, and documentation.
+                </p>
+              </div>
+
+              {/* Additional Confluence Pages */}
+              <div className="form-group">
+                <label>📄 Additional Confluence Pages (Optional)</label>
+                <div className="input-with-button">
+                  <input
+                    type="text"
+                    value={confluenceLinkInput}
+                    onChange={(e) => setConfluenceLinkInput(e.target.value)}
+                    placeholder="https://your-domain.atlassian.net/wiki/spaces/..."
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddConfluenceLink();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="add-link-btn"
+                    onClick={handleAddConfluenceLink}
+                    disabled={!confluenceLinkInput.trim()}
+                  >
+                    Add
+                  </button>
+                </div>
+                {confluenceLinks.length > 0 && (
+                  <div className="link-chips">
+                    {confluenceLinks.map((link, idx) => (
+                      <div key={idx} className="chip">
+                        <span className="chip-text" title={link}>
+                          {link.split('/').pop().substring(0, 30)}...
+                        </span>
+                        <button
+                          type="button"
+                          className="chip-remove"
+                          onClick={() => handleRemoveConfluenceLink(idx)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <span className="input-hint">
+                  Add Confluence page URLs for additional context
+                </span>
+              </div>
+
+              {/* File Upload */}
+              <div className="form-group">
+                <label>📎 Upload Context Files (Optional)</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt,.md"
+                  multiple
+                  onChange={(e) => handleFileUpload(e.target.files)}
+                  className="file-input"
+                />
+                {uploadedFiles.length > 0 && (
+                  <div className="file-chips">
+                    {uploadedFiles.map((file, idx) => (
+                      <div key={idx} className="chip">
+                        <span className="chip-text">
+                          {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                        </span>
+                        <button
+                          type="button"
+                          className="chip-remove"
+                          onClick={() => handleRemoveFile(idx)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <span className="input-hint">
+                  PDF, DOC, DOCX, TXT, MD files supported (max 10MB each)
+                </span>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="modal-cancel" onClick={handleCloseReportModal}>Cancel</button>
+              <button className="modal-generate" onClick={() => handleGenerateReportSubmit('feature')}>
+                🎯 Generate Feature Report
               </button>
             </div>
-            <button className="modal-cancel" onClick={() => setShowReportModal(false)}>Cancel</button>
           </div>
         </div>
       )}

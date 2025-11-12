@@ -65,11 +65,109 @@ class FeatureReportGenerator extends BaseReportGenerator {
         this.logger.warn('Failed to extract Confluence docs', { error: confError.message });
       }
 
+      // Process additional user-provided Confluence links
+      let additionalConfluenceDocs = [];
+      if (options.additionalConfluenceLinks && Array.isArray(options.additionalConfluenceLinks) && options.additionalConfluenceLinks.length > 0) {
+        this.logger.info('Processing additional Confluence links', { count: options.additionalConfluenceLinks.length });
+        
+        for (const link of options.additionalConfluenceLinks) {
+          try {
+            this.logger.info('🔍 Processing Confluence link', { link });
+            
+            const pageId = this._extractPageIdFromUrl(link);
+            this.logger.info('📝 Extracted page ID', { pageId, link });
+            
+            if (pageId && this.confluenceService) {
+              this.logger.info('🌐 Fetching Confluence page from API', { pageId });
+              const page = await this.confluenceService.getPage(pageId);
+              
+              const content = page.body?.storage?.value || page.body?.view?.value || '';
+              const contentLength = content.length;
+              const contentPreview = content.substring(0, 200);
+              
+              this.logger.info('✅ Successfully fetched Confluence page', { 
+                pageId, 
+                title: page.title,
+                contentLength,
+                contentPreview,
+                hasContent: contentLength > 0
+              });
+              
+              additionalConfluenceDocs.push({
+                url: link,
+                title: page.title || 'Confluence Page',
+                content: content,
+                source: 'user-provided',
+                contentFetched: true
+              });
+            } else {
+              this.logger.warn('⚠️ Could not extract page ID or Confluence service not available', { 
+                link, 
+                hasPageId: !!pageId, 
+                hasConfluenceService: !!this.confluenceService 
+              });
+              // If we can't extract page ID, still include the link
+              additionalConfluenceDocs.push({
+                url: link,
+                title: link.split('/').pop(),
+                content: '',
+                source: 'user-provided-link-only',
+                contentFetched: false
+              });
+            }
+          } catch (error) {
+            const is401 = error.message && error.message.includes('401');
+            const errorMessage = is401 
+              ? '⚠️ Confluence access denied. Please disconnect and reconnect JIRA in Settings to grant Confluence read permissions.'
+              : error.message;
+            
+            this.logger.error('❌ Failed to fetch user-provided Confluence page', { 
+              link, 
+              error: errorMessage,
+              is401,
+              stack: error.stack
+            });
+            // Still include the link even if fetch fails
+            additionalConfluenceDocs.push({
+              url: link,
+              title: link.split('/').pop(),
+              content: '',
+              error: errorMessage,
+              source: 'user-provided-error',
+              contentFetched: false
+            });
+          }
+        }
+      }
+
+      // Process uploaded files
+      let uploadedDocuments = [];
+      if (options.uploadedFiles && Array.isArray(options.uploadedFiles) && options.uploadedFiles.length > 0) {
+        this.logger.info('Processing uploaded files', { count: options.uploadedFiles.length });
+        
+        try {
+          const DocumentProcessor = require('../../desktop2/main/services/DocumentProcessor');
+          const processor = new DocumentProcessor(this.logger);
+          uploadedDocuments = await processor.processFiles(options.uploadedFiles);
+          
+          const successCount = uploadedDocuments.filter(d => d.success).length;
+          const failCount = uploadedDocuments.filter(d => !d.success).length;
+          this.logger.info('File processing complete', { 
+            total: uploadedDocuments.length,
+            successful: successCount,
+            failed: failCount
+          });
+        } catch (error) {
+          this.logger.error('Failed to process uploaded files', { error: error.message });
+        }
+      }
+
       return {
         epicKey,
         epic,
         stories: Array.isArray(stories) ? stories : [],
-        confluenceDocs,
+        confluenceDocs: [...confluenceDocs, ...additionalConfluenceDocs],
+        uploadedDocuments,
         period: this._getPeriod(options)
       };
     } catch (error) {
@@ -79,9 +177,26 @@ class FeatureReportGenerator extends BaseReportGenerator {
         epic: null,
         stories: [],
         confluenceDocs: [],
+        uploadedDocuments: [],
         period: this._getPeriod(options),
         error: error.message
       };
+    }
+  }
+
+  /**
+   * Extract Confluence page ID from URL
+   * Supports formats:
+   * - https://domain.atlassian.net/wiki/spaces/SPACE/pages/123456/Page+Title
+   * - https://domain.atlassian.net/wiki/pages/123456
+   */
+  _extractPageIdFromUrl(url) {
+    try {
+      const match = url.match(/pages\/(\d+)/);
+      return match ? match[1] : null;
+    } catch (error) {
+      this.logger.warn('Failed to extract page ID from URL', { url, error: error.message });
+      return null;
     }
   }
 
@@ -275,28 +390,85 @@ class FeatureReportGenerator extends BaseReportGenerator {
       // Use AI to summarize the description if it exists
       if (epicDescription && epicDescription !== 'No description available' && epicDescription.length > 50) {
         this.logger.info('Sending to AI for summarization', { originalLength: epicDescription.length });
+        
+        // Build additional context from Confluence docs and uploaded files
+        let additionalContext = '';
+        
+        // Add Confluence documentation context
+        if (data.confluenceDocs && data.confluenceDocs.length > 0) {
+          additionalContext += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+          additionalContext += 'ADDITIONAL CONTEXT FROM CONFLUENCE DOCUMENTATION:\n';
+          additionalContext += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+          data.confluenceDocs.forEach((doc, idx) => {
+            if (doc.content && doc.content.length > 0) {
+              // Strip HTML tags and limit content length to 5000 chars (increased from 1000)
+              const cleanContent = doc.content.replace(/<[^>]*>/g, '').substring(0, 5000);
+              additionalContext += `\n📄 Confluence Document ${idx + 1}: ${doc.title}\n`;
+              additionalContext += `${cleanContent}\n`;
+              if (doc.content.length > 5000) {
+                additionalContext += `\n[... content truncated, full document is ${doc.content.length} characters]\n`;
+              }
+            }
+          });
+        }
+        
+        // Add uploaded file context
+        if (data.uploadedDocuments && data.uploadedDocuments.length > 0) {
+          const successfulDocs = data.uploadedDocuments.filter(d => d.success);
+          if (successfulDocs.length > 0) {
+            additionalContext += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            additionalContext += 'ADDITIONAL CONTEXT FROM UPLOADED FILES:\n';
+            additionalContext += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            successfulDocs.forEach((doc, idx) => {
+              if (doc.content && doc.content.length > 0) {
+                // Limit content length to 5000 chars (increased from 1000)
+                const content = doc.content.substring(0, 5000);
+                additionalContext += `\n📎 Uploaded File ${idx + 1}: ${doc.filename}\n`;
+                additionalContext += `${content}\n`;
+                if (doc.content.length > 5000) {
+                  additionalContext += `\n[... content truncated, full file is ${doc.content.length} characters]\n`;
+                }
+              }
+            });
+          }
+        }
+        
         epicDescription = await this._aiSummarize(
-          epicDescription,
+          epicDescription + additionalContext,
           `You are extracting information from a JIRA ticket for "${epicName}". Write a LONG, DETAILED explanation (at least 150 words).
+          
+${additionalContext.length > 0 ? `🚨 CRITICAL - USER PROVIDED ADDITIONAL CONTEXT:
+The user has explicitly provided ${data.confluenceDocs ? data.confluenceDocs.length : 0} Confluence page(s) and ${data.uploadedDocuments ? data.uploadedDocuments.filter(d => d.success).length : 0} uploaded file(s).
+This means they WANT this information included in the report.
+
+YOU MUST:
+1. READ all the additional context provided below
+2. EXTRACT key requirements, technical details, and specifications from it
+3. MERGE this information into your summary alongside the JIRA description
+4. DO NOT just mention the documents exist - USE their actual content
+5. If the additional context has more detail than JIRA, prioritize it
+
+The additional context is provided at the end of this prompt.\n\n` : ''}
 
 EXAMPLE FORMAT (copy this style and length):
 "As a developer user, the goal is to see JIRA tasks directly in the HeyJarvis app to have a unified view of work without switching between tools. The requirements include: authenticating with JIRA OAuth, displaying assigned issues in task view with status, priority, and type information, auto-syncing every 5 minutes, and filtering by project and status. Success metrics target 80% of developer users connecting JIRA within the first week and achieving a 50% reduction in context switching between apps. The target users are engineering team members who actively use JIRA for project management. The repository is located at https://github.com/sdalal/BeachBaby. Additional technical requirements include proper error handling for OAuth failures, caching of issue data to reduce API calls, and support for multiple JIRA projects within a single workspace."
 
-Extract and write out EVERYTHING:
+Extract and write out EVERYTHING from BOTH the JIRA description AND the additional context:
 1. User story or feature goal (explain in detail what this is about)
-2. Every single requirement and acceptance criterion (list them ALL)
-3. All success metrics, KPIs, and target numbers
-4. Technical specifications, implementation details, and architecture notes
+2. Every single requirement and acceptance criterion (list them ALL - from JIRA AND additional docs)
+3. All success metrics, KPIs, and target numbers (from JIRA AND additional docs)
+4. Technical specifications, implementation details, and architecture notes (from JIRA AND additional docs)
 5. Target users, stakeholders, and who will benefit
 6. Links, repositories, documentation references, and dependencies
 7. Any constraints, risks, or important context
 
 CRITICAL REQUIREMENTS:
-- Your response MUST be at least 150 words
-- Write 5-8 detailed sentences minimum
+- Your response MUST be at least 150 words (aim for 200+ if additional context is provided)
+- Write 5-8 detailed sentences minimum (more if additional context is rich)
 - Do NOT be concise - be thorough and comprehensive
 - Plain text only, NO markdown
 - Do NOT write "This ticket describes..." - write the information directly
+- If additional context is provided, you MUST use specific details from it
 
 FORBIDDEN - DO NOT USE:
 - ** for bold (just write normal text)
@@ -309,12 +481,19 @@ User Story:
 As a team member, I want to...
 
 Requirements:
-- Native desktop notifications
-- Show task title and priority
+The key requirements for this feature include... [USE DETAILS FROM ADDITIONAL CONTEXT HERE]
 
 Success Metrics:
-- Faster response time
-- Increased engagement
+The success of this feature will be measured by... [USE METRICS FROM ADDITIONAL CONTEXT HERE]
+
+Technical Specifications:
+From a technical standpoint... [USE TECHNICAL DETAILS FROM ADDITIONAL CONTEXT HERE]
+
+Target Users and Stakeholders:
+The primary target users... [USE USER INFO FROM ADDITIONAL CONTEXT HERE]
+
+Additional Context:
+[USE ANY OTHER RELEVANT INFO FROM CONFLUENCE/FILES HERE]
 
 Strip out ALL ** and other markdown from your response. Output only clean plain text.`
         );
@@ -364,12 +543,15 @@ Strip out ALL ** and other markdown from your response. Output only clean plain 
         const url = doc.url || '';
         const description = doc.description || '';
         const source = doc.source || 'linked';
+        const error = doc.error || '';
         
         // Add emoji based on source
         const sourceEmoji = source === 'weblink' ? '🔗' :   // Explicit JIRA web link
                            source === 'regex' ? '📎' :      // Extracted from description via regex
                            source === 'search' ? '🔍' :     // Found via Confluence search
                            source === 'ai' ? '🤖' :         // AI extracted
+                           source === 'user-provided' ? '👤' : // User-provided link
+                           source === 'user-provided-error' ? '❌' : // User-provided link with error
                            '📄';                             // Default
         
         // Add indicator if content was fetched and summarized
@@ -378,6 +560,12 @@ Strip out ALL ** and other markdown from your response. Output only clean plain 
         if (url) {
           summary += `   ${url}\n`;
         }
+        
+        // Show error if present
+        if (error) {
+          summary += `\n   ⚠️ ${error}\n`;
+        }
+        
         if (description) {
           const cleanDesc = description.replace(/<[^>]*>/g, '');
           summary += `\n   Summary:\n`;
@@ -403,6 +591,30 @@ Strip out ALL ** and other markdown from your response. Output only clean plain 
       summary += `\nTip: Add Confluence links to your JIRA ticket:\n`;
       summary += `  • Click "Link" → "Web Link" in JIRA\n`;
       summary += `  • Or paste Confluence URLs in the description\n`;
+    }
+
+    // d) Uploaded documents
+    if (data.uploadedDocuments && data.uploadedDocuments.length > 0) {
+      summary += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      summary += `📎 UPLOADED CONTEXT FILES\n`;
+      summary += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      data.uploadedDocuments.forEach((doc, idx) => {
+        if (doc.success) {
+          summary += `${idx + 1}. 📄 ${doc.filename}\n`;
+          summary += `   Size: ${(doc.size / 1024).toFixed(1)} KB | Words: ${doc.wordCount}\n`;
+          
+          // Include a preview of the content (first 200 characters)
+          if (doc.content) {
+            const preview = doc.content.substring(0, 200).replace(/\n/g, ' ').trim();
+            summary += `   Preview: ${preview}...\n`;
+          }
+        } else {
+          summary += `${idx + 1}. ❌ ${doc.filename}\n`;
+          summary += `   Error: ${doc.error}\n`;
+        }
+        summary += `\n`;
+      });
     }
 
     return summary;

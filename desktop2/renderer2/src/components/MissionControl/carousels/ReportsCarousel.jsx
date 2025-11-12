@@ -12,6 +12,77 @@ export default function ReportsCarousel({ reports, user }) {
   const [generatedReport, setGeneratedReport] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
+  
+  // New state for additional context sources
+  const [confluenceLinks, setConfluenceLinks] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [confluenceLinkInput, setConfluenceLinkInput] = useState('');
+
+  // Handle file upload
+  const handleFileUpload = async (files) => {
+    const fileArray = Array.from(files);
+    
+    // Validate file types and sizes
+    const validFiles = [];
+    for (const file of fileArray) {
+      const validTypes = ['.pdf', '.doc', '.docx', '.txt', '.md'];
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      
+      if (!validTypes.includes(ext)) {
+        setError(`Invalid file type: ${file.name}. Allowed: PDF, DOC, DOCX, TXT, MD`);
+        continue;
+      }
+      if (file.size > maxSize) {
+        setError(`File too large: ${file.name} (max 10MB)`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+    
+    // Convert files to base64 for IPC transfer
+    const processedFiles = await Promise.all(
+      validFiles.map(file => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          content: e.target.result // base64
+        });
+        reader.readAsDataURL(file);
+      }))
+    );
+    
+    setUploadedFiles([...uploadedFiles, ...processedFiles]);
+    setError(null); // Clear any previous errors
+  };
+
+  // Handle adding Confluence link
+  const handleAddConfluenceLink = () => {
+    const link = confluenceLinkInput.trim();
+    if (!link) return;
+    
+    // Basic validation for Confluence URL
+    if (!link.includes('atlassian.net/wiki') && !link.includes('confluence')) {
+      setError('Please enter a valid Confluence URL');
+      return;
+    }
+    
+    setConfluenceLinks([...confluenceLinks, link]);
+    setConfluenceLinkInput('');
+    setError(null);
+  };
+
+  // Handle removing Confluence link
+  const handleRemoveConfluenceLink = (index) => {
+    setConfluenceLinks(confluenceLinks.filter((_, i) => i !== index));
+  };
+
+  // Handle removing uploaded file
+  const handleRemoveFile = (index) => {
+    setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+  };
 
   const handleGenerateReport = async () => {
     if (!entityId.trim()) {
@@ -23,7 +94,13 @@ export default function ReportsCarousel({ reports, user }) {
     setError(null);
 
     try {
-      const result = await window.electronAPI.reporting.generateReport(reportType, entityId, {});
+      // Include additional context in options
+      const options = {
+        additionalConfluenceLinks: confluenceLinks,
+        uploadedFiles: uploadedFiles
+      };
+      
+      const result = await window.electronAPI.reporting.generateReport(reportType, entityId, options);
       
       if (result.success) {
         setGeneratedReport(result.report);
@@ -45,6 +122,9 @@ export default function ReportsCarousel({ reports, user }) {
     setEntityId('');
     setGeneratedReport(null);
     setError(null);
+    setConfluenceLinks([]);
+    setUploadedFiles([]);
+    setConfluenceLinkInput('');
   };
 
   const getPlaceholder = () => {
@@ -176,6 +256,91 @@ export default function ReportsCarousel({ reports, user }) {
                   {reportType === 'team' && 'Enter the JIRA project key (e.g., SCRUM)'}
                   {reportType === 'unit' && 'Enter comma-separated project keys (e.g., PROJ1,PROJ2,PROJ3)'}
                   {reportType === 'feature' && 'Enter the JIRA epic key (e.g., PROJ-123)'}
+                </span>
+              </div>
+
+              {/* Additional Confluence Pages */}
+              <div className="form-group">
+                <label>📄 Additional Confluence Pages (Optional)</label>
+                <div className="input-with-button">
+                  <input
+                    type="text"
+                    value={confluenceLinkInput}
+                    onChange={(e) => setConfluenceLinkInput(e.target.value)}
+                    placeholder="https://your-domain.atlassian.net/wiki/spaces/..."
+                    disabled={isGenerating}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddConfluenceLink();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="add-link-btn"
+                    onClick={handleAddConfluenceLink}
+                    disabled={isGenerating || !confluenceLinkInput.trim()}
+                  >
+                    Add
+                  </button>
+                </div>
+                {confluenceLinks.length > 0 && (
+                  <div className="link-chips">
+                    {confluenceLinks.map((link, idx) => (
+                      <div key={idx} className="chip">
+                        <span className="chip-text" title={link}>
+                          {link.split('/').pop().substring(0, 30)}...
+                        </span>
+                        <button
+                          type="button"
+                          className="chip-remove"
+                          onClick={() => handleRemoveConfluenceLink(idx)}
+                          disabled={isGenerating}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <span className="input-hint">
+                  Add Confluence page URLs for additional context
+                </span>
+              </div>
+
+              {/* File Upload */}
+              <div className="form-group">
+                <label>📎 Upload Context Files (Optional)</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt,.md"
+                  multiple
+                  onChange={(e) => handleFileUpload(e.target.files)}
+                  disabled={isGenerating}
+                  className="file-input"
+                />
+                {uploadedFiles.length > 0 && (
+                  <div className="file-chips">
+                    {uploadedFiles.map((file, idx) => (
+                      <div key={idx} className="chip">
+                        <span className="chip-text">
+                          {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                        </span>
+                        <button
+                          type="button"
+                          className="chip-remove"
+                          onClick={() => handleRemoveFile(idx)}
+                          disabled={isGenerating}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <span className="input-hint">
+                  PDF, DOC, DOCX, TXT, MD files supported (max 10MB each)
                 </span>
               </div>
 
