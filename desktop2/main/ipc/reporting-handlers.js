@@ -46,17 +46,22 @@ function registerReportingHandlers(services, logger) {
 
       // Get the core JIRA service for report engine
       const jiraCore = jiraServiceInstance.jiraCore;
-      
+
       if (!jiraCore) {
         throw new Error('JIRA core service not available');
       }
 
       // Initialize Confluence service (uses same tokens)
       const confluenceService = new ConfluenceService({ logger });
+
+      // ✅ FIX: Get fresh token from JIRA core (handles auto-refresh)
+      // Instead of using potentially expired token from database
+      await jiraCore._ensureValidToken(); // Refresh token if needed
+
       confluenceService.setTokens({
-        accessToken: jiraSettings.access_token,
-        cloudId: jiraSettings.cloud_id,
-        siteUrl: jiraSettings.site_url
+        accessToken: jiraCore.accessToken, // ← Use fresh token from JIRA service
+        cloudId: jiraCore.cloudId,
+        siteUrl: jiraCore.siteUrl
       });
 
       // Create report engine with core JIRA service

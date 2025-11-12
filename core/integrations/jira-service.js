@@ -33,7 +33,9 @@ class JIRAService extends EventEmitter {
         'write:jira-work',
         'read:jira-user',
         'read:space:confluence',
-        'read:content:confluence',
+        'read:page:confluence',              // ✅ CRITICAL: Read page content
+        'read:blogpost:confluence',          // ✅ Read blog posts
+        'read:content:confluence',           // Generic content access
         'read:space-details:confluence',
         'read:content.metadata:confluence',
         'write:content:confluence',

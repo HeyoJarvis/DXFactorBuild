@@ -299,16 +299,29 @@ class ConfluenceService extends EventEmitter {
   /**
    * Search for pages by title
    */
-  async searchPages(query, spaceKey = null) {
+  async searchPages(query, options = {}) {
     try {
+      const spaceKey = options.spaceKey || options.limit;
       this.logger.info('Searching Confluence pages', { query, spaceKey });
 
-      let cql = `title ~ "${query}"`;
-      if (spaceKey) {
-        cql += ` AND space = ${spaceKey}`;
+      // ✅ FIX: Use v2 search API which works with read:page:confluence scope
+      // Old v1 CQL search requires different scopes
+      // V2 API uses simpler title search without CQL
+
+      let searchUrl = `/wiki/api/v2/pages?title=${encodeURIComponent(query)}`;
+      if (spaceKey && typeof spaceKey === 'string') {
+        // Get space ID from key first (v2 uses space IDs not keys)
+        const spacesData = await this._makeRequest(`/wiki/api/v2/spaces?keys=${spaceKey}`);
+        if (spacesData.results && spacesData.results.length > 0) {
+          searchUrl += `&space-id=${spacesData.results[0].id}`;
+        }
       }
 
-      const data = await this._makeRequest(`/wiki/rest/api/content/search?cql=${encodeURIComponent(cql)}`);
+      if (options.limit && typeof options.limit === 'number') {
+        searchUrl += `&limit=${options.limit}`;
+      }
+
+      const data = await this._makeRequest(searchUrl);
 
       this.logger.info('Search complete', { count: data.results?.length || 0 });
 
@@ -356,15 +369,28 @@ class ConfluenceService extends EventEmitter {
     try {
       this.logger.info('Fetching page', { pageId });
 
-      const data = await this._makeRequest(`/wiki/rest/api/content/${pageId}?expand=body.storage,version,space`);
+      // ✅ FIX: Use v2 API which works with granular scopes (read:page:confluence)
+      // Old v1 API (/wiki/rest/api/content/) requires read:confluence-content.all
+      // New v2 API (/wiki/api/v2/pages/) works with read:page:confluence
+      const data = await this._makeRequest(`/wiki/api/v2/pages/${pageId}?body-format=storage`);
 
+      // Return structure compatible with feature-report-generator expectations
       return {
         id: data.id,
         title: data.title,
-        content: data.body?.storage?.value || '',
+        body: {
+          storage: {
+            value: data.body?.storage?.value || '',
+            representation: 'storage'
+          },
+          view: {
+            value: data.body?.view?.value || ''
+          }
+        },
+        content: data.body?.storage?.value || '', // Also include flat content for backward compatibility
         version: data.version?.number || 1,
-        spaceKey: data.space?.key || null,
-        url: `${this.siteUrl}/wiki${data._links.webui}`
+        spaceKey: data.spaceId || null,
+        url: data._links?.webui ? `${this.siteUrl}${data._links.webui}` : null
       };
     } catch (error) {
       this.logger.error('Failed to fetch page', { error: error.message, pageId });
