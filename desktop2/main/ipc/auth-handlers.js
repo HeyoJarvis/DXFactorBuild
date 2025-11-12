@@ -96,19 +96,19 @@ async function initializeUserIntegrations(services, userId, logger) {
 
 function registerAuthHandlers(services, logger) {
   /**
-   * Sign in with Slack
+   * Sign in with Email
    */
-  ipcMain.handle('auth:signInWithSlack', async () => {
+  ipcMain.handle('auth:signInWithEmail', async (event, email, password) => {
     try {
       if (!services.auth) {
         return { success: false, error: 'Auth service not initialized' };
       }
 
-      logger.info('Starting Slack sign in...');
-      const result = await services.auth.signInWithSlack();
+      logger.info('Starting email sign in...', { email });
+      const result = await services.auth.signInWithEmail(email, password);
       
       if (result.success && result.user?.id) {
-        logger.info('Slack sign in successful', { user_id: result.user.id });
+        logger.info('Email sign in successful', { user_id: result.user.id });
         
         // 🔥 Auto-initialize user's integrations
         await initializeUserIntegrations(services, result.user.id, logger);
@@ -116,7 +116,33 @@ function registerAuthHandlers(services, logger) {
       
       return result;
     } catch (error) {
-      logger.error('Slack sign in failed:', error);
+      logger.error('Email sign in failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  /**
+   * Sign up with Email
+   */
+  ipcMain.handle('auth:signUpWithEmail', async (event, email, password) => {
+    try {
+      if (!services.auth) {
+        return { success: false, error: 'Auth service not initialized' };
+      }
+
+      logger.info('Starting email sign up...', { email });
+      const result = await services.auth.signUpWithEmail(email, password);
+      
+      if (result.success && result.user?.id) {
+        logger.info('Email sign up successful', { user_id: result.user.id });
+        
+        // 🔥 Auto-initialize user's integrations
+        await initializeUserIntegrations(services, result.user.id, logger);
+      }
+      
+      return result;
+    } catch (error) {
+      logger.error('Email sign up failed:', error);
       return { success: false, error: error.message };
     }
   });

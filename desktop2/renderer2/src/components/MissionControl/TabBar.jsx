@@ -29,7 +29,8 @@ export default function TabBar({ activeTab, onTabChange }) {
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-      )
+      ),
+      hidden: true  // Hidden - Calendar tab
     },
     { 
       id: 'unibox', 
@@ -39,7 +40,8 @@ export default function TabBar({ activeTab, onTabChange }) {
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
           <polyline points="22,6 12,13 2,6"></polyline>
         </svg>
-      )
+      ),
+      hidden: true  // Hidden - Inbox tab
     },
     { 
       id: 'reports', 
@@ -50,6 +52,7 @@ export default function TabBar({ activeTab, onTabChange }) {
           <polyline points="17 6 23 6 23 12"></polyline>
         </svg>
       )
+      // Visible - Reports tab (Feature reports only)
     },
     { 
       id: 'widgets', 
@@ -61,14 +64,15 @@ export default function TabBar({ activeTab, onTabChange }) {
           <rect x="14" y="14" width="7" height="7"></rect>
           <rect x="3" y="14" width="7" height="7"></rect>
         </svg>
-      )
+      ),
+      hidden: true  // Hidden - Widgets tab
     }
   ];
 
   return (
     <div className="tab-bar">
       <div className="tab-bar-container">
-        {tabs.map(tab => (
+        {tabs.filter(tab => !tab.hidden).map(tab => (
           <button
             key={tab.id}
             className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}

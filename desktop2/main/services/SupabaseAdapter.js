@@ -10,6 +10,7 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
 const SupabaseClient = require('../../../data/storage/supabase-client');
+const { mapJiraStatusToInternal } = require('../utils/jira-status-mapper');
 
 class DesktopSupabaseAdapter {
   constructor(options = {}) {
@@ -83,7 +84,7 @@ class DesktopSupabaseAdapter {
           workflow_id: workflow_id || null,
           workflow_type: workflow_type || 'general',
           workflow_intent: workflow_intent || null,
-          session_title: session_title || null,
+          session_title: session_title || `Chat Session ${new Date().toISOString()}`,
           metadata: remainingMetadata,  // Store remaining metadata
           is_active: true
         }])
@@ -735,29 +736,51 @@ class DesktopSupabaseAdapter {
       if (error) throw error;
 
       // Transform to task format for UI compatibility
-      let tasks = (data || []).map(session => ({
-        id: session.id,
-        user_id: session.user_id,
-        title: session.session_title,
-        description: session.workflow_metadata?.description || null,
-        status: session.is_completed ? 'completed' : 'todo',
-        priority: session.workflow_metadata?.priority || 'medium',
-        tags: session.workflow_metadata?.tags || [],
-        due_date: session.workflow_metadata?.due_date || null,
-        parent_session_id: session.workflow_metadata?.parent_session_id || null,
-        assignor: session.workflow_metadata?.assignor || null,
-        assignee: session.workflow_metadata?.assignee || null,
-        mentioned_users: session.workflow_metadata?.mentioned_users || [],
-        route_to: session.workflow_metadata?.route_to || 'tasks-sales',
-        work_type: session.workflow_metadata?.work_type || 'task',
-        external_id: session.workflow_metadata?.external_id || null,
-        external_key: session.workflow_metadata?.external_key || null,
-        external_url: session.workflow_metadata?.external_url || null,
-        external_source: session.workflow_metadata?.external_source || null,
-        created_at: session.started_at,
-        updated_at: session.last_message_at,
-        completed_at: session.completed_at
-      }));
+      let tasks = (data || [])
+        // Filter out JIRA deleted tasks unless explicitly requested
+        .filter(session => {
+          if (filters.includeDeleted) return true;
+          return !session.workflow_metadata?.jira_deleted;
+        })
+        .map(session => {
+          const jiraStatus = session.workflow_metadata?.jira_status;
+          
+          // Map JIRA status to internal status using centralized utility
+          let internalStatus = 'todo';
+          if (session.is_completed) {
+            internalStatus = 'completed';
+          } else if (jiraStatus) {
+            internalStatus = mapJiraStatusToInternal(jiraStatus);
+          }
+          
+          return {
+            id: session.id,
+            user_id: session.user_id,
+            title: session.session_title,
+            description: session.workflow_metadata?.description || null,
+            status: internalStatus,
+            priority: session.workflow_metadata?.priority || 'medium',
+            tags: session.workflow_metadata?.tags || [],
+            due_date: session.workflow_metadata?.due_date || null,
+            parent_session_id: session.workflow_metadata?.parent_session_id || null,
+            assignor: session.workflow_metadata?.assignor || null,
+            assignee: session.workflow_metadata?.assignee || null,
+            mentioned_users: session.workflow_metadata?.mentioned_users || [],
+            route_to: session.workflow_metadata?.route_to || 'tasks-sales',
+            work_type: session.workflow_metadata?.work_type || 'task',
+            external_id: session.workflow_metadata?.external_id || null,
+            external_key: session.workflow_metadata?.external_key || null,
+            external_url: session.workflow_metadata?.external_url || null,
+            external_source: session.workflow_metadata?.external_source || null,
+            jira_status: jiraStatus || null,
+            jira_issue_type: session.workflow_metadata?.jira_issue_type || null,
+            jira_priority: session.workflow_metadata?.jira_priority || null,
+            jira_deleted: session.workflow_metadata?.jira_deleted || false,
+            created_at: session.started_at,
+            updated_at: session.last_message_at,
+            completed_at: session.completed_at
+          };
+        });
 
       // Get user's Slack ID for assignment filtering
       const userSlackId = filters.slackUserId;
@@ -940,11 +963,12 @@ class DesktopSupabaseAdapter {
         });
       }
       
-      // When viewing team dev tasks, apply explicit external source filter
-      if (filters.filterByTeam && filters.externalSource) {
-        this.logger.info('Applying external source filter for team dev view', {
+      // Apply external source filter if specified (for JIRA, GitHub, etc.)
+      if (filters.externalSource) {
+        this.logger.info('Applying external source filter', {
           externalSource: filters.externalSource,
-          tasksBeforeFilter: tasks.length
+          tasksBeforeFilter: tasks.length,
+          filterByTeam: filters.filterByTeam || false
         });
         tasks = tasks.filter(task => task.external_source === filters.externalSource);
         this.logger.info('Tasks after external source filter', {
@@ -997,6 +1021,96 @@ class DesktopSupabaseAdapter {
   }
 
   /**
+   * Get all tasks from a specific external source (e.g., 'jira', 'github')
+   * Only returns non-deleted tasks by default
+   * @param {string} userId - User ID (can be null to get all users' tasks)
+   * @param {string} externalSource - External source (e.g., 'jira', 'github')
+   * @param {boolean} includeDeleted - Include deleted/completed tasks
+   * @param {boolean} allUsers - If true, get tasks from all users (for sync purposes)
+   */
+  async getTasksBySource(userId, externalSource, includeDeleted = false, allUsers = false) {
+    try {
+      let query = this.supabase
+        .from('conversation_sessions')
+        .select('*')
+        .eq('workflow_type', 'task')
+        .contains('workflow_metadata', { external_source: externalSource });
+
+      // Only filter by user_id if not fetching for all users
+      if (!allUsers && userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      // Filter out completed/deleted tasks unless explicitly requested
+      if (!includeDeleted) {
+        query = query.eq('is_completed', false);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      // Map to consistent format and filter out jira_deleted tasks
+      const tasks = (data || [])
+        .filter(session => {
+          // Always filter out jira_deleted tasks unless includeDeleted is true
+          if (!includeDeleted && session.workflow_metadata?.jira_deleted) {
+            return false;
+          }
+          return true;
+        })
+        .map(session => {
+          const jiraStatus = session.workflow_metadata?.jira_status;
+          
+          // Map JIRA status to internal status using centralized utility
+          let internalStatus = 'active';
+          if (session.is_completed) {
+            internalStatus = 'completed';
+          } else if (jiraStatus) {
+            const mapped = mapJiraStatusToInternal(jiraStatus);
+            // Convert 'todo' to 'active' for this method's return format
+            internalStatus = mapped === 'todo' ? 'active' : mapped;
+          }
+          
+          return {
+            id: session.id,
+            user_id: session.user_id, // Include user_id for debugging
+            title: session.session_title,
+            description: session.workflow_metadata?.description,
+            priority: session.workflow_metadata?.priority,
+            status: internalStatus,
+            external_id: session.workflow_metadata?.external_id,
+            external_key: session.workflow_metadata?.external_key,
+            external_url: session.workflow_metadata?.external_url,
+            external_source: session.workflow_metadata?.external_source,
+            jira_status: jiraStatus,
+            jira_issue_type: session.workflow_metadata?.jira_issue_type,
+            jira_priority: session.workflow_metadata?.jira_priority,
+            jira_deleted: session.workflow_metadata?.jira_deleted || false,
+            created_at: session.started_at,
+            updated_at: session.updated_at
+          };
+        });
+
+      this.logger.info('Fetched tasks by source', {
+        externalSource,
+        totalTasks: tasks.length,
+        includeDeleted,
+        allUsers,
+        userId: allUsers ? 'all' : userId
+      });
+
+      return tasks;
+    } catch (error) {
+      this.logger.error('Failed to get tasks by source', { 
+        error: error.message, 
+        externalSource 
+      });
+      return [];
+    }
+  }
+
+  /**
    * Update a task
    */
   async updateTask(taskId, updates) {
@@ -1016,7 +1130,9 @@ class DesktopSupabaseAdapter {
         }
       } else if (updates.is_completed !== undefined) {
         sessionUpdate.is_completed = updates.is_completed;
-        if (updates.is_completed) {
+        if (updates.is_completed && updates.completed_at) {
+          sessionUpdate.completed_at = updates.completed_at;
+        } else if (updates.is_completed) {
           sessionUpdate.completed_at = new Date().toISOString();
         }
       }
@@ -1037,8 +1153,8 @@ class DesktopSupabaseAdapter {
         sessionUpdate.workflow_metadata = metadata;
       }
 
-      // Update metadata fields
-      if (updates.priority || updates.description || updates.tags || updates.dueDate || updates.assignor || updates.assignee) {
+      // Update metadata fields (including JIRA-related fields)
+      if (updates.priority || updates.description || updates.tags || updates.dueDate || updates.assignor || updates.assignee || updates.jira_deleted !== undefined || updates.jira_status || updates.jira_issue_type || updates.jira_priority || updates.story_points || updates.sprint || updates.labels || updates.externalId || updates.externalKey || updates.externalUrl || updates.externalSource) {
         // Get current metadata first
         const { data: current, error: fetchError } = await this.supabase
           .from('conversation_sessions')
@@ -1056,6 +1172,21 @@ class DesktopSupabaseAdapter {
         if (updates.dueDate !== undefined) metadata.due_date = updates.dueDate;
         if (updates.assignor !== undefined) metadata.assignor = updates.assignor;
         if (updates.assignee !== undefined) metadata.assignee = updates.assignee;
+        if (updates.jira_deleted !== undefined) metadata.jira_deleted = updates.jira_deleted;
+        
+        // JIRA-specific fields
+        if (updates.jira_status !== undefined) metadata.jira_status = updates.jira_status;
+        if (updates.jira_issue_type !== undefined) metadata.jira_issue_type = updates.jira_issue_type;
+        if (updates.jira_priority !== undefined) metadata.jira_priority = updates.jira_priority;
+        if (updates.story_points !== undefined) metadata.story_points = updates.story_points;
+        if (updates.sprint !== undefined) metadata.sprint = updates.sprint;
+        if (updates.labels !== undefined) metadata.labels = updates.labels;
+        
+        // External source fields
+        if (updates.externalId !== undefined) metadata.external_id = updates.externalId;
+        if (updates.externalKey !== undefined) metadata.external_key = updates.externalKey;
+        if (updates.externalUrl !== undefined) metadata.external_url = updates.externalUrl;
+        if (updates.externalSource !== undefined) metadata.external_source = updates.externalSource;
         
         sessionUpdate.workflow_metadata = metadata;
       }

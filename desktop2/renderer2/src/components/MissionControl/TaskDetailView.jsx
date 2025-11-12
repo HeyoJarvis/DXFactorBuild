@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { marked } from 'marked';
 import './TaskDetailView.css';
 
 /**
@@ -30,8 +31,34 @@ export default function TaskDetailView({ task, user, onClose }) {
   const [showReportModal, setShowReportModal] = useState(false);
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editedMessageContent, setEditedMessageContent] = useState('');
+  const [isDescriptionEditMode, setIsDescriptionEditMode] = useState(false);
+  const [editedDescription, setEditedDescription] = useState('');
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [jiraStatus, setJiraStatus] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const descriptionEditorRef = useRef(null);
+
+  // Configure marked for safe rendering
+  useEffect(() => {
+    marked.setOptions({
+      breaks: true, // Convert \n to <br>
+      gfm: true, // GitHub Flavored Markdown
+      headerIds: false,
+      mangle: false
+    });
+  }, []);
+
+  // Render markdown content
+  const renderMarkdown = (content) => {
+    try {
+      const html = marked.parse(content);
+      return <div dangerouslySetInnerHTML={{ __html: html }} />;
+    } catch (error) {
+      console.error('Failed to parse markdown:', error);
+      return <div>{content}</div>;
+    }
+  };
 
   // Load chat history on mount
   useEffect(() => {
@@ -48,14 +75,27 @@ export default function TaskDetailView({ task, user, onClose }) {
     setEditedTitle(task.title || task.session_title || '');
     setEditedAssignee(user?.name || 'John Doe');
     setEditedDueDate(task.dueDate || 'Nov 12, 2025');
+    setJiraStatus(task.jira_status || task.status || 'To Do');
     setIsEditMode(false);
     setHasUnsavedChanges(false);
-  }, [task.id]);
+  }, [task.id, task.jira_status, task.status]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Close status dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showStatusDropdown && !event.target.closest('.status-dropdown-container')) {
+        setShowStatusDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showStatusDropdown]);
 
   const loadChatHistory = async () => {
     try {
@@ -225,6 +265,26 @@ export default function TaskDetailView({ task, user, onClose }) {
     }
   };
 
+  // Helper to convert description to readable text for AI
+  const getReadableDescription = (description) => {
+    if (!description) return 'No description provided';
+    
+    // If it's already a string, return it
+    if (typeof description === 'string') return description;
+    
+    // If it's ADF format, convert to plain text
+    if (typeof description === 'object' && description.content) {
+      return adfToPlainText(description);
+    }
+    
+    // Fallback: try to stringify
+    try {
+      return JSON.stringify(description);
+    } catch (e) {
+      return 'Description format not supported';
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
 
@@ -241,13 +301,25 @@ export default function TaskDetailView({ task, user, onClose }) {
     setIsTyping(true);
 
     try {
+      // Convert description to readable text for AI context
+      const readableDescription = getReadableDescription(task.description);
+      
+      // Include acceptance criteria if available
+      const acText = acceptanceCriteria.length > 0 
+        ? '\n\nAcceptance Criteria:\n' + acceptanceCriteria.map((ac, idx) => 
+            `${idx + 1}. AS A ${ac.role}, I WANT TO ${ac.want}, SO THAT ${ac.so}`
+          ).join('\n')
+        : '';
+      
       const response = await window.electronAPI.tasks.sendChatMessage(task.id, userMessage, {
         task: {
           id: task.id,
-          title: task.title,
-          description: task.description,
+          title: task.title || task.session_title,
+          description: readableDescription + acText,
           priority: task.priority,
           status: task.status,
+          external_key: task.external_key,
+          external_source: task.external_source,
           route_to: task.route_to || 'mission-control',
           work_type: task.work_type || 'task'
         },
@@ -319,6 +391,273 @@ export default function TaskDetailView({ task, user, onClose }) {
       ac.id === id ? { ...ac, [field]: value } : ac
     );
     setEditedAC(updatedAC);
+  };
+
+  // Helper to convert ADF to plain text for editing
+  const adfToPlainText = (adf) => {
+    if (!adf || !adf.content) return '';
+    
+    const extractText = (node) => {
+      if (!node) return '';
+      
+      if (node.type === 'text') {
+        let text = node.text || '';
+        
+        // Add markdown-like formatting for marks
+        if (node.marks && node.marks.length > 0) {
+          node.marks.forEach(mark => {
+            if (mark.type === 'strong') {
+              text = `**${text}**`;
+            } else if (mark.type === 'em') {
+              text = `*${text}*`;
+            } else if (mark.type === 'code') {
+              text = `\`${text}\``;
+            } else if (mark.type === 'underline') {
+              text = `_${text}_`;
+            } else if (mark.type === 'strike') {
+              text = `~~${text}~~`;
+            }
+          });
+        }
+        
+        return text;
+      }
+      
+      if (node.type === 'paragraph') {
+        const text = node.content?.map(extractText).join('') || '';
+        return text + '\n\n';
+      }
+      
+      if (node.type === 'heading') {
+        const level = node.attrs?.level || 1;
+        const text = node.content?.map(extractText).join('') || '';
+        return '#'.repeat(level) + ' ' + text + '\n\n';
+      }
+      
+      if (node.type === 'bulletList') {
+        return node.content?.map(extractText).join('') || '';
+      }
+      
+      if (node.type === 'orderedList') {
+        return node.content?.map((item, idx) => {
+          const text = extractText(item);
+          return text ? `${idx + 1}. ${text.trim()}\n` : '';
+        }).join('') + '\n';
+      }
+      
+      if (node.type === 'listItem') {
+        const text = node.content?.map(extractText).join('') || '';
+        return '• ' + text.trim() + '\n';
+      }
+      
+      if (node.type === 'hardBreak') {
+        return '\n';
+      }
+      
+      if (node.type === 'codeBlock') {
+        const code = node.content?.map(extractText).join('') || '';
+        return '```\n' + code + '\n```\n\n';
+      }
+      
+      if (node.content && Array.isArray(node.content)) {
+        return node.content.map(extractText).join('');
+      }
+      
+      return '';
+    };
+    
+    return adf.content.map(extractText).join('').trim();
+  };
+
+  // Description editing functions
+  const startEditingDescription = () => {
+    // Convert ADF to plain text if it's an object
+    const plainText = typeof task.description === 'object' 
+      ? adfToPlainText(task.description)
+      : task.description;
+    setEditedDescription(plainText);
+    setIsDescriptionEditMode(true);
+  };
+
+  const cancelDescriptionEdit = () => {
+    setEditedDescription('');
+    setIsDescriptionEditMode(false);
+  };
+
+  const handleDescriptionChange = (e) => {
+    setEditedDescription(e.target.value);
+  };
+
+  const updateJiraStatus = async (newStatus) => {
+    setIsSaving(true);
+    try {
+      const issueKey = task.external_key || task.metadata?.jira_key;
+      if (!issueKey) {
+        console.error('No JIRA key found for task');
+        alert('Cannot update JIRA: No issue key found');
+        setIsSaving(false);
+        return;
+      }
+
+      console.log('Updating JIRA status:', { issueKey, newStatus });
+
+      // Use transitionIssue for status changes
+      const result = await window.electronAPI.jira.transitionIssue(issueKey, newStatus);
+
+      if (result && result.success) {
+        setJiraStatus(newStatus);
+        setShowStatusDropdown(false);
+        console.log('✅ JIRA status updated successfully');
+        
+        // Update local task
+        if (onUpdate) {
+          onUpdate(task.id, { jira_status: newStatus });
+        }
+      } else {
+        console.error('Failed to update JIRA status:', result?.error);
+        alert(`Failed to update JIRA status: ${result?.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error updating JIRA status:', error);
+      alert(`Error updating JIRA status: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const saveDescriptionToJira = async () => {
+    setIsSaving(true);
+    try {
+      const issueKey = task.external_key || task.metadata?.jira_key;
+      if (!issueKey) {
+        console.error('No JIRA issue key found');
+        alert('Cannot update: No JIRA issue key found');
+        setIsSaving(false);
+        return;
+      }
+
+      console.log('📤 Updating JIRA description for:', issueKey);
+
+      // Convert text with markdown-like formatting to ADF
+      const textToADF = (text) => {
+        const lines = text.split('\n');
+        const content = [];
+        
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          
+          // Skip empty lines but add paragraph breaks
+          if (!line.trim()) {
+            continue;
+          }
+          
+          // Parse inline formatting (bold, italic, etc.)
+          const parseInlineFormatting = (text) => {
+            const parts = [];
+            let currentPos = 0;
+            
+            // Simple regex to find **bold**, *italic*, etc.
+            const formatRegex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|~~[^~]+~~|_[^_]+_)/g;
+            let match;
+            
+            while ((match = formatRegex.exec(text)) !== null) {
+              // Add text before the match
+              if (match.index > currentPos) {
+                const plainText = text.substring(currentPos, match.index);
+                if (plainText) {
+                  parts.push({ type: 'text', text: plainText });
+                }
+              }
+              
+              // Add formatted text
+              const matched = match[0];
+              if (matched.startsWith('**') && matched.endsWith('**')) {
+                parts.push({
+                  type: 'text',
+                  text: matched.slice(2, -2),
+                  marks: [{ type: 'strong' }]
+                });
+              } else if (matched.startsWith('*') && matched.endsWith('*')) {
+                parts.push({
+                  type: 'text',
+                  text: matched.slice(1, -1),
+                  marks: [{ type: 'em' }]
+                });
+              } else if (matched.startsWith('`') && matched.endsWith('`')) {
+                parts.push({
+                  type: 'text',
+                  text: matched.slice(1, -1),
+                  marks: [{ type: 'code' }]
+                });
+              } else if (matched.startsWith('~~') && matched.endsWith('~~')) {
+                parts.push({
+                  type: 'text',
+                  text: matched.slice(2, -2),
+                  marks: [{ type: 'strike' }]
+                });
+              } else if (matched.startsWith('_') && matched.endsWith('_')) {
+                parts.push({
+                  type: 'text',
+                  text: matched.slice(1, -1),
+                  marks: [{ type: 'underline' }]
+                });
+              }
+              
+              currentPos = match.index + matched.length;
+            }
+            
+            // Add remaining text
+            if (currentPos < text.length) {
+              const remainingText = text.substring(currentPos);
+              if (remainingText) {
+                parts.push({ type: 'text', text: remainingText });
+              }
+            }
+            
+            return parts.length > 0 ? parts : [{ type: 'text', text: text }];
+          };
+          
+          // Create paragraph with formatted content
+          content.push({
+            type: 'paragraph',
+            content: parseInlineFormatting(line)
+          });
+        }
+        
+        return content.length > 0 ? content : [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: ' ' }]
+          }
+        ];
+      };
+
+      const descriptionADF = {
+        type: 'doc',
+        version: 1,
+        content: textToADF(editedDescription)
+      };
+
+      const result = await window.electronAPI.jira.updateIssue(issueKey, {
+        descriptionADF: descriptionADF
+      });
+
+      if (result && result.success) {
+        console.log('✅ Description updated successfully');
+        // Update local task description
+        task.description = descriptionADF;
+        setIsDescriptionEditMode(false);
+        alert('Description updated successfully in JIRA!');
+      } else {
+        console.error('Failed to update description:', result);
+        alert('Failed to update description in JIRA');
+      }
+    } catch (error) {
+      console.error('Error updating description:', error);
+      alert(`Error updating description: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Test JIRA connection
@@ -610,6 +949,62 @@ export default function TaskDetailView({ task, user, onClose }) {
     return false;
   };
 
+  // Render formatted text from plain string (handles **bold**, *italic*, etc.)
+  const renderFormattedText = (text) => {
+    if (!text) return <p>No description provided</p>;
+    
+    // Split text into sections by **Header** pattern
+    // Match pattern: **Something** followed by text until next **Something** or end
+    const sections = [];
+    const headerPattern = /\*\*([^*]+)\*\*/g;
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = headerPattern.exec(text)) !== null) {
+      // Get text before this header
+      if (match.index > lastIndex) {
+        const beforeText = text.substring(lastIndex, match.index).trim();
+        if (beforeText) {
+          sections.push({ type: 'text', content: beforeText });
+        }
+      }
+      
+      // Get the header
+      sections.push({ type: 'header', content: match[1] });
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Get remaining text after last header
+    if (lastIndex < text.length) {
+      const remainingText = text.substring(lastIndex).trim();
+      if (remainingText) {
+        sections.push({ type: 'text', content: remainingText });
+      }
+    }
+    
+    // Render sections
+    return (
+      <div>
+        {sections.map((section, idx) => {
+          if (section.type === 'header') {
+            return (
+              <p key={idx} style={{ marginBottom: '8px', marginTop: idx > 0 ? '16px' : '0' }}>
+                <strong style={{ fontSize: '15px', color: '#0f172a' }}>{section.content}</strong>
+              </p>
+            );
+          } else {
+            return (
+              <p key={idx} style={{ marginBottom: '12px', lineHeight: '1.7' }}>
+                {section.content}
+              </p>
+            );
+          }
+        })}
+      </div>
+    );
+  };
+
   const renderADF = (adf) => {
     if (!adf || !adf.content) return <p>No description provided</p>;
 
@@ -617,7 +1012,43 @@ export default function TaskDetailView({ task, user, onClose }) {
       if (!node) return null;
 
       if (node.type === 'text') {
-        return node.text || '';
+        let text = node.text || '';
+        
+        // Apply text marks (bold, italic, underline, code, etc.) in nested fashion
+        if (node.marks && node.marks.length > 0) {
+          // Reverse to apply marks in correct order (innermost first)
+          const marks = [...node.marks].reverse();
+          
+          marks.forEach((mark, markIdx) => {
+            if (mark.type === 'strong') {
+              text = <strong key={`strong-${index}-${markIdx}`}>{text}</strong>;
+            } else if (mark.type === 'em') {
+              text = <em key={`em-${index}-${markIdx}`}>{text}</em>;
+            } else if (mark.type === 'code') {
+              text = <code key={`code-${index}-${markIdx}`} className="inline-code">{text}</code>;
+            } else if (mark.type === 'underline') {
+              text = <u key={`u-${index}-${markIdx}`}>{text}</u>;
+            } else if (mark.type === 'strike') {
+              text = <s key={`s-${index}-${markIdx}`}>{text}</s>;
+            } else if (mark.type === 'link') {
+              text = (
+                <a 
+                  key={`a-${index}-${markIdx}`} 
+                  href={mark.attrs?.href} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="adf-link"
+                >
+                  {text}
+                </a>
+              );
+            } else if (mark.type === 'textColor') {
+              text = <span key={`color-${index}-${markIdx}`} style={{ color: mark.attrs?.color }}>{text}</span>;
+            }
+          });
+        }
+        
+        return text;
       }
 
       if (node.type === 'paragraph') {
@@ -717,6 +1148,20 @@ export default function TaskDetailView({ task, user, onClose }) {
         );
       }
 
+      if (node.type === 'hardBreak') {
+        return <br key={index} />;
+      }
+
+      if (node.type === 'inlineCard' || node.type === 'blockCard') {
+        // Handle JIRA cards/links
+        const url = node.attrs?.url || '#';
+        return (
+          <a key={index} href={url} target="_blank" rel="noopener noreferrer" style={{ color: '#0052cc', textDecoration: 'underline' }}>
+            {url}
+          </a>
+        );
+      }
+
       if (node.content && Array.isArray(node.content)) {
         return node.content.map((child, idx) => renderNode(child, idx));
       }
@@ -780,8 +1225,30 @@ export default function TaskDetailView({ task, user, onClose }) {
                 <path d="M11.53 2c0 2.4 1.97 4.35 4.35 4.35h1.78v1.7c0 2.4 1.94 4.34 4.34 4.34V4.35a2.35 2.35 0 0 0-2.35-2.35h-8.12zm-4.35 6.35c0 2.4 1.94 4.34 4.34 4.34h1.79v1.7c0 2.4 1.94 4.34 4.34 4.34v-8.03a2.35 2.35 0 0 0-2.35-2.35H7.18zm-4.35 6.34c0 2.4 1.95 4.35 4.35 4.35h1.78v1.78c0 2.4 1.95 4.35 4.35 4.35v-8.13a2.35 2.35 0 0 0-2.35-2.35H2.83z" fill="#2684FF"/>
               </svg>
               <div className="jira-key-badge">{task.external_key || task.id}</div>
-              <div className={`jira-status-badge status-${(task.status || 'todo').toLowerCase().replace(/\s+/g, '-')}`}>
-                {task.status || 'TO DO'}
+              <div className="status-dropdown-container">
+                <div 
+                  className={`jira-status-badge status-${(jiraStatus || 'To Do').toLowerCase().replace(/\s+/g, '-')} clickable`}
+                  onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                  title="Click to change status"
+                >
+                  {jiraStatus || 'To Do'}
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style={{ marginLeft: '4px' }}>
+                    <path d="M6 8L3 5h6z"/>
+                  </svg>
+                </div>
+                {showStatusDropdown && (
+                  <div className="status-dropdown">
+                    {['To Do', 'In Progress', 'In Review', 'Done', 'Blocked'].map(status => (
+                      <div 
+                        key={status}
+                        className={`status-option status-${status.toLowerCase().replace(/\s+/g, '-')}`}
+                        onClick={() => updateJiraStatus(status)}
+                      >
+                        {status}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             
@@ -898,6 +1365,81 @@ export default function TaskDetailView({ task, user, onClose }) {
             </div>
           </div>
         </div>
+
+        {/* Description Section - Always show if description exists */}
+        {task.description && acceptanceCriteria.length === 0 && (
+          <div className="description-section">
+            <div className="description-header">
+              <div className="description-header-left">
+                <h2>Description</h2>
+              </div>
+              <div className="description-header-actions">
+                {isDescriptionEditMode ? (
+                  <>
+                    <button 
+                      className="description-action-btn save-btn" 
+                      onClick={saveDescriptionToJira}
+                      disabled={isSaving}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      {isSaving ? 'Saving...' : 'Save to JIRA'}
+                    </button>
+                    <button 
+                      className="description-action-btn cancel-btn" 
+                      onClick={cancelDescriptionEdit}
+                      disabled={isSaving}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    className="description-action-btn edit-btn" 
+                    onClick={startEditingDescription}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Edit
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="description-content">
+              {isDescriptionEditMode ? (
+                <textarea
+                  ref={descriptionEditorRef}
+                  className="description-editor"
+                  value={editedDescription}
+                  onChange={handleDescriptionChange}
+                  placeholder="Enter task description..."
+                  disabled={isSaving}
+                />
+              ) : (
+                <>
+                  {typeof task.description === 'object' && task.description.content ? (
+                    <div className="description-display">
+                      {renderADF(task.description)}
+                    </div>
+                  ) : typeof task.description === 'string' ? (
+                    <div className="description-display description-text">
+                      {renderFormattedText(task.description)}
+                    </div>
+                  ) : (
+                    <p className="no-description">No description provided</p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Acceptance Criteria - Editable with Save/Cancel */}
         {acceptanceCriteria.length > 0 && (
@@ -1094,7 +1636,9 @@ export default function TaskDetailView({ task, user, onClose }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="message-content">{msg.content}</div>
+                  <div className="message-content">
+                    {msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content}
+                  </div>
                 )}
               </div>
             ))
@@ -1122,20 +1666,22 @@ export default function TaskDetailView({ task, user, onClose }) {
           
           <div className="input-controls">
             <div className="control-buttons-left">
-              {/* GitHub Code Indexer Button */}
-              <button
-                className={`control-btn ${connectedRepo ? 'active' : ''}`}
-                onClick={() => {
-                  if (!showRepoSelector) loadAvailableRepositories();
-                  setShowRepoSelector(!showRepoSelector);
-                }}
-                title="Connect to GitHub repository for code context"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                </svg>
-                <span>Code</span>
-              </button>
+              {/* GitHub Code Indexer Button - Hidden */}
+              {false && (
+                <button
+                  className={`control-btn ${connectedRepo ? 'active' : ''}`}
+                  onClick={() => {
+                    if (!showRepoSelector) loadAvailableRepositories();
+                    setShowRepoSelector(!showRepoSelector);
+                  }}
+                  title="Connect to GitHub repository for code context"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                  </svg>
+                  <span>Code</span>
+                </button>
+              )}
 
               {/* Confluence Documentation Button */}
               <button

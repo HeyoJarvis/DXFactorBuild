@@ -32,6 +32,27 @@ export default function UniversalChatBar({ selectedTask, user, onTaskSelect }) {
     }
   };
 
+  // Helper to convert description to readable text
+  const getReadableDescription = (description) => {
+    if (!description) return 'No description provided';
+    if (typeof description === 'string') return description;
+    
+    // If it's ADF format, extract text
+    if (typeof description === 'object' && description.content) {
+      const extractText = (node) => {
+        if (!node) return '';
+        if (node.type === 'text') return node.text || '';
+        if (node.content && Array.isArray(node.content)) {
+          return node.content.map(extractText).join(' ');
+        }
+        return '';
+      };
+      return description.content.map(extractText).join('\n').trim();
+    }
+    
+    return JSON.stringify(description);
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
     if (!selectedTask) {
@@ -47,10 +68,12 @@ export default function UniversalChatBar({ selectedTask, user, onTaskSelect }) {
       const response = await window.electronAPI.tasks.sendChatMessage(selectedTask.id, userMessage, {
         task: {
           id: selectedTask.id,
-          title: selectedTask.title,
-          description: selectedTask.description,
+          title: selectedTask.title || selectedTask.session_title,
+          description: getReadableDescription(selectedTask.description),
           priority: selectedTask.priority,
           status: selectedTask.status,
+          external_key: selectedTask.external_key,
+          external_source: selectedTask.external_source,
           route_to: selectedTask.route_to || 'mission-control',
           work_type: selectedTask.work_type || 'task'
         },
@@ -122,20 +145,23 @@ export default function UniversalChatBar({ selectedTask, user, onTaskSelect }) {
             </svg>
           </button>
 
-          <button
-            className={`chat-control-btn ${connectedRepo ? 'active' : ''}`}
-            title={connectedRepo ? `Connected: ${connectedRepo}` : "Connect to GitHub repository"}
-            onClick={() => {
-              if (!showRepoSelector) {
-                loadAvailableRepositories();
-              }
-              setShowRepoSelector(!showRepoSelector);
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-            </svg>
-          </button>
+          {/* GitHub button - Hidden */}
+          {false && (
+            <button
+              className={`chat-control-btn ${connectedRepo ? 'active' : ''}`}
+              title={connectedRepo ? `Connected: ${connectedRepo}` : "Connect to GitHub repository"}
+              onClick={() => {
+                if (!showRepoSelector) {
+                  loadAvailableRepositories();
+                }
+                setShowRepoSelector(!showRepoSelector);
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+            </button>
+          )}
 
           <button className="chat-control-btn" title="Create Confluence documentation">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -5,6 +5,7 @@
 
 const JIRAServiceCore = require('../../../core/integrations/jira-service');
 const EventEmitter = require('events');
+const { isJiraStatusCompleted } = require('../utils/jira-status-mapper');
 
 class JIRAService extends EventEmitter {
   constructor({ logger, supabaseAdapter }) {
@@ -244,10 +245,96 @@ class JIRAService extends EventEmitter {
 
       let tasksCreated = 0;
       let tasksUpdated = 0;
+      let tasksDeleted = 0;
 
+      // Get ALL existing JIRA tasks from database (all users, only active, non-deleted ones)
+      // We need to check ALL JIRA tasks, not just the current user's, to properly mark deleted tasks
+      const existingJiraTasks = await this.supabaseAdapter.getTasksBySource(
+        userId, 
+        'jira', 
+        false,  // includeDeleted = false
+        true    // allUsers = true (get tasks from all users)
+      );
+      
+      this.logger.info('🔍 Existing JIRA tasks in database (all users)', {
+        count: existingJiraTasks.length,
+        tasks: existingJiraTasks.map(t => ({
+          id: t.id,
+          user_id: t.user_id,
+          external_id: t.external_id,
+          external_key: t.external_key,
+          title: t.title,
+          has_external_id: !!t.external_id,
+          external_id_format_valid: t.external_id?.startsWith('jira_')
+        }))
+      });
+
+      // Filter out and clean up tasks without external_id (these are malformed or manually created)
+      // Only sync tasks that have proper JIRA external_id (format: jira_XXXXX)
+      const invalidJiraTasks = [];
+      const validExistingTasks = existingJiraTasks.filter(task => {
+        if (!task.external_id) {
+          this.logger.warn('⚠️ Found task marked as JIRA but without external_id', {
+            taskId: task.id,
+            title: task.title,
+            external_key: task.external_key
+          });
+          invalidJiraTasks.push(task);
+          return false;
+        }
+        
+        // Check if external_id has proper JIRA format
+        if (!task.external_id.startsWith('jira_')) {
+          this.logger.warn('⚠️ Found task with invalid JIRA external_id format', {
+            taskId: task.id,
+            title: task.title,
+            external_id: task.external_id
+          });
+          invalidJiraTasks.push(task);
+          return false;
+        }
+        
+        return true;
+      });
+
+      // Clean up invalid JIRA tasks by removing their external_source tag
+      if (invalidJiraTasks.length > 0) {
+        this.logger.warn('🧹 Cleaning up invalid JIRA tasks', {
+          count: invalidJiraTasks.length,
+          tasks: invalidJiraTasks.map(t => ({ id: t.id, title: t.title }))
+        });
+
+        for (const task of invalidJiraTasks) {
+          // Remove the JIRA external_source tag from these tasks
+          await this.supabaseAdapter.updateTask(task.id, {
+            externalSource: null,
+            external_id: null,
+            external_key: null
+          });
+          this.logger.info('✅ Cleaned up invalid JIRA task', {
+            taskId: task.id,
+            title: task.title
+          });
+        }
+      }
+
+      const existingTaskMap = new Map(
+        validExistingTasks.map(task => [task.external_id, task])
+      );
+
+      // Track which tasks we've seen in JIRA
+      const jiraIssueIds = new Set();
+
+      // Create or update tasks from JIRA
       for (const issue of result.issues) {
         const externalId = `jira_${issue.id}`;
-        const existingTask = await this.supabaseAdapter.getTaskByExternalId(externalId);
+        jiraIssueIds.add(externalId);
+        
+        const existingTask = existingTaskMap.get(externalId);
+        
+        // Map JIRA status to internal completion status using centralized utility
+        const jiraStatusName = issue.status?.name;
+        const isCompletedInJira = isJiraStatusCompleted(jiraStatusName);
         
         const taskData = {
           title: issue.summary,
@@ -258,13 +345,25 @@ class JIRAService extends EventEmitter {
           externalKey: issue.key,
           externalUrl: issue.url,
           externalSource: 'jira',
-          jira_status: issue.status?.name,
+          jira_status: jiraStatusName,
           jira_issue_type: issue.issue_type?.name,
           jira_priority: issue.priority?.name,
           story_points: issue.story_points,
           sprint: issue.sprint,
-          labels: issue.labels
+          labels: issue.labels,
+          // Sync internal completion status with JIRA status
+          is_completed: isCompletedInJira,
+          completed_at: isCompletedInJira ? new Date().toISOString() : null
         };
+
+        // Debug logging for status sync
+        this.logger.info('📊 Syncing task', {
+          key: issue.key,
+          title: issue.summary,
+          jira_status: jiraStatusName,
+          is_completed: isCompletedInJira,
+          status_category: issue.status?.category
+        });
 
         if (existingTask) {
           await this.supabaseAdapter.updateTask(existingTask.id, taskData);
@@ -275,10 +374,47 @@ class JIRAService extends EventEmitter {
         }
       }
 
+      // Mark tasks as deleted/archived if they no longer exist in JIRA
+      this.logger.info('Checking for deleted tasks', {
+        existingTaskCount: existingTaskMap.size,
+        currentJiraIssueCount: jiraIssueIds.size
+      });
+
+      for (const [externalId, task] of existingTaskMap) {
+        if (!jiraIssueIds.has(externalId)) {
+          this.logger.info('❌ Marking task as deleted (no longer in JIRA)', {
+            taskId: task.id,
+            externalId,
+            externalKey: task.external_key,
+            title: task.title
+          });
+          
+          // Mark as deleted and completed instead of actually deleting
+          const updateResult = await this.supabaseAdapter.updateTask(task.id, {
+            is_completed: true,
+            jira_deleted: true,
+            completed_at: new Date().toISOString()
+          });
+          
+          if (updateResult.success) {
+            this.logger.info('✅ Task marked as deleted successfully', {
+              taskId: task.id
+            });
+            tasksDeleted++;
+          } else {
+            this.logger.error('Failed to mark task as deleted', {
+              taskId: task.id,
+              error: updateResult.error
+            });
+          }
+        }
+      }
+
       this.logger.info('JIRA sync complete', {
         userId,
         tasksCreated,
         tasksUpdated,
+        tasksDeleted,
         totalIssues: result.issues.length
       });
 
@@ -286,6 +422,7 @@ class JIRAService extends EventEmitter {
         success: true,
         tasksCreated,
         tasksUpdated,
+        tasksDeleted,
         totalIssues: result.issues.length
       };
 

@@ -17,19 +17,21 @@ export default function SlimHeader({ onTeamsClick, onSettingsClick, title }) {
       </div>
 
       <div className="slim-header-right">
-        {/* Teams Button */}
-        <button
-          className="slim-header-btn"
-          onClick={onTeamsClick}
-          title="Switch teams"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        </button>
+        {/* Teams Button - Only show if onTeamsClick is provided */}
+        {onTeamsClick && (
+          <button
+            className="slim-header-btn"
+            onClick={onTeamsClick}
+            title="Switch teams"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </button>
+        )}
 
         {/* Settings Button */}
         <button

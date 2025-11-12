@@ -23,6 +23,34 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 28px;
+  gap: 20px;
+}
+
+.settings-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.settings-back-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #3b82f6;
+  transform: translateX(-2px);
+}
+
+.settings-back-btn svg {
+  flex-shrink: 0;
 }
 
 .settings-title-section {

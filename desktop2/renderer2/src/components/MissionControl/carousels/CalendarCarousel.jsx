@@ -419,10 +419,10 @@ export default function CalendarCarousel({ onSelectEvent, user }) {
     );
   }
 
-  const handleTeamsClick = () => {
-    // Navigate to Mission Control in team mode
-    navigate('/mission-control?mode=team');
-  };
+  // Teams functionality hidden - no longer used
+  // const handleTeamsClick = () => {
+  //   navigate('/mission-control?mode=team');
+  // };
 
   const handleSettingsClick = () => {
     // Navigate to Settings page
@@ -434,7 +434,7 @@ export default function CalendarCarousel({ onSelectEvent, user }) {
       {/* Slim Header Bar */}
       <SlimHeader
         title="Calendar"
-        onTeamsClick={handleTeamsClick}
+        onTeamsClick={null}
         onSettingsClick={handleSettingsClick}
       />
 

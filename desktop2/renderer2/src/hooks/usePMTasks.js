@@ -47,19 +47,33 @@ export function usePMTasks(user, selectedUnit = null) {
       const response = await window.electronAPI.tasks.getAll(filters);
 
       if (response.success) {
-        // Additional client-side filtering to ensure only JIRA tasks
-        const jiraTasks = (response.tasks || []).filter(task =>
-          task.externalSource === 'jira' ||
-          task.external_source === 'jira' ||
-          task.externalKey ||
-          task.external_key ||
-          task.jira_status
-        );
+        // Additional client-side filtering to ensure ONLY tasks with external_source='jira'
+        const jiraTasks = (response.tasks || []).filter(task => {
+          // ONLY show tasks that explicitly have external_source set to 'jira'
+          const isJira = task.external_source === 'jira' || task.externalSource === 'jira';
+          
+          // Debug: Log tasks that are marked as JIRA
+          if (isJira) {
+            console.log('🔍 JIRA task found:', {
+              id: task.id,
+              title: task.title,
+              external_source: task.external_source,
+              external_id: task.external_id,
+              external_key: task.external_key,
+              is_completed: task.is_completed,
+              jira_deleted: task.jira_deleted,
+              status: task.status
+            });
+          }
+          
+          return isJira;
+        });
 
         console.log('📊 PM: All JIRA tasks loaded:', {
           total: response.tasks?.length || 0,
           jiraOnly: jiraTasks.length,
-          tasks: jiraTasks
+          completedCount: jiraTasks.filter(t => t.is_completed).length,
+          deletedCount: jiraTasks.filter(t => t.jira_deleted).length
         });
         setTasks(jiraTasks);
       } else {
@@ -141,13 +155,14 @@ export function usePMTasks(user, selectedUnit = null) {
 
   /**
    * Get task statistics
+   * Uses internal status field which is now properly synced with JIRA status
    */
   const getStats = useCallback(() => {
     return {
       total: tasks.length,
-      todo: tasks.filter(t => !t.is_completed && (!t.jira_status || ['To Do', 'Backlog', 'Open'].includes(t.jira_status))).length,
-      inProgress: tasks.filter(t => !t.is_completed && ['In Progress', 'In Development', 'In Review'].includes(t.jira_status)).length,
-      completed: tasks.filter(t => t.is_completed || ['Done', 'Resolved', 'Closed', 'Completed'].includes(t.jira_status)).length
+      todo: tasks.filter(t => t.status === 'todo' || (!t.status && !t.is_completed)).length,
+      inProgress: tasks.filter(t => t.status === 'in_progress').length,
+      completed: tasks.filter(t => t.status === 'completed' || t.is_completed).length
     };
   }, [tasks]);
 

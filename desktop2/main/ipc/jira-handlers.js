@@ -308,13 +308,15 @@ function registerJIRAHandlers(services, logger) {
 
       logger.info('JIRA tasks synced', {
         created: result.tasksCreated,
-        updated: result.tasksUpdated
+        updated: result.tasksUpdated,
+        deleted: result.tasksDeleted
       });
 
       return {
         success: true,
         tasksCreated: result.tasksCreated,
         tasksUpdated: result.tasksUpdated,
+        tasksDeleted: result.tasksDeleted || 0,
         totalIssues: result.totalIssues
       };
 

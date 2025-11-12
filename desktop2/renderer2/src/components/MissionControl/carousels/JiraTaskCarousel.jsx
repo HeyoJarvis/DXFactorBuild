@@ -19,10 +19,10 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
   const [selectedTaskForReport, setSelectedTaskForReport] = useState(null);
   const navigate = useNavigate();
 
-  const handleTeamsClick = () => {
-    // Navigate to Mission Control in team mode
-    navigate('/mission-control?mode=team');
-  };
+  // Teams functionality hidden - no longer used
+  // const handleTeamsClick = () => {
+  //   navigate('/mission-control?mode=team');
+  // };
 
   const handleSettingsClick = () => {
     // Navigate to Settings page
@@ -33,16 +33,23 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
   const taskList = tasks || [];
 
   const handlePrev = () => {
-    setCurrentIndex(prev => Math.max(0, prev - 1));
+    // Allow going back until the first card is in the center (position 3)
+    // This means currentIndex can go to -2 (so first card appears at index 2 of visible array)
+    setCurrentIndex(prev => Math.max(-2, prev - 1));
   };
 
   const handleNext = () => {
-    setCurrentIndex(prev => Math.min(taskList.length - 1, prev + 1));
+    // Allow going forward until the last card is in the center (position 3)
+    // Last card is at index taskList.length - 1
+    // To center it at position 2, currentIndex should be (taskList.length - 1) - 2 = taskList.length - 3
+    setCurrentIndex(prev => Math.min(taskList.length - 3, prev + 1));
   };
 
   const handleCardClick = (task, index) => {
-    // Bring clicked card to front
-    setCurrentIndex(currentIndex + index);
+    // Bring clicked card to center (position 3, which is index 2)
+    // Calculate the new currentIndex so this card ends up at position 2
+    const newIndex = currentIndex + index - 2;
+    setCurrentIndex(newIndex);
     // Open detail view
     if (onTaskSelect) {
       onTaskSelect(task);
@@ -87,7 +94,7 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
       <div className="jira-carousel-wrapper">
         <SlimHeader
           title="Jira Progress"
-          onTeamsClick={handleTeamsClick}
+          onTeamsClick={null}
           onSettingsClick={handleSettingsClick}
         />
         <div className="jira-carousel-empty">
@@ -103,21 +110,34 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
     );
   }
 
-  // Get 5 visible cards starting from currentIndex
-  const visibleTasks = taskList.slice(currentIndex, currentIndex + 5);
+  // Get 5 visible cards, handling negative indices by padding with nulls
+  const getVisibleTasks = () => {
+    const visible = [];
+    for (let i = 0; i < 5; i++) {
+      const taskIndex = currentIndex + i;
+      if (taskIndex >= 0 && taskIndex < taskList.length) {
+        visible.push(taskList[taskIndex]);
+      } else {
+        visible.push(null); // Empty slot
+      }
+    }
+    return visible;
+  };
+  
+  const visibleTasks = getVisibleTasks();
 
   return (
     <div className="jira-carousel-wrapper">
       <SlimHeader
         title="Jira Progress"
-        onTeamsClick={handleTeamsClick}
+        onTeamsClick={null}
         onSettingsClick={handleSettingsClick}
       />
       <div className="jira-task-carousel">
       {/* Left Navigation */}
       <button 
         onClick={handlePrev} 
-        disabled={currentIndex === 0} 
+        disabled={currentIndex <= -2} 
         className="carousel-nav-btn left"
         aria-label="Previous task"
       >
@@ -128,18 +148,19 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
 
       {/* Carousel Cards Container */}
       <div className="carousel-cards-container">
-        {visibleTasks.map((task, index) => (
-          <div
-            key={task.id || index}
-            className="carousel-card-wrapper"
-            style={{
-              zIndex: 5 - index,
-              transform: `translateX(${index * 60}px) scale(${1 - index * 0.05})`,
-              opacity: 1 - index * 0.15
-            }}
-            onClick={() => handleCardClick(task, index)}
-          >
-            <div className="jira-card">
+        {visibleTasks.map((task, index) => {
+          // Skip rendering if task is null (empty slot)
+          if (!task) {
+            return <div key={`empty-${index}`} className="carousel-card-wrapper" style={{ opacity: 0, pointerEvents: 'none' }} />;
+          }
+          
+          return (
+            <div
+              key={task.id || index}
+              className="carousel-card-wrapper"
+              onClick={() => handleCardClick(task, index)}
+            >
+              <div className="jira-card">
               {/* Card Header */}
               <div className="jira-card-header">
                 <span className="jira-key">{task.externalKey || task.external_key || 'TASK'}</span>
@@ -204,13 +225,14 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
               </button>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
 
       {/* Right Navigation */}
       <button 
         onClick={handleNext} 
-        disabled={currentIndex >= taskList.length - 1} 
+        disabled={currentIndex >= taskList.length - 3} 
         className="carousel-nav-btn right"
         aria-label="Next task"
       >
@@ -222,7 +244,7 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
       {/* Progress Indicator */}
       {taskList.length > 1 && (
         <div className="carousel-progress">
-          {currentIndex + 1} / {taskList.length}
+          {Math.max(1, Math.min(taskList.length, currentIndex + 3))} / {taskList.length}
         </div>
       )}
       </div>

@@ -101,12 +101,12 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
   };
 
   const handleMenuToggle = async () => {
-    console.log('🎯 [ARCREACTOR] Orb clicked - opening Mission Control directly');
+    console.log('🎯 [ARCREACTOR] Orb clicked - opening Mission Control Refactored (home page)');
     
-    // Open Mission Control directly (no menu)
+    // Open Mission Control Refactored directly (no menu) - this is now the home page
     if (window.electronAPI?.window?.openSecondary) {
-      await window.electronAPI.window.openSecondary('/mission-control');
-      console.log('🪟 [ARCREACTOR] Mission Control window opened');
+      await window.electronAPI.window.openSecondary('/mission-control-v2');
+      console.log('🪟 [ARCREACTOR] Mission Control Refactored window opened');
     }
   };
   
@@ -189,7 +189,7 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
     // Map itemId to route for all pages
     const routeMap = {
       'chat': '/copilot',
-      'mission-control': '/mission-control',
+      'mission-control': '/mission-control-v2', // Mission Control Refactored (home page)
       'tasks': '/tasks',
       'architecture': '/architecture',
       'code': '/indexer',
@@ -200,7 +200,8 @@ function ArcReactor({ isCollapsed = true, onNavigate }) {
       'settings': '/settings'
     };
     
-    const route = routeMap[itemId] || '/tasks';
+    // Default to Mission Control Refactored (home page)
+    const route = routeMap[itemId] || '/mission-control-v2';
     
     // Open secondary window with the route
     if (window.electronAPI?.window?.openSecondary) {

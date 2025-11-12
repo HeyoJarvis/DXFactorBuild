@@ -215,7 +215,7 @@
   width: 100% !important;
   max-width: 100% !important;
   margin-top: 4px !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 12px !important;
 }
 
 .chat-messages .message-assistant .message-content {
@@ -228,17 +228,23 @@
   overflow-wrap: break-word !important;
   width: 100% !important;
   font-size: 15px !important;
-  line-height: 1.8 !important;
+  line-height: 1.5 !important;
   white-space: pre-wrap !important;
 }
 
 /* Add spacing between paragraphs in assistant messages */
 .chat-messages .message-assistant .message-content p {
-  margin: 0 0 16px 0;
+  margin: 0 0 1px 0;
 }
 
 .chat-messages .message-assistant .message-content p:last-child {
   margin-bottom: 0;
+}
+
+/* Even tighter spacing for paragraphs inside lists */
+.chat-messages .message-assistant .message-content li p {
+  margin: 0;
+  display: inline;
 }
 
 /* Style headings in assistant messages */
@@ -247,7 +253,7 @@
 .chat-messages .message-assistant .message-content h3 {
   font-weight: 600;
   color: #0f172a;
-  margin: 24px 0 12px 0;
+  margin: 8px 0 2px 0;
   line-height: 1.3;
 }
 
@@ -266,13 +272,18 @@
 /* Style lists in assistant messages */
 .chat-messages .message-assistant .message-content ul,
 .chat-messages .message-assistant .message-content ol {
-  margin: 12px 0;
+  margin: 2px 0;
   padding-left: 24px;
 }
 
 .chat-messages .message-assistant .message-content li {
-  margin: 8px 0;
-  line-height: 1.6;
+  margin: 0;
+  margin-bottom: 1px;
+  line-height: 1.35;
+}
+
+.chat-messages .message-assistant .message-content li:last-child {
+  margin-bottom: 0;
 }
 
 .chat-messages .message-assistant .message-content ul li {
@@ -288,6 +299,13 @@
 .chat-messages .message-assistant .message-content b {
   font-weight: 600;
   color: #0f172a;
+}
+
+/* Tight spacing for bold text followed by colon */
+.chat-messages .message-assistant .message-content li strong:after,
+.chat-messages .message-assistant .message-content li b:after {
+  content: '';
+  margin-right: 0;
 }
 
 /* Style emphasis/italic text */
@@ -352,6 +370,52 @@
 
 .chat-messages .message-assistant .message-content a:hover {
   border-bottom-color: #3b82f6;
+}
+
+/* Markdown rendering styles */
+.chat-messages .message-assistant .message-content > div {
+  width: 100%;
+}
+
+.chat-messages .message-assistant .message-content h1,
+.chat-messages .message-assistant .message-content h2,
+.chat-messages .message-assistant .message-content h3,
+.chat-messages .message-assistant .message-content h4,
+.chat-messages .message-assistant .message-content h5,
+.chat-messages .message-assistant .message-content h6 {
+  margin-top: 8px;
+  margin-bottom: 2px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.chat-messages .message-assistant .message-content h1:first-child,
+.chat-messages .message-assistant .message-content h2:first-child,
+.chat-messages .message-assistant .message-content h3:first-child {
+  margin-top: 0;
+}
+
+.chat-messages .message-assistant .message-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 4px 0;
+  border: 1px solid #e5e7eb;
+}
+
+.chat-messages .message-assistant .message-content table th,
+.chat-messages .message-assistant .message-content table td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.chat-messages .message-assistant .message-content table th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.chat-messages .message-assistant .message-content table tr:nth-child(even) {
+  background: #f9fafb;
 }
 
 .message-content {
@@ -725,6 +789,10 @@
   border: 1px solid #c7d2fe;
 }
 
+.status-dropdown-container {
+  position: relative;
+}
+
 .jira-status-badge {
   font-size: 11px;
   font-weight: 700;
@@ -732,6 +800,62 @@
   border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.jira-status-badge.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jira-status-badge.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 150px;
+  overflow: hidden;
+  animation: dropdownSlide 0.2s ease-out;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status-option {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.status-option:last-child {
+  border-bottom: none;
+}
+
+.status-option:hover {
+  background: #f9fafb;
+  padding-left: 18px;
 }
 
 .status-to-do,
@@ -922,6 +1046,284 @@
   font-size: 12px;
   color: #6b7280;
   font-style: italic;
+}
+
+/* Description Section - For tasks without AC tables */
+.description-section {
+  background: white;
+  border: 1px solid #e0e7ff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.08);
+}
+
+.description-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.description-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.description-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+.description-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Description Action Buttons */
+.description-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+}
+
+.description-action-btn.edit-btn {
+  background: white;
+  border-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.description-action-btn.edit-btn:hover {
+  background: #f5f3ff;
+  border-color: #c7d2fe;
+}
+
+.description-action-btn.save-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+  color: white;
+}
+
+.description-action-btn.save-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.description-action-btn.cancel-btn {
+  background: white;
+  border-color: #e5e7eb;
+  color: #6b7280;
+}
+
+.description-action-btn.cancel-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.description-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.description-action-btn svg {
+  flex-shrink: 0;
+}
+
+.description-content {
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Description Display Mode */
+.description-display {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  min-height: 100px;
+}
+
+.description-text p {
+  margin: 0 0 12px 0;
+  color: #374151;
+  line-height: 1.8;
+}
+
+.description-text p:last-child {
+  margin-bottom: 0;
+}
+
+.description-text p:empty::before {
+  content: '\00A0';
+}
+
+/* Description Editor (Edit Mode) */
+.description-editor {
+  width: 100%;
+  min-height: 200px;
+  padding: 16px;
+  background: white;
+  border: 2px solid #e0e7ff;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #0f172a;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.description-editor:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.description-editor:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.no-description {
+  color: #9ca3af;
+  font-style: italic;
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+}
+
+/* ADF Content Styling in Description */
+.description-content .adf-content {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.description-content .adf-content p {
+  margin: 0 0 16px 0;
+  color: #374151;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.description-content .adf-content p:last-child {
+  margin-bottom: 0;
+}
+
+.description-content .adf-content ul,
+.description-content .adf-content ol {
+  margin: 0 0 16px 0;
+  padding-left: 28px;
+}
+
+.description-content .adf-content li {
+  margin-bottom: 8px;
+  color: #374151;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+.description-content .adf-content ul li {
+  list-style-type: disc;
+}
+
+.description-content .adf-content ol li {
+  list-style-type: decimal;
+}
+
+.description-content .adf-content h1,
+.description-content .adf-content h2,
+.description-content .adf-content h3 {
+  font-weight: 600;
+  color: #0f172a;
+  margin: 24px 0 12px 0;
+  line-height: 1.3;
+}
+
+.description-content .adf-content h1:first-child,
+.description-content .adf-content h2:first-child,
+.description-content .adf-content h3:first-child {
+  margin-top: 0;
+}
+
+.description-content .adf-content h1 {
+  font-size: 22px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.description-content .adf-content h2 {
+  font-size: 19px;
+}
+
+.description-content .adf-content h3 {
+  font-size: 17px;
+  color: #4b5563;
+}
+
+.description-content .adf-content strong,
+.description-content .adf-content b {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.description-content .adf-content em,
+.description-content .adf-content i {
+  font-style: italic;
+}
+
+.description-content .adf-content code,
+.description-content .adf-content .inline-code {
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  color: #0f172a;
+  border: 1px solid #e5e7eb;
+}
+
+.description-content .adf-content a,
+.description-content .adf-content .adf-link {
+  color: #0052cc;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.description-content .adf-content a:hover,
+.description-content .adf-content .adf-link:hover {
+  border-bottom-color: #0052cc;
+  color: #0065ff;
+}
+
+.description-content .adf-content pre {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.description-content .adf-content pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 /* Acceptance Criteria Section - Collapsible Card */

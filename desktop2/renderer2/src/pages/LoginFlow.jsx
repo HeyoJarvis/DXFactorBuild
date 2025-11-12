@@ -48,10 +48,12 @@ export default function LoginFlow({ onLoginSuccess }) {
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [selectedRole, setSelectedRole] = useState(null);
   const [error, setError] = useState(null);
-  const [loadingSlack, setLoadingSlack] = useState(false);
-  const [loadingMicrosoft, setLoadingMicrosoft] = useState(false);
+  const [loadingEmail, setLoadingEmail] = useState(false);
   const [authTimeout, setAuthTimeout] = useState(false);
   const [showMorphAnimation, setShowMorphAnimation] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
 
   // Calculate progress
   const progress = PROGRESS_MAP[flowState] || 0;
@@ -77,99 +79,45 @@ export default function LoginFlow({ onLoginSuccess }) {
   // AUTH HANDLERS
   // ============================================
 
-  const handleSlackLogin = async () => {
-    try {
-      setLoadingSlack(true);
-      setError(null);
-      setProvider('slack');
-      setFlowState(FLOW_STATES.AUTHENTICATING);
-
-      console.log('🔐 Starting Slack login...');
-      const result = await window.electronAPI.auth.signInWithSlack();
-
-      if (result.success) {
-        console.log('✅ Slack login successful!', result.user);
-        await handleAuthSuccess(result);
-      } else {
-        throw new Error(result.error || 'Login failed');
-      }
-    } catch (err) {
-      console.error('❌ Slack login failed:', err);
-      handleAuthError(err.message || 'Failed to sign in with Slack');
-    } finally {
-      setLoadingSlack(false);
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
     }
-  };
 
-  const handleMicrosoftLogin = async () => {
     try {
-      setLoadingMicrosoft(true);
+      setLoadingEmail(true);
       setError(null);
-      setProvider('microsoft');
+      setProvider('email');
       setFlowState(FLOW_STATES.AUTHENTICATING);
 
-      console.log('🔐 Starting Microsoft login...');
-      const result = await window.electronAPI.auth.signInWithMicrosoft();
+      console.log(`🔐 Starting email ${isSignUp ? 'sign up' : 'login'}...`);
+      
+      const result = isSignUp 
+        ? await window.electronAPI.auth.signUpWithEmail(email, password)
+        : await window.electronAPI.auth.signInWithEmail(email, password);
 
       if (result.success) {
-        console.log('✅ Microsoft login successful!', result.user);
+        console.log(`✅ Email ${isSignUp ? 'sign up' : 'login'} successful!`, result.user);
         await handleAuthSuccess(result);
       } else {
-        throw new Error(result.error || 'Login failed');
+        throw new Error(result.error || 'Authentication failed');
       }
     } catch (err) {
-      console.error('❌ Microsoft login failed:', err);
-      handleAuthError(err.message || 'Failed to sign in with Microsoft');
+      console.error(`❌ Email ${isSignUp ? 'sign up' : 'login'} failed:`, err);
+      handleAuthError(err.message || `Failed to ${isSignUp ? 'sign up' : 'sign in'} with email`);
     } finally {
-      setLoadingMicrosoft(false);
+      setLoadingEmail(false);
     }
   };
 
   const handleAuthSuccess = async (authResult) => {
-    // Move to workspace detection
-    setFlowState(FLOW_STATES.DETECTING_WORKSPACE);
-
-    try {
-      // Fetch ALL available teams
-      const availableTeamsResult = await window.electronAPI.teams.getAvailable();
-      
-      // Also fetch user's existing memberships to show which ones they're in
-      const userTeamsResult = await window.electronAPI.teams.getUserTeams();
-      const userTeamIds = new Set(
-        userTeamsResult.success ? userTeamsResult.teams.map(t => t.team_id) : []
-      );
-      
-      if (availableTeamsResult.success && availableTeamsResult.teams.length > 0) {
-        // Show all teams, but indicate which ones user is already in
-        const formattedTeams = availableTeamsResult.teams.map(team => {
-          const isMember = userTeamIds.has(team.id);
-          const userTeam = userTeamsResult.teams?.find(t => t.team_id === team.id);
-          
-          return {
-            id: team.id,
-            name: team.name,
-            description: team.description,
-            avatar: team.name.charAt(0).toUpperCase(),
-            role: isMember ? userTeam?.user_role || 'member' : 'Join',
-            memberCount: team.member_count,
-            canInstall: team.can_join,
-            isMember: isMember,
-            lastActive: userTeam?.last_active 
-              ? new Date(userTeam.last_active).toLocaleDateString() 
-              : null
-          };
-        });
-        
-        setWorkspaces(formattedTeams);
-        setFlowState(FLOW_STATES.SELECTING_WORKSPACE);
-      } else {
-        // No teams available - show create workspace screen
-        setFlowState(FLOW_STATES.CREATING_WORKSPACE);
-      }
-    } catch (err) {
-      console.error('Failed to fetch teams:', err);
-      handleAuthError('Failed to load teams. Please try again.');
-    }
+    // Skip workspace/team creation entirely - go straight to role selection
+    // Teams functionality is hidden in this app
+    console.log('✅ Authentication successful, proceeding to role selection');
+    setFlowState(FLOW_STATES.SELECTING_ROLE);
   };
 
   const handleAuthError = (message) => {
@@ -345,44 +293,69 @@ export default function LoginFlow({ onLoginSuccess }) {
 
   const renderWelcome = () => (
     <>
-      <h1 className="login-flow-title login-flow-title-welcome">Welcome to HeyJarvis</h1>
+      <h1 className="login-flow-title login-flow-title-welcome">
+        {isSignUp ? 'Create Your Account' : 'Welcome to HeyJarvis'}
+      </h1>
       <div className="login-flow-logo-container">
         <img src="/Jarvis.png" alt="HeyJarvis" className="login-flow-logo" />
       </div>
 
       <div className="login-flow-divider" />
 
-      <div className="login-flow-button-group">
-        <button
-          className="login-flow-button"
-          onClick={handleSlackLogin}
-          disabled={loadingSlack || loadingMicrosoft}
-          aria-label="Continue with Slack"
-        >
-          {loadingSlack && <div className="login-flow-loader" />}
-          <SlackIcon />
-          <span>Slack</span>
-        </button>
+      <form onSubmit={handleEmailLogin} className="login-flow-form">
+        <div className="login-flow-input-group">
+          <label htmlFor="email" className="login-flow-label">Email</label>
+          <input
+            id="email"
+            type="email"
+            className="login-flow-input"
+            placeholder="your.email@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loadingEmail}
+            required
+            autoComplete="email"
+          />
+        </div>
 
-        <div className="login-flow-divider-text">
-          <span>or</span>
+        <div className="login-flow-input-group">
+          <label htmlFor="password" className="login-flow-label">Password</label>
+          <input
+            id="password"
+            type="password"
+            className="login-flow-input"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loadingEmail}
+            required
+            autoComplete={isSignUp ? 'new-password' : 'current-password'}
+          />
         </div>
 
         <button
-          className="login-flow-button"
-          onClick={handleMicrosoftLogin}
-          disabled={loadingSlack || loadingMicrosoft}
-          aria-label="Continue with Microsoft"
+          type="submit"
+          className="login-flow-button login-flow-button-primary"
+          disabled={loadingEmail}
         >
-          {loadingMicrosoft && <div className="login-flow-loader" />}
-          <MicrosoftIcon />
-          <span>Microsoft Teams</span>
+          {loadingEmail && <div className="login-flow-loader" />}
+          <span>{isSignUp ? 'Sign Up' : 'Sign In'}</span>
+        </button>
+      </form>
+
+      <div className="login-flow-toggle-auth">
+        <button
+          type="button"
+          className="login-flow-link-button"
+          onClick={() => {
+            setIsSignUp(!isSignUp);
+            setError(null);
+          }}
+          disabled={loadingEmail}
+        >
+          {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
         </button>
       </div>
-
-      <p className="login-flow-caption login-flow-text-center login-flow-mt-md">
-        We'll never post without asking.
-      </p>
 
       {error && (
         <div className="login-flow-error" role="alert">

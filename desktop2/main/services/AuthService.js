@@ -55,6 +55,82 @@ class AuthService {
   }
   
   /**
+   * Sign in with Email and Password
+   */
+  async signInWithEmail(email, password) {
+    try {
+      this.logger.info('Starting email sign in...', { email });
+      
+      const { data, error } = await this.supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.session) {
+        await this.handleSuccessfulAuth(data.session);
+        await this.ensureUserOnboardingFields(data.session.user.id);
+        
+        return {
+          success: true,
+          user: this.currentUser,
+          session: this.currentSession
+        };
+      } else {
+        throw new Error('No session returned from sign in');
+      }
+    } catch (error) {
+      this.logger.error('Email sign in failed', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Sign up with Email and Password
+   */
+  async signUpWithEmail(email, password) {
+    try {
+      this.logger.info('Starting email sign up...', { email });
+      
+      const { data, error } = await this.supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: undefined // No email confirmation redirect needed
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.session) {
+        await this.handleSuccessfulAuth(data.session);
+        await this.ensureUserOnboardingFields(data.session.user.id);
+        
+        return {
+          success: true,
+          user: this.currentUser,
+          session: this.currentSession
+        };
+      } else {
+        // If no session, user needs to confirm email
+        return {
+          success: true,
+          message: 'Please check your email to confirm your account',
+          requiresConfirmation: true
+        };
+      }
+    } catch (error) {
+      this.logger.error('Email sign up failed', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
    * Start Slack OAuth flow with PKCE (restored from working desktop implementation)
    */
   async signInWithSlack() {

@@ -611,7 +611,8 @@ Acceptance Criteria:
       const result = await window.electronAPI.jira.syncTasks();
       
       if (result.success) {
-        setSyncStatus(`Synced! Created: ${result.tasksCreated}, Updated: ${result.tasksUpdated}`);
+        const deletedMsg = result.tasksDeleted > 0 ? `, Archived: ${result.tasksDeleted}` : '';
+        setSyncStatus(`Synced! Created: ${result.tasksCreated}, Updated: ${result.tasksUpdated}${deletedMsg}`);
         
         // Reload issues
         await loadJIRAIssues();

@@ -166,6 +166,99 @@
 }
 
 /* ============================================
+   EMAIL FORM STYLES
+   ============================================ */
+
+.login-flow-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.login-flow-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.login-flow-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+}
+
+.login-flow-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  color: #1d1d1f;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.login-flow-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.login-flow-input:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.login-flow-input::placeholder {
+  color: #94a3b8;
+}
+
+.login-flow-button-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  padding: 14px 24px;
+  margin-top: 8px;
+}
+
+.login-flow-button-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.login-flow-toggle-auth {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.login-flow-link-button {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.login-flow-link-button:hover:not(:disabled) {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.login-flow-link-button:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* ============================================
    TYPOGRAPHY
    ============================================ */
 

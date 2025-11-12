@@ -3,10 +3,11 @@ import './ReportsCarousel.css';
 
 /**
  * ReportsCarousel - Displays reports and metrics with generate button
+ * Locked to Feature reports only (by epic key)
  */
 export default function ReportsCarousel({ reports, user }) {
   const [showModal, setShowModal] = useState(false);
-  const [reportType, setReportType] = useState('person');
+  const [reportType, setReportType] = useState('feature'); // Locked to feature reports
   const [entityId, setEntityId] = useState('');
   const [generatedReport, setGeneratedReport] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -47,18 +48,8 @@ export default function ReportsCarousel({ reports, user }) {
   };
 
   const getPlaceholder = () => {
-    switch (reportType) {
-      case 'person':
-        return 'Enter email (e.g., john@company.com)';
-      case 'team':
-        return 'Enter project key (e.g., PROJ)';
-      case 'unit':
-        return 'Enter project keys (e.g., PROJ1,PROJ2)';
-      case 'feature':
-        return 'Enter epic key (e.g., PROJ-123)';
-      default:
-        return 'Enter entity ID';
-    }
+    // Always return feature placeholder since we're locked to feature reports
+    return 'Enter epic key (e.g., PROJ-123)';
   };
 
   const renderMetrics = (metrics) => {
@@ -92,7 +83,7 @@ export default function ReportsCarousel({ reports, user }) {
   return (
     <div className="reports-carousel-container">
       <div className="reports-header">
-        <h3>Reports & Analytics</h3>
+        <h3>Feature Reports</h3>
         <button 
           className="generate-report-btn"
           onClick={() => setShowModal(true)}
@@ -145,26 +136,29 @@ export default function ReportsCarousel({ reports, user }) {
             </div>
 
             <div className="modal-body">
-              <div className="form-group">
-                <label>Report Type</label>
-                <select 
-                  value={reportType} 
-                  onChange={(e) => {
-                    setReportType(e.target.value);
-                    setEntityId('');
-                    setError(null);
-                  }}
-                  disabled={isGenerating}
-                >
-                  <option value="person">👤 Person Level - Individual metrics</option>
-                  <option value="team">👥 Team Level - Team performance</option>
-                  <option value="unit">🏢 Unit Level - Organizational metrics</option>
-                  <option value="feature">🎯 Feature Level - Project tracking</option>
-                </select>
-              </div>
+              {/* Report Type Selector - Hidden (locked to Feature) */}
+              {false && (
+                <div className="form-group">
+                  <label>Report Type</label>
+                  <select 
+                    value={reportType} 
+                    onChange={(e) => {
+                      setReportType(e.target.value);
+                      setEntityId('');
+                      setError(null);
+                    }}
+                    disabled={isGenerating}
+                  >
+                    <option value="person">👤 Person Level - Individual metrics</option>
+                    <option value="team">👥 Team Level - Team performance</option>
+                    <option value="unit">🏢 Unit Level - Organizational metrics</option>
+                    <option value="feature">🎯 Feature Level - Project tracking</option>
+                  </select>
+                </div>
+              )}
 
               <div className="form-group">
-                <label>Entity ID</label>
+                <label>Epic Key</label>
                 <input
                   type="text"
                   value={entityId}

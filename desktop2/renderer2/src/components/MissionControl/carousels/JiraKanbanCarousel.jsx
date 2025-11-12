@@ -19,9 +19,10 @@ export default function JiraKanbanCarousel({ tasks, onTaskSelect, user, onUpdate
   const [localTasks, setLocalTasks] = useState(tasks || []);
   const navigate = useNavigate();
 
-  const handleTeamsClick = () => {
-    navigate('/mission-control?mode=team');
-  };
+  // Teams functionality hidden - no longer used
+  // const handleTeamsClick = () => {
+  //   navigate('/mission-control?mode=team');
+  // };
 
   const handleSettingsClick = () => {
     navigate('/settings');
@@ -160,7 +161,7 @@ export default function JiraKanbanCarousel({ tasks, onTaskSelect, user, onUpdate
     <div className="jira-kanban-wrapper">
       <SlimHeader
         title="Jira Progress"
-        onTeamsClick={handleTeamsClick}
+        onTeamsClick={null}
         onSettingsClick={handleSettingsClick}
       />
 

@@ -5,8 +5,7 @@ import Tasks from './pages/Tasks';
 import TasksDeveloper from './pages/TasksDeveloper';
 import ArchitectureDiagram from './pages/ArchitectureDiagram';
 import Indexer from './pages/Indexer';
-import MissionControl from './pages/MissionControl';
-import MissionControlRefactored from './pages/MissionControlRefactored';
+import MissionControlRefactored from './pages/MissionControlRefactored'; // Primary home page
 import TeamChat from './pages/TeamChat';
 import Settings from './pages/Settings';
 import Admin from './pages/Admin';
@@ -16,6 +15,9 @@ import LoginFlow from './pages/LoginFlow';
 import DiagnosticMicrosoft from './pages/DiagnosticMicrosoft';
 import Unibox from './pages/Unibox';
 import ArcReactor from './components/ArcReactor/ArcReactor';
+
+// Old Mission Control - kept for backward compatibility but lazy loaded
+import MissionControl from './pages/MissionControl';
 
 function App() {
   const navigate = useNavigate();
@@ -214,7 +216,7 @@ function App() {
     // Navigate based on item ID
     const routeMap = {
       'chat': '/copilot',
-      'mission-control': '/mission-control-v2', // Updated to new carousel-based UI
+      'mission-control': '/mission-control-v2', // Mission Control Refactored (carousel-based UI)
       'tasks': '/tasks',
       'architecture': '/architecture',
       'indexer': '/indexer',
@@ -225,7 +227,8 @@ function App() {
       'deals': '/tasks'
     };
     
-    const targetRoute = routeMap[itemId] || '/copilot';
+    // Default to Mission Control Refactored (home page)
+    const targetRoute = routeMap[itemId] || '/mission-control-v2';
     
     // Open in secondary window
     if (window.electronAPI?.window?.openSecondary) {
@@ -305,7 +308,9 @@ function App() {
     <div className="app app-secondary">
       <div className="app-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/tasks" replace />} />
+          {/* Default home page is now Mission Control Refactored */}
+          <Route path="/" element={<Navigate to="/mission-control-v2" replace />} />
+          <Route path="/mission-control-v2" element={<MissionControlRefactored user={currentUser} />} />
           <Route path="/copilot" element={<Copilot systemStatus={systemStatus} initialMessage={initialChatMessage} user={currentUser} />} />
           <Route path="/tasks" element={
             userRole === 'developer'
@@ -314,8 +319,8 @@ function App() {
           } />
           <Route path="/architecture" element={<ArchitectureDiagram user={currentUser} />} />
           <Route path="/indexer" element={<Indexer user={currentUser} />} />
+          {/* Old Mission Control kept for backward compatibility but not used */}
           <Route path="/mission-control" element={<MissionControl user={currentUser} />} />
-          <Route path="/mission-control-v2" element={<MissionControlRefactored user={currentUser} />} />
           <Route path="/team-chat" element={<TeamChat user={currentUser} />} />
           <Route path="/unibox" element={<Unibox user={currentUser} />} />
           <Route path="/settings" element={<Settings user={currentUser} />} />

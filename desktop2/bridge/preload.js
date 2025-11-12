@@ -48,9 +48,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Auth APIs
   auth: {
-    signInWithSlack: () => ipcRenderer.invoke('auth:signInWithSlack'),
-    signInWithMicrosoft: () => ipcRenderer.invoke('auth:signInWithMicrosoft'),
-    signInWithGoogle: () => ipcRenderer.invoke('auth:signInWithGoogle'),
+    signInWithEmail: (email, password) => ipcRenderer.invoke('auth:signInWithEmail', email, password),
+    signUpWithEmail: (email, password) => ipcRenderer.invoke('auth:signUpWithEmail', email, password),
     signOut: () => ipcRenderer.invoke('auth:signOut'),
     getSession: () => ipcRenderer.invoke('auth:getSession'),
     getCurrentUser: () => ipcRenderer.invoke('auth:getCurrentUser'),
