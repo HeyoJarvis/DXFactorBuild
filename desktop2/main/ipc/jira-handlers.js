@@ -80,8 +80,8 @@ function registerJIRAHandlers(services, logger) {
           const initResult = await jiraService.initialize(userId);
           if (initResult.success && initResult.connected) {
             logger.info('✅ JIRA service auto-initialized successfully');
-            // Start auto-sync
-            jiraService.startAutoSync(userId, 10);
+            // Start auto-sync (PM view - all team tasks)
+            jiraService.startAutoSyncAll(userId, [], 10);
             return {
               success: true,
               connected: true,
@@ -176,8 +176,8 @@ function registerJIRAHandlers(services, logger) {
       // Initialize JIRA service
       await jiraService.initialize(userId);
 
-      // Start auto-sync
-      jiraService.startAutoSync(userId, 10);
+      // Start auto-sync (PM view - all team tasks)
+      jiraService.startAutoSyncAll(userId, [], 10);
 
       logger.info('JIRA authenticated successfully', {
         userId,
@@ -453,7 +453,7 @@ function registerJIRAHandlers(services, logger) {
   ipcMain.handle('jira:debugTokenScopes', async (event) => {
     try {
       const userId = services.auth?.currentUser?.id;
-      
+
       if (!userId) {
         return {
           success: false,
@@ -487,7 +487,7 @@ function registerJIRAHandlers(services, logger) {
             clientId: payload.aud || payload.client_id,
             expiry: payload.exp ? new Date(payload.exp * 1000).toISOString() : 'unknown'
           });
-          
+
           return {
             success: true,
             scopes: payload.scope ? payload.scope.split(' ') : [],
@@ -512,6 +512,216 @@ function registerJIRAHandlers(services, logger) {
 
     } catch (error) {
       logger.error('Debug token scopes error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  // ========================================
+  // PM/Manager View Handlers
+  // ========================================
+
+  /**
+   * Get all team tasks (PM view - no assignee filter)
+   */
+  ipcMain.handle('jira:getAllTeamTasks', async (event, options = {}) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.getAllTeamTasks(options);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA team tasks fetched (PM view)', {
+        total: result.total,
+        returned: result.issues.length,
+        projectKeys: options.projectKeys || 'all'
+      });
+
+      return {
+        success: true,
+        issues: result.issues,
+        total: result.total
+      };
+
+    } catch (error) {
+      logger.error('JIRA get team tasks error:', error);
+      return {
+        success: false,
+        error: error.message,
+        issues: []
+      };
+    }
+  });
+
+  /**
+   * Sync all team tasks to Supabase (PM view)
+   */
+  ipcMain.handle('jira:syncAllTasks', async (event, projectKeys = []) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.syncAllTasks(userId, projectKeys);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA all tasks synced (PM view)', {
+        created: result.tasksCreated,
+        updated: result.tasksUpdated,
+        deleted: result.tasksDeleted,
+        total: result.totalIssues
+      });
+
+      return {
+        success: true,
+        tasksCreated: result.tasksCreated,
+        tasksUpdated: result.tasksUpdated,
+        tasksDeleted: result.tasksDeleted || 0,
+        totalIssues: result.totalIssues
+      };
+
+    } catch (error) {
+      logger.error('JIRA sync all tasks error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  });
+
+  /**
+   * Get epic hierarchy
+   */
+  ipcMain.handle('jira:getEpicHierarchy', async (event, projectKeys = []) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.getEpicHierarchy(projectKeys);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA epic hierarchy fetched', {
+        totalEpics: result.totalEpics,
+        totalIssues: result.totalIssues
+      });
+
+      return result;
+
+    } catch (error) {
+      logger.error('JIRA get epic hierarchy error:', error);
+      return {
+        success: false,
+        error: error.message,
+        hierarchy: []
+      };
+    }
+  });
+
+  /**
+   * Get all sprints rollup
+   */
+  ipcMain.handle('jira:getAllSprintsRollup', async (event, boardIds = []) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.getAllSprintsRollup(boardIds);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA sprints rollup fetched', {
+        totalSprints: result.totalSprints,
+        totalIssues: result.totalIssues
+      });
+
+      return result;
+
+    } catch (error) {
+      logger.error('JIRA get sprints rollup error:', error);
+      return {
+        success: false,
+        error: error.message,
+        rollup: []
+      };
+    }
+  });
+
+  /**
+   * Get dashboard metrics
+   */
+  ipcMain.handle('jira:getDashboardMetrics', async (event, projectKeys = []) => {
+    try {
+      const userId = services.auth?.currentUser?.id;
+
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Ensure JIRA is initialized
+      if (!jiraService.isConnected()) {
+        await jiraService.initialize(userId);
+      }
+
+      const result = await jiraService.getDashboardMetrics(projectKeys);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      logger.info('JIRA dashboard metrics fetched', {
+        totalIssues: result.metrics.overview.totalIssues,
+        completionRate: result.metrics.overview.completionRate
+      });
+
+      return result;
+
+    } catch (error) {
+      logger.error('JIRA get dashboard metrics error:', error);
       return {
         success: false,
         error: error.message

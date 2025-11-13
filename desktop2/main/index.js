@@ -139,9 +139,9 @@ async function autoInitializeUserIntegrations(userId) {
                   logger.error('❌ Initial JIRA sync error', { error: error.message });
                 });
               
-              // Start auto-sync for JIRA tasks
-              appState.services.jira.startAutoSync(userId, 10); // Every 10 minutes
-              logger.info('🔄 JIRA auto-sync started (10 min interval)');
+              // Start auto-sync for JIRA tasks (PM view - all team tasks)
+              appState.services.jira.startAutoSyncAll(userId, [], 10); // Every 10 minutes
+              logger.info('🔄 JIRA auto-sync started (PM view - 10 min interval)');
             } else {
               logger.warn('⚠️ JIRA initialization returned not connected', { result });
             }

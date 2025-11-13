@@ -33,7 +33,7 @@ async function initializeUserIntegrations(services, userId, logger) {
         const result = await services.jira.initialize(userId);
         if (result.success && result.connected) {
           logger.info('✅ JIRA initialized and connected');
-          services.jira.startAutoSync(userId, 10);
+          services.jira.startAutoSyncAll(userId, [], 10);
         }
       } catch (error) {
         logger.error('JIRA init failed:', error.message);
