@@ -186,6 +186,17 @@
   color: #f59e0b !important;
 }
 
+.epic-badge {
+  background: rgba(101, 84, 192, 0.1) !important;
+  border-color: rgba(101, 84, 192, 0.2) !important;
+  color: #6554C0 !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Action Buttons */
 .action-buttons {
   display: flex;

@@ -787,6 +787,7 @@ class JIRAService extends EventEmitter {
       story_points: fields.customfield_10016 || null,
       created_at: fields.created,
       updated_at: fields.updated,
+      duedate: fields.duedate || null,
       labels: fields.labels || [],
       components: (fields.components || []).map(c => c.name),
       sprint: fields.sprint || null,

@@ -24,8 +24,12 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
     subtasks = task.subtasks || [],
     tags = task.tags || [],
     user = task.user || {}, // Added user property
-    workflow_metadata = task.workflow_metadata || {}
+    workflow_metadata = task.workflow_metadata || {},
+    epic_key = task.epic_key || workflow_metadata?.epic_key || null,
+    epic_name = task.epic_name || workflow_metadata?.epic_name || null
   } = task;
+
+  // Epic data is extracted from task.epic_key/epic_name or workflow_metadata
 
   // Check if this is a monitored task
   const isMonitored = workflow_metadata.monitored === true;
@@ -187,6 +191,7 @@ export default function ActionItem({ task, index, onToggle, onDelete, onUpdate, 
               {user?.name ? user.name.substring(0, 2).toUpperCase() : 'AS'}
             </div>
             <div className="action-bottom-badges">
+              {epic_name && <span className="action-badge epic-badge" title={`Epic: ${epic_key}`}>📋 {epic_name}</span>}
               {work_type && <span className="action-badge">{work_type}</span>}
               {priority && <span className="action-badge priority-badge">{priority}</span>}
             </div>

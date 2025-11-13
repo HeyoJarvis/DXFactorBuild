@@ -8,6 +8,15 @@
   overflow: hidden;
 }
 
+/* KPI Dashboard Container */
+.kpi-dashboard-container {
+  padding: 12px 40px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 1;
+}
+
 .carousel-area {
   flex: 1;
   display: flex;

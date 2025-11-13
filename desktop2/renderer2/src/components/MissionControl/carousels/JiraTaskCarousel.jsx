@@ -292,6 +292,13 @@ export default function JiraTaskCarousel({ tasks, onTaskSelect, user }) {
                 </div>
               )}
 
+              {/* Epic Badge */}
+              {(task.epic_name || task.workflow_metadata?.epic_name) && (
+                <div className="jira-epic-badge">
+                  📋 {task.epic_name || task.workflow_metadata?.epic_name}
+                </div>
+              )}
+
               {/* Generate Report Button */}
               <button 
                 className="generate-report-card-btn"

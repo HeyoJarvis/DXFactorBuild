@@ -669,10 +669,14 @@ class DesktopSupabaseAdapter {
             jira_priority: taskData.jira_priority || null,
             story_points: taskData.story_points || null,
             sprint: taskData.sprint || null,
-            labels: taskData.labels || []
+            labels: taskData.labels || [],
+            epic_key: taskData.epic_key || null,
+            epic_name: taskData.epic_name || null,
+            due_date: taskData.due_date || null
           },
           is_active: true,
-          is_completed: false
+          is_completed: taskData.is_completed || false,
+          completed_at: taskData.completed_at || null
         }])
         .select()
         .single();
@@ -714,6 +718,10 @@ class DesktopSupabaseAdapter {
 
       // IMPORTANT: Don't filter by user_id at SQL level - we need to check assignment fields
       // Tasks can be owned by user OR assigned to them OR they're mentioned
+      // EXCEPTION: When skipAllFilters is true (for KPI calculations), filter by user_id at SQL level
+      if (filters.skipAllFilters) {
+        query = query.eq('user_id', userId);
+      }
 
       // Filter by completion status
       if (!filters.includeCompleted) {
@@ -776,6 +784,12 @@ class DesktopSupabaseAdapter {
             jira_issue_type: session.workflow_metadata?.jira_issue_type || null,
             jira_priority: session.workflow_metadata?.jira_priority || null,
             jira_deleted: session.workflow_metadata?.jira_deleted || false,
+            story_points: session.workflow_metadata?.story_points || 0,
+            sprint: session.workflow_metadata?.sprint || null,
+            labels: session.workflow_metadata?.labels || [],
+            epic_key: session.workflow_metadata?.epic_key || null,
+            epic_name: session.workflow_metadata?.epic_name || null,
+            is_completed: session.is_completed || false,
             created_at: session.started_at,
             updated_at: session.last_message_at,
             completed_at: session.completed_at
@@ -792,8 +806,8 @@ class DesktopSupabaseAdapter {
       });
 
       // Apply team filtering if requested (for viewing team dev tasks)
-      // SKIP if skipTeamFilter is true (load ALL tasks)
-      if (filters.filterByTeam && filters.teamId && !filters.skipTeamFilter) {
+      // SKIP if skipTeamFilter is true OR skipAllFilters is true (load ALL tasks)
+      if (filters.filterByTeam && filters.teamId && !filters.skipTeamFilter && !filters.skipAllFilters) {
         this.logger.info('Applying team filtering', {
           teamId: filters.teamId,
           tasksBeforeFilter: tasks.length
@@ -860,8 +874,9 @@ class DesktopSupabaseAdapter {
             teamMemberSlackIds: teamMemberSlackIds.slice(0, 3)
           });
         }
-      } else {
+      } else if (!filters.skipAllFilters) {
         // Apply user assignment filtering - user must be owner, assignee, assignor, or mentioned
+        // SKIP if skipAllFilters is true (for KPI calculations that need ALL user's tasks)
         tasks = tasks.filter(task => {
           const isOwner = task.user_id === userId;
           const isAssignee = userSlackId && task.assignee === userSlackId;
@@ -886,10 +901,17 @@ class DesktopSupabaseAdapter {
 
           return hasAccess;
         });
+      } else {
+        // skipAllFilters is true - keep ALL tasks for this user (for KPI calculations)
+        this.logger.info('Skipping all filters for KPI calculation', {
+          totalTasks: tasks.length,
+          userId
+        });
       }
 
       // Apply assignment view filtering (for "My Tasks", "Assigned by Me", "Assigned to Me" tabs)
-      if (filters.assignmentView && userSlackId) {
+      // SKIP if skipAllFilters is true
+      if (filters.assignmentView && userSlackId && !filters.skipAllFilters) {
         tasks = tasks.filter(task => {
           switch (filters.assignmentView) {
             case 'assigned_to_me':
@@ -915,7 +937,8 @@ class DesktopSupabaseAdapter {
 
       // Apply role-based route filtering
       // SKIP this when viewing team dev tasks (we want to see developer tasks, not filter by sales role)
-      if (!filters.filterByTeam) {
+      // ALSO SKIP if skipAllFilters is true
+      if (!filters.filterByTeam && !filters.skipAllFilters) {
         if (filters.routeTo) {
           // Specific route requested
           tasks = tasks.filter(task => {
@@ -943,8 +966,8 @@ class DesktopSupabaseAdapter {
       }
 
       // Apply external source filtering based on user role
-      // SKIP this filtering when viewing team dev tasks (filterByTeam mode)
-      if (userRole && !filters.filterByTeam) {
+      // SKIP this filtering when viewing team dev tasks (filterByTeam mode) OR when skipAllFilters is true
+      if (userRole && !filters.filterByTeam && !filters.skipAllFilters) {
         tasks = tasks.filter(task => {
           const externalSource = task.external_source;
 
@@ -977,8 +1000,8 @@ class DesktopSupabaseAdapter {
       }
 
       // Apply route_to filtering with dual-routing logic
-      // SKIP this when viewing team dev tasks (we want to see developer tasks, not sales tasks)
-      if (filters.routeTo && !filters.filterByTeam) {
+      // SKIP this when viewing team dev tasks (we want to see developer tasks, not sales tasks) OR when skipAllFilters is true
+      if (filters.routeTo && !filters.filterByTeam && !filters.skipAllFilters) {
         tasks = tasks.filter(task => {
           const taskRoute = task.route_to;
           const workType = task.work_type;
@@ -997,7 +1020,8 @@ class DesktopSupabaseAdapter {
       }
 
       // Apply work_type filtering if specified
-      if (filters.workType) {
+      // SKIP if skipAllFilters is true
+      if (filters.workType && !filters.skipAllFilters) {
         tasks = tasks.filter(task => task.work_type === filters.workType);
       }
 
@@ -1010,7 +1034,12 @@ class DesktopSupabaseAdapter {
         userRoleFilter: filters.userRole || 'none',
         assignmentViewFilter: filters.assignmentView || 'all',
         teamFilter: filters.filterByTeam ? filters.teamId : 'none',
-        dualRouteTasks: tasks.filter(t => t.work_type === 'calendar' || t.work_type === 'email').length
+        dualRouteTasks: tasks.filter(t => t.work_type === 'calendar' || t.work_type === 'email').length,
+        firstTaskEpic: tasks.length > 0 ? {
+          epic_key: tasks[0].epic_key,
+          epic_name: tasks[0].epic_name,
+          title: tasks[0].title
+        } : null
       });
 
       return { success: true, tasks };
@@ -1034,7 +1063,7 @@ class DesktopSupabaseAdapter {
         .from('conversation_sessions')
         .select('*')
         .eq('workflow_type', 'task')
-        .contains('workflow_metadata', { external_source: externalSource });
+        .eq('workflow_metadata->>external_source', externalSource);  // Use JSONB operator for exact match
 
       // Only filter by user_id if not fetching for all users
       if (!allUsers && userId) {
@@ -1087,6 +1116,13 @@ class DesktopSupabaseAdapter {
             jira_issue_type: session.workflow_metadata?.jira_issue_type,
             jira_priority: session.workflow_metadata?.jira_priority,
             jira_deleted: session.workflow_metadata?.jira_deleted || false,
+            story_points: session.workflow_metadata?.story_points || 0,
+            sprint: session.workflow_metadata?.sprint || null,
+            labels: session.workflow_metadata?.labels || [],
+            epic_key: session.workflow_metadata?.epic_key || null,
+            epic_name: session.workflow_metadata?.epic_name || null,
+            due_date: session.workflow_metadata?.due_date || null,
+            is_completed: session.is_completed || false,
             created_at: session.started_at,
             updated_at: session.updated_at
           };
@@ -1154,7 +1190,7 @@ class DesktopSupabaseAdapter {
       }
 
       // Update metadata fields (including JIRA-related fields)
-      if (updates.priority || updates.description || updates.tags || updates.dueDate || updates.assignor || updates.assignee || updates.jira_deleted !== undefined || updates.jira_status || updates.jira_issue_type || updates.jira_priority || updates.story_points || updates.sprint || updates.labels || updates.externalId || updates.externalKey || updates.externalUrl || updates.externalSource) {
+      if (updates.priority || updates.description || updates.tags || updates.dueDate || updates.due_date !== undefined || updates.assignor || updates.assignee || updates.jira_deleted !== undefined || updates.jira_status || updates.jira_issue_type || updates.jira_priority || updates.story_points || updates.sprint || updates.labels || updates.externalId || updates.externalKey || updates.externalUrl || updates.externalSource || updates.epic_key !== undefined || updates.epic_name !== undefined) {
         // Get current metadata first
         const { data: current, error: fetchError } = await this.supabase
           .from('conversation_sessions')
@@ -1170,6 +1206,7 @@ class DesktopSupabaseAdapter {
         if (updates.description !== undefined) metadata.description = updates.description;
         if (updates.tags) metadata.tags = updates.tags;
         if (updates.dueDate !== undefined) metadata.due_date = updates.dueDate;
+        if (updates.due_date !== undefined) metadata.due_date = updates.due_date;
         if (updates.assignor !== undefined) metadata.assignor = updates.assignor;
         if (updates.assignee !== undefined) metadata.assignee = updates.assignee;
         if (updates.jira_deleted !== undefined) metadata.jira_deleted = updates.jira_deleted;
@@ -1181,6 +1218,10 @@ class DesktopSupabaseAdapter {
         if (updates.story_points !== undefined) metadata.story_points = updates.story_points;
         if (updates.sprint !== undefined) metadata.sprint = updates.sprint;
         if (updates.labels !== undefined) metadata.labels = updates.labels;
+        
+        // Epic fields
+        if (updates.epic_key !== undefined) metadata.epic_key = updates.epic_key;
+        if (updates.epic_name !== undefined) metadata.epic_name = updates.epic_name;
         
         // External source fields
         if (updates.externalId !== undefined) metadata.external_id = updates.externalId;

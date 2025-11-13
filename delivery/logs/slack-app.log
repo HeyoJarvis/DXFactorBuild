@@ -118,3 +118,9 @@
 {"level":"info","message":"A pong wasn't received from the server before the timeout of 5000ms!","service":"slack-app","timestamp":"2025-10-23T23:50:01.988Z"}
 {"level":"info","message":"Reconnecting to Slack ...","service":"slack-app","timestamp":"2025-10-23T23:50:01.989Z"}
 {"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-10-23T23:50:01.990Z"}
+{"level":"info","message":"✅ Supabase adapter initialized for Slack bot","service":"slack-app","timestamp":"2025-11-13T03:22:28.884Z"}
+{"level":"info","message":"Going to establish a new connection to Slack ...","service":"slack-app","timestamp":"2025-11-13T03:22:28.925Z"}
+{"level":"info","message":"HeyJarvis Slack app started successfully","port":3000,"service":"slack-app","timestamp":"2025-11-13T03:22:29.153Z","webhook_port":3001}
+{"level":"info","message":"Webhook server started","port":3001,"service":"slack-app","timestamp":"2025-11-13T03:22:29.153Z"}
+{"level":"info","message":"Now connected to Slack","service":"slack-app","timestamp":"2025-11-13T03:22:29.418Z"}
+{"level":"info","message":"Disconnecting ...","service":"slack-app","timestamp":"2025-11-13T03:22:49.873Z"}

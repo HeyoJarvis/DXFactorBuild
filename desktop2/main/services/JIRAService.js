@@ -183,17 +183,22 @@ class JIRAService extends EventEmitter {
       }
 
       const {
-        maxResults = 50,
-        status = 'In Progress,To Do,Code Review'
+        maxResults = 100,
+        status = null  // Fetch ALL statuses
       } = options;
 
-      // Build JQL query for user's assigned issues
-      // Quote each status value to handle spaces in status names
-      const statusList = status
-        .split(',')
-        .map(s => `"${s.trim()}"`)
-        .join(',');
-      const jql = `assignee = currentUser() AND status IN (${statusList}) ORDER BY priority DESC, updated DESC`;
+      // Build JQL query - if no status filter, get ALL tasks
+      let jql;
+      if (status) {
+        const statusList = status
+          .split(',')
+          .map(s => `"${s.trim()}"`)
+          .join(',');
+        jql = `assignee = currentUser() AND status IN (${statusList}) ORDER BY priority DESC, updated DESC`;
+      } else {
+        // Fetch ALL tasks assigned to current user regardless of status
+        jql = `assignee = currentUser() ORDER BY updated DESC`;
+      }
 
       this.logger.info('Fetching JIRA issues', { jql, maxResults });
 
@@ -351,6 +356,9 @@ class JIRAService extends EventEmitter {
           story_points: issue.story_points,
           sprint: issue.sprint,
           labels: issue.labels,
+          epic_key: issue.epic?.key || null,
+          epic_name: issue.epic?.name || null,
+          due_date: issue.duedate || null,
           // Sync internal completion status with JIRA status
           is_completed: isCompletedInJira,
           completed_at: isCompletedInJira ? new Date().toISOString() : null
@@ -362,7 +370,13 @@ class JIRAService extends EventEmitter {
           title: issue.summary,
           jira_status: jiraStatusName,
           is_completed: isCompletedInJira,
-          status_category: issue.status?.category
+          status_category: issue.status?.category,
+          priority: this.mapJiraPriority(issue.priority?.name),
+          jira_priority: issue.priority?.name,
+          due_date: issue.duedate || 'NO DUE DATE',
+          story_points: issue.story_points || 0,
+          epic_key: issue.epic?.key || 'NO EPIC',
+          epic_name: issue.epic?.name || 'NO EPIC'
         });
 
         if (existingTask) {

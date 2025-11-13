@@ -120,6 +120,25 @@ async function autoInitializeUserIntegrations(userId) {
                 userId,
                 siteUrl: result.siteUrl
               });
+              
+              // Perform immediate initial sync
+              logger.info('🔄 Performing initial JIRA sync on startup...');
+              appState.services.jira.syncTasks(userId)
+                .then((syncResult) => {
+                  if (syncResult.success) {
+                    logger.info('✅ Initial JIRA sync completed', {
+                      created: syncResult.tasksCreated,
+                      updated: syncResult.tasksUpdated,
+                      deleted: syncResult.tasksDeleted
+                    });
+                  } else {
+                    logger.warn('⚠️ Initial JIRA sync failed', { error: syncResult.error });
+                  }
+                })
+                .catch((error) => {
+                  logger.error('❌ Initial JIRA sync error', { error: error.message });
+                });
+              
               // Start auto-sync for JIRA tasks
               appState.services.jira.startAutoSync(userId, 10); // Every 10 minutes
               logger.info('🔄 JIRA auto-sync started (10 min interval)');

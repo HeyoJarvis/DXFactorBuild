@@ -7,6 +7,7 @@ import TaskDetailView from '../components/MissionControl/TaskDetailView';
 import UserProfileMenu from '../components/MissionControl/UserProfileMenu';
 import TabBar from '../components/MissionControl/TabBar';
 import MissionControlLoader from '../components/LoadingScreen/MissionControlLoader';
+import JiraKPIDashboard from '../components/MissionControl/JiraKPIDashboard';
 import './MissionControlRefactored.css';
 
 /**
@@ -255,6 +256,13 @@ export default function MissionControlRefactored({ user }) {
       ) : (
         // Carousel View: Show tasks based on active tab
         <>
+          {/* JIRA KPI Dashboard - Show only on jira-progress tab */}
+          {activeTab === 'jira-progress' && !isFullScreenTab && (
+            <div className="kpi-dashboard-container">
+              <JiraKPIDashboard user={user} />
+            </div>
+          )}
+
           <div className={`carousel-area ${isFullScreenTab ? 'fullscreen-mode' : ''}`}>
             <TaskCarousel
               activeTab={activeTab}

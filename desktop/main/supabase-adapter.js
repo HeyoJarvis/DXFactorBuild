@@ -613,7 +613,9 @@ class DesktopSupabaseAdapter {
             story_points: taskData.story_points || null,
             sprint: taskData.sprint || null,
             labels: taskData.labels || [],
-            jira_updated_at: taskData.jira_updated_at || null
+            jira_updated_at: taskData.jira_updated_at || null,
+            epic_key: taskData.epic_key || null,
+            epic_name: taskData.epic_name || null
           },
           is_active: true,
           is_completed: false
@@ -742,6 +744,8 @@ async getUserTasks(userId, filters = {}) {
       story_points: session.workflow_metadata?.story_points || null,
       sprint: session.workflow_metadata?.sprint || null,
       labels: session.workflow_metadata?.labels || [],
+      epic_key: session.workflow_metadata?.epic_key || null,
+      epic_name: session.workflow_metadata?.epic_name || null,
       workflow_metadata: session.workflow_metadata // Keep for filter checks
     }));
 
@@ -839,7 +843,9 @@ async getUserTasks(userId, filters = {}) {
       }
 
       // Update metadata fields
-      if (updates.priority || updates.description || updates.tags || updates.dueDate || updates.assignor || updates.assignee) {
+      if (updates.priority || updates.description || updates.tags || updates.dueDate || updates.assignor || updates.assignee || 
+          updates.jira_issue_type || updates.jira_status || updates.jira_priority || updates.story_points || 
+          updates.sprint || updates.labels || updates.jira_updated_at || updates.epic_key || updates.epic_name) {
         // Get current metadata first
         const { data: current, error: fetchError } = await this.supabase
           .from('conversation_sessions')
@@ -857,6 +863,17 @@ async getUserTasks(userId, filters = {}) {
         if (updates.dueDate !== undefined) metadata.due_date = updates.dueDate;
         if (updates.assignor !== undefined) metadata.assignor = updates.assignor;
         if (updates.assignee !== undefined) metadata.assignee = updates.assignee;
+        
+        // JIRA fields
+        if (updates.jira_issue_type !== undefined) metadata.jira_issue_type = updates.jira_issue_type;
+        if (updates.jira_status !== undefined) metadata.jira_status = updates.jira_status;
+        if (updates.jira_priority !== undefined) metadata.jira_priority = updates.jira_priority;
+        if (updates.story_points !== undefined) metadata.story_points = updates.story_points;
+        if (updates.sprint !== undefined) metadata.sprint = updates.sprint;
+        if (updates.labels !== undefined) metadata.labels = updates.labels;
+        if (updates.jira_updated_at !== undefined) metadata.jira_updated_at = updates.jira_updated_at;
+        if (updates.epic_key !== undefined) metadata.epic_key = updates.epic_key;
+        if (updates.epic_name !== undefined) metadata.epic_name = updates.epic_name;
         
         sessionUpdate.workflow_metadata = metadata;
       }

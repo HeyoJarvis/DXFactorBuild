@@ -1793,7 +1793,9 @@ ipcMain.handle('jira:syncTasks', async (event, options = {}) => {
           story_points: issue.story_points,
           sprint: issue.sprint,
           labels: issue.labels,
-          jira_updated_at: issue.updated_at
+          jira_updated_at: issue.updated_at,
+          epic_key: issue.epic?.key || null,
+          epic_name: issue.epic?.name || null
         };
 
         if (existingTask) {

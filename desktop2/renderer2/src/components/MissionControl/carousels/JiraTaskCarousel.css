@@ -251,6 +251,23 @@
   border: 1px solid #e9d5ff;
 }
 
+.jira-epic-badge {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #6554C0;
+  background: rgba(101, 84, 192, 0.1);
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(101, 84, 192, 0.2);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Generate Report Button on Card */
 .generate-report-card-btn {
   position: absolute;
